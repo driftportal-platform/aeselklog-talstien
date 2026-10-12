@@ -1,30 +1,24 @@
-# ÆselKlog Talstien – version 0.4
+# ÆselKlog Talstien – v0.6 med RIGTIG æsellyd
 
-Dette er en fungerende lokal webapp-prototype uden login eller server til børnenes navne og aldre.
+Den lydfil, du uploadede, er tilpasset og lagt direkte ind i appen som `donkey-bray.wav` (ca. 3,5 sekunder). Ved et forkert svar — også når CPU-æslet svarer forkert — afspiller appen den rigtige æsellyd. Appen venter, så lydklippet når at spille færdigt før brikken flytter.
 
-## Nye funktioner
-- **Begge terninger bliver kastet synligt**, også på CPU-æslets tur. CPU bruger altid digitale terninger, selv hvis spilleren har valgt fysiske terninger.
-- **Spillernes farvede æsler bevæger sig felt for felt på den digitale spilleplade**, efter at opgaven er besvaret. Både menneskers, børns og CPU-æslets brikker vises.
-- Små hopper ved almindelige træk, bonusfelter og straf. Byttefelter opdaterer begge æslers position.
-- **CPU kan svare forkert** (ca. 30 % af CPU-opgaverne) og får da ikke sit ekstra skridt. Forkert svar giver en syntetisk æsellyd.
-- Aldersopgaver fra 3 år og op, voksenopgaver med 60/30/10 sekunders tid efter sværhedsgrad. Ingen tidsgrænse for børn.
-- Dansk oplæsning fra telefonens indbyggede stemme, med stemmevalg, tempo og toneleje.
+Under **Indstil æslets stemme** kan du klikke **🫏 Prøv æsellyd** for at høre optagelsen.
 
 ## Upload til GitHub Pages
-1. Udpak ZIP-filen.
-2. Åbn dit eksisterende ÆselKlog-repository på GitHub.
-3. Upload **alle de udpakkede filer direkte til roden af repositoryet** (ikke mappen som en undermappe), og erstat de gamle filer med samme navn.
-4. Under **Settings → Pages**: vælg `Deploy from a branch`, `main`, `/ (root)`.
-5. Når GitHub Pages er opdateret, genindlæs appen på iPhone. Hvis den gamle udgave stadig vises, luk appen fra hjemmeskærmen, åbn webadressen i Safari igen og opdater siden. Serviceworkerens cache har nyt versionsnummer.
 
-## Brug
-- Vælg spillere, børnenes alder eller `Voksen (18+)` og eventuel voksensværhedsgrad.
-- Vælg `Spil også mod Æslet` for CPU.
-- Ved digital terning trykkes der på terningen på kortlignende fuldskærm. CPU kaster automatisk, men animationen vises.
-- Hvis opgaven er slået med læringsterningen, besvares den, inden brikken flyttes. Ved fysiske terninger indtastes resultatet i appen.
-- Den animerede bane viser alle fem niveauer fra 1 til 100. Talstien kan stadig bruges sammen med den fysiske A3-plade.
+Udpak ZIP-filen. Upload **alle** disse filer til roden af dit eksisterende ÆselKlog-repository på GitHub (erstat de eksisterende med samme navn):
 
-## Filer
-`index.html`, `app.js`, `engine.js`, `icon.svg`, `manifest.webmanifest`, `sw.js`, `aeselklog-card.webp`, `donkey-bray.wav`.
+- `index.html`, `app.js`, `engine.js`, `sw.js`
+- `donkey-bray.wav`, `aeselklog-card.webp`, `icon.svg`, `manifest.webmanifest`
 
-**Bemærk:** Dette er fortsat en prototype, ikke en udgivet App Store-app. Dansk oplæsning og æsellyd bør også prøves på din egen iPhone. CPU'ens svar er tilfældigt simuleret og er ikke en online AI-model.
+Ingen ekstra tjenester er nødvendige for den rigtige æsellyd. Filerne kan også bruges offline efter, at siden er blevet indlæst og gemt i appens cache.
+
+**VIGTIGT:** Hvis du stadig hører den gamle lyd på iPhone, kan det skyldes appens cache. Luk ÆselKlog helt, genåbn og opdater siden. Den nye version vises som `PRØVEVERSION 0.6` øverst.
+
+## Hvad med Mia-stemmen?
+
+Denne opdatering ændrer **kun æsellyden**. Den mere naturlige danske AI-oplæsningsstemme kræver fortsat, at ElevenLabs og Cloudflare forbindes som beskrevet i v0.5. Telefonens stemme er fallback.
+
+## Rettigheder
+
+Før spillet eller appen sælges eller offentliggøres som et kommercielt produkt, skal brugsvilkår/licens for det uploadede æselklip være afklaret. Du skal have lov til at bruge og videredistribuere lydfilen.

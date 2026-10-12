@@ -1,4 +1,4 @@
-const CACHE='aeselklog-talstien-v04';
+const CACHE='aeselklog-talstien-v06-true-bray';
 const CORE=['./','./index.html','./app.js','./engine.js','./manifest.webmanifest','./icon.svg','./aeselklog-card.webp','./donkey-bray.wav'];
 self.addEventListener('install',ev=>ev.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',ev=>ev.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));

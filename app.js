@@ -1,4 +1,4 @@
-/* ÆselKlog Talstien v0.4: lokal, mobilvenlig spilleleder. */
+/* ÆselKlog Talstien v0.5: valgfri AI-stemme med sikker serverproxy. */
 (()=>{'use strict';
 const $=id=>document.getElementById(id);
 const qs=sel=>document.querySelector(sel);
@@ -12,15 +12,19 @@ const LEARN_DIE=['1 2 3','L / U','10 + 1','👑','> <','+ −'];
 const rand=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
 const radio=name=>qs(`input[name="${name}"]:checked`)?.value;
 const defer=(ms)=>new Promise(ok=>setTimeout(ok,ms));
-const sound={on:true,last:'',selected:'auto',rate:1,pitch:1};
-const voiceKey='aeselklog-voice-v02';
+const sound={on:true,last:'',selected:'auto',rate:1,pitch:1,mode:'device',endpoint:''};
+const voiceKey='aeselklog-voice-v03';
 let setupPlayers=[{name:'Spiller 1',age:6,kind:'child',difficulty:'mellem'},{name:'Spiller 2',age:8,kind:'child',difficulty:'mellem'}];
 let players=[],config=null,turn=0,phase='setup',challenge=null,pending=null,resultLines=[],winner=null;
 let busy=false,gameToken=0,showDiceState=null,taskTimer=null,taskDeadline=0;
 const prefersLessMotion=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 let bray=null;
-try{bray=new Audio('./donkey-bray.wav');bray.preload='auto';bray.volume=.85;}catch(e){}
+try{bray=new Audio('./donkey-bray.wav');bray.preload='auto';bray.volume=.78;}catch(e){}
 
+// AI-tale kræver HTTPS-stemmetjeneste. API-nøglen findes ALDRIG på telefonen.
+let speechSerial=0,aiFetch=null,aiSource=null,aiHtmlAudio=null,audioContext=null;
+const speechCache=new Map();
+function normalizedSpeech(text){return String(text).replace(/ÆselKlog/g,'Æsel Klog').replace(/Hov hov!/g,'Hov, hov!').trim().slice(0,350)}
 function voiceOptions(){return ('speechSynthesis' in window)?window.speechSynthesis.getVoices():[]}
 function danishVoices(){return voiceOptions().filter(v=>String(v.lang||'').toLowerCase().startsWith('da'))}
 function refreshVoice(){
@@ -34,37 +38,128 @@ function syncVoiceControls(){
  $('voiceSpeed').value=sound.rate.toFixed(2);$('voicePitch').value=sound.pitch.toFixed(2);
  $('voiceSpeedValue').textContent=sound.rate.toFixed(2).replace('.',',')+'×';
  $('voicePitchValue').textContent=sound.pitch.toFixed(2).replace('.',',')+'×';
+ $('voiceMode').value=sound.mode;
+ $('aiEndpoint').value=sound.endpoint;
+ $('aiVoiceControls').hidden=sound.mode!=='ai';
+ $('deviceVoiceControls').hidden=sound.mode==='ai';
+ $('voiceAvailability').hidden=sound.mode==='ai';
+ aiStatus();
 }
-function saveVoice(){try{localStorage.setItem(voiceKey,JSON.stringify({selected:sound.selected,rate:sound.rate,pitch:sound.pitch}))}catch(e){}}
+function aiStatus(message){
+ const msg=message||(sound.endpoint?'Klar til at prøve den tilsluttede AI-stemme.':'Ingen stemmetjeneste angivet endnu – telefonstemmen bruges som reserve.');
+ $('aiVoiceStatus').textContent=msg;
+}
+function validEndpoint(value){
+ try{const u=new URL(value);return u.protocol==='https:'&&!u.username&&!u.password&&u.pathname.endsWith('/tts')?u.href:null}catch(e){return null}
+}
+function saveVoice(){
+ try{localStorage.setItem(voiceKey,JSON.stringify({selected:sound.selected,rate:sound.rate,pitch:sound.pitch,mode:sound.mode,endpoint:sound.endpoint}))}catch(e){}
+}
+function stopCurrentVoice(){
+ speechSerial++;
+ if(aiFetch){aiFetch.abort();aiFetch=null}
+ if(aiSource){try{aiSource.stop()}catch(e){}aiSource.disconnect();aiSource=null}
+ if(aiHtmlAudio){aiHtmlAudio.pause();if(aiHtmlAudio._blobUrl)URL.revokeObjectURL(aiHtmlAudio._blobUrl);aiHtmlAudio.src='';aiHtmlAudio=null}
+ try{window.speechSynthesis?.cancel?.()}catch(e){}
+}
+function speakLocally(text){
+ if(!('speechSynthesis' in window)||!sound.on)return;
+ try{
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(normalizedSpeech(text));
+  u.lang='da-DK';u.rate=sound.rate;u.pitch=sound.pitch;
+  const ds=danishVoices();u.voice=ds.find(v=>(v.voiceURI||v.name)===sound.selected)||ds.find(v=>/premium|enhanced/i.test(v.name))||ds.find(v=>v.default)||ds[0]||null;
+  speechSynthesis.speak(u);
+ }catch(e){console.warn('Lokal oplæsning kunne ikke starte',e)}
+}
+function ensureAudioContext(){
+ const C=window.AudioContext||window.webkitAudioContext;
+ if(!C)return null;
+ if(!audioContext)audioContext=new C();
+ if(audioContext.state==='suspended')audioContext.resume().catch(()=>{});
+ return audioContext;
+}
+// iOS tillader pålideligt Web Audio efter en brugerhandling (tryk på spil/terning).
+document.addEventListener('pointerdown',()=>{if(sound.on&&sound.mode==='ai')ensureAudioContext()}, {passive:true});
+document.addEventListener('keydown',()=>{if(sound.on&&sound.mode==='ai')ensureAudioContext()}, {passive:true});
+async function speakAI(text,id){
+ const endpoint=validEndpoint(sound.endpoint);
+ if(!endpoint){aiStatus('Manglende eller ugyldig HTTPS-adresse. Afspiller telefonstemmen.');speakLocally(text);return}
+ let bytes;
+ const key=endpoint+'|'+text;
+ try{
+  if(speechCache.has(key))bytes=speechCache.get(key);
+  else{
+   const abort=new AbortController();aiFetch=abort;
+   const timeout=setTimeout(()=>abort.abort(),13000);
+   let response;
+   try{response=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text}),signal:abort.signal,cache:'no-store'});
+   if(!response.ok)throw new Error(`HTTP ${response.status}`);
+   if(!String(response.headers.get('Content-Type')||'').includes('audio/'))throw new Error('Svaret indeholdt ikke lyd');
+   bytes=await response.arrayBuffer();}
+   finally{clearTimeout(timeout)}
+   if(bytes.byteLength<500||bytes.byteLength>2_500_000)throw new Error('Lydfilens størrelse var ugyldig');
+   if(id===speechSerial){speechCache.set(key,bytes);if(speechCache.size>24)speechCache.delete(speechCache.keys().next().value)}
+  }
+  if(id!==speechSerial||!sound.on)return;
+  const ctx=ensureAudioContext();
+  if(ctx){
+   if(ctx.state==='suspended')await ctx.resume();
+   const decoded=await ctx.decodeAudioData(bytes.slice(0));
+   if(id!==speechSerial||!sound.on)return;
+   const node=ctx.createBufferSource();node.buffer=decoded;node.connect(ctx.destination);aiSource=node;
+   node.onended=()=>{if(aiSource===node)aiSource=null};node.start();
+  }else{
+   const blob=new Blob([bytes],{type:'audio/mpeg'});
+   const objectUrl=URL.createObjectURL(blob);
+   const audio=new Audio(objectUrl);audio._blobUrl=objectUrl;aiHtmlAudio=audio;
+   audio.onended=()=>{URL.revokeObjectURL(objectUrl);if(aiHtmlAudio===audio)aiHtmlAudio=null};
+   try{await audio.play()}catch(err){URL.revokeObjectURL(objectUrl);throw err}
+  }
+  if(id===speechSerial)aiStatus('Dansk AI-lyd afspilles.');
+ }catch(e){
+  if(id!==speechSerial||e.name==='AbortError')return;
+  console.warn('Kunne ikke hente AI-lyd',e);
+  aiStatus('AI-lyden kunne ikke hentes ('+e.message+'). Telefonstemmen bruges i stedet.');
+  speakLocally(text);
+ }finally{if(id===speechSerial)aiFetch=null}
+}
 function say(text){
  sound.last=text;
- if(!sound.on||!('speechSynthesis' in window))return;
- try{
-   speechSynthesis.cancel();
-   const u=new SpeechSynthesisUtterance(String(text).replace(/ÆselKlog/g,'Æsel Klog').replace(/Hov hov!/g,'Hov, hov!'));
-   u.lang='da-DK';u.rate=sound.rate;u.pitch=sound.pitch;
-   const ds=danishVoices();u.voice=ds.find(v=>(v.voiceURI||v.name)===sound.selected)||ds.find(v=>/premium|enhanced/i.test(v.name))||ds.find(v=>v.default)||ds[0]||null;
-   speechSynthesis.speak(u);
- }catch(e){console.warn('Oplæsning kunne ikke starte',e)}
+ stopCurrentVoice();
+ if(!sound.on)return;
+ const t=normalizedSpeech(text),id=speechSerial;
+ if(sound.mode==='ai')void speakAI(t,id);
+ else speakLocally(t);
 }
 function playBray(){
  if(!sound.on||!bray)return;
- try{if('speechSynthesis' in window)speechSynthesis.cancel();bray.pause();bray.currentTime=0;bray.play().catch(()=>{});}catch(e){}
+ stopCurrentVoice();
+ try{bray.pause();bray.currentTime=0;bray.play().catch(()=>{})}catch(e){}
 }
 function loadVoice(){
- try{const p=JSON.parse(localStorage.getItem(voiceKey)||'{}');if(typeof p.selected==='string')sound.selected=p.selected;
-  if(p.rate>=.8&&p.rate<=1.15)sound.rate=Number(p.rate);if(p.pitch>=.85&&p.pitch<=1.2)sound.pitch=Number(p.pitch);}catch(e){}
+ try{
+  // Behold brugerens tidligere lokale taleindstillinger.
+  const p=JSON.parse(localStorage.getItem(voiceKey)||localStorage.getItem('aeselklog-voice-v02')||'{}');
+  if(typeof p.selected==='string')sound.selected=p.selected;
+  if(p.rate>=.8&&p.rate<=1.15)sound.rate=Number(p.rate);
+  if(p.pitch>=.85&&p.pitch<=1.2)sound.pitch=Number(p.pitch);
+  if(p.mode==='ai'||p.mode==='device')sound.mode=p.mode;
+  if(typeof p.endpoint==='string')sound.endpoint=p.endpoint.trim();
+ }catch(e){}
  syncVoiceControls();refreshVoice();
 }
 loadVoice();
 window.speechSynthesis?.addEventListener?.('voiceschanged',refreshVoice);
 $('voiceSettings').addEventListener('toggle',()=>{if($('voiceSettings').open)refreshVoice()});
+$('voiceMode').addEventListener('change',e=>{stopCurrentVoice();sound.mode=e.target.value;syncVoiceControls();saveVoice();if(sound.mode==='device')say('Hov hov! Nu bruger jeg telefonens stemme.')});
+$('aiEndpoint').addEventListener('change',e=>{sound.endpoint=e.target.value.trim();stopCurrentVoice();saveVoice();aiStatus()});
 $('voiceChoice').addEventListener('change',e=>{sound.selected=e.target.value;saveVoice();say('Hov hov! Jeg glæder mig til at lege med tallene!')});
 $('voiceSpeed').addEventListener('input',e=>{sound.rate=Number(e.target.value);syncVoiceControls();saveVoice()});
 $('voicePitch').addEventListener('input',e=>{sound.pitch=Number(e.target.value);syncVoiceControls();saveVoice()});
-$('voicePreview').addEventListener('click',()=>say('Hov hov! Du står på syvogtyve. Er fireogtredive større eller mindre end syvogtyve?'));
+$('voicePreview').addEventListener('click',()=>{sound.endpoint=$('aiEndpoint').value.trim();saveVoice();say('Hov hov! Du står på syvogtyve. Er fireogtredive større eller mindre end syvogtyve?')});
 $('brayPreview').addEventListener('click',playBray);
-$('voiceToggle').addEventListener('click',()=>{sound.on=!sound.on;$('voiceToggle').textContent=sound.on?'🔊 Lyd til':'🔇 Lyd fra';$('voiceToggle').setAttribute('aria-pressed',String(sound.on));if(sound.on)say('Hov hov! Nu kan du høre mig!');else {window.speechSynthesis?.cancel?.();bray?.pause();}});
+$('voiceToggle').addEventListener('click',()=>{sound.on=!sound.on;$('voiceToggle').textContent=sound.on?'🔊 Lyd til':'🔇 Lyd fra';$('voiceToggle').setAttribute('aria-pressed',String(sound.on));if(sound.on)say('Hov hov! Nu kan du høre mig!');else {stopCurrentVoice();bray?.pause()}});
 $('testVoice').addEventListener('click',()=>say('Hov hov! Jeg er ÆselKlog, og jeg glæder mig til at spille med jer!'));
 $('speakAgain').addEventListener('click',()=>say(sound.last||'Hov hov! Nu er det din tur.'));
 
@@ -91,7 +186,7 @@ function renderSetupPlayers(){
 renderSetupPlayers();
 $('addPlayer').addEventListener('click',()=>{if(setupPlayers.length<4){setupPlayers.push({name:`Spiller ${setupPlayers.length+1}`,age:7,kind:'child',difficulty:'mellem'});renderSetupPlayers()}});
 function show(view){['setup','game'].forEach(id=>$(id).classList.toggle('active',view===id));window.scrollTo({top:0,behavior:'instant'})}
-function resetAsync(){gameToken++;clearInterval(taskTimer);taskTimer=null;busy=false;showDiceState=null;hideDice();if('speechSynthesis' in window)speechSynthesis.cancel();bray?.pause();}
+function resetAsync(){gameToken++;clearInterval(taskTimer);taskTimer=null;busy=false;showDiceState=null;hideDice();stopCurrentVoice();bray?.pause();}
 $('startButton').addEventListener('click',()=>{
  resetAsync();
  const raw=$('range').value,all=raw==='1-100';
@@ -277,7 +372,7 @@ function processAnswer(idx,timedOut=false){
  resultLines.push(correct?'✅ Rigtigt svar: +1 felt.':timedOut?'⏱️ Tiden gik! Intet ekstra felt.':'🫏 Forkert svar: intet ekstra felt.');
  phase='feedback';render();if(!correct)playBray();else say(`${p.name}, det er rigtigt. Godt klaret!`);
  const g=gameToken;
- setTimeout(()=>{if(g===gameToken&&phase==='feedback')finishActionWithMovement()},correct?1000:2300);
+ setTimeout(()=>{if(g===gameToken&&phase==='feedback')finishActionWithMovement()},correct?1000:(sound.on?3550:850));
 }
 function skipChallenge(){if(phase!=='learn')return;pending.skip=true;pending.correct=false;resultLines.push('Opgaven blev sprunget over.');finishActionWithMovement()}
 async function hopSteps(p,to,speed=245){
