@@ -1,4 +1,4 @@
-/* ÆselKlog Talstien v0.5: valgfri AI-stemme med sikker serverproxy. */
+/* ÆselKlog Talstien v0.7: Mia via ElevenLabs Text-to-Dialogue, Cloudflare proxy. */
 (()=>{'use strict';
 const $=id=>document.getElementById(id);
 const qs=sel=>document.querySelector(sel);
@@ -91,7 +91,7 @@ async function speakAI(text,id){
   if(speechCache.has(key))bytes=speechCache.get(key);
   else{
    const abort=new AbortController();aiFetch=abort;
-   const timeout=setTimeout(()=>abort.abort(),13000);
+   const timeout=setTimeout(()=>abort.abort(),25000);
    let response;
    try{response=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text}),signal:abort.signal,cache:'no-store'});
    if(!response.ok)throw new Error(`HTTP ${response.status}`);

@@ -91,14 +91,14 @@
 <div class="shell">
   <header class="top">
     <div class="brand"><div class="logo" aria-hidden="true">🫏</div><div><h1>Æsel<span class="red">Klog</span> · Talstien</h1><small>Spil, lær og grin sammen</small></div></div>
-    <div class="top-actions"><span class="pill">PRØVEVERSION 0.6</span><button id="voiceToggle" class="btn soft small" type="button" aria-pressed="true">🔊 Lyd til</button></div>
+    <div class="top-actions"><span class="pill">PRØVEVERSION 0.7</span><button id="voiceToggle" class="btn soft small" type="button" aria-pressed="true">🔊 Lyd til</button></div>
   </header>
 
   <details class="voice-settings" id="voiceSettings">
     <summary>🎙️ Indstil æslets stemme <span class="settings-hint">Telefonstemme eller naturlig AI-stemme</span></summary>
     <div class="voice-settings-body">
       <div class="field"><label for="voiceMode">Sådan skal Æslet tale</label>
-        <select id="voiceMode"><option value="device">Telefonens stemme · Gratis og offline</option><option value="ai">AI-stemme · Naturlig dansk tale (kræver tilslutning)</option></select>
+        <select id="voiceMode"><option value="device">Telefonens stemme · Gratis og offline</option><option value="ai">AI-stemme · ElevenLabs (kræver Cloudflare-forbindelse)</option></select>
       </div>
       <div class="grid3" id="deviceVoiceControls">
         <div class="field"><label for="voiceChoice">Dansk stemme på din enhed</label>
@@ -115,7 +115,7 @@
         <div class="field"><label for="aiEndpoint">Adresse til ÆselKlogs sikre AI-stemmetjeneste</label>
           <input type="url" id="aiEndpoint" placeholder="https://aeselklog-voice.…workers.dev/tts" autocomplete="off" spellcheck="false" inputmode="url">
         </div>
-        <p class="tiny">Appen kræver en særskilt Cloudflare Worker og en dansk AI-stemme hos ElevenLabs. <strong>Ingen API-nøgler må sættes ind her eller uploades til GitHub.</strong> Indtalingen er AI-genereret, og teksten sendes til den valgte stemmetjeneste. Brug helst kaldenavne, ikke fulde børnenavne.</p>
+        <p class="tiny">For at høre Mia oprette du én gang ÆselKlogs stemmetjeneste hos Cloudflare og indtaster dens HTTPS-adresse her. <strong>Ingen API-nøgler må sættes ind her eller uploades til GitHub.</strong> Indtalingen er AI-genereret, og teksten sendes til den valgte stemmetjeneste. Brug helst kaldenavne, ikke fulde børnenavne.</p>
         <p class="tiny" id="aiVoiceStatus" role="status">AI-stemme ikke tilsluttet endnu.</p>
       </div>
       <div class="row between">
@@ -153,7 +153,7 @@
   </section>
   </main>
 
-  <footer><strong>ÆselKlog · v0.5 · AI-stemme som tilvalg, farvede æsler og CPU-terninger</strong><br>Den almindelige kortspilsvariant udvikles særskilt. Denne prøve handler om Talstien og læringsopgaverne.<div class="footer-links"><button type="button" class="btn soft small" id="testVoice">🔊 Prøv æslets stemme</button></div></footer>
+  <footer><strong>ÆselKlog · v0.7 · ElevenLabs-stemme, æsellyd og CPU-spil</strong><br>Den almindelige kortspilsvariant udvikles særskilt. Denne prøve handler om Talstien og læringsopgaverne.<div class="footer-links"><button type="button" class="btn soft small" id="testVoice">🔊 Prøv æslets stemme</button></div></footer>
 </div>
 
 <div id="diceOverlay" class="dice-overlay" hidden role="dialog" aria-modal="true" aria-label="Terningeskærm">

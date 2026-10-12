@@ -1,24 +1,20 @@
-# ÆselKlog Talstien – v0.6 med RIGTIG æsellyd
+# ÆselKlog Talstien – v0.7 med ElevenLabs Mia
 
-Den lydfil, du uploadede, er tilpasset og lagt direkte ind i appen som `donkey-bray.wav` (ca. 3,5 sekunder). Ved et forkert svar — også når CPU-æslet svarer forkert — afspiller appen den rigtige æsellyd. Appen venter, så lydklippet når at spille færdigt før brikken flytter.
+## Funktioner
+Denne version viderefører v0.6, herunder fysisk/digital terning, farvede æselbrikker, CPU-modstander med terningkast, opgaver fra 3 år til voksen, voksentimer og den **ægte æsellyd** ved forkerte svar.
 
-Under **Indstil æslets stemme** kan du klikke **🫏 Prøv æsellyd** for at høre optagelsen.
+## Nyt
+- AI-stemmeindstillingen er klar til **ElevenLabs Eleven v4** via en lille sikker Cloudflare Worker (se separat ZIP).
+- Forlænget ventetid på genereret AI-tale til 25 sekunder, fordi Eleven v4 kan bruge lidt længere tid.
+- Opdateret visning og ny cacheversion v0.7.
+- De gamle talestemmeindstillinger fra v0.6 bevares, herunder din valgte stemmetjeneste-URL.
 
-## Upload til GitHub Pages
+## Upload til GitHub
+Udpak og upload alle otte appfiler fra denne mappe direkte til roden af dit eksisterende ÆselKlog-repository:
+- `index.html`, `app.js`, `engine.js`, `sw.js`, `manifest.webmanifest`, `icon.svg`, `aeselklog-card.webp`, `donkey-bray.wav`.
+Erstat de gamle filnavne. Du må ikke uploade hemmelige API-nøgler eller Cloudflare Workerkode i denne mappe.
 
-Udpak ZIP-filen. Upload **alle** disse filer til roden af dit eksisterende ÆselKlog-repository på GitHub (erstat de eksisterende med samme navn):
+## ElevenLabs-opsætning
+Se den separate Worker-ZIP `AeselKlog_Cloudflare_ElevenLabs_Mia_v07.zip`. Appen fungerer som før uden Worker – så bruges telefonstemmen. Når Worker-adressen er indsat i stemmeindstillingerne, kan Mia læse nye opgaver højt. Der kan være forsinkelse ved første generation.
 
-- `index.html`, `app.js`, `engine.js`, `sw.js`
-- `donkey-bray.wav`, `aeselklog-card.webp`, `icon.svg`, `manifest.webmanifest`
-
-Ingen ekstra tjenester er nødvendige for den rigtige æsellyd. Filerne kan også bruges offline efter, at siden er blevet indlæst og gemt i appens cache.
-
-**VIGTIGT:** Hvis du stadig hører den gamle lyd på iPhone, kan det skyldes appens cache. Luk ÆselKlog helt, genåbn og opdater siden. Den nye version vises som `PRØVEVERSION 0.6` øverst.
-
-## Hvad med Mia-stemmen?
-
-Denne opdatering ændrer **kun æsellyden**. Den mere naturlige danske AI-oplæsningsstemme kræver fortsat, at ElevenLabs og Cloudflare forbindes som beskrevet i v0.5. Telefonens stemme er fallback.
-
-## Rettigheder
-
-Før spillet eller appen sælges eller offentliggøres som et kommercielt produkt, skal brugsvilkår/licens for det uploadede æselklip være afklaret. Du skal have lov til at bruge og videredistribuere lydfilen.
+**Status:** App og Worker er testet med simulerede server-/lydsvar, men en rigtig ElevenLabs-konto, Mia-Voice ID og API-secret er endnu ikke koblet på og er derfor ikke live-testet.
