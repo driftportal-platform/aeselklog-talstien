@@ -1,12 +1,19 @@
 {
   "name": "ÆselKlog – Talstien",
   "short_name": "ÆselKlog",
-  "description": "Talstien, spilopgaver og dansk oplæsning for hele familien.",
+  "description": "ÆselKlog Talstien: spil og lær tal fra 3 år til voksne, med æsellyd, terninger og tidsopgaver.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "background_color": "#f6f9fd",
   "theme_color": "#124075",
   "lang": "da",
-  "icons": [{"src":"./icon.svg","sizes":"any","type":"image/svg+xml","purpose":"any maskable"}]
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
 }

@@ -1,35 +1,30 @@
-# ÆselKlog – Talstien (første prøve)
+# ÆselKlog Talstien – version 0.4
 
-Dette er en **første prototype**, ikke en færdig kommerciel app.
+Dette er en fungerende lokal webapp-prototype uden login eller server til børnenes navne og aldre.
 
-## Hvad fungerer allerede?
+## Nye funktioner
+- **Begge terninger bliver kastet synligt**, også på CPU-æslets tur. CPU bruger altid digitale terninger, selv hvis spilleren har valgt fysiske terninger.
+- **Spillernes farvede æsler bevæger sig felt for felt på den digitale spilleplade**, efter at opgaven er besvaret. Både menneskers, børns og CPU-æslets brikker vises.
+- Små hopper ved almindelige træk, bonusfelter og straf. Byttefelter opdaterer begge æslers position.
+- **CPU kan svare forkert** (ca. 30 % af CPU-opgaverne) og får da ikke sit ekstra skridt. Forkert svar giver en syntetisk æsellyd.
+- Aldersopgaver fra 3 år og op, voksenopgaver med 60/30/10 sekunders tid efter sværhedsgrad. Ingen tidsgrænse for børn.
+- Dansk oplæsning fra telefonens indbyggede stemme, med stemmevalg, tempo og toneleje.
 
-- 1–4 spillere med kaldenavn og alder 5–14 år
-- Tilføj Æslet som computerstyret modstander
-- Spil hele Talstien 1–100 eller ét talområde ad gangen
-- Almindelig terning og læringsterning, både virtuelt og med fysisk slag indtastet i appen
-- Dansk tekst-til-tale gennem enhedens egne stemmer (afhænger af browser og stemmer)
-- De seks opgavetyper: før/efter, lige/ulige, tiere/enere, primtal, større/mindre, plus/minus
-- Automatisk spørgsmål og svarmuligheder – med bonus for korrekt svar
-- Specialfelter: Bonus, Hov hov, Byt og Talmester
-- Digital spilleplade med synlig position; kan også bruges ved siden af en fysisk A3-plade
-- Kan fungere uden internet **efter første besøg**, når den hostes på HTTPS med service worker
+## Upload til GitHub Pages
+1. Udpak ZIP-filen.
+2. Åbn dit eksisterende ÆselKlog-repository på GitHub.
+3. Upload **alle de udpakkede filer direkte til roden af repositoryet** (ikke mappen som en undermappe), og erstat de gamle filer med samme navn.
+4. Under **Settings → Pages**: vælg `Deploy from a branch`, `main`, `/ (root)`.
+5. Når GitHub Pages er opdateret, genindlæs appen på iPhone. Hvis den gamle udgave stadig vises, luk appen fra hjemmeskærmen, åbn webadressen i Safari igen og opdater siden. Serviceworkerens cache har nyt versionsnummer.
 
-## Sådan prøver du den
+## Brug
+- Vælg spillere, børnenes alder eller `Voksen (18+)` og eventuel voksensværhedsgrad.
+- Vælg `Spil også mod Æslet` for CPU.
+- Ved digital terning trykkes der på terningen på kortlignende fuldskærm. CPU kaster automatisk, men animationen vises.
+- Hvis opgaven er slået med læringsterningen, besvares den, inden brikken flyttes. Ved fysiske terninger indtastes resultatet i appen.
+- Den animerede bane viser alle fem niveauer fra 1 til 100. Talstien kan stadig bruges sammen med den fysiske A3-plade.
 
-**På computer:** Åbn `index.html` i en moderne browser.
+## Filer
+`index.html`, `app.js`, `engine.js`, `icon.svg`, `manifest.webmanifest`, `sw.js`, `aeselklog-card.webp`, `donkey-bray.wav`.
 
-**På mobil:** Upload hele mappen til en webserver (f.eks. Cloudflare Pages eller GitHub Pages med HTTPS). Åbn linket på mobilen, og vælg **Del > Føj til hjemmeskærm** på iPhone.
-
-Dansk oplæsning kræver, at enheden har en egnet stemme. På nogle enheder skal en knap trykkes, før oplæsning må starte.
-
-## Ting der skal udvikles før en rigtig lancering
-
-- Brugertest med børn, pædagoger og forældre; finpudsning af spørgsmål og pointbalance
-- Gem/fortsæt spil på enheden, eventuelt profiler uden persondata
-- Egen professionel æselgrafik, lyd og animation
-- Særlige opgaver for de fem niveauer og specialfelter
-- Grundig test på Safari iOS og Android samt tilgængelighed
-- Produktionstest og vurdering af privatliv og sikkerhed for børn
-
-Der bruges ingen eksterne biblioteker, ingen konto og ingen dataoverførsel fra spillet til en server.
+**Bemærk:** Dette er fortsat en prototype, ikke en udgivet App Store-app. Dansk oplæsning og æsellyd bør også prøves på din egen iPhone. CPU'ens svar er tilfældigt simuleret og er ikke en online AI-model.

@@ -1,5 +1,7 @@
-const CACHE = 'aeselklog-talstien-v01';
-const CORE = ['./','./index.html','./manifest.webmanifest','./icon.svg'];
-self.addEventListener('install',e=>{e.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting()));});
-self.addEventListener('activate',e=>{e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim()));});
-self.addEventListener('fetch',e=>{if(e.request.method!=='GET'||new URL(e.request.url).origin!==self.location.origin)return;e.respondWith(caches.match(e.request).then(cached=>cached||fetch(e.request)));});
+const CACHE='aeselklog-talstien-v04';
+const CORE=['./','./index.html','./app.js','./engine.js','./manifest.webmanifest','./icon.svg','./aeselklog-card.webp','./donkey-bray.wav'];
+self.addEventListener('install',ev=>ev.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting())));
+self.addEventListener('activate',ev=>ev.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
+self.addEventListener('fetch',ev=>{if(ev.request.method!=='GET'||new URL(ev.request.url).origin!==location.origin)return;
+ ev.respondWith(fetch(ev.request).then(response=>{const copy=response.clone();if(response.ok)caches.open(CACHE).then(c=>c.put(ev.request,copy)).catch(()=>{});return response;}).catch(()=>caches.match(ev.request)));
+});
