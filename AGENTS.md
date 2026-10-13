@@ -24,4 +24,4 @@ Dette repository er et familie-/læringsspil. **Læs altid `UDVIKLINGSPLAN.md` f
 - Matematik er **altid valgfri**. Spillet skal kunne spilles for sjov uden opgaver.
 - Kort- og brætdesign skal være originalt; tallene er vigtigere end dekorationer.
 - Appen bør fungere på iPhone, iPad, Android og desktop, både ved fysiske og digitale terninger.
-- Den aktuelle arbejdsleverance er **v0.8-A**. Den samlede v0.8 er ikke færdig, indtil statusfilen dokumenterer det.
+- Den aktuelle arbejdsleverance er **v0.8-B** (udviklet; ikke automatisk uploadet til GitHub). Næste fase er **v0.8-C**, med flere actionfelter. Den samlede v0.8 er ikke færdig, indtil statusfilen dokumenterer det.

@@ -1,4 +1,4 @@
-/* ÆselKlog Talstien v0.8-A: SVG-bane fra board.js, bevaret v0.7-motor og Mia. */
+/* ÆselKlog Talstien v0.8-B: fuldskærmsbane og sekventielt kast → hop → læring → bonus → action. */
 (()=>{'use strict';
 const $=id=>document.getElementById(id);
 const qs=sel=>document.querySelector(sel);
@@ -20,7 +20,7 @@ let setupPlayers=[{name:'Spiller 1',age:6,kind:'child',difficulty:'mellem'},{nam
 let players=[],config=null,turn=0,phase='setup',challenge=null,pending=null,resultLines=[],winner=null;
 let busy=false,gameToken=0,showDiceState=null,taskTimer=null,taskDeadline=0;
 const prefersLessMotion=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
-let boardScale=0.73,followActive=true,boardExpanded=false;
+let boardScale=0.73,followActive=true,boardExpanded=false,boardFitMode=false;
 let bray=null;
 try{bray=new Audio('./donkey-bray.wav');bray.preload='auto';bray.volume=.78;}catch(e){}
 
@@ -200,7 +200,7 @@ $('startButton').addEventListener('click',()=>{
  turn=0;phase='move';challenge=null;pending=null;resultLines=[];winner=null;
  $('rangeTitle').textContent=all?'Hele Talstien · 1–100':`Talområde ${raw}`;
  $('boardModeLabel').textContent=config.boardMode==='physical'?'Fysisk bræt + app-overblik':'Digital spilleplade';
- show('game');buildBoard();render();requestAnimationFrame(()=>scrollToTile(players[turn].pos,true));say(`Hov hov! Velkommen til Talstien. ${players[turn].name} starter!`);
+ show('game');buildBoard();render();setBoardExpanded(true);say(`Hov hov! Velkommen til Talstien. ${players[turn].name} starter!`);
 });
 $('newGame').addEventListener('click',()=>{if(window.confirm('Vil I afslutte spillet og starte forfra?')){resetAsync();phase='setup';show('setup')}});
 $('editPos').addEventListener('click',()=>{
@@ -215,34 +215,49 @@ function donkeySvg(color){
  return `<svg viewBox="0 0 64 64" class="donkey-svg" aria-hidden="true"><g stroke="#273449" stroke-width="3" stroke-linejoin="round"><path d="M12 25 7 5Q6 1 11 2L25 18M40 18 52 2Q57-1 56 6L51 25" fill="${color}"/><path d="M12 7 19 20 17 23 10 7M47 20 53 7 46 23" fill="#f5b7a9" stroke-width="1"/><path d="M10 31Q9 18 21 17L26 13 29 17 32 13 36 18Q56 14 56 36Q54 58 33 58Q10 57 10 31Z" fill="${color}"/><path d="M16 42Q16 35 32 36Q50 35 50 43Q50 57 33 57Q15 57 16 42Z" fill="#ffebdb"/><path d="M27 46Q24 43 22 48M40 46Q43 43 45 48" fill="none" stroke="#79574d" stroke-width="2"/><circle cx="23" cy="31" r="3.4" fill="#fff"/><circle cx="42" cy="31" r="3.4" fill="#fff"/><circle cx="23.6" cy="31.2" r="1.9" fill="#172c41" stroke="none"/><circle cx="41.5" cy="31.2" r="1.9" fill="#172c41" stroke="none"/><path d="M27 49Q32 53 38 49" fill="none" stroke="#673b36" stroke-width="2"/></g></svg>`;
 }
 // v0.8-A: En præcist optegnet, responsiv SVG-bane med 100 numre.
+function boardPadding(){
+ const b=$('board'),css=getComputedStyle(b);
+ return {left:parseFloat(css.paddingLeft)||0,top:parseFloat(css.paddingTop)||0};
+}
 function buildBoard(){
- const board=$('board');board.innerHTML=B.render(SPECIAL);
- const sc=$('boardScroll');
- const initial= sc.clientWidth>=900?.73:sc.clientWidth>=600?.72:.78;
- setBoardZoom(initial,{preserve:false});
+ $('board').innerHTML=B.render(SPECIAL);
+ setBoardZoom($('boardScroll').clientWidth>=700?.72:.68,{preserve:false});
  followActive=true;
  requestAnimationFrame(()=>scrollToTile(players[turn]?.pos??config.start,true));
 }
 function setBoardZoom(value,{preserve=true}={}){
  const sc=$('boardScroll'),svg=$('boardSvg');if(!svg||!sc)return;
- const s=boardScale;
- const midX=(sc.scrollLeft+sc.clientWidth/2)/s;
- const midY=(sc.scrollTop+sc.clientHeight/2)/s;
- boardScale=Math.max(.22,Math.min(1.65,value));
+ const old=boardPadding(),oldScale=boardScale;
+ const worldX=(sc.scrollLeft+sc.clientWidth/2-old.left)/oldScale;
+ const worldY=(sc.scrollTop+sc.clientHeight/2-old.top)/oldScale;
+ boardScale=Math.max(.18,Math.min(2.2,value));
  svg.style.width=(B.WIDTH*boardScale)+'px';
  svg.style.height=(B.HEIGHT*boardScale)+'px';
  $('boardZoomValue').textContent=Math.round(boardScale*100)+' %';
- if(preserve){sc.scrollLeft=midX*boardScale-sc.clientWidth/2;sc.scrollTop=midY*boardScale-sc.clientHeight/2;}
+ if(preserve){const pad=boardPadding();sc.scrollLeft=worldX*boardScale+pad.left-sc.clientWidth/2;sc.scrollTop=worldY*boardScale+pad.top-sc.clientHeight/2;}
 }
 function scrollToTile(n,force=false){
  if(!followActive&&!force)return;
  const sc=$('boardScroll');if(!sc)return;
- const p=B.position(Math.max(0,Math.min(100,n)));
- sc.scrollTo({left:Math.max(0,p.x*boardScale-sc.clientWidth/2),top:Math.max(0,p.y*boardScale-sc.clientHeight/2),behavior:prefersLessMotion?'instant':'smooth'});
+ const p=B.position(Math.max(0,Math.min(100,n))),pad=boardPadding();
+ // Hold aktivt æsel på venstre side, når opgavekortet dækker højre side.
+ const panelWidth=boardExpanded&&!boardFitMode?$('boardPanelDock').getBoundingClientRect().width:0;
+ const visibleCenterX=boardExpanded&&!boardFitMode?(sc.clientWidth-panelWidth)/2:sc.clientWidth/2;
+ sc.scrollTo({left:Math.max(0,p.x*boardScale+pad.left-visibleCenterX),
+   top:Math.max(0,p.y*boardScale+pad.top-sc.clientHeight/2),
+   behavior:prefersLessMotion?'instant':'smooth'});
+}
+function coverBoard(){
+ const sc=$('boardScroll');if(!sc)return;
+ boardFitMode=false;$('boardBox').classList.remove('fit-view');followActive=true;
+ // Beskær hellere lidt af verdenskanterne end at efterlade brede tomme striber.
+ const cover=Math.max(sc.clientWidth/B.WIDTH,sc.clientHeight/B.HEIGHT);
+ setBoardZoom(Math.max(.4,cover*1.045),{preserve:false});
+ requestAnimationFrame(()=>scrollToTile(players[turn]?.pos??config.start,true));
 }
 function fitBoard(){
  const sc=$('boardScroll');if(!sc)return;
- followActive=false;
+ followActive=false;boardFitMode=true;$('boardBox').classList.add('fit-view');
  const fit=Math.min((sc.clientWidth-6)/B.WIDTH,(sc.clientHeight-6)/B.HEIGHT);
  setBoardZoom(fit,{preserve:false});
  sc.scrollTo({left:0,top:0,behavior:'instant'});
@@ -254,17 +269,33 @@ function setBoardExpanded(expanded){
  $('boardExpand').hidden=expanded;
  $('boardClose').hidden=!expanded;
  $('boardExpand').setAttribute('aria-expanded',String(expanded));
- if(expanded){
-  followActive=true;
-  requestAnimationFrame(()=>scrollToTile(players[turn]?.pos??config.start,true));
- }
+ // Behold den eksisterende opgave-komponent og alle dens event listeners.
+ (expanded?$('boardPanelDock'):$('turnPanelHome')).append($('turnPanel'));
+ if(expanded){requestAnimationFrame(coverBoard)}
+ else{$('boardBox').classList.remove('fit-view');boardFitMode=false;requestAnimationFrame(()=>scrollToTile(players[turn]?.pos??config.start,true));}
+ updateBoardHud();
 }
+function updateBoardHud(){
+ const p=players[turn];if(!p)return;
+ $('boardHudDot').style.background=p.color;
+ $('boardHudName').textContent=phase==='win'?'🏆 Vinder: '+winner.name:(p.isCPU?'🫏 ':'')+p.name+'s tur';
+ $('boardHudPosition').textContent=(p.pos===config?.start?'START':`Felt ${p.pos}`)+
+  ' · '+({move:'Slå terningen',learn:'Læringsterning',question:'Svar på opgaven',moving:'Æslet hopper',feedback:'Svar afgjort',result:'Næste spiller',swap:'Byt felt',win:'MÅL!'}[phase]||'Spil');
+ $('boardPanelDock').dataset.phase=phase;
+}
+$('boardRepeat').addEventListener('click',()=>say(sound.last||`Nu er det ${players[turn]?.name||'din'} tur.`));
+window.addEventListener('resize',()=>{
+ if(!boardExpanded)return;
+ // Reskalér efter mobilens rotation og bevar automatisk fokus på aktivt æsel.
+ requestAnimationFrame(()=>{if(boardFitMode)fitBoard();else coverBoard();});
+});
 $('boardExpand').addEventListener('click',()=>setBoardExpanded(true));
 $('boardClose').addEventListener('click',()=>setBoardExpanded(false));
-$('boardZoomIn').addEventListener('click',()=>setBoardZoom(boardScale*1.25));
-$('boardZoomOut').addEventListener('click',()=>setBoardZoom(boardScale/1.25));
+$('boardZoomIn').addEventListener('click',()=>{boardFitMode=false;$('boardBox').classList.remove('fit-view');setBoardZoom(boardScale*1.25);scrollToTile(players[turn]?.pos??config.start,true);});
+$('boardZoomOut').addEventListener('click',()=>{boardFitMode=false;$('boardBox').classList.remove('fit-view');setBoardZoom(boardScale/1.25);scrollToTile(players[turn]?.pos??config.start,true);});
 $('boardFit').addEventListener('click',fitBoard);
 $('boardFollow').addEventListener('click',()=>{
+ if(boardFitMode){boardFitMode=false;$('boardBox').classList.remove('fit-view');}
  followActive=true;
  if(boardScale<.52)setBoardZoom(.78,{preserve:false});
  scrollToTile(players[turn]?.pos??config.start,true);
@@ -283,7 +314,7 @@ $('boardScroll').addEventListener('touchmove',e=>{
   e.preventDefault();followActive=false;
   const [a,b]=e.touches;
   const d=Math.hypot(b.clientX-a.clientX,b.clientY-a.clientY);
-  setBoardZoom(pinchStart.scale*d/Math.max(1,pinchStart.distance));
+  boardFitMode=false;$('boardBox').classList.remove('fit-view');setBoardZoom(pinchStart.scale*d/Math.max(1,pinchStart.distance));
  }
 },{passive:false});
 $('boardScroll').addEventListener('touchend',e=>{if(e.touches.length<2)pinchStart=null},{passive:true});
@@ -311,7 +342,7 @@ function drawBoard(){
   const t=$(`tile-${n}`);if(!t)continue;
   t.classList.toggle('outside',!config.all&&(n<=config.start||n>config.goal));
   t.classList.toggle('current',n===players[turn]?.pos);
-  t.classList.toggle('landing-target',Boolean(pending&&pending.landing===n&&phase!=='moving'));
+  t.classList.toggle('landing-target',Boolean(pending&&(pending.target??pending.landing)===n&&phase!=='moving'));
  }
  const layer=$('boardPlayers');if(layer)layer.innerHTML=boardTokens();
 }
@@ -321,7 +352,7 @@ function drawScores(){
 function btn(label,action,style='main'){return `<button type="button" class="btn ${style}" data-act="${action}">${label}</button>`}
 function render(){
  if(!config)return;
- drawScores();drawBoard();const p=players[turn];
+ drawScores();drawBoard();updateBoardHud();const p=players[turn];
  $('turnTitle').textContent=phase==='win'?'🏆 Talstien er gennemført!':`${p.isCPU?'🫏 ':''}${p.name}s tur`;
  $('turnSubtitle').textContent=phase==='win'?'Hov hov! Vi har en vinder!':`${p.name} står på ${p.pos===config.start?'START':`felt ${p.pos}`} · målet er ${config.goal}.`;
  const panel=$('turnPanel');
@@ -333,11 +364,11 @@ function render(){
   return;
  }
  if(phase==='learn'){
-  panel.innerHTML=`<h2>🧠 Læringsterning</h2><p class="hint">${esc(p.name)} slog ${pending.roll} og skal til felt <strong>${pending.landing}</strong>. Opgaven kommer før æslets hop på banen.</p>${p.isCPU?'<p class="cpu-note">🫏 Æslet slår også læringsterningen …</p>':config.learnDice==='physical'?`<p class="hint">Kast den fysiske læringsterning, og tryk på det viste ikon:</p><div class="learning-options">${S.TASKS.map((t,i)=>`<button data-act="task-${i+1}" type="button"><span class="ico">${t.short}</span>${esc(t.name)}</button>`).join('')}</div>`:btn('🎲 Vis læringsterningen','rollLearn')}${p.isCPU?'':`<div class="voicebar">${btn('Spring opgaven over','skip','soft')}</div>`}`;
+  panel.innerHTML=`<h2>🧠 Læringsterning</h2><p class="hint">${esc(p.name)} slog ${pending.roll} og skal til felt <strong>${pending.landing}</strong>. Æslet har først hoppet til feltet. Nu kommer opgaven.</p>${p.isCPU?'<p class="cpu-note">🫏 Æslet slår også læringsterningen …</p>':config.learnDice==='physical'?`<p class="hint">Kast den fysiske læringsterning, og tryk på det viste ikon:</p><div class="learning-options">${S.TASKS.map((t,i)=>`<button data-act="task-${i+1}" type="button"><span class="ico">${t.short}</span>${esc(t.name)}</button>`).join('')}</div>`:btn('🎲 Vis læringsterningen','rollLearn')}${p.isCPU?'':`<div class="voicebar">${btn('Spring opgaven over','skip','soft')}</div>`}`;
   return;
  }
  if(phase==='question'){
-  panel.innerHTML=`<h2>🫏 ${p.isCPU?'Æslet tænker …':'Æslet spørger!'}</h2><span class="age-chip">${esc(challenge.tier)} ${p.kind==='adult'?'· Tid på opgaven':'· Uden tidsgrænse'}</span><div class="prompt ${p.kind==='child'&&p.age<=4?'early':''}"><div class="tiny">${esc(S.TASKS[challenge.type-1].name)} · felt ${pending.landing}</div><h3>${esc(challenge.question)}</h3>${challenge.adapted?'<p class="hint">Opgaven er gjort lettere til dit niveau.</p>':''}</div>
+  panel.innerHTML=`<h2>🫏 ${p.isCPU?'Æslet tænker …':'Æslet spørger!'}</h2><span class="age-chip">${esc(challenge.tier)} ${p.kind==='adult'?'· Tid på opgaven':'· Uden tidsgrænse'}</span><div class="prompt ${p.kind==='child'&&p.age<=4?'early':''}"><div class="tiny">${esc(S.TASKS[challenge.type-1].name)} · felt ${p.pos}</div><h3>${esc(challenge.question)}</h3>${challenge.adapted?'<p class="hint">Opgaven er gjort lettere til dit niveau.</p>':''}</div>
    ${!p.isCPU&&p.kind==='adult'?`<div class="question-time" id="questionTime"><span>⏱️ Du har</span><strong id="clock" class="clock-big">${challenge.timeLimit||30} sek.</strong><div class="time-track"><div id="timeFill" class="time-fill"></div></div></div>`:''}
    <div class="choices">${challenge.options.map((opt,i)=>`<button class="choice ${p.kind==='child'&&p.age<=4?'early':''}" ${p.isCPU?'disabled':''} data-act="answer-${i}">${esc(opt)}</button>`).join('')}</div>
    ${p.isCPU?'<p class="hint">Æslet prøver selv – det kan også svare forkert!</p>':`<div class="voicebar">${btn('🔊 Læs op','read','soft')} ${btn('💡 Få et tip','help','soft')}</div><div id="tip" class="help" hidden>${esc(challenge.help)}</div>`}`;
@@ -345,10 +376,10 @@ function render(){
  }
  if(phase==='feedback'){
   const good=pending.correct;
-  panel.innerHTML=`<div class="feedback ${good?'':'error'}"><h2>${good?'✅ Godt svaret!':'🫏 Iiiih-åååh! Iiiih-åååh!'}</h2><p>${esc(pending.feedback)}</p><p class="hint">${p.isCPU?'Æslet skal også hoppe på banen.':'Nu hopper dit æsel på spillepladen …'}</p></div>`;return;
+  panel.innerHTML=`<div class="feedback ${good?'':'error'}"><h2>${good?'✅ Godt svaret!':'🫏 Iiiih-åååh! Iiiih-åååh!'}</h2><p>${esc(pending.feedback)}</p><p class="hint">${p.isCPU?'Æslet skal også hoppe på banen.':'Nu ser vi om du får et ekstra skridt …'}</p></div>`;return;
  }
  if(phase==='moving'){
-  panel.innerHTML=`<div class="move-message"><div class="moving-donkey" style="--fur:${p.color}">${donkeySvg(p.color)}</div><div><h2>Hop, hop, hop! 🥕</h2><p id="moveProgress">${esc(p.name)} hopper fra ${p.pos} mod felt ${pending?.landing??'?'} …</p><p class="hint">Se dit farvede æsel bevæge sig felt for felt på banen.</p></div></div>`;return;
+  panel.innerHTML=`<div class="move-message"><div class="moving-donkey" style="--fur:${p.color}">${donkeySvg(p.color)}</div><div><h2>Hop, hop, hop! 🥕</h2><p id="moveProgress">${esc(p.name)} hopper fra felt ${p.pos} mod felt ${pending?.target??pending?.landing??'?'} …</p><p class="hint">Følg det farvede æsel, mens det hopper felt for felt.</p></div></div>`;return;
  }
  if(phase==='swap'){
   const others=players.filter((_,i)=>i!==turn);
@@ -405,15 +436,28 @@ async function animateDie(){
 function receiveMoveRoll(roll){
  if(phase!=='move'||busy)return;
  const p=players[turn],landing=Math.min(config.goal,p.pos+roll);
- pending={from:p.pos,roll,landing,correct:false,feedback:'',skip:false};
+ pending={from:p.pos,roll,landing,target:landing,correct:false,feedback:'',skip:false};
  resultLines=[`${p.name} slog ${roll}: ${p.pos===config.start?'START':p.pos} → ${landing}.`];
- if(config.learning==='udfordring'||(config.learning==='laer'&&Boolean(SPECIAL[landing]))){phase='learn';render();say(`${p.name} slog ${roll}. Nu er det læringsterningens tur!`);if(p.isCPU)scheduleCPU('learn');}
- else {pending.feedback='';finishActionWithMovement();}
+ void moveFirst();
+}
+async function moveFirst(){
+ if(busy||!pending)return;
+ const g=gameToken,p=players[turn];
+ busy=true;phase='moving';render();
+ await hopSteps(p,pending.landing);
+ if(g!==gameToken)return;
+ busy=false;
+ if(p.pos>=config.goal){declareWin(p);return;}
+ const wantsTask=config.learning==='udfordring'||(config.learning==='laer'&&Boolean(SPECIAL[p.pos]));
+ if(wantsTask){
+  phase='learn';render();say(`${p.name} er landet på felt ${p.pos}. Nu kommer læringsterningen!`);
+  if(p.isCPU)scheduleCPU('learn');
+ }else void resolveLandingAction();
 }
 function receiveLearnRoll(type){
  if(phase!=='learn'||busy)return;
  const p=players[turn];
- challenge=S.makeChallenge({player:p,type,field:pending.landing,roll:pending.roll});
+ challenge=S.makeChallenge({player:p,type,field:p.pos,roll:pending.roll});
  phase='question';render();say(`${p.name}! ${challenge.question}`);
  if(p.isCPU)scheduleCPU('question');else startAdultTimer();
 }
@@ -440,48 +484,63 @@ function processAnswer(idx,timedOut=false){
  resultLines.push(correct?'✅ Rigtigt svar: +1 felt.':timedOut?'⏱️ Tiden gik! Intet ekstra felt.':'🫏 Forkert svar: intet ekstra felt.');
  phase='feedback';render();if(!correct)playBray();else say(`${p.name}, det er rigtigt. Godt klaret!`);
  const g=gameToken;
- setTimeout(()=>{if(g===gameToken&&phase==='feedback')finishActionWithMovement()},correct?1000:(sound.on?3550:850));
+ setTimeout(()=>{if(g===gameToken&&phase==='feedback')void finishLearning()},correct?1000:(sound.on?3550:850));
 }
-function skipChallenge(){if(phase!=='learn')return;pending.skip=true;pending.correct=false;resultLines.push('Opgaven blev sprunget over.');finishActionWithMovement()}
+function skipChallenge(){if(phase!=='learn')return;pending.skip=true;pending.correct=false;resultLines.push('Opgaven blev sprunget over.');void finishLearning()}
 async function hopSteps(p,to,speed=245){
+ const g=gameToken;
  const goal=Math.max(config.start,Math.min(config.goal,to));
  if(p.pos===goal)return;
  const direction=goal>p.pos?1:-1;
  // Den farvede æselbrik opdateres for hvert enkelt nummer på den digitale bane.
  while(p.pos!==goal){
-  p.pos+=direction;p.moving=true;drawScores();drawBoard();scrollToTile(p.pos);
+  if(g!==gameToken||!config)return;
+  p.pos+=direction;p.moving=true;drawScores();drawBoard();updateBoardHud();scrollToTile(p.pos);
   const el=$('moveProgress');if(el)el.textContent=`🫏 ${p.name}: felt ${p.pos} af ${goal}`;
   await defer(prefersLessMotion?35:speed);
  }
- p.moving=false;drawBoard();
+ p.moving=false;drawBoard();updateBoardHud();
 }
-async function finishActionWithMovement(){
+async function finishLearning(){
  if(!pending||busy)return;
- busy=true;const g=gameToken,p=players[turn];
- phase='moving';render();
- try{
-  $('board').scrollIntoView({block:'center',behavior:prefersLessMotion?'instant':'smooth'});await defer(180);
-  await hopSteps(p,pending.landing);if(g!==gameToken)return;
-  if(pending.correct){await hopSteps(p,Math.min(config.goal,p.pos+1),310);if(g!==gameToken)return;}
-  const special=SPECIAL[pending.landing];
-  if(special==='bonus'){resultLines.push('⭐ Bonus: +2 felter.');await hopSteps(p,p.pos+2);}
-  else if(special==='hov'){resultLines.push('🫏 Hov hov!: −2 felter.');await hopSteps(p,p.pos-2);}
-  else if(special==='mester'){resultLines.push('🏆 Talmester: +1 felt.');await hopSteps(p,p.pos+1);}
+ const g=gameToken,p=players[turn];busy=true;
+ if(pending.correct){
+  pending.target=Math.min(config.goal,p.pos+1);
+  phase='moving';render();
+  await hopSteps(p,pending.target,310);
   if(g!==gameToken)return;
-  busy=false;
-  if(p.pos>=config.goal){declareWin(p);return;}
-  if(special==='byt'&&players.length>1){
-   if(p.isCPU){
-    const o=players.filter(x=>x!==p).sort((a,b)=>b.pos-a.pos)[0];
-    if(o&&o.pos>p.pos){const target=o.pos;const original=p.pos;resultLines.push(`🔄 Æslet byttede plads med ${o.name}.`);
-      // to æsler skifter position og vises på deres nye felter
-      p.pos=target;o.pos=original;drawBoard();drawScores();scrollToTile(target);await defer(650);
-    }else resultLines.push('🔄 Æslet blev på sit felt.');
-   }else{phase='swap';render();return;}
-  }
-  if(p.pos>=config.goal){declareWin(p);return;}
-  phase='result';render();say(`Hov hov! ${p.name} er nu på felt ${p.pos}.`);
- }catch(err){busy=false;console.error('Animationen stoppede',err);phase='result';render()}
+ }
+ busy=false;
+ if(p.pos>=config.goal){declareWin(p);return;}
+ void resolveLandingAction();
+}
+async function resolveLandingAction(){
+ if(!pending||busy)return;
+ const g=gameToken,p=players[turn],special=SPECIAL[p.pos];
+ busy=true;
+ if(special==='bonus'||special==='hov'||special==='mester'){
+  const effect=special==='bonus'?2:special==='hov'?-2:1;
+  resultLines.push(special==='bonus'?'⭐ Bonus: +2 felter.':special==='hov'?'🫏 Hov hov!: −2 felter.':'🏆 Talmester: +1 felt.');
+  pending.target=Math.max(config.start,Math.min(config.goal,p.pos+effect));
+  phase='moving';render();
+  if(special==='hov')say(`${p.name}, hov hov! Du skal to felter tilbage!`);
+  await hopSteps(p,pending.target);
+  if(g!==gameToken)return;
+ }
+ if(g!==gameToken)return;
+ busy=false;
+ if(p.pos>=config.goal){declareWin(p);return;}
+ if(special==='byt'&&players.length>1){
+  if(p.isCPU){
+   const o=players.filter(x=>x!==p).sort((a,b)=>b.pos-a.pos)[0];
+   if(o&&o.pos>p.pos){const target=o.pos,old=p.pos;resultLines.push(`🔄 Æslet byttede plads med ${o.name}.`);
+    p.pos=target;o.pos=old;drawBoard();drawScores();updateBoardHud();scrollToTile(target);await defer(650);
+    if(g!==gameToken)return;
+   }else resultLines.push('🔄 Æslet blev på sit felt.');
+  }else{phase='swap';render();return;}
+ }
+ if(p.pos>=config.goal){declareWin(p);return;}
+ phase='result';render();say(`Hov hov! ${p.name} er nu på felt ${p.pos}.`);
 }
 async function swapWith(playerId){
  if(phase!=='swap'||busy)return;

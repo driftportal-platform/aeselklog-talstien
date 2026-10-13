@@ -1,40 +1,40 @@
-# ÆselKlog Talstien – v0.8-A: den snoede bondegårdsbane
+# ÆselKlog Talstien – v0.8-B: fuldskærmsplade og flydende spil
 
 **Spil:** https://driftportal-platform.github.io/aeselklog-talstien/  
-**Status:** v0.8-A er bygget og browserafprøvet lokalt og leveres som ZIP til manuel GitHub-upload. GitHub Pages ændres ikke, før ZIP'en er uploadet.
+**Kode:** https://github.com/driftportal-platform/aeselklog-talstien  
+**Status:** v0.8-B er udviklet og browserafprøvet lokalt. **Den er ikke live før ZIP-filerne er uploadet til GitHub.**
 
-## Hvad er nyt i v0.8-A?
+## Det nye i v0.8-B
 
-- Ny, original og langt mere levende **SVG-Talsti** med stald, gulerødder, hegn, blomster, træer, høns, dam, sol og mål.
-- **Alle tal fra 1 til 100 genereres automatisk** og går i zigzag på fem bølgende baner; ikke ét eneste tal er tegnet ind i et billede.
-- Tydelige farver pr. talområde og mindre actionikoner, så hvert nummer er synligt.
-- **Stor plade** for næsten heldækkende visning, **✕ Luk** uden at nulstille spillet.
-- Panorering, zoom +/- og knib-til-zoom (på berøringsskærme), **Hele banen** og **🫏 Find æslet**.
-- De farvede spilleræsler inklusive CPU-æslet vises og kan hoppe på den nye bane.
-- Tidligere funktioner er videreført: fysisk/digital terning, opgaver fra 3 år til voksen, voksen-tidsgrænser, CPU, ægte æselskry, AI-stemmeindstillinger og lokal fallback.
+- Når spillet starter, bliver **den snoede ÆselKlog-bane automatisk hovedskærmen** – den fylder hele browserens skærmareal i både mobilens liggende og stående format.
+- **Spillerstatus og knapper ligger på spillepladen.** Brug **✕ Luk** for at gå til det gamle kontrolpanel uden at nulstille spillet; brug **Stor plade** for at åbne igen.
+- **Terninger, opgaver, svarmuligheder og Næste spiller** vises i overlays oven på spillepladen. Intet sideskift mellem turene.
+- Banen fokuserer på aktivt æsel og beskærer om nødvendigt en del af landskabet, så den fylder hele skærmen. Træk, knib-zoom, zoomknapper, **Find æslet** og **Hele banen** fungerer fortsat.
+- **Rigtig rækkefølge:** annoncer tur → almindelig terning → æslet hopper felt for felt → evt. læringsterning/opgave → korrekt svar giver ét ekstra hop, forkert svar giver æselskry → specialfelt på slutpositionen → Næste spiller.
+- CPU-æslet viser stadig sit eget digitale kast, kan svare forkert og flytter sin farvede brik. Børn har ingen tidsgrænse, voksne kan stadig spille med tidspres.
+- De hidtidige fire specialfelter er bevaret. **Nye actionfelter kommer først i 0.8-C.**
+- Dansk telefonstemme, Cloudflare/ElevenLabs-tilvalg og rigtig æsellyd er ikke ændret.
 
-## Vigtigt: dette er kun fase A
+## Sådan opdaterer du på GitHub
 
-Version **0.8-B** flytter terninge- og opgaveforløbet ind som overlays på den store plade og retter rækkefølgen til **kast → flyt → læringsterning → svar → evt. ekstra skridt → action**.
+1. Download ZIP, og pak den ud.
+2. Upload filerne til roden af repository `driftportal-platform/aeselklog-talstien` og erstat filerne med samme navne. Upload `tests/board.test.js` til **tests/**.
+3. Sørg for, at `index.html`, `app.js`, `board.js`, `engine.js`, `sw.js`, `manifest.webmanifest`, `icon.svg`, `aeselklog-card.webp`, `donkey-bray.wav`, `README.md`, `UDVIKLINGSPLAN.md` og `AGENTS.md` ligger samme sted som før.
+4. Vælg **Commit changes** på branch `main`, åbn GitHub Pages og opdatér siden. Ved gammel version: luk hjemmeskærmsappen helt og åbn igen, så serviceworker kan opdatere.
 
-Lige nu ligger det gamle terninge-/opgavepanel stadig oven over spillepladen. Luk udvidet plade med X for at bruge panelet. Flere actionfelter som Gulerod og Vandpyt kommer i fase **0.8-C**, ikke i denne release.
+## Browser- og logiktest
 
-## Sådan lægger du den på GitHub
+- ✅ 100 unikke tal, fem korrekt vendende rækker: `node tests/board.test.js`.
+- ✅ Fuldskærms visningsmål: **844×390 mobil landscape, 390×844 portrait og 1280×800 desktop**.
+- ✅ Digital terning-overlay, X-luk/genåbn og bevarelse af spilstatus.
+- ✅ Fysisk terning, LEG: START → 5 → Bonus +2 → felt 7.
+- ✅ UDFORDRING: START → 3 **før** opgaven; korrekt svar → felt 4.
+- ✅ CPU-spiller får en synlig terning efter næste tur.
+- ✅ Ingen JavaScript-fejl i de afprøvede Chromium-forløb.
+- ⚠️ Rigtig iPhone Safari/hjemmeskærms-PWA og ElevenLabs-stemme er endnu ikke afprøvet i denne release. Mere fuldstændige CPU- og voksentimertests følger senere.
 
-1. Pak ZIP'en ud.
-2. Upload **appfilerne og `board.js`** til roden af `driftportal-platform/aeselklog-talstien` og erstat eksisterende filer med samme navn.
-3. Upload `UDVIKLINGSPLAN.md`, `AGENTS.md` og `tests/board.test.js`. README.md opdateres også.
-4. Commit ændringerne på `main` og åbn GitHub Pages-adressen.
-5. På iPhone: Genindlæs siden, og prøv **Stor plade**, **Find æslet** samt et almindeligt spil. Hvis hjemmeskærmsappen viser en gammel version, luk den og åbn den igen, så Service Worker får mulighed for at opdatere.
+## Næste udvikling
 
-**Cloudflare Worker skal ikke ændres.** API-nøglen må aldrig uploades i offentlig GitHub-kode.
+Læs altid [UDVIKLINGSPLAN.md](./UDVIKLINGSPLAN.md) og [AGENTS.md](./AGENTS.md) før videre arbejde. **v0.8-C** tilføjer nye actionfelter som Gulerod, Vandpyt og Overraskelse. **v0.8-D** er finpudsning af animationer, tale og feedback; **v0.8-E** er samlet mobiltest og fejlrettelser.
 
-## Test
-
-Kør `node tests/board.test.js` (kræver kun Node.js) for at kontrollere 100 felter, retning, koordinater og SVG-markup. Appen er også afprøvet i Chromium på mobilstørrelse og desktop med to almindelige spillere og CPU.
-
-**Begrænsninger:** Ikke endnu testet fysisk på iPhone/iPad, og ElevenLabs-lyd er ikke live-testet i v0.8-A. Den nuværende AI-forbindelse er ikke ændret.
-
-## Fremtidigt arbejde
-
-Læs altid [UDVIKLINGSPLAN.md](./UDVIKLINGSPLAN.md) først. [AGENTS.md](./AGENTS.md) beskriver arbejdsrutinen. Hold afkrydsningerne opdateret ved næste version.
+**API-hemmeligheder:** Ingen ElevenLabs-nøgler må lægges i dette offentlige repository. Cloudflare Worker gemmer dem som Secrets.

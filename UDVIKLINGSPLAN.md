@@ -3,9 +3,9 @@
 > **Projektets fælles huskeliste og facit for fremdrift.** Denne fil skal holdes opdateret og læses sammen med koden, hver gang vi arbejder videre. Den beskriver både hvad der virker, hvad vi har besluttet, og hvad der mangler.
 
 **Opdateret:** 13. oktober 2026  
-**Senest bekræftede kodeversion i GitHub `main`:** v0.7 (ved udviklingsstart)
-**Ny klar udviklingspakke til GitHub:** v0.8-A (skal uploades før den er live)  
-**Næste udviklingsfase:** v0.8-B – turforløb på den store spilleplade  
+**Senest bekræftede kodeversion i GitHub `main` før denne udvikling:** v0.8-A (13. oktober 2026)  
+**Ny klar udviklingspakke til GitHub:** v0.8-B (skal uploades før den er live)  
+**Næste udviklingsfase:** v0.8-C – flere actionfelter og sjovere hændelser  
 **Repository:** https://github.com/driftportal-platform/aeselklog-talstien  
 **Spil:** https://driftportal-platform.github.io/aeselklog-talstien/
 
@@ -25,9 +25,9 @@
 - **Ægte æselskry** ved forkerte svar. ElevenLabs-stemmen *Mia* til tale, med enhedens lokale oplæsning som reserve. AI-nøgler ligger kun som secrets hos Cloudflare, aldrig i offentlig GitHub-kode.
 - Oprindeligt æselspil-inspireret spilprincip, men helt eget navn, figurer og design; rettighedskontrol før salg.
 
-## 2. Aktuel status – hvad findes i v0.7?
+## 2. Aktuel status – hvad findes i v0.8-B?
 
-Denne status er baseret på gennemgang af `README.md`, `index.html`, `app.js`, `engine.js` og `sw.js` i GitHub `main` den 13. oktober 2026.
+Denne status er baseret på GitHubs v0.8-A-filer og en ny v0.8-B-kodepakke afprøvet lokalt i Chromium den 13. oktober 2026. Upload til GitHub er endnu ikke udført for v0.8-B.
 
 | Område | Status | Bemærkning |
 | --- | --- | --- |
@@ -38,8 +38,8 @@ Denne status er baseret på gennemgang af `README.md`, `index.html`, `app.js`, `
 | CPU og farvede æselbrikker | ✅ I koden | Mere synlig tursekvens ønskes |
 | Ægte æsellyd | ✅ I koden | `donkey-bray.wav` |
 | ElevenLabs / Cloudflare AI-stemme | 🟡 Under afprøvning | Bruger har hørt ændret stemme; endelig live-verifikation, forbrug og kvalitet mangler |
-| Fuldskærms-spilleplade og snoet bane | ✅ v0.8-A-pakke | SVG-bane, landskab, 100 tal, panorering, zoom, udvid/luk; iPhone-test udestår |
-| Flere actionfelter | ⬜ Planlagt | Hovedopgaven i v0.8 |
+| Fuldskærms-spilleplade og snoet bane | ✅ v0.8-B-kode | Automatisk ved spilstart, fylder 100dvh i landskab, zoom/følg; iPhone-test udestår |
+| Nye actionfelter (Gulerod, Vandpyt, Overraskelse) | ⬜ Planlagt | Hører til v0.8-C; eksisterende fire actionfelter fungerer |
 
 **Kodens fordeling:** `board.js` = original SVG-bane og felternes koordinater; `index.html` = layout/styling; `app.js` = spilforløb, terninger, brikker, lyd, specialfelter; `engine.js` = matematikopgaver; `sw.js` = cache/offline; `aeselklog-card.webp` = maskot; `donkey-bray.wav` = æselskry.
 
@@ -62,12 +62,26 @@ Denne status er baseret på gennemgang af `README.md`, `index.html`, `app.js`, `
 - [x] Mobil panorering, zoom +/- samt knib-til-zoom, **Find æslet**, **Hele banen** og automatisk scroll/følg ved hop.
 - [x] Farvede spilleræsler og CPU-brik indtegnes dynamisk på SVG-stien.
 - [x] Respekt for `prefers-reduced-motion`, store knapper og viewport-sikker placering.
-- [ ] **Næste tur direkte oven på den store plade** og overlays til terninger/opgaver – hører til fase 0.8-B. I v0.8-A lukkes stor plade med X for at komme til det eksisterende spillepanel.
-- [ ] Virkelig iPhone/Safari og tablet-test mangler; Chromium er testet med mobilvisning og desktopvisning.
+- [x] **Næste tur, terninger og opgaver direkte oven på den store plade** i v0.8-B; X lukker til det almindelige oversigtspanel uden at afbryde spillet.
+- [ ] Virkelig iPhone/Safari og tablet-test mangler; Chromium er testet med mobilvisning både liggende og stående samt desktopvisning.
 
 **Testet lokalt 2026-10-13:** JavaScript uden fejl, 100 unikke felter, mobil 390×844 og desktop 1360×970, zoom, udvid/luk, menneskespiller med fysisk terning og udfordringsopgave, CPU's terning-/opgaveforløb. Ingen live-test på telefonen eller AI-stemmen i denne ændring.
 
 ### 3.2 Turforløb uden sideskift – v0.8-B
+
+**Status 13. oktober 2026: IMPLEMENTERET OG BROWSERTESTET (endnu ikke live-afprøvet på iPhone).**
+
+- [x] Efter **Start spillet** åbner banen automatisk i en CSS-baseret fuldskærmsvisning (`100vw × 100dvh`), også i liggende mobilformat.
+- [x] Lille X lukker til normalvisningen uden at nulstille spillet; *Stor plade* åbner den igen.
+- [x] Flydende HUD med aktivt spillernavn og felt; **Gentag**, **Find æslet**, **Hele banen** og zoom ligger på pladen.
+- [x] Eksisterende turpanel flyttes ind på selve spillepladen, så terninger, spørgsmål, svarmuligheder og **Næste spiller** vises over banen uden sideskift.
+- [x] Terningekast → **almindeligt hop først** → læringsterning/spørgsmål → eventuelt +1 hop → specialfelt på slutpositionen.
+- [x] CPU beholder sin digitale terning og kan svare forkert. Fysisk terning, LEG/LÆR/UDFORDRING og voksentimer er videreført.
+- [x] Ved zoom/følg forsøger kameraet at vise den aktive brik til venstre for opgavekortet; **Hele banen** viser overblikket.
+- [x] Store tomme sidekanter undgås ved at vælge et beskåret udsnit i standardvisningen i stedet for at presse hele banen ind på skærmen.
+- [x] Rettet rækkefølge for specialfelter: handlingen udføres på **aktuel slutposition**, ikke altid på det oprindelige terningelandingsfelt.
+- [ ] Fysisk iPhone Safari, hjemmeskærms-PWA, iPad og alle skærmrotationer skal gennemtestes efter upload.
+
 
 **Den præcise rækkefølge er vigtig og er besluttet sådan:**
 
@@ -115,8 +129,8 @@ Sørg for jævn fordeling og rimelig balance – ingen action på næsten alle f
 
 | Milepæl | Leverance | Status |
 | --- | --- | --- |
-| **0.8-A** | Korrekt snoet 1–100-bane, baggrund, udvid/luk, mobilzoom | ✅ Bygget og browserafprøvet; afventer upload og iPhone-test |
-| **0.8-B** | Nyt komplet turforløb: tur → terning → flyt → læring → ekstra skridt | ⬜ Ikke startet |
+| **0.8-A** | Korrekt snoet 1–100-bane, baggrund, udvid/luk, mobilzoom | ✅ Uploadet til GitHub; iPhone-test afventes |
+| **0.8-B** | Automatisk fuldskærm, flydende kontrolpanel, kast → flyt → læring → ekstra skridt → action | ✅ Bygget og browserafprøvet; skal uploades og iPhone-testes |
 | **0.8-C** | Flere actions, CPU-flow, æselanimationer | ⬜ Ikke startet |
 | **0.8-D** | Talerutiner, opgave-overlays, voksen-timer, tilgængelighed | ⬜ Ikke startet |
 | **0.8-E** | Test, fejlrettelser, dokumentation, versionering og udgivelse | ⬜ Ikke startet |
@@ -127,15 +141,15 @@ Sørg for jævn fordeling og rimelig balance – ingen action på næsten alle f
 
 - [x] Alle 100 tal ligger én gang og i korrekt, sammenhængende rækkefølge (automatisk model- og DOM-test).
 - [x] Actionikoner skjuler ikke tal, og start-/slutpositioner er modelleret for alle fem områder; nærmere spiltest på mobil mangler.
-- [ ] Appen beholder spillepladen som hovedvisning under en hel tur – også på iPhone.
-- [ ] Bevægelsesbrikken går **før** læringsopgaven, og ekstra skridt sker **efter** rigtigt svar.
-- [ ] Fysisk/digital terning virker; CPU har synlig terning og kan svare forkert.
+- [x] Appen beholder spillepladen som hovedvisning under en hel tur i browserens mobil-landskabsvisning (virkelig iPhone-test afventes).
+- [x] Bevægelsesbrikken går **før** læringsopgaven, og ekstra skridt sker **efter** rigtigt svar (browsertest med fysisk terning og opgave).
+- [x] Fysisk terning, digital terning-overlay og CPU-terning kontrolleret i browser; CPU-forkert-svar logik videreført fra v0.7.
 - [ ] Treårige får lette genkendelsesopgaver; 5–6-årige kan få let plus/minus; ældre får gradvist sværere spørgsmål; voksentimer virker.
 - [ ] Alle actionfelter og spring over tur virker uden løkker eller utilsigtet dobbeltflytning.
 - [ ] Tale, æselskry og lyden fra ElevenLabs/fallback afbryder ikke spillets flow.
 - [ ] Offline-funktioner for grundspillet bevares; internet kræves kun til AI-tale.
 - [ ] iPhone/Safari/PWA samt mindst én desktopbrowser er testet; touch, zoom og skærmrotation fungerer.
-- [x] Versionsnummer, cache og README/UDVIKLINGSPLAN er opdateret i v0.8-A-pakken (afventer upload).
+- [x] Versionsnummer, serviceworker-cache, README og UDVIKLINGSPLAN er opdateret til v0.8-B i leverancepakken.
 
 ## 6. Kendte risici / afklaringer
 
@@ -169,6 +183,8 @@ Sørg for jævn fordeling og rimelig balance – ingen action på næsten alle f
 4. Gem ændringerne i GitHub med en meningsfuld commit, så næste udviklingsrunde kan begynde fra den faktiske seneste status.
 
 ### Dokumentets ændringslog
+
+- **2026-10-13 (v0.8-B):** Stor bane som automatisk heldækkende spilvisning (844×390, 390×844 og 1280×800 afprøvet), flydende turpanel og HUD, terning/opgaver oven på banen; omordnet turflow til **kast → hop → opgave → bonus → action**, CPU-terning beholdt. Testet 100 SVG-felter, fysisk bonuskast 5→7, flytning før læring, korrekt svar +1, CPU-terning og X-luk/genåbn. Browser- og kildekontrol uden JavaScript-fejl. Test på rigtig iPhone og ElevenLabs live mangler. Ingen nye actiontyper i B.
 
 - **2026-10-13 (v0.8-A):** Ny original SVG-bane, 100 testede numre, farveområder, bondegårdsgrafik, zoom/følg og udvid/luk. Appens øvrige spilmotor og stemmekode videreført. 0.8-B/C/D/E stadig åbne.
 

@@ -137,13 +137,123 @@
      .boardbox.expanded .board-scroll{min-height:0}
     }
     @media(prefers-reduced-motion:reduce){.board-tile,.board-piece{transition:none!important;animation:none!important}}
+
+    /* v0.8-B – spillepladen er hele spilskærmen; UI bliver flydende ovenpå banen. */
+    .board-game-hud,.board-panel-dock{display:none}
+    .boardbox.expanded{
+       position:fixed!important;inset:0!important;width:100vw;height:100dvh;
+       max-height:100dvh;padding:0!important;margin:0!important;border:0!important;border-radius:0!important;
+       background:#d7edbe;z-index:500;display:block!important;overflow:hidden;isolation:isolate;
+    }
+    .boardbox.expanded .board-scroll{position:absolute;inset:0;width:100%;height:100%;max-height:none;
+       min-height:0;margin:0;padding:0;border:0;border-radius:0;box-shadow:none;
+       background:linear-gradient(130deg,#d7eec8,#a2d69c);overflow:auto;overscroll-behavior:contain}
+    .boardbox.expanded .board{padding:clamp(42px,12vh,100px) 42vw clamp(32px,11vh,90px) 10vw;
+       background:linear-gradient(125deg,#dbeec7,#b7deab);}
+    .boardbox.expanded.fit-view .board{padding:0}
+    .boardbox.expanded .board-head{position:absolute;top:calc(env(safe-area-inset-top,0px) + 7px);
+       left:calc(env(safe-area-inset-left,0px) + 10px);right:calc(env(safe-area-inset-right,0px) + 10px);
+       z-index:18;display:flex;align-items:flex-start;justify-content:space-between;pointer-events:none;
+       flex-wrap:nowrap;gap:8px}
+    .boardbox.expanded .board-heading{background:#fffdf2ee;border:1px solid #d3e2c7;
+       border-radius:14px;padding:7px 11px;box-shadow:0 2px 14px #25412525;
+       max-width:min(50vw,320px)}
+    .boardbox.expanded .board-heading h3{font-size:clamp(.74rem,1.75vw,1rem);margin:0;line-height:1.22}
+    .boardbox.expanded #boardModeLabel{display:none}
+    .boardbox.expanded .board-main-actions{pointer-events:auto;justify-content:flex-end;flex-wrap:nowrap}
+    .boardbox.expanded .board-main-actions .btn{border:1px solid #e4c9bc;min-height:35px;
+       padding:7px 12px;box-shadow:0 3px 10px #674b3640}
+    .boardbox.expanded .board-toolbar{position:absolute;z-index:20;
+       left:calc(env(safe-area-inset-left,0px) + 10px);bottom:calc(env(safe-area-inset-bottom,0px) + 10px);
+       display:flex;flex-wrap:nowrap;gap:5px;margin:0;padding:6px;
+       background:#fffdf5e8;border:1px solid #d6e5d2;border-radius:14px;
+       box-shadow:0 3px 14px #29473235;max-width:55vw}
+    .boardbox.expanded .board-toolbar .btn{font-size:.75rem;padding:7px 10px;white-space:nowrap}
+    .boardbox.expanded .zoom-controls{margin-left:0}
+    .boardbox.expanded .legend,.boardbox.expanded .board-tip,.boardbox.expanded .board-stage-note{display:none}
+    .boardbox.expanded #editPos{display:none}
+    .boardbox.expanded #boardClose{display:inline-flex}
+    .boardbox.expanded .board-game-hud{position:absolute;z-index:17;display:flex;align-items:center;gap:9px;
+      top:calc(env(safe-area-inset-top,0px) + 56px);left:calc(env(safe-area-inset-left,0px) + 10px);
+      padding:7px 8px;border:1px solid #d0d9c1;border-radius:14px;
+      background:#fffcf1ee;box-shadow:0 4px 16px #20432324;max-width:48vw;pointer-events:auto}
+    .hud-player-dot{width:21px;height:21px;border-radius:50%;border:3px solid white;
+      box-shadow:0 0 0 2px #647760;flex:none}
+    .hud-message{min-width:0;display:flex;flex-flow:column;line-height:1.17}
+    .hud-message strong,.hud-message small{white-space:nowrap;text-overflow:ellipsis;overflow:hidden}
+    .hud-message strong{font-size:.91rem;color:#173d55}.hud-message small{font-size:.7rem;color:#4a674f}
+    .hud-speaker{border:0;border-radius:10px;background:#e2edf8;min-height:32px;min-width:34px;padding:5px;cursor:pointer}
+    .boardbox.expanded .board-panel-dock{display:block;z-index:23;position:absolute;
+      right:calc(env(safe-area-inset-right,0px) + 10px);bottom:calc(env(safe-area-inset-bottom,0px) + 10px);
+      width:min(365px,43vw);max-height:calc(100dvh - env(safe-area-inset-top,0px) - env(safe-area-inset-bottom,0px) - 22px);
+      overflow:auto;overscroll-behavior:contain;border-radius:20px;box-shadow:0 6px 22px #36502b48}
+    .board-panel-dock>.turn-panel{margin:0;background:#fffffbf5;border:2px solid #dfebc9;
+      border-radius:19px;padding:clamp(10px,1.8vw,16px);box-shadow:none}
+    .board-panel-dock .turn-panel h2{font-size:clamp(.95rem,1.65vw,1.18rem);margin:0 0 6px}
+    .board-panel-dock .turn-panel p.hint{font-size:.79rem;margin:4px 0 9px}
+    .board-panel-dock .prompt{padding:10px;border-radius:12px}
+    .board-panel-dock .prompt h3{font-size:clamp(.94rem,1.8vw,1.2rem);line-height:1.2}
+    .board-panel-dock .choice{min-height:43px;padding:7px;font-size:.96rem}
+    .board-panel-dock .choices{gap:6px;margin-top:9px}
+    .board-panel-dock .learning-options{grid-template-columns:repeat(3,1fr);gap:5px;margin:8px 0}
+    .board-panel-dock .learning-options button{min-height:64px;padding:6px 4px;font-size:.72rem}
+    .board-panel-dock .learning-options .ico{font-size:20px}
+    .board-panel-dock .dice-options{gap:5px;margin:6px 0}
+    .board-panel-dock .dice-options button{min-height:44px}
+    .board-panel-dock .voicebar{margin-top:7px}
+    .board-panel-dock .voicebar .btn{font-size:.82rem;min-height:33px;padding:7px 10px}
+    .board-panel-dock .question-time{padding:6px 8px;margin:7px 0}
+    .board-panel-dock .clock-big{font-size:1.05rem}
+    .board-panel-dock .move-message{padding:8px}
+    .board-panel-dock .move-message .moving-donkey{height:43px;width:43px}
+    .board-panel-dock .feedback{padding:8px;margin:6px 0}
+    .board-panel-dock .finish{padding:10px}
+    .board-panel-dock .finish .donkey{font-size:35px}
+    .boardbox.expanded .board-panel-dock[data-phase="moving"]{width:min(300px,39vw)}
+    .boardbox.expanded .board-panel-dock[data-phase="moving"] .turn-panel{background:#faffebeb}
+    .boardbox.expanded .board-panel-dock .result-text{font-size:.84rem;line-height:1.3;margin:7px 0}
+    .boardbox.expanded .board-panel-dock [data-act="next"]{width:100%;font-size:1.08rem}
+    @media(orientation:landscape) and (max-height:500px){
+      .boardbox.expanded .board-heading{padding:5px 8px}
+      .boardbox.expanded .board-game-hud{top:calc(env(safe-area-inset-top,0px) + 49px);padding:5px 7px}
+      .boardbox.expanded .board-toolbar{padding:4px;gap:3px}
+      .boardbox.expanded .board-toolbar .btn{font-size:.7rem;padding:5px 7px;min-height:32px}
+      .boardbox.expanded .zoom-controls{min-height:32px}
+      .boardbox.expanded .zoom-controls button{height:32px;width:30px}
+      .boardbox.expanded .board-panel-dock{width:min(340px,42vw)}
+      .boardbox.expanded .board-panel-dock .turn-panel{padding:10px}
+      .boardbox.expanded .board-panel-dock .turn-panel h2{font-size:1rem}
+      .boardbox.expanded .board-panel-dock .prompt{padding:8px}
+      .boardbox.expanded .board-panel-dock .prompt h3{font-size:1rem}
+      .boardbox.expanded .board-panel-dock .choice{min-height:39px}
+      .boardbox.expanded .board-panel-dock .choice.early{min-height:48px;font-size:1.3rem}
+      .dice-overlay .dice-playing-card{max-width:none;width:100%;border-radius:0;border-width:4px;
+        padding:8px max(18px,env(safe-area-inset-right,0px))}
+      .dice-playing-card .dice-mascot{height:55px;width:55px;top:15px;right:20px}
+      .dice-playing-card .dice-head{min-height:26px}
+      .dice-playing-card .dice-middle{gap:8px}
+      .dice-playing-card .dice-title{font-size:1.1rem}
+      .dice-playing-card .dice-button{width:clamp(115px,27vh,175px);height:clamp(115px,27vh,175px)}
+      .dice-playing-card .dice-prompt{font-size:.9rem}
+      .dice-playing-card .dice-foot{min-height:22px}
+    }
+    @media(orientation:portrait){
+      .boardbox.expanded .board-panel-dock{left:calc(env(safe-area-inset-left,0px) + 10px);
+        right:calc(env(safe-area-inset-right,0px) + 10px);width:auto;max-height:min(48dvh,410px)}
+      .boardbox.expanded .board-toolbar{bottom:calc(env(safe-area-inset-bottom,0px) + min(49dvh,415px));
+        left:calc(env(safe-area-inset-left,0px) + 8px);max-width:96vw}
+      .boardbox.expanded .board-toolbar .btn{font-size:.69rem;padding:6px}
+      .boardbox.expanded .board-heading{max-width:58vw}
+      .boardbox.expanded .board-game-hud{max-width:72vw}
+    }
+    @media(prefers-reduced-motion:reduce){.board-panel-dock,.board-game-hud{transition:none!important}}
   </style>
 </head>
 <body>
 <div class="shell">
   <header class="top">
     <div class="brand"><div class="logo" aria-hidden="true">🫏</div><div><h1>Æsel<span class="red">Klog</span> · Talstien</h1><small>Spil, lær og grin sammen</small></div></div>
-    <div class="top-actions"><span class="pill">PRØVEVERSION 0.8-A</span><button id="voiceToggle" class="btn soft small" type="button" aria-pressed="true">🔊 Lyd til</button></div>
+    <div class="top-actions"><span class="pill">PRØVEVERSION 0.8-B</span><button id="voiceToggle" class="btn soft small" type="button" aria-pressed="true">🔊 Lyd til</button></div>
   </header>
 
   <details class="voice-settings" id="voiceSettings">
@@ -200,7 +310,7 @@
 
   <section id="game" class="view" aria-label="Talstien spil">
     <div class="status"><div class="row between"><div><div class="tiny" id="rangeTitle">Hele talstien</div><h2 id="turnTitle">Næste tur</h2><div id="turnSubtitle" class="hint" style="margin-bottom:0">Nu skal der spilles!</div></div><div class="row"><button type="button" class="btn soft small" id="speakAgain">🔊 Gentag</button><button type="button" class="btn soft small" id="newGame">↩ Nyt spil</button></div></div><div id="scores" class="score"></div></div>
-    <div id="turnPanel" class="turn-panel" aria-live="polite"></div>
+    <div id="turnPanelHome"><div id="turnPanel" class="turn-panel" aria-live="polite"></div></div>
     <section class="boardbox" id="boardBox" aria-label="ÆselKlog spilleplade">
       <div class="board-head">
         <div class="board-heading"><h3>🗺️ Talstien · den levende bondegård</h3><span class="tiny" id="boardModeLabel">Digital spilleplade</span></div>
@@ -216,14 +326,20 @@
          <div class="zoom-controls"><button type="button" id="boardZoomOut" aria-label="Zoom ud">−</button><output id="boardZoomValue" aria-live="polite">73 %</output><button type="button" id="boardZoomIn" aria-label="Zoom ind">+</button></div>
       </div>
       <div class="board-scroll" id="boardScroll" tabindex="0" aria-label="Flyt rundt på Talstien, brug zoom og Find æslet til at følge brikken"><div class="board" id="board"></div></div>
+      <div id="boardHud" class="board-game-hud" aria-live="polite">
+        <span class="hud-player-dot" id="boardHudDot"></span>
+        <div class="hud-message"><strong id="boardHudName">ÆselKlog</strong><small id="boardHudPosition">Velkommen til Talstien</small></div>
+        <button class="hud-speaker" type="button" id="boardRepeat" aria-label="Gentag seneste besked">🔊</button>
+      </div>
+      <div class="board-panel-dock" id="boardPanelDock" role="region" aria-label="Tur og matematikopgave"></div>
       <div class="legend"><span>🟦 1–20</span><span>🌷 21–40</span><span>🟨 41–60</span><span>🟩 61–80</span><span>🟪 81–100</span></div>
       <p class="board-tip tiny">Træk med én finger for at se banen, knib med to fingre for at zoome, eller brug knapperne. Feltnumrene er altid synlige – også på actionfelter.</p>
-      <p class="board-stage-note tiny">I v0.8-A er banen forbedret. Selve terninge- og opgaveflowet ligger stadig i panelet ovenfor; i v0.8-B flytter vi det ind over spillepladen.</p>
+      <p class="board-stage-note tiny">I v0.8-B vises terninger, opgaver og turknapper direkte på den store spilleplade.</p>
     </section>
   </section>
   </main>
 
-  <footer><strong>ÆselKlog · v0.8-A · Snoet spilleplade, dansk stemme, æsellyd og CPU-spil</strong><br>Den almindelige kortspilsvariant udvikles særskilt. Denne prøve handler om Talstien og læringsopgaverne.<div class="footer-links"><button type="button" class="btn soft small" id="testVoice">🔊 Prøv æslets stemme</button></div></footer>
+  <footer><strong>ÆselKlog · v0.8-B · Fuldskærmsbane med terninger, opgaver, dansk stemme og CPU</strong><br>Den almindelige kortspilsvariant udvikles særskilt. Denne prøve handler om Talstien og læringsopgaverne.<div class="footer-links"><button type="button" class="btn soft small" id="testVoice">🔊 Prøv æslets stemme</button></div></footer>
 </div>
 
 <div id="diceOverlay" class="dice-overlay" hidden role="dialog" aria-modal="true" aria-label="Terningeskærm">
