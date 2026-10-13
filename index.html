@@ -253,14 +253,14 @@
 <div class="shell">
   <header class="top">
     <div class="brand"><div class="logo" aria-hidden="true">🫏</div><div><h1>Æsel<span class="red">Klog</span> · Talstien</h1><small>Spil, lær og grin sammen</small></div></div>
-    <div class="top-actions"><span class="pill">PRØVEVERSION 0.8-B</span><button id="voiceToggle" class="btn soft small" type="button" aria-pressed="true">🔊 Lyd til</button></div>
+    <div class="top-actions"><span class="pill">PRØVEVERSION 0.8-B.1</span><button id="voiceToggle" class="btn soft small" type="button" aria-pressed="true">🔊 Lyd til</button></div>
   </header>
 
   <details class="voice-settings" id="voiceSettings">
     <summary>🎙️ Indstil æslets stemme <span class="settings-hint">Telefonstemme eller naturlig AI-stemme</span></summary>
     <div class="voice-settings-body">
       <div class="field"><label for="voiceMode">Sådan skal Æslet tale</label>
-        <select id="voiceMode"><option value="device">Telefonens stemme · Gratis og offline</option><option value="ai">AI-stemme · ElevenLabs (kræver Cloudflare-forbindelse)</option></select>
+        <select id="voiceMode"><option value="ai">AI-stemme · ElevenLabs (automatisk forbindelse)</option><option value="device">Telefonens stemme · Gratis og offline</option></select>
       </div>
       <div class="grid3" id="deviceVoiceControls">
         <div class="field"><label for="voiceChoice">Dansk stemme på din enhed</label>
@@ -274,17 +274,21 @@
         </div>
       </div>
       <div id="aiVoiceControls" class="ai-settings" hidden>
-        <div class="field"><label for="aiEndpoint">Adresse til ÆselKlogs sikre AI-stemmetjeneste</label>
-          <input type="url" id="aiEndpoint" placeholder="https://aeselklog-voice.…workers.dev/tts" autocomplete="off" spellcheck="false" inputmode="url">
+        <div class="field"><label for="aiVoiceChoice">Vælg Æslets AI-stemme</label>
+          <select id="aiVoiceChoice"><option value="mia">Mia – varm dansk fortæller</option></select>
         </div>
-        <p class="tiny">For at høre Mia oprette du én gang ÆselKlogs stemmetjeneste hos Cloudflare og indtaster dens HTTPS-adresse her. <strong>Ingen API-nøgler må sættes ind her eller uploades til GitHub.</strong> Indtalingen er AI-genereret, og teksten sendes til den valgte stemmetjeneste. Brug helst kaldenavne, ikke fulde børnenavne.</p>
-        <p class="tiny" id="aiVoiceStatus" role="status">AI-stemme ikke tilsluttet endnu.</p>
+        <div class="row between" style="gap:9px;align-items:center">
+          <p class="tiny" style="margin:0;flex:1">Cloudflare-forbindelsen er indbygget – ingen adresse eller API-nøgle skal indtastes. Vælg stemme, og prøv den.</p>
+          <button class="btn soft small" type="button" id="reloadAIVoices">↻ Opdater stemmer</button>
+        </div>
+        <p class="tiny" id="aiVoiceStatus" role="status">Mia er standardstemme. Henter flere stemmer…</p>
+        <p class="tiny">Kun stemmer godkendt af ÆselKlogs sikre stemmetjeneste vises. Tale sendes til ElevenLabs via Cloudflare; brug gerne kaldenavne til børn.</p>
       </div>
       <div class="row between">
         <p class="tiny" id="voiceAvailability" style="margin:0;flex:1">Finder danske stemmer…</p>
         <button id="voicePreview" class="btn soft small" type="button">▶ Prøv valgt stemme</button><button id="brayPreview" class="btn soft small" type="button">🫏 Prøv æsellyd</button>
       </div>
-      <p class="tiny" style="margin:7px 0 0">Telefonstemmen virker uden net. AI-stemmen skal forbindes med en privat nøgle på Cloudflare og virker, når der er internet. Hvis AI-lyden ikke kan hentes, bruges telefonstemmen automatisk.</p>
+      <p class="tiny" style="margin:7px 0 0">Telefonstemmen virker uden internet. Mia er standardvalget, og AI-stemmer kræver internet. Hvis ElevenLabs ikke svarer, skifter spillet til telefonens stemme.</p>
     </div>
   </details>
 
@@ -339,7 +343,7 @@
   </section>
   </main>
 
-  <footer><strong>ÆselKlog · v0.8-B · Fuldskærmsbane med terninger, opgaver, dansk stemme og CPU</strong><br>Den almindelige kortspilsvariant udvikles særskilt. Denne prøve handler om Talstien og læringsopgaverne.<div class="footer-links"><button type="button" class="btn soft small" id="testVoice">🔊 Prøv æslets stemme</button></div></footer>
+  <footer><strong>ÆselKlog · v0.8-B.1 · Fuldskærmsbane og stemmevælger med terninger, opgaver, dansk stemme og CPU</strong><br>Den almindelige kortspilsvariant udvikles særskilt. Denne prøve handler om Talstien og læringsopgaverne.<div class="footer-links"><button type="button" class="btn soft small" id="testVoice">🔊 Prøv æslets stemme</button></div></footer>
 </div>
 
 <div id="diceOverlay" class="dice-overlay" hidden role="dialog" aria-modal="true" aria-label="Terningeskærm">

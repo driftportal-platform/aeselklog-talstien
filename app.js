@@ -1,4 +1,4 @@
-/* ÆselKlog Talstien v0.8-B: fuldskærmsbane og sekventielt kast → hop → læring → bonus → action. */
+/* ÆselKlog Talstien v0.8-B.1: automatisk AI-stemme, stemmevælger og fuldskærmsbane og sekventielt kast → hop → læring → bonus → action. */
 (()=>{'use strict';
 const $=id=>document.getElementById(id);
 const qs=sel=>document.querySelector(sel);
@@ -14,8 +14,13 @@ const LEARN_DIE=['1 2 3','L / U','10 + 1','👑','> <','+ −'];
 const rand=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
 const radio=name=>qs(`input[name="${name}"]:checked`)?.value;
 const defer=(ms)=>new Promise(ok=>setTimeout(ok,ms));
-const sound={on:true,last:'',selected:'auto',rate:1,pitch:1,mode:'device',endpoint:''};
+// Public Cloudflare Worker address (never a secret). API key remains exclusively in Cloudflare.
+const AI_VOICE_BASE='https://aeselklog-mia-stemme-test.driftportal-platform.workers.dev';
+const AI_TTS_ENDPOINT=AI_VOICE_BASE+'/tts';
+const AI_VOICES_ENDPOINT=AI_VOICE_BASE+'/voices';
+const sound={on:true,last:'',selected:'auto',rate:1,pitch:1,mode:'ai',aiVoice:'mia'};
 const voiceKey='aeselklog-voice-v03';
+let aiVoices=[{id:'mia',name:'Mia – varm dansk fortæller'}],aiVoicesLoadedAt=0,aiVoiceLoading=null;
 let setupPlayers=[{name:'Spiller 1',age:6,kind:'child',difficulty:'mellem'},{name:'Spiller 2',age:8,kind:'child',difficulty:'mellem'}];
 let players=[],config=null,turn=0,phase='setup',challenge=null,pending=null,resultLines=[],winner=null;
 let busy=false,gameToken=0,showDiceState=null,taskTimer=null,taskDeadline=0;
@@ -42,21 +47,55 @@ function syncVoiceControls(){
  $('voiceSpeedValue').textContent=sound.rate.toFixed(2).replace('.',',')+'×';
  $('voicePitchValue').textContent=sound.pitch.toFixed(2).replace('.',',')+'×';
  $('voiceMode').value=sound.mode;
- $('aiEndpoint').value=sound.endpoint;
  $('aiVoiceControls').hidden=sound.mode!=='ai';
+ renderAIVoices();
  $('deviceVoiceControls').hidden=sound.mode==='ai';
  $('voiceAvailability').hidden=sound.mode==='ai';
  aiStatus();
 }
 function aiStatus(message){
- const msg=message||(sound.endpoint?'Klar til at prøve den tilsluttede AI-stemme.':'Ingen stemmetjeneste angivet endnu – telefonstemmen bruges som reserve.');
- $('aiVoiceStatus').textContent=msg;
+ $('aiVoiceStatus').textContent=message||'AI-stemme er klar til prøve. Mia er standardstemme.';
 }
-function validEndpoint(value){
- try{const u=new URL(value);return u.protocol==='https:'&&!u.username&&!u.password&&u.pathname.endsWith('/tts')?u.href:null}catch(e){return null}
+function renderAIVoices(){
+ const select=$('aiVoiceChoice');
+ const value=sound.aiVoice;
+ select.replaceChildren(...aiVoices.map(v=>{
+  const option=document.createElement('option');option.value=v.id;option.textContent=v.name;return option;
+ }));
+ if(aiVoices.some(v=>v.id===value))select.value=value;
+ else if(aiVoicesLoadedAt){sound.aiVoice='mia';select.value='mia';saveVoice()}
+ else select.value='mia'; // Preserve a saved alternative until /voices finishes loading.
+}
+async function loadAIVoices(force=false){
+ if(aiVoiceLoading)return aiVoiceLoading;
+ if(!force&&aiVoicesLoadedAt&&Date.now()-aiVoicesLoadedAt<3*60*1000)return;
+ aiStatus('Henter tilgængelige danske stemmer…');
+ aiVoiceLoading=(async()=>{
+  const controller=new AbortController();
+  const timeout=setTimeout(()=>controller.abort(),8000);
+  try{
+   const response=await fetch(AI_VOICES_ENDPOINT,{cache:'no-store',signal:controller.signal});
+   if(!response.ok)throw new Error('HTTP '+response.status);
+   const data=await response.json();
+   if(!Array.isArray(data.voices))throw new Error('Ingen stemmeliste');
+   const voices=[{id:'mia',name:'Mia – varm dansk fortæller'}];
+   for(const voice of data.voices.slice(0,35)){
+    if(!voice||typeof voice.id!=='string'||typeof voice.name!=='string'||!/^[a-zA-Z0-9_-]{1,50}$/.test(voice.id))continue;
+    const name=voice.name.trim().slice(0,65);
+    if(name&&!voices.some(v=>v.id===voice.id))voices.push({id:voice.id,name});
+   }
+   aiVoices=voices;aiVoicesLoadedAt=Date.now();renderAIVoices();
+   aiStatus(voices.length>1?`${voices.length} AI-stemmer tilgængelige. Vælg en, og tryk Prøv valgt stemme.`:
+    (typeof data.hint==='string'&&data.hint.length<180?data.hint:'Mia er klar. Andre stemmer kan tilføjes i ElevenLabs.'));
+  }catch(error){
+   aiVoices=[{id:'mia',name:'Mia – varm dansk fortæller'}];renderAIVoices();
+   aiStatus('Kun Mia vises lige nu. Opdater Cloudflare Worker for flere stemmer. ('+error.message+')');
+  }finally{clearTimeout(timeout);aiVoiceLoading=null}
+ })();
+ return aiVoiceLoading;
 }
 function saveVoice(){
- try{localStorage.setItem(voiceKey,JSON.stringify({selected:sound.selected,rate:sound.rate,pitch:sound.pitch,mode:sound.mode,endpoint:sound.endpoint}))}catch(e){}
+ try{localStorage.setItem(voiceKey,JSON.stringify({selected:sound.selected,rate:sound.rate,pitch:sound.pitch,mode:sound.mode,aiVoice:sound.aiVoice}))}catch(e){}
 }
 function stopCurrentVoice(){
  speechSerial++;
@@ -86,17 +125,16 @@ function ensureAudioContext(){
 document.addEventListener('pointerdown',()=>{if(sound.on&&sound.mode==='ai')ensureAudioContext()}, {passive:true});
 document.addEventListener('keydown',()=>{if(sound.on&&sound.mode==='ai')ensureAudioContext()}, {passive:true});
 async function speakAI(text,id){
- const endpoint=validEndpoint(sound.endpoint);
- if(!endpoint){aiStatus('Manglende eller ugyldig HTTPS-adresse. Afspiller telefonstemmen.');speakLocally(text);return}
+ const endpoint=AI_TTS_ENDPOINT;
  let bytes;
- const key=endpoint+'|'+text;
+ const key=endpoint+'|'+sound.aiVoice+'|'+text;
  try{
   if(speechCache.has(key))bytes=speechCache.get(key);
   else{
    const abort=new AbortController();aiFetch=abort;
    const timeout=setTimeout(()=>abort.abort(),25000);
    let response;
-   try{response=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text}),signal:abort.signal,cache:'no-store'});
+   try{response=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text,voice:sound.aiVoice}),signal:abort.signal,cache:'no-store'});
    if(!response.ok)throw new Error(`HTTP ${response.status}`);
    if(!String(response.headers.get('Content-Type')||'').includes('audio/'))throw new Error('Svaret indeholdt ikke lyd');
    bytes=await response.arrayBuffer();}
@@ -119,7 +157,7 @@ async function speakAI(text,id){
    audio.onended=()=>{URL.revokeObjectURL(objectUrl);if(aiHtmlAudio===audio)aiHtmlAudio=null};
    try{await audio.play()}catch(err){URL.revokeObjectURL(objectUrl);throw err}
   }
-  if(id===speechSerial)aiStatus('Dansk AI-lyd afspilles.');
+  if(id===speechSerial)aiStatus('AI-lyd afspilles: '+(aiVoices.find(v=>v.id===sound.aiVoice)?.name||'ÆselKlog-stemme')+'.');
  }catch(e){
   if(id!==speechSerial||e.name==='AbortError')return;
   console.warn('Kunne ikke hente AI-lyd',e);
@@ -148,19 +186,29 @@ function loadVoice(){
   if(p.rate>=.8&&p.rate<=1.15)sound.rate=Number(p.rate);
   if(p.pitch>=.85&&p.pitch<=1.2)sound.pitch=Number(p.pitch);
   if(p.mode==='ai'||p.mode==='device')sound.mode=p.mode;
-  if(typeof p.endpoint==='string')sound.endpoint=p.endpoint.trim();
+  if(typeof p.aiVoice==='string'&&/^[a-zA-Z0-9_-]{1,50}$/.test(p.aiVoice))sound.aiVoice=p.aiVoice;
  }catch(e){}
  syncVoiceControls();refreshVoice();
 }
 loadVoice();
 window.speechSynthesis?.addEventListener?.('voiceschanged',refreshVoice);
-$('voiceSettings').addEventListener('toggle',()=>{if($('voiceSettings').open)refreshVoice()});
-$('voiceMode').addEventListener('change',e=>{stopCurrentVoice();sound.mode=e.target.value;syncVoiceControls();saveVoice();if(sound.mode==='device')say('Hov hov! Nu bruger jeg telefonens stemme.')});
-$('aiEndpoint').addEventListener('change',e=>{sound.endpoint=e.target.value.trim();stopCurrentVoice();saveVoice();aiStatus()});
+$('voiceSettings').addEventListener('toggle',()=>{
+ if($('voiceSettings').open){refreshVoice();if(sound.mode==='ai')void loadAIVoices()}
+});
+$('voiceMode').addEventListener('change',e=>{
+ stopCurrentVoice();sound.mode=e.target.value;syncVoiceControls();saveVoice();
+ if(sound.mode==='ai')void loadAIVoices();
+ else say('Hov hov! Nu bruger jeg telefonens stemme.');
+});
+$('aiVoiceChoice').addEventListener('change',e=>{
+ stopCurrentVoice();sound.aiVoice=e.target.value;saveVoice();
+ aiStatus('Valgt: '+(aiVoices.find(v=>v.id===sound.aiVoice)?.name||'AI-stemme')+'. Tryk Prøv valgt stemme.');
+});
+$('reloadAIVoices').addEventListener('click',()=>void loadAIVoices(true));
 $('voiceChoice').addEventListener('change',e=>{sound.selected=e.target.value;saveVoice();say('Hov hov! Jeg glæder mig til at lege med tallene!')});
 $('voiceSpeed').addEventListener('input',e=>{sound.rate=Number(e.target.value);syncVoiceControls();saveVoice()});
 $('voicePitch').addEventListener('input',e=>{sound.pitch=Number(e.target.value);syncVoiceControls();saveVoice()});
-$('voicePreview').addEventListener('click',()=>{sound.endpoint=$('aiEndpoint').value.trim();saveVoice();say('Hov hov! Du står på syvogtyve. Er fireogtredive større eller mindre end syvogtyve?')});
+$('voicePreview').addEventListener('click',()=>say('Hov hov! Du står på syvogtyve. Er fireogtredive større eller mindre end syvogtyve?'));
 $('brayPreview').addEventListener('click',playBray);
 $('voiceToggle').addEventListener('click',()=>{sound.on=!sound.on;$('voiceToggle').textContent=sound.on?'🔊 Lyd til':'🔇 Lyd fra';$('voiceToggle').setAttribute('aria-pressed',String(sound.on));if(sound.on)say('Hov hov! Nu kan du høre mig!');else {stopCurrentVoice();bray?.pause()}});
 $('testVoice').addEventListener('click',()=>say('Hov hov! Jeg er ÆselKlog, og jeg glæder mig til at spille med jer!'));

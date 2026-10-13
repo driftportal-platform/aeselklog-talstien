@@ -25,3 +25,7 @@ Dette repository er et familie-/læringsspil. **Læs altid `UDVIKLINGSPLAN.md` f
 - Kort- og brætdesign skal være originalt; tallene er vigtigere end dekorationer.
 - Appen bør fungere på iPhone, iPad, Android og desktop, både ved fysiske og digitale terninger.
 - Den aktuelle arbejdsleverance er **v0.8-B** (udviklet; ikke automatisk uploadet til GitHub). Næste fase er **v0.8-C**, med flere actionfelter. Den samlede v0.8 er ikke færdig, indtil statusfilen dokumenterer det.
+
+
+## Stemmer – v0.8-B.1
+Den offentlige Worker-URL ligger som konstant i `app.js`. API-nøglen findes kun i Cloudflare Secrets. AI-stemmer hentes fra `/voices` og afspilles via `/tts`, aldrig direkte fra ElevenLabs i browseren. Arbejd videre fra den nyeste GitHub-`main` og den separate Worker-kilde. Ny stemme kræver enten ElevenLabs Voices: Read + konto-stemme eller eksplicit godkendelse i Worker-konfigurationen. Ved release skal både app og Worker dokumenteres/testes separat.

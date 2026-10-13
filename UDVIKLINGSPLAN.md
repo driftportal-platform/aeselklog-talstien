@@ -1,3 +1,22 @@
+## Opdatering 13. oktober 2026 – v0.8-B.1 stemmevælger
+
+**Status: kode pakket til upload; ikke bekræftet live på GitHub Pages/Cloudflare.**
+
+- [x] Stemme-URL ligger automatisk i appkoden; manuel indtastning er fjernet.
+- [x] AI-stemmevælger med Mia som standard, prøveoplæsning og gemt valg.
+- [x] Cloudflare Worker har `/voices`-liste og tillader kun godkendte stemmer ved `/tts`.
+- [x] Mulighed for automatisk liste fra ElevenLabs ved `Voices: Read`, plus manuelt godkendte ekstra stemmer.
+- [x] Telefonstemme og ægte æsellyd bevares; spilskærm, terninger og opgaver uændret.
+- [x] Browser-test og Worker-kontrakttest med simulerede lydsvar.
+- [ ] Opdater Cloudflare Workeren med ny pakke.
+- [ ] Upload app v0.8-B.1 til GitHub Pages.
+- [ ] Bekræft ægte dansk ElevenLabs-lyd og stemmeskift på iPhone.
+- [ ] Tilføj og test 1–3 ekstra danskegnede stemmer i ElevenLabs.
+
+**Næste planlagte spilfase:** v0.8-C med ekstra actionfelter.
+
+---
+
 # ÆselKlog – udviklingsplan og projektstatus
 
 > **Projektets fælles huskeliste og facit for fremdrift.** Denne fil skal holdes opdateret og læses sammen med koden, hver gang vi arbejder videre. Den beskriver både hvad der virker, hvad vi har besluttet, og hvad der mangler.

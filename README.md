@@ -1,40 +1,52 @@
-# ÆselKlog Talstien – v0.8-B: fuldskærmsplade og flydende spil
+# ÆselKlog Talstien – v0.8-B.1 (automatisk AI-stemme og stemmevalg)
 
-**Spil:** https://driftportal-platform.github.io/aeselklog-talstien/  
-**Kode:** https://github.com/driftportal-platform/aeselklog-talstien  
-**Status:** v0.8-B er udviklet og browserafprøvet lokalt. **Den er ikke live før ZIP-filerne er uploadet til GitHub.**
+**App:** https://driftportal-platform.github.io/aeselklog-talstien/  
+**Repository:** https://github.com/driftportal-platform/aeselklog-talstien
 
-## Det nye i v0.8-B
+## Nye funktioner i v0.8-B.1
 
-- Når spillet starter, bliver **den snoede ÆselKlog-bane automatisk hovedskærmen** – den fylder hele browserens skærmareal i både mobilens liggende og stående format.
-- **Spillerstatus og knapper ligger på spillepladen.** Brug **✕ Luk** for at gå til det gamle kontrolpanel uden at nulstille spillet; brug **Stor plade** for at åbne igen.
-- **Terninger, opgaver, svarmuligheder og Næste spiller** vises i overlays oven på spillepladen. Intet sideskift mellem turene.
-- Banen fokuserer på aktivt æsel og beskærer om nødvendigt en del af landskabet, så den fylder hele skærmen. Træk, knib-zoom, zoomknapper, **Find æslet** og **Hele banen** fungerer fortsat.
-- **Rigtig rækkefølge:** annoncer tur → almindelig terning → æslet hopper felt for felt → evt. læringsterning/opgave → korrekt svar giver ét ekstra hop, forkert svar giver æselskry → specialfelt på slutpositionen → Næste spiller.
-- CPU-æslet viser stadig sit eget digitale kast, kan svare forkert og flytter sin farvede brik. Børn har ingen tidsgrænse, voksne kan stadig spille med tidspres.
-- De hidtidige fire specialfelter er bevaret. **Nye actionfelter kommer først i 0.8-C.**
-- Dansk telefonstemme, Cloudflare/ElevenLabs-tilvalg og rigtig æsellyd er ikke ændret.
+- Appen kender nu den offentlige **Cloudflare Worker-adresse** i koden. Der er **ikke længere et adressefelt**, og API-nøglen er stadig kun gemt som Secret hos Cloudflare.
+- Nye installationer foreslår **AI-stemme med Mia** som standard. Tidligere valgte indstillinger på enheden respekteres.
+- Under **🎙️ Indstil æslets stemme** kan man vælge mellem tilgængelige AI-stemmer, prøve stemmen og gemme valget.
+- Flere danske AI-stemmer indlæses fra Cloudflare `/voices`, hvis din ElevenLabs API-nøgle må læse stemmelisten, eller hvis ekstra stemmer er angivet i Worker-konfigurationen.
+- Der er fortsat mulighed for **telefonens danske stemmer**, som også virker offline.
+- Hvis ElevenLabs er utilgængelig, bruges telefonstemmen automatisk. Den ægte æsellyd ved forkert svar bevares.
+- Hele spiloplevelsen fra **0.8-B** (fuldskærmsplade, CPU, terninger, voksne/børn, opgaver) er uændret.
 
-## Sådan opdaterer du på GitHub
+## Sådan får du ændringerne i drift
 
-1. Download ZIP, og pak den ud.
-2. Upload filerne til roden af repository `driftportal-platform/aeselklog-talstien` og erstat filerne med samme navne. Upload `tests/board.test.js` til **tests/**.
-3. Sørg for, at `index.html`, `app.js`, `board.js`, `engine.js`, `sw.js`, `manifest.webmanifest`, `icon.svg`, `aeselklog-card.webp`, `donkey-bray.wav`, `README.md`, `UDVIKLINGSPLAN.md` og `AGENTS.md` ligger samme sted som før.
-4. Vælg **Commit changes** på branch `main`, åbn GitHub Pages og opdatér siden. Ved gammel version: luk hjemmeskærmsappen helt og åbn igen, så serviceworker kan opdatere.
+**1. Opdatér Cloudflare først (anbefalet).** Brug pakken `AeselKlog_Cloudflare_Stemmer_v0.8-B.1.zip`, **ikke GitHub-appen**. Udpak lokalt i din Worker-mappe og erstat `worker.js` og `wrangler.jsonc`. Kontrollér at `wrangler.jsonc` indeholder korrekt Worker-navn og `ALLOWED_ORIGIN`. Kør derefter i PowerShell:
 
-## Browser- og logiktest
+```powershell
+npx.cmd wrangler deploy
+```
 
-- ✅ 100 unikke tal, fem korrekt vendende rækker: `node tests/board.test.js`.
-- ✅ Fuldskærms visningsmål: **844×390 mobil landscape, 390×844 portrait og 1280×800 desktop**.
-- ✅ Digital terning-overlay, X-luk/genåbn og bevarelse af spilstatus.
-- ✅ Fysisk terning, LEG: START → 5 → Bonus +2 → felt 7.
-- ✅ UDFORDRING: START → 3 **før** opgaven; korrekt svar → felt 4.
-- ✅ CPU-spiller får en synlig terning efter næste tur.
-- ✅ Ingen JavaScript-fejl i de afprøvede Chromium-forløb.
-- ⚠️ Rigtig iPhone Safari/hjemmeskærms-PWA og ElevenLabs-stemme er endnu ikke afprøvet i denne release. Mere fuldstændige CPU- og voksentimertests følger senere.
+Den samme Worker bruges som før: `aeselklog-mia-stemme-test.driftportal-platform.workers.dev`. Din eksisterende `ELEVENLABS_API_KEY` og `ELEVENLABS_VOICE_ID` skal fortsat ligge som *Secrets* hos Cloudflare; læg dem **aldrig** i projektets filer. Hvis `/health` ikke viser `klar` efter deploy, så kontrollér Secrets og bindings i dashboardet.
 
-## Næste udvikling
+**2. Opdatér appen.** Upload indholdet af dette ZIP-arkiv til roden af det eksisterende GitHub-repository, og erstat filer med samme navn. Workerkoden skal **ikke** uploades til GitHub.
 
-Læs altid [UDVIKLINGSPLAN.md](./UDVIKLINGSPLAN.md) og [AGENTS.md](./AGENTS.md) før videre arbejde. **v0.8-C** tilføjer nye actionfelter som Gulerod, Vandpyt og Overraskelse. **v0.8-D** er finpudsning af animationer, tale og feedback; **v0.8-E** er samlet mobiltest og fejlrettelser.
+**3. Prøv en stemme.** Åbn spillet → **Indstil æslets stemme** → vælg **AI-stemme** og **Mia** eller en anden tilgængelig stemme → **Prøv valgt stemme**. Intet adressefelt er nødvendigt. Vælg **Telefonens stemme** hvis du hellere vil bruge de lokale danske stemmer.
 
-**API-hemmeligheder:** Ingen ElevenLabs-nøgler må lægges i dette offentlige repository. Cloudflare Worker gemmer dem som Secrets.
+## Hvis der kun vises Mia
+
+Det er forventeligt, hvis ElevenLabs API-nøglen kun har tilladelse til at generere tale (Text to Speech).
+
+- I ElevenLabs: vælg andre stemmer under **Voices → Explore**, helst med **Danish** som sprog, og tilføj dem til **My Voices**.
+- Giv API-nøglen **Voices: Read**-tilladelse, hvis ElevenLabs tilbyder at redigere den eksisterende nøgle. Hvis ikke, opret en ny begrænset nøgle med både Text to Speech og Voices: Read, og **udskift nøglen som Cloudflare Secret** (aldrig i chat eller GitHub).
+- Tryk **↻ Opdater stemmer** i ÆselKlog. Workerens liste opdateres med få minutters mellemrum.
+- Alternativt: Skriv de ekstra stemmers ID og navn ind i `ELEVENLABS_EXTRA_VOICES` i den separate Worker-konfiguration. Format og eksempel findes i Worker-pakkens README.
+
+Andre stemmer kan være engelsksprogede eller internationale; afprøv udtalen på dansk før brug med børn. Nogle Voice Library-stemmer kan kræve betalt plan.
+
+## Sikkerhed, forbrug og tests
+
+- `https://aeselklog-mia-stemme-test.driftportal-platform.workers.dev/tts` er en **offentlig URL, ikke en hemmelighed**. Kun **API-nøglen** skal være hemmelig.
+- Workeren indeholder stadig rate-limit-bindings. Origin/CORS alene er **ikke adgangskontrol**; behold en lav ElevenLabs-creditgrænse for denne offentligt tilgængelige prototype.
+- Brugerens kaldenavn kan indgå i tekst, der sendes til ElevenLabs. Brug helst kaldenavne for børn.
+- ✅ Testet lokalt i Chromium: automatisk adresse, 2 simulerede AI-stemmer, stemmevalg, lagring, telefonstemme og mobilens fuldskærmsbræt.
+- ✅ Worker testet med simulerede ElevenLabs-svar for Mira/Mia, andre godkendte stemmer, forkerte valg, Origin/CORS og opkald.
+- ⚠️ **Selve ElevenLabs-integrationen er ikke live-testet på din konto**. Test den på din iPhone efter begge opdateringer.
+
+## Videre udvikling
+
+Læs altid [UDVIKLINGSPLAN.md](./UDVIKLINGSPLAN.md) og [AGENTS.md](./AGENTS.md), før der arbejdes videre. Næste planlagte spilfase er **v0.8-C: flere actionfelter**.
