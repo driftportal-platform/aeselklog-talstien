@@ -1,10 +1,12 @@
-/* ÆselKlog Talstien v0.7: Mia via ElevenLabs Text-to-Dialogue, Cloudflare proxy. */
+/* ÆselKlog Talstien v0.8-A: SVG-bane fra board.js, bevaret v0.7-motor og Mia. */
 (()=>{'use strict';
 const $=id=>document.getElementById(id);
 const qs=sel=>document.querySelector(sel);
 const esc=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const COLORS=['#d84464','#227fcb','#24a667','#9361c9','#d69c34'];
 const S=window.AeselEngine;
+const B=window.AeselBoard;
+if(!B||!B.validate()){document.body.textContent='ÆselKlog kan ikke starte: board.js mangler eller har ugyldige felter.';return;}
 if(!S){document.body.textContent='ÆselKlog kan ikke starte: engine.js mangler.';return;}
 const SPECIAL={5:'bonus',10:'hov',15:'byt',24:'mester',29:'bonus',35:'byt',44:'bonus',50:'mester',55:'hov',64:'hov',69:'bonus',75:'byt',84:'bonus',90:'hov',95:'mester'};
 const SPECIAL_ICON={bonus:'⭐',hov:'🫏',byt:'🔄',mester:'🏆'};
@@ -18,6 +20,7 @@ let setupPlayers=[{name:'Spiller 1',age:6,kind:'child',difficulty:'mellem'},{nam
 let players=[],config=null,turn=0,phase='setup',challenge=null,pending=null,resultLines=[],winner=null;
 let busy=false,gameToken=0,showDiceState=null,taskTimer=null,taskDeadline=0;
 const prefersLessMotion=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+let boardScale=0.73,followActive=true,boardExpanded=false;
 let bray=null;
 try{bray=new Audio('./donkey-bray.wav');bray.preload='auto';bray.volume=.78;}catch(e){}
 
@@ -186,7 +189,7 @@ function renderSetupPlayers(){
 renderSetupPlayers();
 $('addPlayer').addEventListener('click',()=>{if(setupPlayers.length<4){setupPlayers.push({name:`Spiller ${setupPlayers.length+1}`,age:7,kind:'child',difficulty:'mellem'});renderSetupPlayers()}});
 function show(view){['setup','game'].forEach(id=>$(id).classList.toggle('active',view===id));window.scrollTo({top:0,behavior:'instant'})}
-function resetAsync(){gameToken++;clearInterval(taskTimer);taskTimer=null;busy=false;showDiceState=null;hideDice();stopCurrentVoice();bray?.pause();}
+function resetAsync(){gameToken++;clearInterval(taskTimer);taskTimer=null;busy=false;showDiceState=null;hideDice();if(boardExpanded)setBoardExpanded(false);stopCurrentVoice();bray?.pause();}
 $('startButton').addEventListener('click',()=>{
  resetAsync();
  const raw=$('range').value,all=raw==='1-100';
@@ -197,55 +200,120 @@ $('startButton').addEventListener('click',()=>{
  turn=0;phase='move';challenge=null;pending=null;resultLines=[];winner=null;
  $('rangeTitle').textContent=all?'Hele Talstien · 1–100':`Talområde ${raw}`;
  $('boardModeLabel').textContent=config.boardMode==='physical'?'Fysisk bræt + app-overblik':'Digital spilleplade';
- buildBoard();show('game');render();say(`Hov hov! Velkommen til Talstien. ${players[turn].name} starter!`);
+ show('game');buildBoard();render();requestAnimationFrame(()=>scrollToTile(players[turn].pos,true));say(`Hov hov! Velkommen til Talstien. ${players[turn].name} starter!`);
 });
 $('newGame').addEventListener('click',()=>{if(window.confirm('Vil I afslutte spillet og starte forfra?')){resetAsync();phase='setup';show('setup')}});
 $('editPos').addEventListener('click',()=>{
  if(busy||!config||phase==='win'||showDiceState)return;
  const p=players[turn];const requested=window.prompt(`Vælg felt for ${p.name}: ${config.start}–${config.goal}`,p.pos);
  if(requested===null)return;const n=Number(requested);if(!Number.isInteger(n)||n<config.start||n>config.goal)return window.alert('Vælg et felt inden for banen.');
- p.pos=n;render();
+ p.pos=n;render();scrollToTile(n,true);
 });
 
 function donkeySvg(color){
  // Originalt simpelt æselhoved. Pelsfarven kommer fra spillerens farve.
  return `<svg viewBox="0 0 64 64" class="donkey-svg" aria-hidden="true"><g stroke="#273449" stroke-width="3" stroke-linejoin="round"><path d="M12 25 7 5Q6 1 11 2L25 18M40 18 52 2Q57-1 56 6L51 25" fill="${color}"/><path d="M12 7 19 20 17 23 10 7M47 20 53 7 46 23" fill="#f5b7a9" stroke-width="1"/><path d="M10 31Q9 18 21 17L26 13 29 17 32 13 36 18Q56 14 56 36Q54 58 33 58Q10 57 10 31Z" fill="${color}"/><path d="M16 42Q16 35 32 36Q50 35 50 43Q50 57 33 57Q15 57 16 42Z" fill="#ffebdb"/><path d="M27 46Q24 43 22 48M40 46Q43 43 45 48" fill="none" stroke="#79574d" stroke-width="2"/><circle cx="23" cy="31" r="3.4" fill="#fff"/><circle cx="42" cy="31" r="3.4" fill="#fff"/><circle cx="23.6" cy="31.2" r="1.9" fill="#172c41" stroke="none"/><circle cx="41.5" cy="31.2" r="1.9" fill="#172c41" stroke="none"/><path d="M27 49Q32 53 38 49" fill="none" stroke="#673b36" stroke-width="2"/></g></svg>`;
 }
+// v0.8-A: En præcist optegnet, responsiv SVG-bane med 100 numre.
 function buildBoard(){
- const board=$('board');board.innerHTML='';
- for(let row=4;row>=0;row--){
-  const lane=document.createElement('div');lane.className='board-row';
-  const nums=Array.from({length:20},(_,j)=>row*20+j+1);if(row%2===1)nums.reverse();
-  for(const n of nums){const tile=document.createElement('div');tile.id=`tile-${n}`;
-   tile.className=`tile r${row+1}`;tile.dataset.n=n;
-   tile.innerHTML=`<span class="tile-num">${n}</span>${SPECIAL[n]?`<span class="special">${SPECIAL_ICON[SPECIAL[n]]}</span>`:''}<span class="piece-group"></span>`;
-   lane.append(tile);
-  }
-  board.append(lane);
- }
- if(config.start===0){
-   const startSpot=document.createElement('div');
-   startSpot.className='start-spot';startSpot.innerHTML='<span>🏡 START</span><span class="piece-group"></span>';
-   board.append(startSpot);
+ const board=$('board');board.innerHTML=B.render(SPECIAL);
+ const sc=$('boardScroll');
+ const initial= sc.clientWidth>=900?.73:sc.clientWidth>=600?.72:.78;
+ setBoardZoom(initial,{preserve:false});
+ followActive=true;
+ requestAnimationFrame(()=>scrollToTile(players[turn]?.pos??config.start,true));
+}
+function setBoardZoom(value,{preserve=true}={}){
+ const sc=$('boardScroll'),svg=$('boardSvg');if(!svg||!sc)return;
+ const s=boardScale;
+ const midX=(sc.scrollLeft+sc.clientWidth/2)/s;
+ const midY=(sc.scrollTop+sc.clientHeight/2)/s;
+ boardScale=Math.max(.22,Math.min(1.65,value));
+ svg.style.width=(B.WIDTH*boardScale)+'px';
+ svg.style.height=(B.HEIGHT*boardScale)+'px';
+ $('boardZoomValue').textContent=Math.round(boardScale*100)+' %';
+ if(preserve){sc.scrollLeft=midX*boardScale-sc.clientWidth/2;sc.scrollTop=midY*boardScale-sc.clientHeight/2;}
+}
+function scrollToTile(n,force=false){
+ if(!followActive&&!force)return;
+ const sc=$('boardScroll');if(!sc)return;
+ const p=B.position(Math.max(0,Math.min(100,n)));
+ sc.scrollTo({left:Math.max(0,p.x*boardScale-sc.clientWidth/2),top:Math.max(0,p.y*boardScale-sc.clientHeight/2),behavior:prefersLessMotion?'instant':'smooth'});
+}
+function fitBoard(){
+ const sc=$('boardScroll');if(!sc)return;
+ followActive=false;
+ const fit=Math.min((sc.clientWidth-6)/B.WIDTH,(sc.clientHeight-6)/B.HEIGHT);
+ setBoardZoom(fit,{preserve:false});
+ sc.scrollTo({left:0,top:0,behavior:'instant'});
+}
+function setBoardExpanded(expanded){
+ boardExpanded=expanded;
+ $('boardBox').classList.toggle('expanded',expanded);
+ document.body.classList.toggle('board-expanded',expanded);
+ $('boardExpand').hidden=expanded;
+ $('boardClose').hidden=!expanded;
+ $('boardExpand').setAttribute('aria-expanded',String(expanded));
+ if(expanded){
+  followActive=true;
+  requestAnimationFrame(()=>scrollToTile(players[turn]?.pos??config.start,true));
  }
 }
-function scrollToTile(n){
- const t=$(`tile-${Math.min(100,Math.max(1,n))}`);if(!t)return;
- const sc=$('boardScroll');if(!sc)return;
- const target=t.offsetLeft-sc.clientWidth/2+t.clientWidth/2;
- sc.scrollTo({left:Math.max(0,target),behavior:prefersLessMotion?'instant':'smooth'});
+$('boardExpand').addEventListener('click',()=>setBoardExpanded(true));
+$('boardClose').addEventListener('click',()=>setBoardExpanded(false));
+$('boardZoomIn').addEventListener('click',()=>setBoardZoom(boardScale*1.25));
+$('boardZoomOut').addEventListener('click',()=>setBoardZoom(boardScale/1.25));
+$('boardFit').addEventListener('click',fitBoard);
+$('boardFollow').addEventListener('click',()=>{
+ followActive=true;
+ if(boardScale<.52)setBoardZoom(.78,{preserve:false});
+ scrollToTile(players[turn]?.pos??config.start,true);
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&boardExpanded)setBoardExpanded(false)});
+// Knib-til-zoom på telefon. Enkelt fingertræk panorerer naturligt i scrollområdet.
+let pinchStart=null;
+$('boardScroll').addEventListener('touchstart',e=>{
+ if(e.touches.length===2){
+  const [a,b]=e.touches;
+  pinchStart={distance:Math.hypot(b.clientX-a.clientX,b.clientY-a.clientY),scale:boardScale};
+ }
+},{passive:true});
+$('boardScroll').addEventListener('touchmove',e=>{
+ if(e.touches.length===2&&pinchStart){
+  e.preventDefault();followActive=false;
+  const [a,b]=e.touches;
+  const d=Math.hypot(b.clientX-a.clientX,b.clientY-a.clientY);
+  setBoardZoom(pinchStart.scale*d/Math.max(1,pinchStart.distance));
+ }
+},{passive:false});
+$('boardScroll').addEventListener('touchend',e=>{if(e.touches.length<2)pinchStart=null},{passive:true});
+function boardTokens(){
+ const byPos=new Map();
+ players.forEach(p=>{if(!byPos.has(p.pos))byPos.set(p.pos,[]);byPos.get(p.pos).push(p)});
+ const tags=[];
+ byPos.forEach((ps,n)=>{
+  const c=B.position(n);
+  ps.forEach((p,i)=>{
+   const dx=(i-(ps.length-1)/2)*18;
+   const dy=(i%2)*-7;
+   const focused=p.id===players[turn]?.id;
+   tags.push(`<g class="board-piece ${p.moving?'piece-hop':''}${focused?' is-active':''}" transform="translate(${(c.x+dx-20).toFixed(1)} ${(c.y+dy-62).toFixed(1)})">
+    <circle cx="20" cy="20" r="23" fill="#fffef9" stroke="${p.color}" stroke-width="4"/>
+    ${donkeySvg(p.color).replace('class="donkey-svg"','class="donkey-svg board-token-icon" x="0" y="0" width="40" height="40"')}
+   </g>`);
+  });
+ });
+ return tags.join('');
 }
 function drawBoard(){
- const startGroup=document.querySelector('.start-spot .piece-group');
- if(startGroup){startGroup.innerHTML=players.filter(p=>p.pos===0).map(p=>`<span class="donkey-piece ${p.moving?'piece-hop':''}" title="${esc(p.name)}" style="--fur:${p.color}">${donkeySvg(p.color)}</span>`).join('');}
+ if(!config)return;
  for(let n=1;n<=100;n++){
   const t=$(`tile-${n}`);if(!t)continue;
   t.classList.toggle('outside',!config.all&&(n<=config.start||n>config.goal));
   t.classList.toggle('current',n===players[turn]?.pos);
   t.classList.toggle('landing-target',Boolean(pending&&pending.landing===n&&phase!=='moving'));
-  let here=players.filter(p=>p.pos===n);
-  t.querySelector('.piece-group').innerHTML=here.map(p=>`<span class="donkey-piece ${p.moving?'piece-hop':''}" title="${esc(p.name)}" aria-label="${esc(p.name)}" style="--fur:${p.color};z-index:${p.id===players[turn]?.id?3:1}">${donkeySvg(p.color)}</span>`).join('');
  }
+ const layer=$('boardPlayers');if(layer)layer.innerHTML=boardTokens();
 }
 function drawScores(){
  $('scores').innerHTML=players.map((p,i)=>`<div class="score-card ${i===turn?'active':''}"><span class="mini-donkey" style="--fur:${p.color}">${donkeySvg(p.color)}</span><div><strong>${esc(p.name)}</strong><div class="meta">${p.isCPU?'Computer':p.kind==='adult'?`Voksen · ${p.difficulty==='svaer'?'Svær':p.difficulty==='let'?'Let':'Mellem'}`:`${p.age} år`}</div></div><div style="margin-left:auto;text-align:right"><span class="pos">${p.pos===config.start?'START':p.pos}</span><div class="meta">felt</div></div></div>`).join('');

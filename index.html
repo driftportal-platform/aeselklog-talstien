@@ -85,13 +85,65 @@
        .player-input input,.player-input select{min-width:0;max-width:100%}.board-row{min-width:780px}
        .tile{min-width:35px}.score-card{min-width:125px;flex:1 1 130px}}
     @media(prefers-reduced-motion:reduce){.piece-hop,.moving-donkey{animation:none!important}}
+
+    /* v0.8-A: SVG-talsti, organisk rute og panorama-/zoomvisning */
+    .boardbox{padding:15px;background:#fffdfa;position:relative}
+    .board-heading h3{margin-bottom:2px;font-size:clamp(1rem,2.8vw,1.25rem)}
+    .board-main-actions{display:flex;align-items:center;flex-wrap:wrap;gap:7px}
+    .board-main-actions [hidden]{display:none!important}
+    .board-close{background:#b9434b;color:#fff;box-shadow:none}
+    .board-toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:7px;margin:9px 0 8px}
+    .board-toolbar .btn{min-height:37px;padding:7px 10px}
+    .zoom-controls{display:flex;align-items:center;overflow:hidden;border-radius:11px;border:1px solid #cbddee;background:#f6faff;margin-left:auto;min-height:37px}
+    .zoom-controls button{border:0;background:transparent;color:#184873;font-size:1.3rem;font-weight:900;width:42px;height:37px;cursor:pointer}
+    .zoom-controls button:active{background:#d7ecff}
+    .zoom-controls output{font-size:.78rem;min-width:50px;text-align:center;font-weight:900;color:#34627f}
+    .board-scroll{height:min(66vh,680px);min-height:370px;overflow:auto;overscroll-behavior:contain;scrollbar-color:#b9d6bf #e9f3e2;border:5px solid #e0ebcf;border-radius:18px;padding:0;touch-action:pan-x pan-y;background:#d9edc4;box-shadow:inset 0 3px 9px #456e4433;position:relative}
+    .board{width:max-content;min-width:0;height:max-content;border:0;border-radius:0;overflow:visible;padding:0;background:transparent;line-height:normal}
+    .board-svg{display:block;max-width:none;flex:none;user-select:none;-webkit-user-select:none}
+    .board-tile{transition:opacity .2s ease}
+    .board-tile.outside{opacity:.36}
+    .board-tile .board-tile-frame{filter:drop-shadow(0 2px 1px #35612a20)}
+    .board-tile.current .board-tile-frame{stroke:#ed941b;stroke-width:7;filter:drop-shadow(0 0 8px #ffd267)}
+    .board-tile.landing-target:not(.current) .board-tile-frame{stroke:#1a7ebe;stroke-width:6}
+    .board-tile.current .board-tile-number{fill:#97202a}
+    .board-tile-number{paint-order:stroke;stroke:#fffaf2;stroke-width:2px;stroke-linejoin:round}
+    .board-action-symbol{pointer-events:none}
+    .board-piece{pointer-events:none;filter:drop-shadow(0 4px 3px #123c336b)}
+    .board-piece .board-token-icon{width:40px;height:40px;overflow:visible}
+    .board-piece.is-active circle{stroke-width:5}
+    .board-piece.piece-hop{transform-box:fill-box;transform-origin:center;animation:littleDonkeyHop .33s ease-out infinite}
+    .board-tip{margin:9px 1px 3px}
+    .board-stage-note{margin:4px 1px 0;color:#5f745d;font-style:italic}
+    .board-expanded{overflow:hidden!important}
+    .boardbox.expanded{position:fixed;inset:0;z-index:500;display:flex;flex-direction:column;background:#fcfff6;border:0;border-radius:0;padding:calc(env(safe-area-inset-top, 0px) + 10px) 10px calc(env(safe-area-inset-bottom, 0px) + 10px);margin:0;box-shadow:none}
+    .boardbox.expanded .board-head{flex:none}
+    .boardbox.expanded .board-toolbar{flex:none}
+    .boardbox.expanded .board-scroll{flex:1;min-height:0;height:auto;max-height:none}
+    .boardbox.expanded .board-tip,.boardbox.expanded .board-stage-note{display:none}
+    .boardbox.expanded .legend{padding:8px 5px 0;flex:none}
+    .boardbox.expanded #editPos{display:none}
+    .boardbox.expanded #boardClose{display:inline-flex}
+    @media(max-width:680px){
+     .board-scroll{height:61vh;min-height:390px}
+     .board-head{gap:5px}.board-main-actions .btn{padding:7px 9px}
+     .boardbox{padding:9px}.board-toolbar{gap:5px}
+     .board-toolbar .btn{font-size:.74rem;padding:7px 8px}
+     .zoom-controls{min-height:35px}.zoom-controls button{width:34px;height:35px}
+     .zoom-controls output{min-width:43px;font-size:.72rem}
+     .boardbox.expanded .board-heading h3{font-size:1rem}
+     .boardbox.expanded .boardModeLabel{display:none}
+     .boardbox.expanded .board-toolbar{justify-content:space-between}
+     .boardbox.expanded .board-scroll{min-height:0}
+    }
+    @media(prefers-reduced-motion:reduce){.board-tile,.board-piece{transition:none!important;animation:none!important}}
   </style>
 </head>
 <body>
 <div class="shell">
   <header class="top">
     <div class="brand"><div class="logo" aria-hidden="true">🫏</div><div><h1>Æsel<span class="red">Klog</span> · Talstien</h1><small>Spil, lær og grin sammen</small></div></div>
-    <div class="top-actions"><span class="pill">PRØVEVERSION 0.7</span><button id="voiceToggle" class="btn soft small" type="button" aria-pressed="true">🔊 Lyd til</button></div>
+    <div class="top-actions"><span class="pill">PRØVEVERSION 0.8-A</span><button id="voiceToggle" class="btn soft small" type="button" aria-pressed="true">🔊 Lyd til</button></div>
   </header>
 
   <details class="voice-settings" id="voiceSettings">
@@ -149,11 +201,29 @@
   <section id="game" class="view" aria-label="Talstien spil">
     <div class="status"><div class="row between"><div><div class="tiny" id="rangeTitle">Hele talstien</div><h2 id="turnTitle">Næste tur</h2><div id="turnSubtitle" class="hint" style="margin-bottom:0">Nu skal der spilles!</div></div><div class="row"><button type="button" class="btn soft small" id="speakAgain">🔊 Gentag</button><button type="button" class="btn soft small" id="newGame">↩ Nyt spil</button></div></div><div id="scores" class="score"></div></div>
     <div id="turnPanel" class="turn-panel" aria-live="polite"></div>
-    <section class="boardbox"><div class="board-head"><h3>🗺️ Talstien 1–100</h3><div class="row"><span class="tiny" id="boardModeLabel">Digital spilleplade</span><button class="btn soft small" type="button" id="editPos">✏️ Ret felt</button></div></div><div class="board-scroll" id="boardScroll"><div class="board" id="board"></div></div><div class="legend"><span>🟦 1–20</span><span>🌷 21–40</span><span>🟨 41–60</span><span>🟩 61–80</span><span>🟪 81–100</span></div><p class="tiny" style="margin:9px 0 0">Hvert felt har sit nummer – også Bonus, Hov hov!, Byt og Talmester. Appen viser placeringerne, selv når I spiller på det fysiske bræt.</p></section>
+    <section class="boardbox" id="boardBox" aria-label="ÆselKlog spilleplade">
+      <div class="board-head">
+        <div class="board-heading"><h3>🗺️ Talstien · den levende bondegård</h3><span class="tiny" id="boardModeLabel">Digital spilleplade</span></div>
+        <div class="board-main-actions">
+          <button class="btn soft small" type="button" id="editPos">✏️ Ret felt</button>
+          <button class="btn main small" type="button" id="boardExpand" aria-controls="boardBox" aria-expanded="false">⛶ Stor plade</button>
+          <button class="btn board-close small" type="button" id="boardClose" hidden aria-label="Luk stor spilleplade">✕ Luk</button>
+        </div>
+      </div>
+      <div class="board-toolbar" role="group" aria-label="Styr spillepladens visning">
+         <button type="button" class="btn soft small" id="boardFollow">🫏 Find æslet</button>
+         <button type="button" class="btn soft small" id="boardFit">🗺 Hele banen</button>
+         <div class="zoom-controls"><button type="button" id="boardZoomOut" aria-label="Zoom ud">−</button><output id="boardZoomValue" aria-live="polite">73 %</output><button type="button" id="boardZoomIn" aria-label="Zoom ind">+</button></div>
+      </div>
+      <div class="board-scroll" id="boardScroll" tabindex="0" aria-label="Flyt rundt på Talstien, brug zoom og Find æslet til at følge brikken"><div class="board" id="board"></div></div>
+      <div class="legend"><span>🟦 1–20</span><span>🌷 21–40</span><span>🟨 41–60</span><span>🟩 61–80</span><span>🟪 81–100</span></div>
+      <p class="board-tip tiny">Træk med én finger for at se banen, knib med to fingre for at zoome, eller brug knapperne. Feltnumrene er altid synlige – også på actionfelter.</p>
+      <p class="board-stage-note tiny">I v0.8-A er banen forbedret. Selve terninge- og opgaveflowet ligger stadig i panelet ovenfor; i v0.8-B flytter vi det ind over spillepladen.</p>
+    </section>
   </section>
   </main>
 
-  <footer><strong>ÆselKlog · v0.7 · ElevenLabs-stemme, æsellyd og CPU-spil</strong><br>Den almindelige kortspilsvariant udvikles særskilt. Denne prøve handler om Talstien og læringsopgaverne.<div class="footer-links"><button type="button" class="btn soft small" id="testVoice">🔊 Prøv æslets stemme</button></div></footer>
+  <footer><strong>ÆselKlog · v0.8-A · Snoet spilleplade, dansk stemme, æsellyd og CPU-spil</strong><br>Den almindelige kortspilsvariant udvikles særskilt. Denne prøve handler om Talstien og læringsopgaverne.<div class="footer-links"><button type="button" class="btn soft small" id="testVoice">🔊 Prøv æslets stemme</button></div></footer>
 </div>
 
 <div id="diceOverlay" class="dice-overlay" hidden role="dialog" aria-modal="true" aria-label="Terningeskærm">
@@ -169,5 +239,6 @@
 </div>
 
 <script src="./engine.js" defer></script>
+<script src="./board.js" defer></script>
 <script src="./app.js" defer></script>
 </body></html>
