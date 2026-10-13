@@ -24,8 +24,16 @@ Dette repository er et familie-/læringsspil. **Læs altid `UDVIKLINGSPLAN.md` f
 - Matematik er **altid valgfri**. Spillet skal kunne spilles for sjov uden opgaver.
 - Kort- og brætdesign skal være originalt; tallene er vigtigere end dekorationer.
 - Appen bør fungere på iPhone, iPad, Android og desktop, både ved fysiske og digitale terninger.
-- Den aktuelle arbejdsleverance er **v0.8-B** (udviklet; ikke automatisk uploadet til GitHub). Næste fase er **v0.8-C**, med flere actionfelter. Den samlede v0.8 er ikke færdig, indtil statusfilen dokumenterer det.
+- Den aktuelle arbejdsleverance er **v0.8-C (pakket til upload, endnu ikke bekræftet på GitHub Pages)**. Næste fase er **v0.8-D** (animationer, lyd og feedback). Den samlede v0.8 er ikke færdig, indtil statusfilen dokumenterer det.
 
 
 ## Stemmer – v0.8-B.1
 Den offentlige Worker-URL ligger som konstant i `app.js`. API-nøglen findes kun i Cloudflare Secrets. AI-stemmer hentes fra `/voices` og afspilles via `/tts`, aldrig direkte fra ElevenLabs i browseren. Arbejd videre fra den nyeste GitHub-`main` og den separate Worker-kilde. Ny stemme kræver enten ElevenLabs Voices: Read + konto-stemme eller eksplicit godkendelse i Worker-konfigurationen. Ved release skal både app og Worker dokumenteres/testes separat.
+
+## Actionfelter – v0.8-C
+
+- Actionfelter, ikoner, regler for overraskelser og flyttegrænser er samlet i `actions.js` (`AeselActions`). `board.js` tegner dem. `app.js` udfører dem.
+- **Ingen handlingskæder**: bonus-/straf-/broflytning må ikke udløse et nyt specialfelt på destinationen.
+- Gulerod giver højst ét ekstra kast på en tur. Vandpyt springer præcis næste tur over, også ved CPU. Overraskelser giver +3, +2, -1 eller -2 felter. Bro giver +4. Superopgaven er **altid frivillig** og har ingen straf ved fejl.
+- CPU skal deltage i alle handlinger, og alle bevægelser skal respektere det valgte talområdes start og mål.
+- Kør `node tests/actions.test.js`, `node tests/board.test.js` og `node tests/flow.test.js`, og kontrollér derefter på rigtig iPhone før release.

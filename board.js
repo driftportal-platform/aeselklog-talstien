@@ -1,4 +1,4 @@
-/* ÆselKlog Talstien v0.8-A: programmatisk SVG-spilleplade.
+/* ÆselKlog Talstien v0.8-C: programmatisk SVG-spilleplade.
    Samtlige 100 felter og koordinater afledes her – ingen AI-genererede tal.
    Dette modul ændrer ikke spillets terninge- eller opgaveregler. */
 (function(root, factory){
@@ -15,7 +15,7 @@ const LEVELS=[
  {name:'61–80',color:'#dff1d6',deep:'#377a51'},
  {name:'81–100',color:'#ecdafa',deep:'#7c4aa3'}
 ];
-const ACTIONS={bonus:{icon:'★',label:'Bonus'},hov:{icon:'🫏',label:'Hov hov'},byt:{icon:'⇄',label:'Byt'},mester:{icon:'🏆',label:'Talmester'},gulerod:{icon:'🥕',label:'Gulerod'},vandpyt:{icon:'💧',label:'Vandpyt'},overraskelse:{icon:'🎁',label:'Overraskelse'}};
+const ACTIONS={bonus:{icon:'★',label:'Bonus'},hov:{icon:'🫏',label:'Hov hov'},byt:{icon:'⇄',label:'Byt'},mester:{icon:'🏆',label:'Talmester'},gulerod:{icon:'🥕',label:'Gulerod'},vandpyt:{icon:'💧',label:'Vandpyt'},overraskelse:{icon:'🎁',label:'Overraskelse'},bro:{icon:'🌉',label:'Bro'},super:{icon:'🎯',label:'Superopgave'}};
 function pos(n){
  if(n===0)return{x:69,y:1067};
  if(!Number.isInteger(n)||n<1||n>100)throw Error('Ukendt talfelt: '+n);

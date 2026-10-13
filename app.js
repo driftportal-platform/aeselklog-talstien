@@ -1,4 +1,4 @@
-/* ÆselKlog Talstien v0.8-B.1: automatisk AI-stemme, stemmevælger og fuldskærmsbane og sekventielt kast → hop → læring → bonus → action. */
+/* ÆselKlog Talstien v0.8-C: fem nye actiontyper, synlige hændelser og sikkert CPU/turflow. */
 (()=>{'use strict';
 const $=id=>document.getElementById(id);
 const qs=sel=>document.querySelector(sel);
@@ -8,8 +8,10 @@ const S=window.AeselEngine;
 const B=window.AeselBoard;
 if(!B||!B.validate()){document.body.textContent='ÆselKlog kan ikke starte: board.js mangler eller har ugyldige felter.';return;}
 if(!S){document.body.textContent='ÆselKlog kan ikke starte: engine.js mangler.';return;}
-const SPECIAL={5:'bonus',10:'hov',15:'byt',24:'mester',29:'bonus',35:'byt',44:'bonus',50:'mester',55:'hov',64:'hov',69:'bonus',75:'byt',84:'bonus',90:'hov',95:'mester'};
-const SPECIAL_ICON={bonus:'⭐',hov:'🫏',byt:'🔄',mester:'🏆'};
+const A=window.AeselActions;
+if(!A||!A.validate()){document.body.textContent='ÆselKlog kan ikke starte: actions.js mangler eller har ugyldige felter.';return;}
+const SPECIAL=A.FIELDS;
+const SPECIAL_ICON=Object.fromEntries(Object.entries(A.DETAILS).map(([key,d])=>[key,d.icon]));
 const LEARN_DIE=['1 2 3','L / U','10 + 1','👑','> <','+ −'];
 const rand=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
 const radio=name=>qs(`input[name="${name}"]:checked`)?.value;
@@ -24,6 +26,7 @@ let aiVoices=[{id:'mia',name:'Mia – varm dansk fortæller'}],aiVoicesLoadedAt=
 let setupPlayers=[{name:'Spiller 1',age:6,kind:'child',difficulty:'mellem'},{name:'Spiller 2',age:8,kind:'child',difficulty:'mellem'}];
 let players=[],config=null,turn=0,phase='setup',challenge=null,pending=null,resultLines=[],winner=null;
 let busy=false,gameToken=0,showDiceState=null,taskTimer=null,taskDeadline=0;
+let extraRollUsed=false,actionBannerSerial=0;
 const prefersLessMotion=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 let boardScale=0.73,followActive=true,boardExpanded=false,boardFitMode=false;
 let bray=null;
@@ -237,15 +240,15 @@ function renderSetupPlayers(){
 renderSetupPlayers();
 $('addPlayer').addEventListener('click',()=>{if(setupPlayers.length<4){setupPlayers.push({name:`Spiller ${setupPlayers.length+1}`,age:7,kind:'child',difficulty:'mellem'});renderSetupPlayers()}});
 function show(view){['setup','game'].forEach(id=>$(id).classList.toggle('active',view===id));window.scrollTo({top:0,behavior:'instant'})}
-function resetAsync(){gameToken++;clearInterval(taskTimer);taskTimer=null;busy=false;showDiceState=null;hideDice();if(boardExpanded)setBoardExpanded(false);stopCurrentVoice();bray?.pause();}
+function resetAsync(){gameToken++;clearInterval(taskTimer);taskTimer=null;busy=false;extraRollUsed=false;showDiceState=null;hideDice();hideActionFlash();if(boardExpanded)setBoardExpanded(false);stopCurrentVoice();bray?.pause();}
 $('startButton').addEventListener('click',()=>{
  resetAsync();
  const raw=$('range').value,all=raw==='1-100';
  const start=all?0:Number(raw.split('-')[0])-1,goal=all?100:Number(raw.split('-')[1]);
  config={raw,all,start,goal,learning:radio('learning'),boardMode:radio('boardMode'),moveDice:radio('moveDice'),learnDice:radio('learnDice')};
- players=setupPlayers.map((p,i)=>({...p,name:(p.name||'').trim()||`Spiller ${i+1}`,color:COLORS[i],id:`player${i+1}`,isCPU:false,pos:start}));
- if($('cpuCheck').checked)players.push({name:'Æslet',kind:'cpu',age:8,color:'#c18b46',id:'cpu',isCPU:true,pos:start});
- turn=0;phase='move';challenge=null;pending=null;resultLines=[];winner=null;
+ players=setupPlayers.map((p,i)=>({...p,name:(p.name||'').trim()||`Spiller ${i+1}`,color:COLORS[i],id:`player${i+1}`,isCPU:false,pos:start,skipNextTurn:false}));
+ if($('cpuCheck').checked)players.push({name:'Æslet',kind:'cpu',age:8,color:'#c18b46',id:'cpu',isCPU:true,pos:start,skipNextTurn:false});
+ turn=0;phase='move';challenge=null;pending=null;resultLines=[];winner=null;extraRollUsed=false;
  $('rangeTitle').textContent=all?'Hele Talstien · 1–100':`Talområde ${raw}`;
  $('boardModeLabel').textContent=config.boardMode==='physical'?'Fysisk bræt + app-overblik':'Digital spilleplade';
  show('game');buildBoard();render();setBoardExpanded(true);say(`Hov hov! Velkommen til Talstien. ${players[turn].name} starter!`);
@@ -328,7 +331,7 @@ function updateBoardHud(){
  $('boardHudDot').style.background=p.color;
  $('boardHudName').textContent=phase==='win'?'🏆 Vinder: '+winner.name:(p.isCPU?'🫏 ':'')+p.name+'s tur';
  $('boardHudPosition').textContent=(p.pos===config?.start?'START':`Felt ${p.pos}`)+
-  ' · '+({move:'Slå terningen',learn:'Læringsterning',question:'Svar på opgaven',moving:'Æslet hopper',feedback:'Svar afgjort',result:'Næste spiller',swap:'Byt felt',win:'MÅL!'}[phase]||'Spil');
+  ' · '+({move:extraRollUsed?'Ekstra kast':'Slå terningen',learn:'Læringsterning',question:'Svar på opgaven',moving:'Æslet hopper',feedback:'Svar afgjort',result:'Næste spiller',swap:'Byt felt',skipped:'Spring tur over', 'super-offer':'Frivillig superopgave',win:'MÅL!'}[phase]||'Spil');
  $('boardPanelDock').dataset.phase=phase;
 }
 $('boardRepeat').addEventListener('click',()=>say(sound.last||`Nu er det ${players[turn]?.name||'din'} tur.`));
@@ -395,9 +398,21 @@ function drawBoard(){
  const layer=$('boardPlayers');if(layer)layer.innerHTML=boardTokens();
 }
 function drawScores(){
- $('scores').innerHTML=players.map((p,i)=>`<div class="score-card ${i===turn?'active':''}"><span class="mini-donkey" style="--fur:${p.color}">${donkeySvg(p.color)}</span><div><strong>${esc(p.name)}</strong><div class="meta">${p.isCPU?'Computer':p.kind==='adult'?`Voksen · ${p.difficulty==='svaer'?'Svær':p.difficulty==='let'?'Let':'Mellem'}`:`${p.age} år`}</div></div><div style="margin-left:auto;text-align:right"><span class="pos">${p.pos===config.start?'START':p.pos}</span><div class="meta">felt</div></div></div>`).join('');
+ $('scores').innerHTML=players.map((p,i)=>`<div class="score-card ${i===turn?'active':''}"><span class="mini-donkey" style="--fur:${p.color}">${donkeySvg(p.color)}</span><div><strong>${esc(p.name)}</strong><div class="meta">${p.isCPU?'Computer':p.kind==='adult'?`Voksen · ${p.difficulty==='svaer'?'Svær':p.difficulty==='let'?'Let':'Mellem'}`:`${p.age} år`}${p.skipNextTurn?' · 💧 En tur over':''}</div></div><div style="margin-left:auto;text-align:right"><span class="pos">${p.pos===config.start?'START':p.pos}</span><div class="meta">felt</div></div></div>`).join('');
 }
 function btn(label,action,style='main'){return `<button type="button" class="btn ${style}" data-act="${action}">${label}</button>`}
+function hideActionFlash(){
+ actionBannerSerial++;
+ const toast=$('actionToast');if(toast){toast.hidden=true;toast.classList.remove('show')}
+}
+function flashAction(type,title,detail){
+ const toast=$('actionToast');if(!toast)return;
+ const id=++actionBannerSerial;
+ toast.innerHTML=`<div class="toast-icon">${SPECIAL_ICON[type]||'⭐'}</div><div><strong>${esc(title)}</strong><small>${esc(detail)}</small></div>`;
+ toast.hidden=false;toast.classList.remove('show');void toast.offsetWidth;toast.classList.add('show');
+ setTimeout(()=>{if(id===actionBannerSerial)hideActionFlash()},2300);
+}
+
 function render(){
  if(!config)return;
  drawScores();drawBoard();updateBoardHud();const p=players[turn];
@@ -408,7 +423,7 @@ function render(){
   panel.innerHTML=`<div class="finish"><div class="donkey">🏆🫏</div><h2>Hov hov! ${esc(winner.name)} vandt!</h2><p>Flot klaret på Talstien!</p>${btn('Spil igen','restart')}</div>`;return;
  }
  if(phase==='move'){
-  panel.innerHTML=`<h2>🎲 ${p.isCPU?'Nu slår Æslet terningen':`${esc(p.name)}, slå terningen`}</h2><p class="hint">${p.isCPU?'Æslets terning bliver også kastet og vist på skærmen.':config.moveDice==='physical'?'Kast din fysiske terning, og tryk på det antal øjne, du slog.':'Terningen fylder hele skærmen, når du slår.'}</p>${p.isCPU?'<p class="cpu-note">🫏 Vent et øjeblik – Æslet gør sig klar til sit slag …</p>':config.moveDice==='digital'?btn('🎲 Vis terningen','roll'):`<div class="dice-options">${[1,2,3,4,5,6].map(n=>`<button type="button" data-act="move-${n}">${n}</button>`).join('')}</div>`}`;
+  panel.innerHTML=`<h2>🎲 ${extraRollUsed?'🥕 Ekstra kast! ':''}${p.isCPU?'Nu slår Æslet terningen':`${esc(p.name)}, slå terningen`}</h2><p class="hint">${p.isCPU?'Æslets terning bliver også kastet og vist på skærmen.':config.moveDice==='physical'?'Kast din fysiske terning, og tryk på det antal øjne, du slog.':'Terningen fylder hele skærmen, når du slår.'}</p>${p.isCPU?'<p class="cpu-note">🫏 Vent et øjeblik – Æslet gør sig klar til sit slag …</p>':config.moveDice==='digital'?btn('🎲 Vis terningen','roll'):`<div class="dice-options">${[1,2,3,4,5,6].map(n=>`<button type="button" data-act="move-${n}">${n}</button>`).join('')}</div>`}`;
   return;
  }
  if(phase==='learn'){
@@ -416,15 +431,15 @@ function render(){
   return;
  }
  if(phase==='question'){
-  panel.innerHTML=`<h2>🫏 ${p.isCPU?'Æslet tænker …':'Æslet spørger!'}</h2><span class="age-chip">${esc(challenge.tier)} ${p.kind==='adult'?'· Tid på opgaven':'· Uden tidsgrænse'}</span><div class="prompt ${p.kind==='child'&&p.age<=4?'early':''}"><div class="tiny">${esc(S.TASKS[challenge.type-1].name)} · felt ${p.pos}</div><h3>${esc(challenge.question)}</h3>${challenge.adapted?'<p class="hint">Opgaven er gjort lettere til dit niveau.</p>':''}</div>
+  panel.innerHTML=`<h2>🫏 ${pending?.superTask?'🎯 Superopgave':p.isCPU?'Æslet tænker …':'Æslet spørger!'}</h2><span class="age-chip">${esc(challenge.tier)} ${p.kind==='adult'?'· Tid på opgaven':'· Uden tidsgrænse'}</span><div class="prompt ${p.kind==='child'&&p.age<=4?'early':''}"><div class="tiny">${esc(S.TASKS[challenge.type-1].name)} · felt ${p.pos}</div><h3>${esc(challenge.question)}</h3>${challenge.adapted?'<p class="hint">Opgaven er gjort lettere til dit niveau.</p>':''}</div>${pending?.superTask?'<p class="super-prize">🎯 Frivillig bonus: +3 felter for et rigtigt svar · ingen straf for fejl</p>':''}
    ${!p.isCPU&&p.kind==='adult'?`<div class="question-time" id="questionTime"><span>⏱️ Du har</span><strong id="clock" class="clock-big">${challenge.timeLimit||30} sek.</strong><div class="time-track"><div id="timeFill" class="time-fill"></div></div></div>`:''}
    <div class="choices">${challenge.options.map((opt,i)=>`<button class="choice ${p.kind==='child'&&p.age<=4?'early':''}" ${p.isCPU?'disabled':''} data-act="answer-${i}">${esc(opt)}</button>`).join('')}</div>
    ${p.isCPU?'<p class="hint">Æslet prøver selv – det kan også svare forkert!</p>':`<div class="voicebar">${btn('🔊 Læs op','read','soft')} ${btn('💡 Få et tip','help','soft')}</div><div id="tip" class="help" hidden>${esc(challenge.help)}</div>`}`;
   return;
  }
  if(phase==='feedback'){
-  const good=pending.correct;
-  panel.innerHTML=`<div class="feedback ${good?'':'error'}"><h2>${good?'✅ Godt svaret!':'🫏 Iiiih-åååh! Iiiih-åååh!'}</h2><p>${esc(pending.feedback)}</p><p class="hint">${p.isCPU?'Æslet skal også hoppe på banen.':'Nu ser vi om du får et ekstra skridt …'}</p></div>`;return;
+  const good=pending?.superTask?pending.superCorrect:pending.correct;
+  panel.innerHTML=`<div class="feedback ${good?'':'error'}"><h2>${good?(pending?.superTask?'🎯 Superklaret!':'✅ Godt svaret!'):'🫏 Iiiih-åååh! Iiiih-åååh!'}</h2><p>${esc(pending.feedback)}</p><p class="hint">${p.isCPU?'Æslet skal også hoppe på banen.':'Nu ser vi om du får et ekstra skridt …'}</p></div>`;return;
  }
  if(phase==='moving'){
   panel.innerHTML=`<div class="move-message"><div class="moving-donkey" style="--fur:${p.color}">${donkeySvg(p.color)}</div><div><h2>Hop, hop, hop! 🥕</h2><p id="moveProgress">${esc(p.name)} hopper fra felt ${p.pos} mod felt ${pending?.target??pending?.landing??'?'} …</p><p class="hint">Følg det farvede æsel, mens det hopper felt for felt.</p></div></div>`;return;
@@ -432,6 +447,12 @@ function render(){
  if(phase==='swap'){
   const others=players.filter((_,i)=>i!==turn);
   panel.innerHTML=`<h2>🔄 Byt felt!</h2><p class="hint">Du landede på Byt. Vælg en anden spiller eller behold din plads.</p><div class="choices">${others.map(o=>`<button class="choice" data-act="swap-${esc(o.id)}">${esc(o.name)} · felt ${o.pos}</button>`).join('')}</div><div class="voicebar">${btn('Behold min plads','swap-none','soft')}</div>`;return;
+ }
+ if(phase==='super-offer'){
+  panel.innerHTML=`<h2>🎯 Frivillig superopgave!</h2><p class="hint">${esc(p.name)} landede på et superfelt. Prøv en alderspassende ekstra opgave og vind <strong>3 felter</strong>. I kan altid sige nej tak – også i LEG.</p>${p.isCPU?'<p class="cpu-note">🫏 Æslet beslutter sig …</p>':`<div class="choices">${btn('🎯 Prøv for +3 felter','super-yes')}${btn('Nej tak · næste spiller','super-no','soft')}</div>`}`;return;
+ }
+ if(phase==='skipped'){
+  panel.innerHTML=`<div class="feedback"><h2>💧 Vandpyt-pause!</h2><p>${esc(p.name)} står over denne tur og rykker ikke.</p></div>${p.isCPU?'<p class="cpu-note">Æslet venter pænt, til næste spiller er klar …</p>':btn('Næste spiller →','next')}`;return;
  }
  if(phase==='result'){
   panel.innerHTML=`<h2>✨ Sådan gik turen</h2><p class="result-text">${esc(resultLines.join('\n'))}</p>${btn('Næste spiller →','next')}`;return;
@@ -526,13 +547,15 @@ function processAnswer(idx,timedOut=false){
  clearInterval(taskTimer);taskTimer=null;
  const p=players[turn],got=idx===null?null:challenge.options[idx];
  const correct=!timedOut&&got===challenge.correct;
- pending.correct=correct;
+ const isSuper=Boolean(pending?.superTask);
+ if(isSuper)pending.superCorrect=correct;else pending.correct=correct;
+ const prize=isSuper?3:1;
  pending.feedback=timedOut?`Tiden løb ud! Det rigtige svar var ${challenge.correct}.`:
-    correct?`Det er rigtigt, ${p.name}! Du får ét ekstra skridt.`:`${p.name} svarede ${got}. Det rigtige svar var ${challenge.correct}.`;
- resultLines.push(correct?'✅ Rigtigt svar: +1 felt.':timedOut?'⏱️ Tiden gik! Intet ekstra felt.':'🫏 Forkert svar: intet ekstra felt.');
+    correct?`Det er rigtigt, ${p.name}! Du får ${prize} ekstra ${prize===1?'skridt':'felter'}.`:`${p.name} svarede ${got}. Det rigtige svar var ${challenge.correct}.`;
+ resultLines.push(correct?`✅ Rigtigt svar: +${prize} felter.`:timedOut?'⏱️ Tiden gik! Intet ekstra felt.':'🫏 Forkert svar: intet ekstra felt.');
  phase='feedback';render();if(!correct)playBray();else say(`${p.name}, det er rigtigt. Godt klaret!`);
  const g=gameToken;
- setTimeout(()=>{if(g===gameToken&&phase==='feedback')void finishLearning()},correct?1000:(sound.on?3550:850));
+ setTimeout(()=>{if(g===gameToken&&phase==='feedback')void (isSuper?finishSuper():finishLearning())},correct?1000:(sound.on?3550:850));
 }
 function skipChallenge(){if(phase!=='learn')return;pending.skip=true;pending.correct=false;resultLines.push('Opgaven blev sprunget over.');void finishLearning()}
 async function hopSteps(p,to,speed=245){
@@ -562,33 +585,97 @@ async function finishLearning(){
  if(p.pos>=config.goal){declareWin(p);return;}
  void resolveLandingAction();
 }
+// Specialfelter afvikles kun én gang på slutpositionen. Nye flytninger udløser IKKE flere felter.
+function completeTurn({announce=true}={}){
+ const p=players[turn];
+ if(p.pos>=config.goal){declareWin(p);return;}
+ phase='result';render();
+ if(announce)say(`Hov hov! ${p.name} er nu på felt ${p.pos}.`);
+}
 async function resolveLandingAction(){
- if(!pending||busy)return;
+ if(!pending||busy||pending.actionHandled)return;
  const g=gameToken,p=players[turn],special=SPECIAL[p.pos];
+ pending.actionHandled=true;
+ if(!special){completeTurn();return;}
  busy=true;
- if(special==='bonus'||special==='hov'||special==='mester'){
-  const effect=special==='bonus'?2:special==='hov'?-2:1;
-  resultLines.push(special==='bonus'?'⭐ Bonus: +2 felter.':special==='hov'?'🫏 Hov hov!: −2 felter.':'🏆 Talmester: +1 felt.');
-  pending.target=Math.max(config.start,Math.min(config.goal,p.pos+effect));
+ const d=A.DETAILS[special];
+ flashAction(special,d.label,d.description);
+ resultLines.push(`${d.icon} ${d.label} på felt ${p.pos}.`);
+ // Kun én oplæsning pr. handling: undgå at afbryde AI-stemmen og forbruge ekstra credits.
+ if(['bonus','hov','mester','byt','bro'].includes(special))say(`${p.name}! ${d.label}. ${d.description}.`);
+ await defer(prefersLessMotion?100:850);
+ if(g!==gameToken)return;
+ if(special==='gulerod'){
+  if(!extraRollUsed){
+   extraRollUsed=true;resultLines.push('🥕 Du får ét ekstra almindeligt terningkast!');
+   pending=null;challenge=null;busy=false;phase='move';render();
+   say(`Hov hov! ${p.name} får et ekstra terningkast. Slå igen!`);
+   if(p.isCPU)scheduleCPU('move');
+   return;
+  }
+  resultLines.push('🥕 Du har allerede fået dit ekstra kast på denne tur.');
+  say(`Hov hov, ${p.name}! Du har allerede fået dit ekstra kast denne tur.`);
+ }
+ if(special==='vandpyt'){
+  p.skipNextTurn=true;
+  resultLines.push('💧 Våde hove: du står over din næste tur.');
+  say(`Plask! ${p.name} har våde hove og må stå over næste gang!`);
+ }
+ if(special==='super'){
+  busy=false;phase='super-offer';render();
+  say(`${p.name}, vil du prøve en frivillig superopgave og vinde tre ekstra felter?`);
+  if(p.isCPU){setTimeout(()=>{if(g===gameToken&&phase==='super-offer'&&players[turn]===p)chooseSuper(Math.random()<.75)},1000)}
+  return;
+ }
+ if(special==='bonus'||special==='hov'||special==='mester'||special==='bro'||special==='overraskelse'){
+  let delta=special==='bonus'?2:special==='hov'?-2:special==='mester'?1:special==='bro'?4:0;
+  if(special==='overraskelse'){
+   const surprise=A.surprise();delta=surprise.delta;
+   resultLines.push(`🎁 ${surprise.title}: ${delta>0?'+':''}${delta} felter.`);
+   flashAction(special,surprise.title,surprise.speech);
+   say(surprise.speech);
+  }else {
+   resultLines.push(`${d.icon} ${delta>0?'+':''}${delta} felter.`);
+  }
+  pending.target=A.destination(p.pos,delta,config.start,config.goal);
   phase='moving';render();
-  if(special==='hov')say(`${p.name}, hov hov! Du skal to felter tilbage!`);
   await hopSteps(p,pending.target);
   if(g!==gameToken)return;
  }
- if(g!==gameToken)return;
- busy=false;
- if(p.pos>=config.goal){declareWin(p);return;}
  if(special==='byt'&&players.length>1){
   if(p.isCPU){
    const o=players.filter(x=>x!==p).sort((a,b)=>b.pos-a.pos)[0];
-   if(o&&o.pos>p.pos){const target=o.pos,old=p.pos;resultLines.push(`🔄 Æslet byttede plads med ${o.name}.`);
-    p.pos=target;o.pos=old;drawBoard();drawScores();updateBoardHud();scrollToTile(target);await defer(650);
+   if(o&&o.pos>p.pos){const old=p.pos;
+    p.pos=o.pos;o.pos=old;
+    resultLines.push(`🔄 Æslet byttede plads med ${o.name}.`);
+    drawBoard();drawScores();updateBoardHud();scrollToTile(p.pos);await defer(650);
     if(g!==gameToken)return;
    }else resultLines.push('🔄 Æslet blev på sit felt.');
-  }else{phase='swap';render();return;}
+  }else{busy=false;phase='swap';render();return;}
  }
- if(p.pos>=config.goal){declareWin(p);return;}
- phase='result';render();say(`Hov hov! ${p.name} er nu på felt ${p.pos}.`);
+ if(g!==gameToken)return;
+ busy=false;completeTurn({announce:false});
+}
+function chooseSuper(yes){
+ if(busy||phase!=='super-offer')return;
+ const p=players[turn];
+ if(!yes){resultLines.push('🎯 Superopgaven blev sprunget over.');completeTurn({announce:false});return;}
+ pending.superTask=true;
+ // Små børn får et simpelt tal; ældre børn og voksne får et regnestykke.
+ const type=(p.kind==='child'&&p.age<=4)?1:6;
+ challenge=S.makeChallenge({player:p,type,field:p.pos,roll:pending.roll});
+ phase='question';render();say(`${p.name}! Her kommer din superopgave: ${challenge.question}`);
+ if(p.isCPU)scheduleCPU('question');else startAdultTimer();
+}
+async function finishSuper(){
+ if(!pending||busy)return;
+ const g=gameToken,p=players[turn];busy=true;
+ if(pending.superCorrect){
+  pending.target=A.destination(p.pos,3,config.start,config.goal);
+  phase='moving';render();await hopSteps(p,pending.target,300);
+  if(g!==gameToken)return;
+ }
+ busy=false;completeTurn({announce:false});
 }
 async function swapWith(playerId){
  if(phase!=='swap'||busy)return;
@@ -602,10 +689,17 @@ async function swapWith(playerId){
 }
 function declareWin(p){winner=p;phase='win';render();say(`Hov hov! Tillykke ${p.name}! Du vandt ÆselKlog Talstien!`)}
 function nextTurn(){
- if(busy||phase!=='result')return;
- turn=(turn+1)%players.length;phase='move';pending=null;challenge=null;resultLines=[];
- render();say(`Hov hov! Nu er det ${players[turn].name}s tur.`);
- if(players[turn].isCPU)scheduleCPU('move');
+ if(busy||(phase!=='result'&&phase!=='skipped'))return;
+ turn=(turn+1)%players.length;phase='move';pending=null;challenge=null;resultLines=[];extraRollUsed=false;
+ const p=players[turn];
+ if(p.skipNextTurn){
+  p.skipNextTurn=false;phase='skipped';resultLines=[`💧 ${p.name} springer denne tur over efter vandpytten.`];
+  render();say(`${p.name} har våde hove og står over denne tur!`);
+  if(p.isCPU){const g=gameToken;setTimeout(()=>{if(g===gameToken&&phase==='skipped'&&players[turn]===p)nextTurn()},1550)}
+  return;
+ }
+ render();say(`Hov hov! Nu er det ${p.name}s tur.`);
+ if(p.isCPU)scheduleCPU('move');
 }
 function scheduleCPU(which){
  const g=gameToken;
@@ -631,6 +725,8 @@ $('turnPanel').addEventListener('click',e=>{
  else if(a==='skip')skipChallenge();
  else if(a.startsWith('swap-')&&phase==='swap')swapWith(a.slice(5));
  else if(a==='swap-none'&&phase==='swap'){resultLines.push('🔄 Ingen bytte.');phase='result';render()}
+ else if(a==='super-yes'&&phase==='super-offer')chooseSuper(true);
+ else if(a==='super-no'&&phase==='super-offer')chooseSuper(false);
  else if(a==='next')nextTurn();
  else if(a==='restart'){resetAsync();phase='setup';show('setup')}
 });

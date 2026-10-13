@@ -247,6 +247,43 @@
       .boardbox.expanded .board-game-hud{max-width:72vw}
     }
     @media(prefers-reduced-motion:reduce){.board-panel-dock,.board-game-hud{transition:none!important}}
+
+    /* v0.8-C – hændelser og frivillige superopgaver. */
+    .action-toast[hidden]{display:none!important}
+    .action-toast{position:absolute;z-index:31;left:50%;top:22%;transform:translate(-50%,-20%) scale(.85);
+      max-width:min(380px,70vw);display:flex;align-items:center;gap:13px;
+      background:#fffdf4f4;border:3px solid #e8b96c;border-radius:22px;
+      padding:14px 18px;box-shadow:0 15px 35px #2b472750;pointer-events:none;
+      text-align:left;opacity:0}
+    .action-toast.show{animation:actionPop .5s cubic-bezier(.2,1.3,.25,1) forwards}
+    .action-toast .toast-icon{font-size:clamp(2rem,5vw,3rem);line-height:1}
+    .action-toast strong{display:block;font-size:clamp(1rem,2vw,1.22rem);color:#904b28}
+    .action-toast small{display:block;font-size:.84rem;line-height:1.25;color:#465b46}
+    @keyframes actionPop{0%{opacity:0;transform:translate(-50%,-20%) scale(.7) rotate(-4deg)}
+      65%{opacity:1;transform:translate(-50%,-20%) scale(1.06) rotate(2deg)}
+      100%{opacity:1;transform:translate(-50%,-20%) scale(1)}}
+    .action-help{position:relative;z-index:25;flex:none;}
+    .action-help>summary{font-size:.77rem;font-weight:800;background:#fff9e7;
+      color:#214c58;border:1px solid #d1dfd3;border-radius:10px;padding:8px 10px;
+      cursor:pointer;list-style:none;white-space:nowrap;min-height:35px}
+    .action-help>summary::-webkit-details-marker{display:none}
+    .action-help-grid{position:absolute;z-index:40;left:0;bottom:calc(100% + 8px);
+      background:#fffefa;border:2px solid #cfdaae;border-radius:15px;
+      box-shadow:0 8px 26px #1e512744;width:min(300px,80vw);max-height:65dvh;overflow:auto;
+      padding:10px 13px;font-size:.81rem;line-height:1.42}
+    .action-help-grid div{padding:4px 0;border-bottom:1px solid #e6eddd}
+    .action-help-grid div:last-child{border:0}
+    .super-prize{background:#fff0c3;border-radius:10px;border:1px solid #f0d37a;
+      color:#6d421d;padding:9px 10px;margin:8px 0;font-weight:800;font-size:.86rem}
+    .board-panel-dock[data-phase="super-offer"] .btn{margin:4px 2px}
+    .board-panel-dock[data-phase="skipped"] .feedback{background:#e2f2fc}
+    @media(max-width:650px) and (orientation:landscape){
+      .boardbox.expanded .board-toolbar{max-width:61vw}
+      .action-help>summary{font-size:.68rem;padding:6px;min-height:32px}
+      .action-toast{top:27%;padding:10px;max-width:50vw}
+      .action-toast small{font-size:.73rem}
+    }
+    @media(prefers-reduced-motion:reduce){.action-toast.show{animation:none;opacity:1;transform:translate(-50%,-20%)}}
   </style>
 </head>
 <body>
@@ -327,9 +364,17 @@
       <div class="board-toolbar" role="group" aria-label="Styr spillepladens visning">
          <button type="button" class="btn soft small" id="boardFollow">🫏 Find æslet</button>
          <button type="button" class="btn soft small" id="boardFit">🗺 Hele banen</button>
+         <details class="action-help"><summary>🎁 Felter</summary><div class="action-help-grid" aria-label="Hvad gør specialfelterne?">
+           <div>⭐ Bonus – 2 frem</div><div>🫏 Hov hov – 2 tilbage</div>
+           <div>🔄 Byt – byt plads</div><div>🏆 Talmester – 1 frem</div>
+           <div>🥕 Gulerod – ét ekstra kast</div><div>💧 Vandpyt – stå over næste tur</div>
+           <div>🎁 Overraskelse – frem eller tilbage</div><div>🌉 Bro – 4 frem</div>
+           <div>🎯 Superopgave – frivillig opgave, 3 frem ved rigtigt svar</div>
+         </div></details>
          <div class="zoom-controls"><button type="button" id="boardZoomOut" aria-label="Zoom ud">−</button><output id="boardZoomValue" aria-live="polite">73 %</output><button type="button" id="boardZoomIn" aria-label="Zoom ind">+</button></div>
       </div>
       <div class="board-scroll" id="boardScroll" tabindex="0" aria-label="Flyt rundt på Talstien, brug zoom og Find æslet til at følge brikken"><div class="board" id="board"></div></div>
+      <div class="action-toast" id="actionToast" role="status" aria-live="polite" hidden></div>
       <div id="boardHud" class="board-game-hud" aria-live="polite">
         <span class="hud-player-dot" id="boardHudDot"></span>
         <div class="hud-message"><strong id="boardHudName">ÆselKlog</strong><small id="boardHudPosition">Velkommen til Talstien</small></div>
@@ -338,12 +383,12 @@
       <div class="board-panel-dock" id="boardPanelDock" role="region" aria-label="Tur og matematikopgave"></div>
       <div class="legend"><span>🟦 1–20</span><span>🌷 21–40</span><span>🟨 41–60</span><span>🟩 61–80</span><span>🟪 81–100</span></div>
       <p class="board-tip tiny">Træk med én finger for at se banen, knib med to fingre for at zoome, eller brug knapperne. Feltnumrene er altid synlige – også på actionfelter.</p>
-      <p class="board-stage-note tiny">I v0.8-B vises terninger, opgaver og turknapper direkte på den store spilleplade.</p>
+      <p class="board-stage-note tiny">I v0.8-C får du gulerødder, vandpytter, overraskelser, broer og frivillige superopgaver.</p>
     </section>
   </section>
   </main>
 
-  <footer><strong>ÆselKlog · v0.8-B.1 · Fuldskærmsbane og stemmevælger med terninger, opgaver, dansk stemme og CPU</strong><br>Den almindelige kortspilsvariant udvikles særskilt. Denne prøve handler om Talstien og læringsopgaverne.<div class="footer-links"><button type="button" class="btn soft small" id="testVoice">🔊 Prøv æslets stemme</button></div></footer>
+  <footer><strong>ÆselKlog · v0.8-C · Sjove actionfelter, fuldskærmsbane, stemmevælger og CPU</strong><br>Den almindelige kortspilsvariant udvikles særskilt. Denne prøve handler om Talstien og læringsopgaverne.<div class="footer-links"><button type="button" class="btn soft small" id="testVoice">🔊 Prøv æslets stemme</button></div></footer>
 </div>
 
 <div id="diceOverlay" class="dice-overlay" hidden role="dialog" aria-modal="true" aria-label="Terningeskærm">
@@ -360,5 +405,6 @@
 
 <script src="./engine.js" defer></script>
 <script src="./board.js" defer></script>
+<script src="./actions.js" defer></script>
 <script src="./app.js" defer></script>
 </body></html>

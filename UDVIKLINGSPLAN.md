@@ -1,210 +1,103 @@
-## Opdatering 13. oktober 2026 – v0.8-B.1 stemmevælger
+# ÆselKlog – udviklingsplan og fælles projektstatus
 
-**Status: kode pakket til upload; ikke bekræftet live på GitHub Pages/Cloudflare.**
-
-- [x] Stemme-URL ligger automatisk i appkoden; manuel indtastning er fjernet.
-- [x] AI-stemmevælger med Mia som standard, prøveoplæsning og gemt valg.
-- [x] Cloudflare Worker har `/voices`-liste og tillader kun godkendte stemmer ved `/tts`.
-- [x] Mulighed for automatisk liste fra ElevenLabs ved `Voices: Read`, plus manuelt godkendte ekstra stemmer.
-- [x] Telefonstemme og ægte æsellyd bevares; spilskærm, terninger og opgaver uændret.
-- [x] Browser-test og Worker-kontrakttest med simulerede lydsvar.
-- [ ] Opdater Cloudflare Workeren med ny pakke.
-- [ ] Upload app v0.8-B.1 til GitHub Pages.
-- [ ] Bekræft ægte dansk ElevenLabs-lyd og stemmeskift på iPhone.
-- [ ] Tilføj og test 1–3 ekstra danskegnede stemmer i ElevenLabs.
-
-**Næste planlagte spilfase:** v0.8-C med ekstra actionfelter.
-
----
-
-# ÆselKlog – udviklingsplan og projektstatus
-
-> **Projektets fælles huskeliste og facit for fremdrift.** Denne fil skal holdes opdateret og læses sammen med koden, hver gang vi arbejder videre. Den beskriver både hvad der virker, hvad vi har besluttet, og hvad der mangler.
+> Dette er vores **eneste løbende status- og planlægningsfil**. Læs nyeste GitHub-`main` + `README.md` + `AGENTS.md`, før du udvikler videre. Opdater status, tests og kendte fejl efter hver version.
 
 **Opdateret:** 13. oktober 2026  
-**Senest bekræftede kodeversion i GitHub `main` før denne udvikling:** v0.8-A (13. oktober 2026)  
-**Ny klar udviklingspakke til GitHub:** v0.8-B (skal uploades før den er live)  
-**Næste udviklingsfase:** v0.8-C – flere actionfelter og sjovere hændelser  
+**Sidst bekræftet på GitHub `main` før ændringen:** v0.8-B.1  
+**Ny lokal udviklingspakke:** v0.8-C, **endnu ikke bekræftet live**  
+**Næste fase:** v0.8-D, mere liv i spillet (bevægelser, lyd og feedback)  
 **Repository:** https://github.com/driftportal-platform/aeselklog-talstien  
 **Spil:** https://driftportal-platform.github.io/aeselklog-talstien/
 
-## 1. Den overordnede idé
+## 1. Grundidé – beslutninger vi bevarer
 
-ÆselKlog skal være et hyggeligt familiespil, der også kan lære børn matematik. Der findes fysiske talkort, en fysisk Talstien-spilleplade og en app, der kan bruges sammen med eller uden det fysiske spil. **Læringsopgaver er frivillige.** Man skal altid kunne spille uden skoleopgaver.
+- ÆselKlog er et originalt familiespil med fysisk kortspil, fysisk A3-spilleplade og en valgfri digital app.
+- **Læringsopgaver skal altid være frivillige.** En LEG-variant uden matematik er obligatorisk.
+- Fem lysfarvede talområder: 1–20, 21–40, 41–60, 61–80, 81–100; alle tal én gang og korrekt rækkefølge.
+- Fysiske kort: 63 × 88 mm. Foreløbig produktidé: 5 af hvert tal og 8 æselkort pr. talområde. Alle kort kan læses i begge ender.
+- Spillere får navn (helst kaldenavn), alder og farvet æselbrik. Børn fra 3 år med lette opgaver, 5–6 år også enkel plus/minus; ældre får gangetabeller, primtal og hovedregning.
+- Børn **uden tidspres** som standard. Voksne: 60 / 30 / 10 sekunder efter sværhedsgrad.
+- Fysiske eller digitale terninger, CPU-Æsel som kaster synligt og svarer forkert en del af tiden.
+- Fuldskærms-snoet bane på mobil, automatisk fokus på æslet, zoom/pan, terninge-/opgavepanel som overlay.
+- Ægte æsellyd ved forkerte svar, AI-stemmer fra ElevenLabs via Cloudflare Worker, offline telefonstemme som fallback. **Ingen secrets i GitHub**.
 
-**Beslutninger, vi bevarer:**
+## 2. Versionsoversigt og fremdrift
 
-- Fem talområder med hver sin lyse farve: **1–20, 21–40, 41–60, 61–80 og 81–100**.
-- Fysiske kort i **63 × 88 mm**. Foreløbigt produktkoncept pr. talområde: 5 af hvert tal og 8 æselkort. Et enkelt print-testsæt kan bestå af ét af hvert tal + 8 æselkort.
-- Kortene har store, tydelige tal, kan læses fra begge ender, har diskrete læringssymboler og samme bagside.
-- Spil fra cirka **3 år til voksen**. Meget lette opgaver til de yngste; lettere plus/minus allerede omkring 5–6 år; gradvist større udfordringer, gangestykker, division, primtal og blandet hovedregning.
-- **Børn: ingen tidsgrænse som udgangspunkt. Voksne: 60, 30 eller 10 sekunder afhængigt af sværhedsgraden.**
-- Flere spillere med kaldenavn, alder og personlig brikfarve. **Æslet som CPU** skal kaste terninger, få opgaver og indimellem svare forkert (foreløbig ca. 30 %).
-- Både fysisk og digital bevægelsesterning og læringsterning. CPU kaster altid synligt i appen.
-- **Ægte æselskry** ved forkerte svar. ElevenLabs-stemmen *Mia* til tale, med enhedens lokale oplæsning som reserve. AI-nøgler ligger kun som secrets hos Cloudflare, aldrig i offentlig GitHub-kode.
-- Oprindeligt æselspil-inspireret spilprincip, men helt eget navn, figurer og design; rettighedskontrol før salg.
-
-## 2. Aktuel status – hvad findes i v0.8-B?
-
-Denne status er baseret på GitHubs v0.8-A-filer og en ny v0.8-B-kodepakke afprøvet lokalt i Chromium den 13. oktober 2026. Upload til GitHub er endnu ikke udført for v0.8-B.
-
-| Område | Status | Bemærkning |
+| Fase | Indhold | Status |
 | --- | --- | --- |
-| Spilleroprettelse, alder, voksenvalg | ✅ I koden | Testet tidligere i prototypen; gentest efter ændringer |
-| Talområder og eksisterende digital 1–100-bane | ✅ I koden | 100 unikke, programmatisk tegnede felter i ny v0.8-A-pakke |
-| Fysisk/digital terning og læringsterning | ✅ I koden | Nyt overlay-flow ønskes |
-| Aldersopdelte opgaver, voksen-timer | ✅ I koden | `engine.js` |
-| CPU og farvede æselbrikker | ✅ I koden | Mere synlig tursekvens ønskes |
-| Ægte æsellyd | ✅ I koden | `donkey-bray.wav` |
-| ElevenLabs / Cloudflare AI-stemme | 🟡 Under afprøvning | Bruger har hørt ændret stemme; endelig live-verifikation, forbrug og kvalitet mangler |
-| Fuldskærms-spilleplade og snoet bane | ✅ v0.8-B-kode | Automatisk ved spilstart, fylder 100dvh i landskab, zoom/følg; iPhone-test udestår |
-| Nye actionfelter (Gulerod, Vandpyt, Overraskelse) | ⬜ Planlagt | Hører til v0.8-C; eksisterende fire actionfelter fungerer |
+| 0.8-A | Korrekt SVG-bane 1–100, bondegård, touchzoom | ✅ På GitHub og videreført |
+| 0.8-B | Fuldskærms-spilleplade, terning → hop → læring → bonus → action | ✅ På GitHub og videreført |
+| 0.8-B.1 | Automatisk ElevenLabs-URL og stemmevælger (Mia + andre) | ✅ På GitHub, **bekræftet af bruger at virke** |
+| **0.8-C** | **Nye actionfelter med regler, feedback og CPU-adfærd** | ✅ **Kodet og testet i Node**, ⬜ GitHub-upload/iPhone-test mangler |
+| 0.8-D | Polerede animations- og lydforløb, sejrs-/fejlfeedback | ⬜ Ikke startet |
+| 0.8-E | Helhedstest mobil, alder, CPU, lydforbrug og release | ⬜ Ikke startet |
+| 0.9 | Gem/fortsæt spil, adaptiv læring og test med familier/Hyggeonkel | 📋 Fremtidig idé |
 
-**Kodens fordeling:** `board.js` = original SVG-bane og felternes koordinater; `index.html` = layout/styling; `app.js` = spilforløb, terninger, brikker, lyd, specialfelter; `engine.js` = matematikopgaver; `sw.js` = cache/offline; `aeselklog-card.webp` = maskot; `donkey-bray.wav` = æselskry.
+## 3. V0.8-C – regler og handlinger
 
-> **Vigtigt:** Byg videre på den seneste version i GitHub. Undgå at starte forfra eller miste eksisterende funktioner og filer.
+**Alle specialfelter skal beholde deres tal på banen. 25 felter fordelt 5 i hvert talområde.** Felter og effektgrundlag ligger samlet i `actions.js`, tegningen i `board.js` og handlingen i `app.js`.
 
-## 3. Mål for v0.8
+| Talområde | Specielle felter (tal: handling) |
+| --- | --- |
+| 1–20 | 5: Bonus · **7: Gulerod** · 10: Hov hov · 15: Byt · **16: Vandpyt** |
+| 21–40 | 24: Talmester · **27: Overraskelse** · 29: Bonus · 35: Byt · **37: Bro** |
+| 41–60 | 44: Bonus · **47: Gulerod** · 50: Talmester · 55: Hov hov · **57: Superopgave** |
+| 61–80 | 64: Hov hov · **67: Vandpyt** · 69: Bonus · 75: Byt · **78: Overraskelse** |
+| 81–100 | 84: Bonus · **86: Gulerod** · 90: Hov hov · **93: Superopgave** · 95: Talmester |
 
-**Hovedmål:** Spillepladen er centrum. Efter spilstart bliver spilleren på en stor, levende spilleplade, hvor terninger, læringsspørgsmål og actionfelter vises ovenpå uden hop tilbage til hovedmenuen.
+### Vigtige spilleregler
 
-### 3.1 Ny visuel spilleplade – v0.8-A
+- ⭐ Bonus +2, 🫏 Hov hov −2, 🔄 Byt plads, 🏆 Talmester +1 (gamle felter).
+- 🥕 Gulerod: **ét ekstra almindeligt kast** med animation; højst én bonusrulle pr. tur, også for CPU.
+- 💧 Vandpyt: **stå over præcis den næste tur**; status vises ved spillerens navn. CPU springer også over.
+- 🎁 Overraskelse: tilfældig +3, +2, −1 eller −2 felter; ekstra flytning vises.
+- 🌉 Bro: +4 felter; stop ved talområdets slutning.
+- 🎯 Superopgave: **altid frivillig**, også i LEG. Passende for alder; korrekt svar → +3 felter, forkert/nej tak → ingen straf eller ekstra felter. Den voksne spiller får normal tidsgrænse.
+- Alle actionflytninger respekterer start og mål; **de udløser ikke nye specialfelter** på destinationen. En ekstra gulerodsrulle er en selvstændig turdel og må udløse andre specialfelter – blot ikke flere gulerodsruller.
+- Action udføres **efter almindeligt kast → bevægelse → valgt læringsterning → eventuel læringsbonus**. På actionfelt vises kort animation/tekst og én relevant stemmereaktion, så vi sparer ElevenLabs-credits.
 
-**Implementeret i ZIP-pakken (ikke automatisk live på GitHub Pages):**
+## 4. Kodeorganisation
 
-- [x] Større visning med **Stor plade** og **✕ Luk**, uden at nulstille spillets stilling. CSS-baseret heldækkende visning og iPhone-safe-area.
-- [x] Et originalt bondegårdslandskab med stald, træer, blomster, hegn, dam, gulerødder, høns, sol og målskilt.
-- [x] **Alle 100 tal vises præcis én gang**, og den sammenhængende sti går i korrekt rækkefølge.
-- [x] 1–20 venstre → højre, 21–40 højre → venstre, 41–60 venstre → højre, 61–80 højre → venstre, 81–100 venstre → højre. Buer ved vendingerne.
-- [x] Fem lyse farvezoner. De gamle actionfelter vises med ikon **uden at skjule tallet**.
-- [x] Alle felter genereres deterministisk i et separat modul `board.js` (SVG), ingen tekst sat på billeder.
-- [x] Mobil panorering, zoom +/- samt knib-til-zoom, **Find æslet**, **Hele banen** og automatisk scroll/følg ved hop.
-- [x] Farvede spilleræsler og CPU-brik indtegnes dynamisk på SVG-stien.
-- [x] Respekt for `prefers-reduced-motion`, store knapper og viewport-sikker placering.
-- [x] **Næste tur, terninger og opgaver direkte oven på den store plade** i v0.8-B; X lukker til det almindelige oversigtspanel uden at afbryde spillet.
-- [ ] Virkelig iPhone/Safari og tablet-test mangler; Chromium er testet med mobilvisning både liggende og stående samt desktopvisning.
+| Fil | Ansvar |
+| --- | --- |
+| `index.html` | Skærm, layout, specialfelt-menu og animationslag |
+| `board.js` | Programmatisk SVG-bane, 100 nummererede felter og actionikoner |
+| `actions.js` | **NY:** Specialfelter, beskrivelser, overraskelser og bevægelsesgrænser |
+| `app.js` | Spilflow, tur-rækkefølge, CPU, actions, stemmevalg og animation |
+| `engine.js` | Lokale, aldersbestemte matematikopgaver og voksentimer |
+| `sw.js` | Offline-cache; husk at øge cachens version ved opdateringer |
+| `donkey-bray.wav` | Ægte æsellyd ved forkert svar |
+| `aeselklog-card.webp` / `icon.svg` | Spillets maskot og ikon |
+| `tests/` | Node-tests af bane, actionmotor og spilflow |
 
-**Testet lokalt 2026-10-13:** JavaScript uden fejl, 100 unikke felter, mobil 390×844 og desktop 1360×970, zoom, udvid/luk, menneskespiller med fysisk terning og udfordringsopgave, CPU's terning-/opgaveforløb. Ingen live-test på telefonen eller AI-stemmen i denne ændring.
+## 5. Teststatus og åbne kontrolpunkter
 
-### 3.2 Turforløb uden sideskift – v0.8-B
+- [x] 100 heltalsfelter 1–100 og sammenhængende zigzag-bane kontrolleret (Node).
+- [x] 25 specialfelter og 9 handlingstyper kontrolleret (Node).
+- [x] Overraskelse +3/+2/−1/−2 og klampning ved områdegrænser kontrolleret (Node).
+- [x] Gulerod kun én ekstra turdel; nulstilling næste tur (simuleret Node-spilflow).
+- [x] Vandpyt springer en enkelt efterfølgende tur over (simuleret Node-spilflow).
+- [x] Bro, superopgave, valgfrit nej tak og +3 ved korrekt svar (simuleret Node-spilflow).
+- [x] CPU-bonus og CPU-superafslag (simuleret Node-spilflow).
+- [x] `node --check` på ny JS, `node tests/actions.test.js`, `node tests/board.test.js`, `node tests/flow.test.js`.
+- [ ] **Gennemspil alle specialfelter på rigtig iPhone i liggende format.** Browsernavigation i udviklingsmiljø er blokeret, så fuld visuel browsertest er ikke gennemført.
+- [ ] Kontrollér CPU'ens automatiske ekstra terningkast og tur der springes over på rigtig telefon.
+- [ ] Afprøv 3-årige børn, 5–6-årige og voksen-timer under actionquizzer.
+- [ ] Bekræft AI-tale, æsellyd og om taleafbrydelser/forbrug er acceptable i dette release.
+- [ ] Opdater GitHub til v0.8-C og bekræft PWA-cachen på mobil.
 
-**Status 13. oktober 2026: IMPLEMENTERET OG BROWSERTESTET (endnu ikke live-afprøvet på iPhone).**
+## 6. Næste fase v0.8-D
 
-- [x] Efter **Start spillet** åbner banen automatisk i en CSS-baseret fuldskærmsvisning (`100vw × 100dvh`), også i liggende mobilformat.
-- [x] Lille X lukker til normalvisningen uden at nulstille spillet; *Stor plade* åbner den igen.
-- [x] Flydende HUD med aktivt spillernavn og felt; **Gentag**, **Find æslet**, **Hele banen** og zoom ligger på pladen.
-- [x] Eksisterende turpanel flyttes ind på selve spillepladen, så terninger, spørgsmål, svarmuligheder og **Næste spiller** vises over banen uden sideskift.
-- [x] Terningekast → **almindeligt hop først** → læringsterning/spørgsmål → eventuelt +1 hop → specialfelt på slutpositionen.
-- [x] CPU beholder sin digitale terning og kan svare forkert. Fysisk terning, LEG/LÆR/UDFORDRING og voksentimer er videreført.
-- [x] Ved zoom/følg forsøger kameraet at vise den aktive brik til venstre for opgavekortet; **Hele banen** viser overblikket.
-- [x] Store tomme sidekanter undgås ved at vælge et beskåret udsnit i standardvisningen i stedet for at presse hele banen ind på skærmen.
-- [x] Rettet rækkefølge for specialfelter: handlingen udføres på **aktuel slutposition**, ikke altid på det oprindelige terningelandingsfelt.
-- [ ] Fysisk iPhone Safari, hjemmeskærms-PWA, iPad og alle skærmrotationer skal gennemtestes efter upload.
+- Glattere og sjovere terninge-/æselanimationer, vinder-confetti og synlig belønning.
+- Klarere opgave-overlays og hjælp til de yngste uden at skjule brættet.
+- Bedre timing i AI-tale og handlinger; understøt altid lyd fra/til og gentagelse.
+- Børnevenlige, letlæselige kontroller, sikkerhed ved hurtige tryk, reduceret bevægelse.
+- Mulige senere felter: staldpause/skjold, hjælp en ven, æselhop, ekstra banetemaer.
 
+## 7. Arbejdsgang ved næste version
 
-**Den præcise rækkefølge er vigtig og er besluttet sådan:**
-
-1. Spillepladen er synlig. Æslet/Mia siger eksempelvis: *“Så er det Annas tur!”*
-2. Bevægelsesterningen vises som et stort kort-overlay med ÆselKlog-logo. Brugeren slår digitalt (terningen hopper/ruller) eller indtaster resultat af fysisk terning. CPU ruller synligt selv.
-3. **Først flytter det farvede æsel sig det antal felter, terningen viste** – ét animeret hop pr. felt. Kameraet følger brikken.
-4. Hvis læringsdelen er valgt: Vis læringsterning (digital/fysisk) og lav en opgave, der passer til spillerens alder, niveau og det **nye felt**. Læs spørgsmålet højt.
-5. Spilleren svarer. Børn har normalt ingen timer. Voksne har efter valgt niveau 60/30/10 sekunder.
-6. **Rigtigt svar:** fejring og **ét ekstra animeret felt**. **Forkert/tid ude:** ægte æselskry, ingen ekstra felt. CPU kan også fejle.
-7. **Specialfeltets handling sker på slutpositionen** efter en eventuel læringsbonus. Bonus/straf/bytte animeres. Ekstra flytninger må ikke sætte uendelige nye actions i gang.
-8. Pladen forbliver åben. Vis **Næste tur** og annoncer næste spiller; samme flow igen.
-
-**LEG-tilstand:** uden læringsopgaver springes punkt 4–6 over. I alle tilstande må man altid kunne bruge de almindelige spilregler.
-
-**Foreslået teknisk state machine:** `boardReady → announce → moveDie → animateMove → learnDie → question → answer → bonusMove → specialAction → turnFinished → boardReady`. Den konkrete implementering kan navngives anderledes, men må ikke ændre rækkefølgen eller udløse dobbeltslag.
-
-### 3.3 Flere actionfelter – v0.8-C
-
-| Ikon | Handling | Status |
-| --- | --- | --- |
-| ⭐ Bonus | Gå 2 felter frem | Findes allerede |
-| 🫏 Hov hov! | Gå 2 felter tilbage | Findes allerede |
-| 🔄 Byt | Byt plads med en anden spiller | Findes allerede |
-| 🏆 Talmester | Gå 1 felt frem | Findes allerede |
-| 🥕 Gulerod | Få ét ekstra almindeligt terningkast; max én gang i samme tur | Nyt i v0.8 |
-| 💧 Vandpyt | Stå over din næste tur; tilstand vises ved spillerens navn | Nyt i v0.8 |
-| 🎁 Overraskelse | Træk tilfældig, enkel hændelse (positiv eller negativ) | Nyt i v0.8 |
-
-Sørg for jævn fordeling og rimelig balance – ingen action på næsten alle felter. Definér actionplaceringer centralt i koden og brug samme data til både visning og effekt. Ingen uendelige actionkæder. Test særskilt med CPU og flere spillere.
-
-**Til idébanken efter v0.8:** 🌉 Bro/genvej, 🛖 Staldpause/skjold, 🎯 Superopgave, 🤝 Hjælp en ven, 🫏 Æselhop.
-
-### 3.4 Animationer, lyd og oplevelse – v0.8-D
-
-- [ ] Stor terningeanimation midt på skærmen, gerne med kortdesign og logo; samme for CPU.
-- [ ] Opgave og svarmuligheder i tydeligt overlay, mens pladen kan ses bagved.
-- [ ] Farvet æsel hopper felt for felt; også på ekstra skridt og actions.
-- [ ] Rigtigt svar = kort fejring. Forkert svar = ægte æselskry.
-- [ ] Mia annoncerer spiller, slag, opgave, korrekt/ukorrekt og actions; lokal tale som fallback.
-- [ ] Giv mulighed for at slå lyd fra og gentage opgaven.
-- [ ] Beskyt mod dobbelte tryk, dobbelt handling, hurtige CPU-ture og animationer, der afbryder hinanden.
-- [ ] Behold privatlivsprincippet: børnenavne helst kaldenavne; ingen API-nøgle i appen; send kun oplæsningstekst til stemmetjenesten.
-
-## 4. Implementeringsplan og fremdrift
-
-| Milepæl | Leverance | Status |
-| --- | --- | --- |
-| **0.8-A** | Korrekt snoet 1–100-bane, baggrund, udvid/luk, mobilzoom | ✅ Uploadet til GitHub; iPhone-test afventes |
-| **0.8-B** | Automatisk fuldskærm, flydende kontrolpanel, kast → flyt → læring → ekstra skridt → action | ✅ Bygget og browserafprøvet; skal uploades og iPhone-testes |
-| **0.8-C** | Flere actions, CPU-flow, æselanimationer | ⬜ Ikke startet |
-| **0.8-D** | Talerutiner, opgave-overlays, voksen-timer, tilgængelighed | ⬜ Ikke startet |
-| **0.8-E** | Test, fejlrettelser, dokumentation, versionering og udgivelse | ⬜ Ikke startet |
-
-**Anbefalet prioritering:** Færdiggør og test A + B først, før vi udvider med mange actiontyper. På den måde får vi den vigtigste forbedring uden at skabe nye fejl i spillemotoren.
-
-## 5. Testkrav før en udgave må kaldes v0.8 færdig
-
-- [x] Alle 100 tal ligger én gang og i korrekt, sammenhængende rækkefølge (automatisk model- og DOM-test).
-- [x] Actionikoner skjuler ikke tal, og start-/slutpositioner er modelleret for alle fem områder; nærmere spiltest på mobil mangler.
-- [x] Appen beholder spillepladen som hovedvisning under en hel tur i browserens mobil-landskabsvisning (virkelig iPhone-test afventes).
-- [x] Bevægelsesbrikken går **før** læringsopgaven, og ekstra skridt sker **efter** rigtigt svar (browsertest med fysisk terning og opgave).
-- [x] Fysisk terning, digital terning-overlay og CPU-terning kontrolleret i browser; CPU-forkert-svar logik videreført fra v0.7.
-- [ ] Treårige får lette genkendelsesopgaver; 5–6-årige kan få let plus/minus; ældre får gradvist sværere spørgsmål; voksentimer virker.
-- [ ] Alle actionfelter og spring over tur virker uden løkker eller utilsigtet dobbeltflytning.
-- [ ] Tale, æselskry og lyden fra ElevenLabs/fallback afbryder ikke spillets flow.
-- [ ] Offline-funktioner for grundspillet bevares; internet kræves kun til AI-tale.
-- [ ] iPhone/Safari/PWA samt mindst én desktopbrowser er testet; touch, zoom og skærmrotation fungerer.
-- [x] Versionsnummer, serviceworker-cache, README og UDVIKLINGSPLAN er opdateret til v0.8-B i leverancepakken.
-
-## 6. Kendte risici / afklaringer
-
-1. **100 tal på en lille mobilskærm:** kræver zoom/følg aktiv brik samt overbliksvisning. Undgå at presse alle små tal ind samtidig.
-2. **Animation + terninger + CPU:** brug én central turtilstand for at undgå parallelle hændelser.
-3. **Hvornår virker specialfeltet?** V0.8-regel: på slutpositionen efter læringsbonus. Afprøves med børn.
-4. **Gulerod/ekstra kast:** højst ét ekstra kast i samme tur, så runder kan afsluttes.
-5. **ElevenLabs og Cloudflare:** først rigtig live-test af Mia, forbrugsbegrænsninger og status ved nedbrud; en ændret stemme er ikke i sig selv bevis for korrekt AI-forbindelse.
-6. **Design og kommercielt salg:** egne figurer og nye regler; rettigheder, CE/legetøj og lydrettigheder undersøges før salg.
-
-## 7. Efter v0.8 – idébank
-
-- Flere banetemaer og årstider, brik-tilpasning, flere sjove æselreaktioner.
-- Nye actions som bro, skjold, superopgave, hjælp en ven og æselhop.
-- Mere individuel progression, læringsstatistik for forældre/lærere med passende privatlivsbeskyttelse.
-- Gem/fortsæt spil samt mere gnidningsfri brug med fysiske kort og A3-plade.
-- Særlige samarbejdsrunder, udfordringer og flere spilvarianter til hver aldersgruppe.
-
-## 8. Fast udviklingsrutine – så vi altid tager udgangspunkt i det nyeste
-
-**Før en ny ændring:**
-1. Hent de nyeste filer fra GitHub `main`, ikke en tidligere chat-ZIP.
-2. Læs `README.md`, denne `UDVIKLINGSPLAN.md` og `AGENTS.md`.
-3. Kontrollér den faktiske version i `index.html`, `app.js` og `sw.js`; noter hvad der virker, og hvad der endnu kun er planlagt.
-4. Lav målrettede ændringer med små testbare milepæle, og bevar funktionerne fra tidligere versioner.
-
-**Efter en ændring:**
-1. Kør relevante tests og markér tydeligt forskellen mellem implementeret, testet og planlagt.
-2. Opdatér afkrydsningerne her, kendte fejl og versionsnummer.
-3. Opdatér README og serviceworker-cache, når spilfiler ændres.
-4. Gem ændringerne i GitHub med en meningsfuld commit, så næste udviklingsrunde kan begynde fra den faktiske seneste status.
-
-### Dokumentets ændringslog
-
-- **2026-10-13 (v0.8-B):** Stor bane som automatisk heldækkende spilvisning (844×390, 390×844 og 1280×800 afprøvet), flydende turpanel og HUD, terning/opgaver oven på banen; omordnet turflow til **kast → hop → opgave → bonus → action**, CPU-terning beholdt. Testet 100 SVG-felter, fysisk bonuskast 5→7, flytning før læring, korrekt svar +1, CPU-terning og X-luk/genåbn. Browser- og kildekontrol uden JavaScript-fejl. Test på rigtig iPhone og ElevenLabs live mangler. Ingen nye actiontyper i B.
-
-- **2026-10-13 (v0.8-A):** Ny original SVG-bane, 100 testede numre, farveområder, bondegårdsgrafik, zoom/følg og udvid/luk. Appens øvrige spilmotor og stemmekode videreført. 0.8-B/C/D/E stadig åbne.
-
-- **2026-10-13:** Første fælles status- og udviklingsplan. Kortlagt v0.7 i GitHub og planlagt v0.8 med ny bane, turflow, actionfelter og animations-/talesystem.
+1. Hent **aktuel GitHub `main`** før ændringer. Læs `AGENTS.md`, `README.md`, denne fil og de relevante JS-filer.
+2. Verificér faktisk versionsnummer og hvad der er live/implementeret/testet. Bevar tidligere funktioner og appens Cloudflare-forbindelse.
+3. Udvikl ændringen i små, kontrollerbare trin, og kør relevante tests.
+4. Opdatér roadmap, README, versionsnummer og serviceworker-cache. Del ZIP/commit og vær åben om utestede funktioner.
+5. Del ALDRIG ElevenLabs-secrets; brug kaldenavne til børn, og kontroller rettigheder før salg.
