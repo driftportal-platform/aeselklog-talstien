@@ -1,4 +1,4 @@
-const CACHE='aeselklog-talstien-v08d-tables-voice-topscore';
+const CACHE='aeselklog-talstien-v08e-quality';
 const CORE=['./','./index.html','./app.js','./engine.js','./board.js','./actions.js','./leaderboard.js','./manifest.webmanifest','./icon.svg','./aeselklog-card.webp','./donkey-bray.wav'];
 self.addEventListener('install',ev=>ev.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',ev=>ev.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));

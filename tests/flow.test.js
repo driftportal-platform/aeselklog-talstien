@@ -11,8 +11,8 @@ function element(id=''){
  const e={id,classList:{add:x=>classNames.add(x),remove:x=>classNames.delete(x),contains:x=>classNames.has(x),toggle:(x,b)=>{if(b===undefined)b=!classNames.has(x);if(b)classNames.add(x);else classNames.delete(x);return b}},
    dataset:{},style:{},value:'',hidden:false,innerHTML:'',textContent:'',disabled:false,checked:false,options:[],
    clientWidth:844,clientHeight:390,scrollLeft:0,scrollTop:0,offsetWidth:3,
-   addEventListener:()=>{},querySelector:()=>element(),append:()=>{},replaceChildren:()=>{},
-   setAttribute:()=>{},getBoundingClientRect:()=>({width:320,height:200}),scrollTo:()=>{}};
+   addEventListener:()=>{},querySelector:()=>element(),append:()=>{},remove:()=>{},setAttribute:()=>{},replaceChildren:()=>{},
+   getBoundingClientRect:()=>({width:320,height:200}),scrollTo:()=>{}};
  if(id==='boardScroll'){e.clientWidth=844;e.clientHeight=390;}
  return e;
 }
