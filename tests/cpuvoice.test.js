@@ -1,0 +1,15 @@
+const assert=require('node:assert/strict');
+const V=require('../cpuvoice.js');
+const voices=[{id:'mia',name:'Mia'},{id:'glenn123',name:'Glenn'}];
+assert.equal(V.chooseVoice(voices,'mia','auto'),'glenn123','Different voice from narrator');
+assert.equal(V.chooseVoice([{id:'mia',name:'Mia'},{id:'miaActualID',name:'Mia Danish'},{id:'glenn123',name:'Glenn'}],'mia','auto'),'glenn123','Skip duplicate alias for Mia');
+assert.equal(V.chooseVoice(voices,'glenn123','auto'),'mia','Auto prefers Mia if different');
+assert.equal(V.chooseVoice(voices,'mia','mia'),'mia','Can explicitly pick Mia');
+assert.equal(V.chooseVoice(voices,'mia','glenn123'),'glenn123','Can explicitly pick Glenn');
+assert.equal(V.chooseVoice(voices,'mia','unknown'),'glenn123','Unapproved voice is never forwarded');
+assert.equal(V.chooseVoice([{id:'mia',name:'Mia'}],'mia','auto'),'mia','Single-voice fallback');
+assert.equal(V.chooseVoice([{id:'not allowed!*',name:'Bogus'}],'mia','auto'),'mia','Invalid ID ignored');
+assert(V.makeReply(54,()=>0).includes('54'),'CPU always says its chosen answer');
+assert(V.makeReply('Ulige',()=>.9).includes('Ulige'));
+assert(!V.makeReply('x'.repeat(200),()=>0).includes('x'.repeat(50)),'Answer length bounded');
+console.log('OK: CPU voice selection, valid IDs, and spoken answers');

@@ -58,3 +58,16 @@ Skriv ved en fejl: **enhed og browser, spiltype, valgt alder/tabel, placering p�
 - [ ] Test AI-stemme og æsellyd både online og i offline/telefonstemme-tilstand.
 
 **Bemærk:** Gemte spil findes kun i browserens lagring på denne enhed. Rydning af webstedsdata eller privat browsing kan fjerne dem.
+
+
+## v0.9.1 – prøve af sjov CPU-stemme
+
+1. Åbn indstillingerne og vælg Mia som spilleleder. Vælg Glenn eller *Automatisk* under **CPU-æslets egen stemme**.
+2. Tryk **▶ Hør CPU-æslet svare**, og lyt efter en anderledes, lidt fjollet stemme.
+3. Start et spil med CPU, vælg UDFORDRING eller TABELTRÆNING, og lad Æslet få et spørgsmål.
+4. Kontroller, at CPU'en siger sit valgte svar **før** "rigtigt/forkert" vises; svaret skal også være markeret på skærmen.
+5. Ved forkert CPU-svar kommer ægte æsellyd. Ved korrekt svar får CPU'en sit ekstra felt. Kontroller tempo og bevægelse.
+6. Test at slå lyd fra, genindlæse appen, skifte mellem to stemmer og fortsætte et gemt spil. Test også offline telefonstemmen.
+7. Sammenlign AI-credits før og efter 5–10 CPU-spørgsmål. Korte svar bruger stadig separate AI-forespørgsler; kontrollér forbrugsgrænserne.
+
+**Automatiseret:** `node tests/cpuvoice.test.js` og `python tests/cpu_voice_browser.py` (mockede svar og lyd, ingen reelle API-kald).

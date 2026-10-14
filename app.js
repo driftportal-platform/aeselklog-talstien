@@ -1,4 +1,4 @@
-/* ÆselKlog Talstien v0.9: gem/fortsæt og individuel, alderssikker læring. */
+/* ÆselKlog Talstien v0.9.1: sjov CPU-stemme oven på v0.9 gem/fortsæt og adaptiv læring. */
 (()=>{'use strict';
 const $=id=>document.getElementById(id);
 const qs=sel=>document.querySelector(sel);
@@ -11,7 +11,8 @@ if(!S){document.body.textContent='ÆselKlog kan ikke starte: engine.js mangler.'
 const L=window.AeselLeaderboard;
 const G=window.AeselSave;
 const P=window.AeselAdaptive;
-if(!G||!P){document.body.textContent='ÆselKlog kan ikke starte: savegame.js eller adaptive.js mangler.';return;}
+const CV=window.AeselCpuVoice;
+if(!G||!P||!CV){document.body.textContent='ÆselKlog kan ikke starte: savegame.js, adaptive.js eller cpuvoice.js mangler.';return;}
 const A=window.AeselActions;
 if(!A||!A.validate()){document.body.textContent='ÆselKlog kan ikke starte: actions.js mangler eller har ugyldige felter.';return;}
 const SPECIAL=A.FIELDS;
@@ -24,7 +25,7 @@ const defer=(ms)=>new Promise(ok=>setTimeout(ok,ms));
 const AI_VOICE_BASE='https://aeselklog-mia-stemme-test.driftportal-platform.workers.dev';
 const AI_TTS_ENDPOINT=AI_VOICE_BASE+'/tts';
 const AI_VOICES_ENDPOINT=AI_VOICE_BASE+'/voices';
-const sound={on:true,last:'',selected:'auto',rate:1,pitch:1,mode:'ai',aiVoice:'mia'};
+const sound={on:true,last:'',selected:'auto',rate:1,pitch:1,mode:'ai',aiVoice:'mia',cpuVoice:'auto'};
 const voiceKey='aeselklog-voice-v03';
 let aiVoices=[{id:'mia',name:'Mia – varm dansk fortæller'}],aiVoicesLoadedAt=0,aiVoiceLoading=null;
 let setupPlayers=[{name:'Spiller 1',age:6,kind:'child',difficulty:'mellem'},{name:'Spiller 2',age:8,kind:'child',difficulty:'mellem'}];
@@ -71,12 +72,22 @@ function syncVoiceControls(){
  $('voiceMode').value=sound.mode;
  $('aiVoiceControls').hidden=sound.mode!=='ai';
  renderAIVoices();
+ renderCPUVoices();
  $('deviceVoiceControls').hidden=sound.mode==='ai';
  $('voiceAvailability').hidden=sound.mode==='ai';
  aiStatus();
 }
 function aiStatus(message){
  $('aiVoiceStatus').textContent=message||'AI-stemme er klar til prøve. Mia er standardstemme.';
+}
+function renderCPUVoices(){
+ const select=$('cpuVoiceChoice'),value=sound.cpuVoice;
+ if(!select)return;
+ const opts=[{id:'auto',name:'Automatisk · anden stemme end spilleleder'},...aiVoices];
+ select.replaceChildren(...opts.map(v=>{const el=document.createElement('option');el.value=v.id;el.textContent=v.name;return el}));
+ if(opts.some(v=>v.id===value))select.value=value;
+ else if(aiVoicesLoadedAt){sound.cpuVoice='auto';select.value='auto';saveVoice()}
+ else select.value='auto';
 }
 function renderAIVoices(){
  const select=$('aiVoiceChoice');
@@ -106,18 +117,18 @@ async function loadAIVoices(force=false){
     const name=voice.name.trim().slice(0,65);
     if(name&&!voices.some(v=>v.id===voice.id))voices.push({id:voice.id,name});
    }
-   aiVoices=voices;aiVoicesLoadedAt=Date.now();renderAIVoices();
+   aiVoices=voices;aiVoicesLoadedAt=Date.now();renderAIVoices();renderCPUVoices();
    aiStatus(voices.length>1?`${voices.length} AI-stemmer tilgængelige. Vælg en, og tryk Prøv valgt stemme.`:
     (typeof data.hint==='string'&&data.hint.length<180?data.hint:'Mia er klar. Andre stemmer kan tilføjes i ElevenLabs.'));
   }catch(error){
-   aiVoices=[{id:'mia',name:'Mia – varm dansk fortæller'}];renderAIVoices();
+   aiVoices=[{id:'mia',name:'Mia – varm dansk fortæller'}];renderAIVoices();renderCPUVoices();
    aiStatus('Kun Mia vises lige nu. Opdater Cloudflare Worker for flere stemmer. ('+error.message+')');
   }finally{clearTimeout(timeout);aiVoiceLoading=null}
  })();
  return aiVoiceLoading;
 }
 function saveVoice(){
- try{localStorage.setItem(voiceKey,JSON.stringify({selected:sound.selected,rate:sound.rate,pitch:sound.pitch,mode:sound.mode,aiVoice:sound.aiVoice}))}catch(e){}
+ try{localStorage.setItem(voiceKey,JSON.stringify({selected:sound.selected,rate:sound.rate,pitch:sound.pitch,mode:sound.mode,aiVoice:sound.aiVoice,cpuVoice:sound.cpuVoice}))}catch(e){}
 }
 function stopCurrentVoice(){
  speechSerial++;
@@ -142,13 +153,14 @@ function waitForPlayback(begin,maxMs){
   try{begin(finish)}catch(e){console.warn('Oplæsning kunne ikke afspilles',e);finish()}
  });
 }
-function speakLocally(text){
+function speakLocally(text,{cpu=false}={}){
  if(!('speechSynthesis' in window)||!sound.on)return Promise.resolve();
  try{
   const sentence=normalizedSpeech(text);
   const u=new SpeechSynthesisUtterance(sentence);
-  u.lang='da-DK';u.rate=sound.rate;u.pitch=sound.pitch;
-  const ds=danishVoices();u.voice=ds.find(v=>(v.voiceURI||v.name)===sound.selected)||ds.find(v=>/premium|enhanced/i.test(v.name))||ds.find(v=>v.default)||ds[0]||null;
+  u.lang='da-DK';u.rate=cpu?Math.min(1.15,sound.rate*1.04):sound.rate;u.pitch=cpu?Math.min(1.5,sound.pitch*1.17):sound.pitch;
+  const ds=danishVoices();const narrator=ds.find(v=>(v.voiceURI||v.name)===sound.selected)||ds.find(v=>/premium|enhanced/i.test(v.name))||ds.find(v=>v.default)||ds[0]||null;
+  u.voice=cpu?(ds.find(v=>v!==narrator)||narrator):narrator;
   return waitForPlayback(done=>{u.onend=done;u.onerror=done;speechSynthesis.speak(u)},Math.min(28000,4000+sentence.length*160));
  }catch(e){console.warn('Lokal oplæsning kunne ikke starte',e);return Promise.resolve()}
 }
@@ -162,9 +174,10 @@ function ensureAudioContext(){
 // iOS tillader pålideligt Web Audio efter en brugerhandling (tryk på spil/terning).
 document.addEventListener('pointerdown',()=>{if(sound.on&&sound.mode==='ai')ensureAudioContext()}, {passive:true});
 document.addEventListener('keydown',()=>{if(sound.on&&sound.mode==='ai')ensureAudioContext()}, {passive:true});
-async function speakAI(text,id){
+async function speakAI(text,id,{cpu=false}={}){
  const endpoint=AI_TTS_ENDPOINT;
- const key=endpoint+'|'+sound.aiVoice+'|'+text;
+ const voiceId=cpu?CV.chooseVoice(aiVoices,sound.aiVoice,sound.cpuVoice):sound.aiVoice;
+ const key=endpoint+'|'+voiceId+'|'+text;
  let bytes;
  try{
   if(speechCache.has(key))bytes=speechCache.get(key);
@@ -173,7 +186,7 @@ async function speakAI(text,id){
    const timeout=setTimeout(()=>abort.abort(),25000);
    let response;
    try{
-    response=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text,voice:sound.aiVoice}),signal:abort.signal,cache:'no-store'});
+    response=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text,voice:voiceId}),signal:abort.signal,cache:'no-store'});
     if(!response.ok)throw new Error(`HTTP ${response.status}`);
     if(!String(response.headers.get('Content-Type')||'').includes('audio/'))throw new Error('Svaret indeholdt ikke lyd');
     bytes=await response.arrayBuffer();
@@ -187,14 +200,14 @@ async function speakAI(text,id){
    if(ctx.state==='suspended')await ctx.resume();
    const decoded=await ctx.decodeAudioData(bytes.slice(0));
    if(id!==speechSerial||!sound.on)return;
-   const node=ctx.createBufferSource();node.buffer=decoded;node.connect(ctx.destination);aiSource=node;
-   aiStatus('AI-lyd afspilles: '+(aiVoices.find(v=>v.id===sound.aiVoice)?.name||'ÆselKlog-stemme')+'.');
-   await waitForPlayback(done=>{node.onended=()=>{if(aiSource===node)aiSource=null;done()};node.start()},Math.min(45000,Math.max(2000,decoded.duration*1000+2000)));
+   const node=ctx.createBufferSource();node.buffer=decoded;node.playbackRate.value=cpu?1.07:1;node.connect(ctx.destination);aiSource=node;
+   aiStatus('AI-lyd afspilles: '+(aiVoices.find(v=>v.id===voiceId)?.name||'ÆselKlog-stemme')+(cpu?' · CPU-æsel.':'.'));
+   await waitForPlayback(done=>{node.onended=()=>{if(aiSource===node)aiSource=null;done()};node.start()},Math.min(45000,Math.max(2000,decoded.duration*1000/(cpu?1.07:1)+2000)));
   }else{
    const blob=new Blob([bytes],{type:'audio/mpeg'});
    const objectUrl=URL.createObjectURL(blob);
-   const audio=new Audio(objectUrl);audio._blobUrl=objectUrl;aiHtmlAudio=audio;
-   aiStatus('AI-lyd afspilles: '+(aiVoices.find(v=>v.id===sound.aiVoice)?.name||'ÆselKlog-stemme')+'.');
+   const audio=new Audio(objectUrl);audio._blobUrl=objectUrl;audio.playbackRate=cpu?1.07:1;aiHtmlAudio=audio;
+   aiStatus('AI-lyd afspilles: '+(aiVoices.find(v=>v.id===voiceId)?.name||'ÆselKlog-stemme')+(cpu?' · CPU-æsel.':'.'));
    try{
     await waitForPlayback(done=>{
      audio.onended=done;audio.onerror=done;
@@ -206,15 +219,15 @@ async function speakAI(text,id){
   if(id!==speechSerial||e.name==='AbortError')return;
   console.warn('Kunne ikke hente AI-lyd',e);
   aiStatus('AI-lyden kunne ikke hentes ('+e.message+'). Telefonstemmen bruges i stedet.');
-  return speakLocally(text);
+  return speakLocally(text,{cpu});
  }finally{if(id===speechSerial)aiFetch=null}
 }
-function say(text){
+function say(text,{cpu=false}={}){
  sound.last=text;
  stopCurrentVoice();
  if(!sound.on){lastNarration=Promise.resolve();return lastNarration}
  const t=normalizedSpeech(text),id=speechSerial;
- lastNarration=sound.mode==='ai'?speakAI(t,id):speakLocally(t);
+ lastNarration=sound.mode==='ai'?speakAI(t,id,{cpu}):speakLocally(t,{cpu});
  return lastNarration;
 }
 function playBray(){
@@ -237,6 +250,7 @@ function loadVoice(){
   if(p.pitch>=.85&&p.pitch<=1.2)sound.pitch=Number(p.pitch);
   if(p.mode==='ai'||p.mode==='device')sound.mode=p.mode;
   if(typeof p.aiVoice==='string'&&/^[a-zA-Z0-9_-]{1,50}$/.test(p.aiVoice))sound.aiVoice=p.aiVoice;
+  if(typeof p.cpuVoice==='string'&&(p.cpuVoice==='auto'||/^[a-zA-Z0-9_-]{1,50}$/.test(p.cpuVoice)))sound.cpuVoice=p.cpuVoice;
  }catch(e){}
  syncVoiceControls();refreshVoice();
 }
@@ -254,6 +268,11 @@ $('aiVoiceChoice').addEventListener('change',e=>{
  stopCurrentVoice();sound.aiVoice=e.target.value;saveVoice();
  aiStatus('Valgt: '+(aiVoices.find(v=>v.id===sound.aiVoice)?.name||'AI-stemme')+'. Tryk Prøv valgt stemme.');
 });
+$('cpuVoiceChoice').addEventListener('change',e=>{
+ stopCurrentVoice();sound.cpuVoice=e.target.value;saveVoice();
+ aiStatus('CPU-æslets stemme er valgt. Prøv den med knappen nedenfor.');
+});
+$('cpuVoicePreview').addEventListener('click',()=>say(CV.makePreview(),{cpu:true}));
 $('reloadAIVoices').addEventListener('click',()=>void loadAIVoices(true));
 $('voiceChoice').addEventListener('change',e=>{sound.selected=e.target.value;saveVoice();say('Hov hov! Jeg glæder mig til at lege med tallene!')});
 $('voiceSpeed').addEventListener('input',e=>{sound.rate=Number(e.target.value);syncVoiceControls();saveVoice()});
@@ -376,6 +395,7 @@ $('startButton').addEventListener('click',()=>{
  config={raw,all,start,goal,learning:radio('learning'),boardMode:radio('boardMode'),moveDice:radio('moveDice'),learnDice:radio('learnDice'),pace:['normal','rolig','ekstra'].includes($('gamePace').value)?$('gamePace').value:'rolig',tables:$('tablesChoice').value||'auto',adaptive:$('adaptiveCheck').checked};
  players=setupPlayers.map((p,i)=>({...p,name:(p.name||'').trim()||`Spiller ${i+1}`,color:COLORS[i],id:`player${i+1}`,isCPU:false,pos:start,skipNextTurn:false,stats:{correct:0,attempted:0},learning:P.fresh()}));
  if($('cpuCheck').checked)players.push({name:'Æslet',kind:'cpu',age:8,color:'#c18b46',id:'cpu',isCPU:true,pos:start,skipNextTurn:false,stats:{correct:0,attempted:0},learning:P.fresh()});
+ if($('cpuCheck').checked&&sound.mode==='ai')void loadAIVoices();
  turn=0;phase='move';challenge=null;pending=null;resultLines=[];winner=null;extraRollUsed=false;
  $('rangeTitle').textContent=all?'Hele Talstien · 1–100':`Talområde ${raw}`;
  $('boardModeLabel').textContent=config.boardMode==='physical'?'Fysisk bræt + app-overblik':'Digital spilleplade';
@@ -563,7 +583,7 @@ function render(){
   panel.innerHTML=`<h2>🫏 ${pending?.superTask?'🎯 Superopgave':p.isCPU?'Æslet tænker …':'Æslet spørger!'}</h2><span class="age-chip">${esc(challenge.tier)} ${p.kind==='adult'?'· Tid på opgaven':'· Uden tidsgrænse'}</span><div class="prompt ${p.kind==='child'&&p.age<=4?'early':''}"><div class="tiny">${esc(challenge.tableLabel||S.TASKS[challenge.type-1].name)} · felt ${p.pos}</div><h3>${esc(challenge.question)}</h3>${challenge.adapted?'<p class="hint">Opgaven er gjort lettere til dit niveau.</p>':''}${config.adaptive&&p.kind==='child'?`<p class="adapt-level">🧠 ${esc(P.label(p.learning?.step||0))}</p>`:''}</div>${pending?.superTask?'<p class="super-prize">🎯 Frivillig bonus: +3 felter for et rigtigt svar · ingen straf for fejl</p>':''}
    ${!p.isCPU&&p.kind==='adult'?`<div class="question-time" id="questionTime"><span>⏱️ Du har</span><strong id="clock" class="clock-big">${challenge.timeLimit||30} sek.</strong><div class="time-track"><div id="timeFill" class="time-fill"></div></div></div>`:''}
    <div class="choices">${challenge.options.map((opt,i)=>`<button class="choice ${p.kind==='child'&&p.age<=4?'early':''}" ${p.isCPU?'disabled':''} data-act="answer-${i}">${esc(opt)}</button>`).join('')}</div>
-   ${p.isCPU?'<p class="hint">Æslet prøver selv – det kan også svare forkert!</p>':`<div class="voicebar">${btn('🔊 Læs op','read','soft')} ${btn('💡 Få et tip','help','soft')}</div><div id="tip" class="help" hidden>${esc(challenge.help)}</div>`}`;
+   ${p.isCPU?'<p class="cpu-says" id="cpuSays" aria-live="polite">🫏 Æslet tænker … snart fortæller det sit svar højt!</p>':`<div class="voicebar">${btn('🔊 Læs op','read','soft')} ${btn('💡 Få et tip','help','soft')}</div><div id="tip" class="help" hidden>${esc(challenge.help)}</div>`}`;
   return;
  }
  if(phase==='feedback'){
@@ -909,7 +929,16 @@ function scheduleCPU(which){
   if(which==='question'){
    const pass=Math.random()>.30;
    const idx=pass?challenge.options.indexOf(challenge.correct):challenge.options.findIndex(v=>v!==challenge.correct);
-   processAnswer(idx);
+   if(idx<0)return;
+   const spokenAnswer=challenge.options[idx];
+   const bubble=$('cpuSays');
+   if(bubble)bubble.textContent='🫏 Æslet svarer: '+spokenAnswer;
+   const chosen=$(`turnPanel`)?.querySelector(`button[data-act="answer-${idx}"]`);
+   if(chosen)chosen.classList.add('cpu-chosen');
+   await say(CV.makeReply(spokenAnswer),{cpu:true});
+   await pauseBeat();
+   await waitUntilVisible();
+   if(g===gameToken&&phase==='question'&&players[turn]===p&&!busy)processAnswer(idx);
   }else showDie(which);
  })();
 }

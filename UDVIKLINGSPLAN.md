@@ -1,5 +1,24 @@
 # 🫏 ÆselKlog – udviklingsplan og projektstatus
 
+## Opdatering 14. oktober 2026 – v0.9.1 (CPU-stemme)
+
+**Status: v0.9.1 er udviklet lokalt og pakket til upload, men endnu ikke bekræftet på GitHub Pages.**
+
+- [x] CPU-æslet svarer **selv højt med den valgte konkrete svarmulighed** og nogle sjove, varierede udtryk.
+- [x] Separat AI-stemmevælger for **spilleleder** og **CPU**. Automatisk forskellig stemme, hvis muligt (fx Mia til spilleleder og Glenn til CPU), ellers mild toneændring.
+- [x] CPU'ens svar vises i taleboble, og facit afsløres **først når stemmen er færdig**.
+- [x] Ægte æsellyd ved forkert svar og ca. 30 % CPU-fejl er bevaret.
+- [x] Nyt `cpuvoice.js`; stemmevalg gemmes lokalt; ingen ændring af Cloudflare secrets.
+- [x] Tests med Node, mobilbrowser og **mockede AI-lydfiler** uden ElevenLabs-forbrug.
+- [ ] Rigtig iPhone-test med Mia og en alternativ godkendt dansk ElevenLabs-stemme.
+- [ ] Vurdér lydkvalitet og ekstra creditforbrug ved mange CPU-ture.
+- [ ] Brugertest med børn og voksne, og eventuel produktion af unik karakterstemme for Æslet.
+
+**Næste forslag:** Testfamilier, finjustering af opgaver/tempo og evt. endnu mere karakteristisk original æselstemme i v1.0.
+
+---
+
+
 > Dette er **vores fælles, autoritative projektstatus**. Læs filen, `README.md` og `AGENTS.md` sammen med nyeste GitHub `main`, før vi udvikler videre.
 
 **Opdateret:** 14. oktober 2026  

@@ -33,3 +33,13 @@
 - Prøv fysisk iPhone/iPad med gem/fortsæt, skift app, digital/fysisk terning, voksen-timer og rigtig ElevenLabs.
 
 **Status 14. oktober 2026:** v0.9 udviklet som ZIP ud fra GitHub `main` v0.8-E. Browser- og Node-test bestået; afventer upload og fysisk telefon-/familietest.
+
+
+## v0.9.1 – CPU-æslets egen stemme
+
+- **Før udvikling:** læs GitHub `main`, ikke kun gamle ZIP-filer. Den seneste udviklingspakke er v0.9.1, men kan mangle live-upload.
+- `cpuvoice.js` er et rent modul for stemmevalg og sjove CPU-svarsætninger; `app.js` håndterer oplæsning/ventetid. `index.html` viser et selvstændigt CPU-stemmevalg.
+- CPU skal **fortælle sit konkrete svar** og vente på oplæsningens afslutning, før `processAnswer()` afslører resultatet. Det gælder også forkerte svar; den rigtige æsellyd spilles derefter.
+- AI-stemmer må kun vælges blandt de stemmer, som allerede er godkendt af Cloudflare `/voices`; ingen API-nøgler i klientkode.
+- Bevar 30 % CPU-fejl, nul tvungne læringsopgaver i LEG, adaptive børneopgaver, voksen-timer, saved games og leaderboard.
+- Kør `node tests/cpuvoice.test.js`, de øvrige Node-tests og `python tests/cpu_voice_browser.py` med simuleret lyd. Rigtig mobil/ElevenLabs er en separat manuel test.

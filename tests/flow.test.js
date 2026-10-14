@@ -27,6 +27,7 @@ const window={
  AeselEngine:require(path.join(root,'engine.js')),
  AeselBoard:require(path.join(root,'board.js')),
  AeselActions:require(path.join(root,'actions.js')),
+ AeselCpuVoice:require(path.join(root,'cpuvoice.js')),
  AeselAdaptive:require(path.join(root,'adaptive.js')),
  AeselSave:require(path.join(root,'savegame.js')),
  matchMedia:()=>({matches:false}),

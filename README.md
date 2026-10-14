@@ -1,9 +1,25 @@
-# 🫏 ÆselKlog Talstien – v0.9
+# 🫏 ÆselKlog Talstien – v0.9.1 (CPU-æslet taler selv)
 
 **App:** https://driftportal-platform.github.io/aeselklog-talstien/  
 **GitHub:** https://github.com/driftportal-platform/aeselklog-talstien  
 **Udviklet:** 14. oktober 2026  
-**Status:** v0.9 er kodet og testet i simuleret browsermiljø. **Ikke automatisk uploadet; skal udgives på GitHub og testes på en fysisk iPhone.**
+**Status:** v0.9.1 er kodet og testet lokalt (inkl. simuleret AI-lyd). **Ikke automatisk uploadet; skal udgives på GitHub og testes på en fysisk iPhone.**
+
+
+## Nyt i v0.9.1 – CPU-æslet har sin egen stemme
+
+- CPU-æslet **siger nu sit konkrete svar højt** på enhver matematikopgave, også hvis det gætter forkert. Det gør det med korte fjollede udtryk som "Høhø! Jeg tror, svaret er ...".
+- Spilleleder og CPU har **hver deres stemmevalg** under **🎙️ Indstil æslets stemme**. Spilleleder kan fx være Mia, og CPU kan vælge Glenn. Standard "Automatisk" vælger en anden godkendt stemme, hvis tilgængelig. Hvis der kun findes én, anvendes den med en mild, lysere CPU-effekt.
+- Svaret vises også i en tydelig taleboble og markeres blandt svarmulighederne. **Facit kommer først, når CPU-stemmen er færdig.**
+- Ved forkert svar lyder fortsat det rigtige æselskry. CPU'en svarer stadig bevidst forkert ca. 30 % af gangene. Ved korrekt svar fortsætter den normale spilleleder.
+- Den valgte CPU-stemme gemmes lokalt på samme enhed. Også ved telefonens offline-stemme får CPU'en lidt sjovere toneleje.
+- Ingen ny Cloudflare Worker og ingen ekstra API-nøgler. Dette kræver dog **en ekstra ElevenLabs-talegenerering per CPU-svar** og kan derfor øge kreditforbruget.
+- Nyt modul: `cpuvoice.js`; appens cache opdateret til `aeselklog-talstien-v091-cpu-voice`.
+- **Testet:** Node-test for stemmevalg/svar, de eksisterende regressions- og mobilbrowsertests samt browser-test med simuleret ElevenLabs-lyd, hvor CPU anvender en anden godkendt stemme end spilleleder. **Endnu ikke testet med rigtige ElevenLabs-credits på fysisk iPhone.**
+
+**Sådan afprøver du:** Upload hele ZIP-pakken til roden af GitHub-repository, inklusive den nye `cpuvoice.js`. Genindlæs appen, og kontroller "PRØVEVERSION 0.9.1". Vælg **Spillelederens stemme: Mia**, **CPU-æslets egen stemme: Automatisk eller Glenn** og tryk **▶ Hør CPU-æslet svare**. Sæt derefter kryds ved **Spil også mod Æslet**.
+
+---
 
 ## Nyt i v0.9
 
@@ -37,7 +53,7 @@
 ## Installation på GitHub
 
 1. Udpak `AeselKlog_v09.zip`.
-2. Åbn https://github.com/driftportal-platform/aeselklog-talstien og upload **alle app-filer fra pakkens rod**, inklusive **de to nye filer** `savegame.js` og `adaptive.js`.
+2. Åbn https://github.com/driftportal-platform/aeselklog-talstien og upload **alle app-filer fra pakkens rod**, inklusive `savegame.js`, `adaptive.js` og **den nye fil `cpuvoice.js`**.
 3. Erstat eksisterende filer med samme navn, og upload gerne `tests/`, `README.md`, `AGENTS.md`, `UDVIKLINGSPLAN.md` og `TESTPLAN.md`.
 4. Vælg **Commit changes**, åbn appen igen, og kontrollér, at der står **PRØVEVERSION 0.9** øverst. Genindlæs eventuelt, hvis PWA'en viser gamle filer.
 
@@ -53,8 +69,9 @@
 | `adaptive.js` | Individuelle sværhedstrin og streak-regler |
 | `engine.js` | Opgavegenerator: tilpassede talspænd, alder, tabelopgaver og voksentid |
 | `leaderboard.js` | Separat, lokal Topscore |
+| `cpuvoice.js` | Vælger CPU-stemme og danner de sjove svarudsagn |
 | `board.js` / `actions.js` | Tegnet 1–100-bane og actionregler |
-| `sw.js` | PWA-cache: `aeselklog-talstien-v09-save-adaptive` |
+| `sw.js` | PWA-cache: `aeselklog-talstien-v091-cpu-voice` |
 
 ## Teststatus
 

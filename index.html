@@ -75,6 +75,8 @@
     .moving-donkey{width:65px;height:65px;flex:none;animation:bigDonkeyHop .58s ease-in-out infinite alternate}
     @keyframes bigDonkeyHop{from{transform:translateY(6px) rotate(-7deg)}to{transform:translateY(-9px) rotate(6deg)}}
     .cpu-note{background:#fff5e7;color:#75451b;border-radius:10px;padding:10px 12px;font-weight:750}
+    .cpu-says{background:linear-gradient(120deg,#fff4cd,#ffe6cb);color:#6a3b12;border:2px solid #efb86e;border-radius:14px;padding:12px 14px;font-size:1.05rem;font-weight:850;margin:12px 0 0}
+    .choice.cpu-chosen{outline:3px solid #e99b30;outline-offset:-3px;background:#fff0c4;color:#664018}
     .score-card{gap:8px}.result-text{white-space:pre-line}
     .question-time{min-width:0}.clock-big{white-space:nowrap}
     .dice-overlay:not([hidden]){display:flex!important}.dice-overlay[hidden]{display:none!important}.dice-face[hidden]{display:none!important}
@@ -329,7 +331,7 @@
 <div class="shell">
   <header class="top">
     <div class="brand"><div class="logo" aria-hidden="true">🫏</div><div><h1>Æsel<span class="red">Klog</span> · Talstien</h1><small>Spil, lær og grin sammen</small></div></div>
-    <div class="top-actions"><span class="pill">PRØVEVERSION 0.9</span><button id="voiceToggle" class="btn soft small" type="button" aria-pressed="true">🔊 Lyd til</button></div>
+    <div class="top-actions"><span class="pill">PRØVEVERSION 0.9.1</span><button id="voiceToggle" class="btn soft small" type="button" aria-pressed="true">🔊 Lyd til</button></div>
   </header>
 
   <details class="voice-settings" id="voiceSettings">
@@ -350,9 +352,14 @@
         </div>
       </div>
       <div id="aiVoiceControls" class="ai-settings" hidden>
-        <div class="field"><label for="aiVoiceChoice">Vælg Æslets AI-stemme</label>
+        <div class="field"><label for="aiVoiceChoice">Spillelederens stemme (fx Mia)</label>
           <select id="aiVoiceChoice"><option value="mia">Mia – varm dansk fortæller</option></select>
         </div>
+        <div class="field"><label for="cpuVoiceChoice">🫏 CPU-æslets egen stemme</label>
+          <select id="cpuVoiceChoice"><option value="auto">Automatisk · anden stemme end spilleleder</option></select>
+          <p class="tiny">Æslet vælger en anden AI-stemme, hvis der er en ledig. Ellers bliver stemmen lidt lysere. Det svarer højt, før facit vises.</p>
+        </div>
+        <button id="cpuVoicePreview" type="button" class="btn soft small">▶ Hør CPU-æslet svare</button>
         <div class="row between" style="gap:9px;align-items:center">
           <p class="tiny" style="margin:0;flex:1">Cloudflare-forbindelsen er indbygget – ingen adresse eller API-nøgle skal indtastes. Vælg stemme, og prøv den.</p>
           <button class="btn soft small" type="button" id="reloadAIVoices">↻ Opdater stemmer</button>
@@ -444,7 +451,7 @@
   </section>
   </main>
 
-  <footer><strong>ÆselKlog · v0.9 · Gem og fortsæt · Tilpasset læring</strong><br>Den almindelige kortspilsvariant udvikles særskilt. Denne prøve handler om Talstien og læringsopgaverne.<div class="footer-links"><button type="button" class="btn soft small" id="testVoice">🔊 Prøv æslets stemme</button></div></footer>
+  <footer><strong>ÆselKlog · v0.9.1 · Gem og fortsæt · Tilpasset læring</strong><br>Den almindelige kortspilsvariant udvikles særskilt. Denne prøve handler om Talstien og læringsopgaverne.<div class="footer-links"><button type="button" class="btn soft small" id="testVoice">🔊 Prøv æslets stemme</button></div></footer>
 </div>
 
 <dialog id="topscoreDialog" class="topscore-dialog" aria-labelledby="topscoreTitle">
@@ -471,5 +478,6 @@
 <script src="./leaderboard.js" defer></script>
 <script src="./adaptive.js" defer></script>
 <script src="./savegame.js" defer></script>
+<script src="./cpuvoice.js" defer></script>
 <script src="./app.js" defer></script>
 </body></html>
