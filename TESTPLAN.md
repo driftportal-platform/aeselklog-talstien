@@ -1,6 +1,6 @@
 # 🧪 ÆselKlog – praktisk test på iPhone og computer
 
-**Test denne version:** v0.8-E  
+**Test denne version:** v0.9 (grundtest fra 0.8-E + nye testpunkter)  
 **Mål:** Kontrollér om spillet nu er klar til en første større familieprøve. Sæt kryds og skriv eventuelle fejl ned i GitHub Issues.
 
 ## Start med teknikken
@@ -40,3 +40,21 @@ Skriv ved en fejl: **enhed og browser, spiltype, valgt alder/tabel, placering p�
 
 - [ ] Klar til familieprøve
 - [ ] Kræver fejlretning (opret GitHub issue)
+
+---
+
+## 🆕 Tilføjelse til testplan – v0.9: gem/fortsæt og adaptive opgaver
+
+- [ ] Kontrollér at startsiden har **Tilpas opgaver automatisk** og mulighed for at slå det fra.
+- [ ] Start et spil med fysisk terning og mindst to spillere. Ryk et par felter. Tryk **Gem & afslut** fra spillepladen.
+- [ ] Luk **hele** ÆselKlog (og eventuelt Safari) på iPhone. Åbn den samme webapp igen på **samme enhed**.
+- [ ] Tryk **Fortsæt spillet**, og bekræft at navne, CPU, positioner, tur, terningevalg og spiltempo er bevaret.
+- [ ] Prøv at lukke midt i en **opgave** og fortsætte senere. Opgaven og svarmulighederne skal være de samme.
+- [ ] Prøv at lukke midt i en **animation**. Spillet må starte igen fra et sikkert punkt – uden duplikeret bonus.
+- [ ] Som voksen: gem midt i en nedtælling. Ved fortsættelse skal resterende tid være bevaret, og nedtællingen starter efter oplæsning.
+- [ ] Som barn: svar tre gange rigtigt uden at bruge et tip. Niveauet skal stige ét trin (ses ved spilleren). Svar derefter to gange forkert – niveauet skal blive lidt lettere.
+- [ ] Prøv samme kamp med en 3-årig og en 9-årig. Den 3-årige må ikke få gangestykker, mens den 9-årige gerne må få tabelopgaver.
+- [ ] Tjek at den lokale topscore stadig findes efter **Slet gemt spil**, men at et afsluttet spil ikke længere kan genoptages.
+- [ ] Test AI-stemme og æsellyd både online og i offline/telefonstemme-tilstand.
+
+**Bemærk:** Gemte spil findes kun i browserens lagring på denne enhed. Rydning af webstedsdata eller privat browsing kan fjerne dem.

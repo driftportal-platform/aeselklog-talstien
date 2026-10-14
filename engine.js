@@ -1,4 +1,4 @@
-/* ÆselKlog v0.8-D — spørgemotor. Ingen netværk, profiler eller tredjeparts-API. */
+/* ÆselKlog v0.9 — spørgemotor med individuel og alderssikker progression. Ingen netværk, profiler eller tredjeparts-API. */
 (function(root,factory){
   const api=factory();
   if(typeof module !== 'undefined' && module.exports) module.exports=api;
@@ -38,8 +38,8 @@ function toddler(type,age,rng){
  if(type===5&&age>=4){const small=ri(1,3,rng),big=small+ri(1,2,rng);return pack(type,`Hvilket tal er størst? ${small} eller ${big}?`,big,shuf([small,big],rng),'Det store tal kommer senere, når du tæller.',ageTier({age}));}
  return pack(type,`Tryk på tallet ${asked}.`,asked,easyOptions(asked),'Find det samme tal på skærmen, og tryk på det.',ageTier({age}));
 }
-function young(type,age,field,roll,rng){
- const max=age===5?10:20;
+function young(type,age,field,roll,rng,skill=0){
+ const max=Math.max(6,(age===5?10:20)+skill*(age===5?2:4));
  if(type===1){const n=ri(2,max-1,rng),after=rng()>.5,ans=n+(after?1:-1);return pack(type,`Hvilket tal kommer ${after?'efter':'før'} ${n}?`,ans,numericOptions(ans,rng,3,0),'Tæl ét trin '+(after?'frem':'tilbage')+'.',ageTier({age}));}
  if(type===2){if(age===5)return toddler(type,4,rng);const n=ri(1,20,rng);return pack(type,`Er ${n} lige eller ulige?`,n%2===0?'Lige':'Ulige',['Lige','Ulige'],'Lige tal slutter på 0, 2, 4, 6 eller 8.',ageTier({age}));}
  if(type===3){if(age===5)return toddler(type,4,rng);const n=ri(10,39,rng),t=Math.floor(n/10),o=n%10;return pack(type,`Hvor mange tiere er der i ${n}?`,t,numericOptions(t,rng,3,0),'Se på det første ciffer i tallet.',ageTier({age}));}
@@ -50,21 +50,22 @@ function young(type,age,field,roll,rng){
  const a=ri(3,max,rng),b=ri(1,Math.min(a,age===5?3:9),rng),ans=a-b;
  return pack(type,`Hvad er ${a} − ${b}?`,ans,numericOptions(ans,rng,3,0),'Tæl '+b+' baglæns fra '+a+'.',ageTier({age}));
 }
-function child(type,age,field,roll,rng){
+function child(type,age,field,roll,rng,skill=0){
  if(age<=4)return toddler(type,age,rng);
- if(age<=6)return young(type,age,field,roll,rng);
+ if(age<=6)return young(type,age,field,roll,rng,skill);
  const tier=ageTier({age});const older=age>=9,teen=age>=13;
- if(type===1){const n=ri(3,teen?350:(older?150:90),rng);const step=teen?pick([5,10,25],rng):(older?pick([2,5,10],rng):1);const after=rng()>.5,ans=n+(after?step:-step);return pack(type,`Hvad kommer ${step} ${after?'efter':'før'} ${n}?`,ans,numericOptions(ans,rng,4,0),'Tæl '+step+' '+(after?'frem':'tilbage')+' fra '+n+'.',tier);}
- if(type===2){if(teen||older){const a=ri(4,teen?125:50,rng),b=ri(3,15,rng),val=a+b,correct=val%2===0?'Lige':'Ulige';return pack(type,`Er resultatet af ${a} + ${b} lige eller ulige?`,correct,['Lige','Ulige'],'Regn først, og kig så på sidste ciffer.',tier);}const n=ri(20,70,rng);return pack(type,`Er ${n} lige eller ulige?`,n%2===0?'Lige':'Ulige',['Lige','Ulige'],'Se på sidste ciffer: 0, 2, 4, 6 og 8 er lige.',tier);}
- if(type===3){if(teen){const n=ri(150,2999,rng),t=Math.floor(n/10)%10,h=Math.floor(n/100)%10,o=n%10;const correct=`${h} hundreder, ${t} tiere og ${o} enere`;const opts=[correct,`${h+1} hundreder, ${t} tiere og ${o} enere`,`${h} hundreder, ${t+1} tiere og ${o} enere`];return pack(type,`Hvor mange hundreder, tiere og enere har ${n} i de sidste tre cifre?`,correct,shuf(opts,rng),`Kig på de sidste tre cifres placering.`,tier);}const n=ri(10,Math.min(200,older?199:99),rng),t=Math.floor(n/10),o=n%10,correct=`${t} tiere og ${o} enere`;let candidates=[correct,`${t+1} tiere og ${o} enere`,`${t} tiere og ${(o+1)%10} enere`];return pack(type,`Hvordan er tallet ${n} bygget?`,correct,shuf(candidates,rng),`Der er ${t} hele tiere og ${o} enere.`,tier);}
- if(type===4){if(!older){const n=ri(10,60,rng);return pack(type,`Er ${n} deleligt med 2 uden rest?`,n%2===0?'Ja':'Nej',['Ja','Nej'],'Alle lige tal kan deles med 2 uden rest.',tier,{adapted:true});}const n=ri(13,teen?150:90,rng);return pack(type,`Er ${n} et primtal?`,prime(n)?'Ja':'Nej',['Ja','Nej'],'Et primtal har kun 1 og sig selv som positive divisorer.',tier);}
- if(type===5){const n=ri(10,teen?150:85,rng),delta=ri(2,teen?25:10,rng),x=n+(rng()>.5?delta:-delta);return pack(type,`Er ${x} større eller mindre end ${n}?`,x>n?'Større':'Mindre',['Større','Mindre'],'Sammenlign på talrækken: det længst fremme er størst.',tier);}
+ const scaled=n=>Math.max(5,Math.round(n*(1+Math.max(-2,Math.min(2,skill))*.20)));
+ if(type===1){const n=ri(3,scaled(teen?350:(older?150:90)),rng);const step=teen?pick([5,10,25],rng):(older?pick([2,5,10],rng):1);const after=rng()>.5,ans=n+(after?step:-step);return pack(type,`Hvad kommer ${step} ${after?'efter':'før'} ${n}?`,ans,numericOptions(ans,rng,4,0),'Tæl '+step+' '+(after?'frem':'tilbage')+' fra '+n+'.',tier);}
+ if(type===2){if(teen||older){const a=ri(4,teen?125:50,rng),b=ri(3,15,rng),val=a+b,correct=val%2===0?'Lige':'Ulige';return pack(type,`Er resultatet af ${a} + ${b} lige eller ulige?`,correct,['Lige','Ulige'],'Regn først, og kig så på sidste ciffer.',tier);}const n=ri(20,scaled(70),rng);return pack(type,`Er ${n} lige eller ulige?`,n%2===0?'Lige':'Ulige',['Lige','Ulige'],'Se på sidste ciffer: 0, 2, 4, 6 og 8 er lige.',tier);}
+ if(type===3){if(teen){const n=ri(150,2999,rng),t=Math.floor(n/10)%10,h=Math.floor(n/100)%10,o=n%10;const correct=`${h} hundreder, ${t} tiere og ${o} enere`;const opts=[correct,`${h+1} hundreder, ${t} tiere og ${o} enere`,`${h} hundreder, ${t+1} tiere og ${o} enere`];return pack(type,`Hvor mange hundreder, tiere og enere har ${n} i de sidste tre cifre?`,correct,shuf(opts,rng),`Kig på de sidste tre cifres placering.`,tier);}const n=ri(10,scaled(Math.min(200,older?199:99)),rng),t=Math.floor(n/10),o=n%10,correct=`${t} tiere og ${o} enere`;let candidates=[correct,`${t+1} tiere og ${o} enere`,`${t} tiere og ${(o+1)%10} enere`];return pack(type,`Hvordan er tallet ${n} bygget?`,correct,shuf(candidates,rng),`Der er ${t} hele tiere og ${o} enere.`,tier);}
+ if(type===4){if(!older){const n=ri(10,scaled(60),rng);return pack(type,`Er ${n} deleligt med 2 uden rest?`,n%2===0?'Ja':'Nej',['Ja','Nej'],'Alle lige tal kan deles med 2 uden rest.',tier,{adapted:true});}const n=ri(13,scaled(teen?150:90),rng);return pack(type,`Er ${n} et primtal?`,prime(n)?'Ja':'Nej',['Ja','Nej'],'Et primtal har kun 1 og sig selv som positive divisorer.',tier);}
+ if(type===5){const n=ri(10,scaled(teen?150:85),rng),delta=ri(2,teen?25:10,rng),x=n+(rng()>.5?delta:-delta);return pack(type,`Er ${x} større eller mindre end ${n}?`,x>n?'Større':'Mindre',['Større','Mindre'],'Sammenlign på talrækken: det længst fremme er størst.',tier);}
  // mixed arithmetic progression with multiplication or division from age 9+
- const ops=age<=8?['+','−']:teen?['+','−','×','÷','mix']:['+','−','×','÷'];const op=pick(ops,rng);
+ const ops=age<=8?(age===8&&skill>=2?['+','−','×']:['+','−']):teen?(skill<=-2?['+','−','×','÷']:['+','−','×','÷','mix']):(skill<=-1?['+','−','×']:['+','−','×','÷']);const op=pick(ops,rng);
  let a,b,ans,q;
- if(op==='+'){a=ri(10,teen?180:older?85:45,rng);b=ri(2,teen?85:older?40:20,rng);ans=a+b;q=`Hvad er ${a} + ${b}?`;}
- else if(op==='−'){a=ri(18,teen?250:older?120:70,rng);b=ri(2,a-1,rng);ans=a-b;q=`Hvad er ${a} − ${b}?`;}
- else if(op==='×'){a=ri(2,teen?19:12,rng);b=ri(2,teen?15:10,rng);ans=a*b;q=`Hvad er ${a} × ${b}?`;}
+ if(op==='+'){a=ri(10,scaled(teen?180:older?85:45),rng);b=ri(2,scaled(teen?85:older?40:20),rng);ans=a+b;q=`Hvad er ${a} + ${b}?`;}
+ else if(op==='−'){a=ri(18,scaled(teen?250:older?120:70),rng);b=ri(2,a-1,rng);ans=a-b;q=`Hvad er ${a} − ${b}?`;}
+ else if(op==='×'){a=ri(2,scaled(teen?19:12),rng);b=ri(2,scaled(teen?15:10),rng);ans=a*b;q=`Hvad er ${a} × ${b}?`;}
  else if(op==='÷'){b=ri(2,teen?12:9,rng);ans=ri(2,teen?15:10,rng);a=b*ans;q=`Hvad er ${a} ÷ ${b}?`;}
  else {a=ri(3,15,rng);b=ri(3,12,rng);let k=ri(2,28,rng);ans=a*b+k;q=`Hvad er (${a} × ${b}) + ${k}?`;}
  return pack(type,q,ans,numericOptions(ans,rng,4,0),'Regn ét skridt ad gangen. Brug papir, hvis du vil.',tier);
@@ -91,7 +92,7 @@ function adult(type,difficulty,field,roll,rng){
  return pack(type,q,ans,options,help,tier,{timeLimit:TIME_LIMITS[difficulty]||30});
 }
 /** Gangeopgaver knyttet til valgt tabel. 3–6-årige får stadig normale begynderopgaver. */
-function tableChallenge(player,tables='auto',rng=Math.random){
+function tableChallenge(player,tables='auto',rng=Math.random,skill=0){
  const age=player.kind==='adult'?18:Math.max(3,Math.min(17,Number(player.age)||7));
  if(age<7)return null;
  const selected=Number(tables);
@@ -99,7 +100,7 @@ function tableChallenge(player,tables='auto',rng=Math.random){
  const fixed=Number.isInteger(selected)&&selected>=2&&selected<=12?selected:pick(available,rng);
  let high;
  if(player.kind==='adult')high=player.difficulty==='svaer'?20:player.difficulty==='mellem'?15:10;
- else high=age<=7?5:age<=8?10:12;
+ else high=Math.max(3,(age<=7?5:age<=8?10:12)+Math.max(-2,Math.min(2,skill))*2);
  const multiplier=ri(age<=8?1:2,high,rng);
  const answer=fixed*multiplier;
  let question=`Hvad er ${fixed} × ${multiplier}?`;
@@ -113,7 +114,8 @@ function tableChallenge(player,tables='auto',rng=Math.random){
    table:fixed,tableLabel:label,timeLimit:player.kind==='adult'?TIME_LIMITS[player.difficulty]||30:undefined
  });
 }
-function makeChallenge({player,type,field=1,roll=1,tables='auto',forceTable=false,rng=Math.random}){
+function makeChallenge({player,type,field=1,roll=1,tables='auto',forceTable=false,skillStep=0,rng=Math.random}){
+ const step=player?.kind==='child'?Math.max(-2,Math.min(2,Math.round(Number(skillStep)||0))):0;
 
  if(!player||!Number.isInteger(type)||type<1||type>6)throw new Error('Ukendt spørgsmålstype');
  // Læringsterningens regne-side tilbyder også valgfri tabeltræning.
@@ -123,14 +125,15 @@ function makeChallenge({player,type,field=1,roll=1,tables='auto',forceTable=fals
   if(age>=7){
    const forced=forceTable||/^(?:[2-9]|1[0-2])$/.test(String(tables));
    const ratio=forced?1:tables==='mix'?.72:(age<=8?.32:.48);
-   if(rng()<ratio)return tableChallenge(player,tables,rng);
+   if(rng()<ratio)return {...tableChallenge(player,tables,rng,step),adaptiveStep:step};
   }
  }
 
  if(player.kind==='adult')return adult(type,player.difficulty||'mellem',field,roll,rng);
  const age=Math.max(3,Math.min(17,Number(player.age)||7));
- if(age<=6)return age<=4?toddler(type,age,rng):young(type,age,field,roll,rng);
- return child(type,age,field,roll,rng);
+ if(age<=4){const effort=step>0?4:age;return {...toddler(type,effort,rng),tier:ageTier(player),adaptiveStep:step};}
+ if(age<=6)return {...young(type,age,field,roll,rng,step),tier:ageTier(player),adaptiveStep:step};
+ return {...child(type,age,field,roll,rng,step),tier:ageTier(player),adaptiveStep:step};
 }
 return {TASKS,TIME_LIMITS,makeChallenge,tableChallenge,prime,numericOptions,ageTier};
 });

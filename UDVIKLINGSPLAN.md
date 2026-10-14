@@ -1,119 +1,79 @@
 # 🫏 ÆselKlog – udviklingsplan og projektstatus
 
-> **Læs dette dokument, README.md, AGENTS.md og seneste kode før næste ændring.** Opdater status ved hver udviklingsversion. Skeln mellem implementeret, browser-testet og afprøvet på rigtig telefon.
+> Dette er **vores fælles, autoritative projektstatus**. Læs filen, `README.md` og `AGENTS.md` sammen med nyeste GitHub `main`, før vi udvikler videre.
 
 **Opdateret:** 14. oktober 2026  
-**Senest kontrolleret GitHub `main`:** v0.8-C  
-**Seneste samlede, udviklede prøvepakke:** v0.8-E (baseret på det komplette v0.8-D-arkiv), klar til GitHub-upload  
-**Næste udviklingsfase:** v0.9 efter iPhone/familietest  
+**Senest bekræftet i GitHub `main` før udvikling:** **v0.8-E**  
+**Ny udviklingspakke:** **v0.9**, bygget på den seneste v0.8-E-kode fra GitHub, klar til manuel upload.  
 **Spil:** https://driftportal-platform.github.io/aeselklog-talstien/  
-**Kode:** https://github.com/driftportal-platform/aeselklog-talstien
+**Repository:** https://github.com/driftportal-platform/aeselklog-talstien
 
-## 1. Projektets faste principper
+## 1. Produktprincipper (fastholdes)
 
-- ÆselKlog skal altid kunne spilles uden matematik (**LEG**); læringsopgaver er frivillige.
-- Digital Talstien og fysisk A3-plade: tal 1–100 i fem farvede områder, aldrig manglende eller duplikerede feltnumre.
-- Fysiske kort: 63 × 88 mm, fem af hvert tal og otte æselkort pr. variant som foreløbig plan. Ens bagsider, enkel original grafik, aflæselige fra begge ender.
-- Børn fra 3 år og voksne skal kunne spille sammen. Treårige får opgaver i talgenkendelse, 5–6-årige let plus/minus, 7+ år tabeller og gradvist sværere opgaver. Børn uden tidspres; voksne 60/30/10 sekunder efter valg.
-- Digitale/fysiske terninger, farvede æselbrikker, CPU-modstander som også kaster og kan svare forkert, stor spilleplade i mobilens liggende format.
-- Spilflow: annoncer tur → almindelig terning → hop → eventuel læringsterning/opgave → ekstra hop ved korrekt svar → actionfelt → næste spiller. Specialfelt-flytning udløser ikke automatisk nye actionfelter.
-- Ægte æsellyd ved fejl; dansk AI-stemme via Cloudflare/ElevenLabs og offline telefonstemme som fallback. API-secrets må aldrig indgå i offentligt GitHub.
-- Brug kaldenavne; undgå at sende unødige personoplysninger til online stemmetjenester.
+- Kortspil + fysisk A3-spilleplade + digital ÆselKlog med mange frivillige læringslege.
+- **LEG uden matematik** må aldrig kræve besvarelse af opgaver. Frivillig superopgave kan afslås uden straf.
+- Fem talområder 1–20, 21–40, 41–60, 61–80, 81–100. Fysiske kort 63 × 88 mm; foreløbigt fem af hvert tal + otte æselkort pr. pakke.
+- Digital bane viser hvert tal 1–100 præcis én gang i snoet rækkefølge. Actionikoner dækker aldrig tal.
+- Fysiske/digitale terninger, dansk tale/ægte æsellyd, farvede æselbrikker og CPU der kaster og kan svare forkert.
+- Børn fra tre år med lette opgaver uden timer. 5–6 år simple plus/minus, ældre passende tabeller/primtal. Voksen-timer **60/30/10 sekunder**, først efter oplæsning.
+- Stor spilleplade i landskab, roligt spiltempo og sammenhængende tur: kast → brik hopper → læring → eventuel bonus → action.
+- Spillet gemmer ikke API-nøgler i GitHub. ElevenLabs kaldes gennem eksisterende Cloudflare Worker.
 
-## 2. Versionshistorik og faktisk status
+## 2. Versionsstatus
 
-| Version | Indhold | Status |
-| --- | --- | --- |
-| v0.8-A | Korrekt SVG-bane 1–100, bondegård, zoom og pan | ✅ På GitHub, videreført |
-| v0.8-B | Fuldskærmsbræt, tur → terning → hop → læringsopgave | ✅ På GitHub, videreført |
-| v0.8-B.1 | Automatisk Cloudflare-adresse og stemmevælger | ✅ På GitHub, ElevenLabs bekræftet fungerende af bruger |
-| v0.8-C | 25 actionfelter, ni actiontyper og CPU-adfærd | ✅ Bekræftet i GitHub `main` |
-| v0.8-D | Gangetabeller, TABELTRÆNING, langsommere spil og lokal Topscore | ✅ Indeholder tests, leveret i ZIP; **ikke set på GitHub** |
-| **v0.8-E** | **Samlet kvalitetstest, baggrundspauser, længere actionbeskeder og lille vinderfejring** | ✅ Bygget og browser-testet lokalt; **endnu ikke live-testet på iPhone** |
-| v0.9 | Gem/fortsæt, adaptiv læring, statistik og familiepilot | 📋 Planlagt |
+| Version | Leverance | Faktisk status |
+|---|---|---|
+| 0.8-A | SVG-bane 1–100, bondegård og zoom | ✅ Bekræftet på GitHub |
+| 0.8-B | Fuldskærm og ture direkte på spillepladen | ✅ Bekræftet på GitHub |
+| 0.8-B.1 | Automatisk AI-adresse og stemmevælger | ✅ Bruger har bekræftet fungerende stemmeskift |
+| 0.8-C | Nye actionfelter, Bro, Superopgave, Gulerod m.fl. | ✅ Bekræftet på GitHub |
+| 0.8-D | Gangetabeller 2–12, tempo, lokal Topscore | ✅ Videreført i 0.8-E |
+| 0.8-E | Baggrundspauser, animationer og kvalitetstjek | ✅ **Lå på GitHub main ved start på v0.9** |
+| **0.9** | **Gem/fortsæt og individuel adaptiv matematik** | ✅ Kodet og testet lokalt. ⏳ Ikke uploadet/live-testet på iPhone |
 
-**Vigtigt:** Upload **hele v0.8-E-pakken**, ikke kun ændrede filer fra E. Den indeholder også v0.8-D (herunder den nye `leaderboard.js`), som endnu ikke er bekræftet uploadet.
+## 3. Implementeret i v0.9
 
-## 3. Actionfelter og regler
+- [x] **Automatiske kontrolpunkter**: gem ved stabile faser i turen, inklusive spilkonfiguration, aktive spillere, felter, CPU og læringsniveau.
+- [x] **Fortsæt-knap** på startsiden. Mulighed for **Gem & afslut** og **Slet gemt spil**.
+- [x] Én lokal gemmeplads; gemmes i `localStorage` uden brugerlogin eller backend.
+- [x] **Spørgsmål og voksen-tid** kan genoptages. Når en ikke-afsluttet animation afbrydes, starter spillet fra sidste sikre checkpoint.
+- [x] **Individuel adaptiv progression**: tre rigtige i træk giver et trin op; to forkerte giver et trin ned, maksimalt ±2.
+- [x] **Alderssikring** og voksen-undtagelse: voksne beholder deres valgte niveau/timer; 3–6-årige tvinges ikke til tabeller.
+- [x] Ny lokal modulstruktur `savegame.js`, `adaptive.js`, øgede tests og opdateret PWA-cache.
+- [x] Node-regressionstests og browser-smoke med gemt state genåbnet i en ny browserdokument-simulering.
+- [ ] **Virkelig iPhone/PWA-test efter upload**: gem, luk app helt, åbn igen, fortsæt, prøv AI-lyd og voksen-timer.
+- [ ] **Familiefeedback**: om progressionen opleves passende og sjov, også når børnene fejler flere gange.
 
-| Talområde | Handlinger |
-| --- | --- |
-| 1–20 | 5 Bonus · 7 Gulerod · 10 Hov hov · 15 Byt · 16 Vandpyt |
-| 21–40 | 24 Talmester · 27 Overraskelse · 29 Bonus · 35 Byt · 37 Bro |
-| 41–60 | 44 Bonus · 47 Gulerod · 50 Talmester · 55 Hov hov · 57 Superopgave |
-| 61–80 | 64 Hov hov · 67 Vandpyt · 69 Bonus · 75 Byt · 78 Overraskelse |
-| 81–100 | 84 Bonus · 86 Gulerod · 90 Hov hov · 93 Superopgave · 95 Talmester |
+## 4. Regler for lokal gemning
 
-- ⭐ Bonus +2, 🫏 Hov hov −2, 🔄 Byt plads, 🏆 Talmester +1.
-- 🥕 Gulerod: ét ekstra almindeligt kast, maks. én gang samme tur; CPU får også ekstra kast.
-- 💧 Vandpyt: stå over netop næste tur, også CPU.
-- 🎁 Overraskelse: tilfældig +3, +2, −1 eller −2, altid inden for talområdet.
-- 🌉 Bro: +4, aldrig forbi målet.
-- 🎯 Superopgave: altid frivillig; korrekt svar +3, fejl/nej tak ingen ekstra straf.
-- Actionflytninger udløser ikke ny handling på landingsfeltet; undtagelsen er et nyt almindeligt kast fra Gulerod, dog ikke flere ekstra gulerodskast samme tur.
+- Automatik gemmer **kun stabile faser**: før kast, ved opgave, efter tur, ved valg af action/bytte. Midt i en animation er sidste checkpoint sikrest.
+- Manuel **Gem & afslut** er mulig mellem handlinger. Hvis æslet er ved at hoppe, vises en kort besked om at gemme efter bevægelsen.
+- Ved afsluttet spil slettes gemningen, mens resultatet fortsat skrives til separat Topscore.
+- Ét gemt spil pr. browser/enhed. Ingen sky-synkronisering. Browseren kan slette webstedsdata; brug ikke som garanteret backup.
+- Lokal gemning indeholder midlertidigt spilleres **kaldenavne og aldre** til spørgsmål, men ikke API-nøgler. Topscore indeholder **ikke alder**.
 
-## 4. Opnået i v0.8-D og videreført i v0.8-E
+## 5. Læringsalgoritme (foreløbig)
 
-- [x] Gangetabeller 2–12, én tabel eller blanding, frivillig TABELTRÆNING hver tur.
-- [x] Alderspassende tilpasning af regning, også når voksne og børn spiller sammen.
-- [x] Tempo Normalt, Roligt (standard), Ekstra roligt; CPU afventer lydslut, bevægelser sker langsomt.
-- [x] Enhedens topscore med sejre, kampe og rigtige svar; ingen centralt lagrede børnedata.
-- [x] Oplæsning kan gentages; ElevenLabs-worker og stemmevælger er uændret.
+- **Hver børnespiller** har sit eget niveau i intervallet −2 til +2.
+- 3 selvstændige rigtige svar i træk → +1, 2 forkerte svar → −1. Rigtige svar med brugt tip tæller med i statistikken, men ikke til streak.
+- Sværhedsgraden styrer bl.a. talspænd, længde på regnestykker og niveauet i tabeltræning. Barnets egen alder forbliver den primære begrænsning.
+- Børn får ingen timer. Voksne følger valgt Let/Mellem/Svær, og CPU justerer ikke børnenes niveau.
+- Progressionen er **spilmotivation**, ikke en pædagogisk diagnose. Ændres efter rigtig børne-/lærertest.
 
-## 5. Forbedringer i v0.8-E
+## 6. Næste skridt efter v0.9
 
-- [x] Voksen-timer sættes automatisk på pause, når telefon/browser går i baggrunden, og fortsætter efter tilbagevenden.
-- [x] CPU venter, når spillet ligger i baggrunden. Animerede hop og automatisk terning venter også ved tilbagevenden.
-- [x] Actionfeltets besked bliver synlig, mens tilknyttet stemme og feltflytning afvikles.
-- [x] Vinderfejring med diskrete symboler; brugerens indstilling for reduceret bevægelse respekteres.
-- [x] Vinderens rigtige svar vises; *Se topscore* er tilgængelig direkte efter sejren.
-- [x] Alle tidligere Node-tests består; browser-smoke for tre skærmstørrelser, CPU, voksen-timer, Topscore og afslutning består.
-- [ ] Endelig kontrol af rigtig iPhone med internet og ElevenLabs, inklusive låseskærm/samtaleafbrydelse.
-- [ ] Afprøv PWA-automatisk opdatering fra v0.8-C til v0.8-E på brugerens telefon.
-- [ ] Test udvidede opgaveeksempler på rigtige børn i forskellige aldre (reel læringseffekt er endnu ikke dokumenteret).
-- [ ] Kontrollér lydbelastning, evt. forbrug og børnevenlig sværhedsgrad i en reel familiepilot.
+1. **0.9.1** – hvis nødvendigt: fejlrettelser fra telefon- og familieafprøvning (herunder lagerbegrænsning i iOS, hviletid i PWA og gemte voksenopgaver).
+2. Valgfri **forældreside** med enkle lokale fremskridtsgrafer på tværs af afsluttede spil, helst anonymiseret og uden unødig alderslagring.
+3. Bedre tilpasning pr. opgavetype, ikke blot samlet niveau – fx særskilt plus/minus, lige/ulige, tabeller og primtal.
+4. Prøvespil hos 5–10 familier og skolebørn i forskellige aldre. Indsaml oplevelse, bugs og om barnet ønsker at spille igen.
+5. Efter familietest: materiale til Hyggeonkel, pris- og produktionsvurdering for de fysiske kort/æsker, originale illustrationer og rettighedskontrol.
 
-## 6. Test og kvalitetskrav
+## 7. Sådan fortsætter vi arbejdet
 
-Kør dette i projektmappen:
+1. Hent først **aktuelle GitHub main**-filer, og sammenlign med eventuelle nyere lokale ZIP-leverancer.
+2. Læs `README.md`, `UDVIKLINGSPLAN.md`, `AGENTS.md` og `TESTPLAN.md`.
+3. Bevar alle ældre funktioner og undgå at ændre Cloudflare Worker, medmindre der er konkret grund.
+4. Kør alle tests (`node tests/*.test.js` enkeltvis, samt browser-smoke efter store UI-ændringer), og markér hvilke tests der faktisk blev udført.
+5. Opdatér versionsnumre i HTML/JS/PWA-cache og roadmap sammen med release.
 
-```bash
-node --check app.js
-node --check engine.js
-node --check actions.js
-node --check board.js
-node --check leaderboard.js
-node tests/actions.test.js
-node tests/board.test.js
-node tests/flow.test.js
-node tests/tables.test.js
-node tests/leaderboard.test.js
-```
-
-Valgfri browser-smoke (kræver Python med Playwright og Chromium): `python tests/browser_smoke.py`. Browser-smoke anvender inline HTML/JS og simuleret tale/lokal lager, så der bruges **ingen ElevenLabs-credits** i testen.
-
-**Praktisk mobiltest:** Se `TESTPLAN.md`. Test fysisk terning, digital terning, CPU, 3-årig, 6-årig, 9-årig, voksen, actionfelter, skærmrotation og Topscore.
-
-## 7. Hvad kommer efter v0.8-E?
-
-**Version v0.9 – foreslået rækkefølge:**
-
-1. **Gem og fortsæt spil** lokalt, også efter at browseren er lukket, uden login.
-2. **Adaptivt læringsniveau**, der bliver gradvist sværere ved mange rigtige svar og lettere ved gentagne fejl.
-3. **Valgfri lokal forældreoversigt** over øvede emner og udvikling, uden registrering af følsomme børnedata.
-4. **Test hos 5–10 familier** med forskellige aldre; observer om regler, tale og animationer passer.
-5. **Præsentationspakke til Hyggeonkel**: kort prototypevideo, produktark, trykpriser og feedback.
-
-## 8. Arbejdsrutine
-
-- Start altid med nyeste GitHub `main` samt seneste ikke-uploadede ZIP-version, hvis der findes én.
-- Læs `AGENTS.md`, `README.md`, denne plan og de relevante JS-filer, **før** ændringer.
-- Adskil i dokumentationen hvad der er udviklet, testet med simulering og afprøvet på rigtig telefon.
-- Udvid testene, opdatér version i HTML/app/sw/cache samt udviklingsplan efter hver release.
-- Læg aldrig API-nøgler eller hemmelige oplysninger i GitHub; kopiér aldrig tidligere brugerdata ind i test.
-
-## Ændringslog
-
-- **2026-10-14:** v0.8-E: kvalitetstest i browser, baggrundspauser, vedvarende action-feedback og vinderfejring. Status: klar til manuel iPhone-test, ikke endeligt released.
-- **2026-10-13:** v0.8-D: tabeltræning, tempo, taleventetid og lokal topscore.
-- **2026-10-13:** v0.8-C: nye specialfelter og CPU-/spilflow.
+**Ingen påstand om produktion eller live-telefontest, før den er bekræftet.**

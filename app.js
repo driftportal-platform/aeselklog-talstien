@@ -1,4 +1,4 @@
-/* ÆselKlog Talstien v0.8-E: gennemtestet spilflow, pausetimer, vedvarende action-feedback og vindereffekt. */
+/* ÆselKlog Talstien v0.9: gem/fortsæt og individuel, alderssikker læring. */
 (()=>{'use strict';
 const $=id=>document.getElementById(id);
 const qs=sel=>document.querySelector(sel);
@@ -9,6 +9,9 @@ const B=window.AeselBoard;
 if(!B||!B.validate()){document.body.textContent='ÆselKlog kan ikke starte: board.js mangler eller har ugyldige felter.';return;}
 if(!S){document.body.textContent='ÆselKlog kan ikke starte: engine.js mangler.';return;}
 const L=window.AeselLeaderboard;
+const G=window.AeselSave;
+const P=window.AeselAdaptive;
+if(!G||!P){document.body.textContent='ÆselKlog kan ikke starte: savegame.js eller adaptive.js mangler.';return;}
 const A=window.AeselActions;
 if(!A||!A.validate()){document.body.textContent='ÆselKlog kan ikke starte: actions.js mangler eller har ugyldige felter.';return;}
 const SPECIAL=A.FIELDS;
@@ -28,6 +31,7 @@ let setupPlayers=[{name:'Spiller 1',age:6,kind:'child',difficulty:'mellem'},{nam
 let players=[],config=null,turn=0,phase='setup',challenge=null,pending=null,resultLines=[],winner=null;
 let busy=false,gameToken=0,showDiceState=null,taskTimer=null,taskDeadline=0,taskPausedAt=null;
 let extraRollUsed=false,actionBannerSerial=0;
+let resumeAdultMs=null,helpUsed=false,restoringGame=false,lastSaveOk=null,saveStatusTimer=null;
 let lastNarration=Promise.resolve();
 let activeVoiceDone=null;
 const PACE={normal:{hop:380,rest:240,roll:1100},rolig:{hop:630,rest:460,roll:1450},ekstra:{hop:900,rest:800,roll:1800}};
@@ -261,6 +265,70 @@ $('testVoice').addEventListener('click',()=>say('Hov hov! Jeg er ÆselKlog, og j
 $('speakAgain').addEventListener('click',()=>say(sound.last||'Hov hov! Nu er det din tur.'));
 
 function safeStorage(){try{return window.localStorage}catch(_){return null}}
+function timeLeftForSave(){
+ if(phase!=='question'||players[turn]?.kind!=='adult')return 0;
+ if(resumeAdultMs!==null)return resumeAdultMs;
+ if(!taskDeadline)return (challenge?.timeLimit||30)*1000;
+ return Math.max(0,taskDeadline-(taskPausedAt??Date.now()));
+}
+function snapshot(){
+ return {config,players,turn,phase,pending,challenge,resultLines,extraRollUsed,timeLeftMs:timeLeftForSave()};
+}
+function updateSaveBadge(message){
+ const badge=$('saveStatus');if(!badge)return;clearTimeout(saveStatusTimer);badge.textContent=message;
+ if(message)saveStatusTimer=setTimeout(()=>{if(badge.textContent===message)badge.textContent=''},4400);
+}
+function safePhase(){return G.PHASES.has(phase)}
+function saveCheckpoint({notify=false}={}){
+ if(!config||!players.length||!safePhase()||restoringGame)return false;
+ const ok=G.write(safeStorage(),snapshot());lastSaveOk=ok;
+ if(notify)updateSaveBadge(ok?'💾 Spillet er gemt på denne enhed.':'⚠️ Kunne ikke gemme på denne enhed.');
+ return ok;
+}
+function renderResumeCard(){
+ const card=$('resumeCard');if(!card)return;
+ const record=G.read(safeStorage());card.hidden=!record;
+ if(!record)return;
+ const time=new Date(record.savedAt).toLocaleString('da-DK',{day:'numeric',month:'short',hour:'2-digit',minute:'2-digit'});
+ const names=record.players.map(p=>p.name).slice(0,5).join(', ');
+ $('resumeInfo').textContent=`${record.config.raw} · ${names} · ${time}`;
+}
+function saveAndLeave(){
+ if(!config)return;
+ if(busy||!safePhase()||showDiceState){updateSaveBadge('🫏 Gem spillet efter den igangværende handling.');return;}
+ if(!saveCheckpoint({notify:true})){window.alert('Spillet kunne ikke gemmes. Kontrollér, at privat browsing eller browserlager ikke blokerer.');return;}
+ resetAsync();config=null;players=[];phase='setup';winner=null;pending=null;challenge=null;
+ show('setup');renderResumeCard();
+}
+async function resumeSavedGame(){
+ if(busy)return;
+ const state=G.read(safeStorage());if(!state){renderResumeCard();window.alert('Det gemte spil kunne ikke læses.');return;}
+ resetAsync();restoringGame=true;
+ config=state.config;players=state.players.map(p=>({...p,learning:P.clean(p.learning)}));
+ turn=state.turn;phase=state.phase;pending=state.pending;challenge=state.challenge;
+ resultLines=state.resultLines;winner=null;extraRollUsed=state.extraRollUsed;
+ helpUsed=false;resumeAdultMs=state.phase==='question'&&players[turn]?.kind==='adult'?state.timeLeftMs:null;
+ $('rangeTitle').textContent=config.all?'Hele Talstien · 1–100':`Talområde ${config.raw}`;
+ $('boardModeLabel').textContent=config.boardMode==='physical'?'Fysisk bræt + app-overblik':'Digital spilleplade';
+ show('game');buildBoard();render();setBoardExpanded(true);restoringGame=false;
+ updateSaveBadge('💾 Spillet blev fortsat fra et lokalt gemt punkt.');
+ const player=players[turn],g=gameToken;
+ const line=phase==='question'?`${player.name}, vi fortsætter med din opgave. ${challenge.question}`:`Hov hov! Velkommen tilbage, ${player.name}. Vi er på felt ${player.pos}.`;
+ const narration=say(line);
+ if(phase==='question'){
+  if(player.isCPU)scheduleCPU('question');
+  else if(player.kind==='adult')void narration.then(()=>{if(g===gameToken&&phase==='question')startAdultTimer()});
+ }else if(player.isCPU&&phase==='move')scheduleCPU('move');
+ else if(player.isCPU&&phase==='learn')scheduleCPU('learn');
+ else if(player.isCPU&&phase==='super-offer')void narration.then(async()=>{await pauseBeat();await waitUntilVisible();if(g===gameToken&&phase==='super-offer')chooseSuper(Math.random()<.75)});
+ else if(player.isCPU&&phase==='skipped')void narration.then(async()=>{await pauseBeat();await waitUntilVisible();if(g===gameToken&&phase==='skipped')nextTurn()});
+}
+$('resumeGame').addEventListener('click',()=>void resumeSavedGame());
+$('deleteSave').addEventListener('click',()=>{
+ if(window.confirm('Vil du slette det gemte spil på denne enhed? Topscoren bliver ikke slettet.')){G.clear(safeStorage());renderResumeCard()}
+});
+$('saveGame').addEventListener('click',saveAndLeave);
+renderResumeCard();
 function refreshTopscore(){
  const root=$('topscoreContent');
  if(!L){root.innerHTML='<p class="topscore-empty">Topscoren er ikke tilgængelig.</p>';return}
@@ -300,20 +368,20 @@ function renderSetupPlayers(){
 renderSetupPlayers();
 $('addPlayer').addEventListener('click',()=>{if(setupPlayers.length<4){setupPlayers.push({name:`Spiller ${setupPlayers.length+1}`,age:7,kind:'child',difficulty:'mellem'});renderSetupPlayers()}});
 function show(view){['setup','game'].forEach(id=>$(id).classList.toggle('active',view===id));window.scrollTo({top:0,behavior:'instant'})}
-function resetAsync(){gameToken++;const fanfare=$('victoryFanfare');if(fanfare)fanfare.remove();clearInterval(taskTimer);taskTimer=null;taskPausedAt=null;taskDeadline=0;busy=false;extraRollUsed=false;showDiceState=null;hideDice();hideActionFlash();if(boardExpanded)setBoardExpanded(false);stopCurrentVoice();bray?.pause();}
+function resetAsync(){gameToken++;resumeAdultMs=null;helpUsed=false;const fanfare=$('victoryFanfare');if(fanfare)fanfare.remove();clearInterval(taskTimer);taskTimer=null;taskPausedAt=null;taskDeadline=0;busy=false;extraRollUsed=false;showDiceState=null;hideDice();hideActionFlash();if(boardExpanded)setBoardExpanded(false);stopCurrentVoice();bray?.pause();}
 $('startButton').addEventListener('click',()=>{
- resetAsync();
+ resetAsync();G.clear(safeStorage());renderResumeCard();
  const raw=$('range').value,all=raw==='1-100';
  const start=all?0:Number(raw.split('-')[0])-1,goal=all?100:Number(raw.split('-')[1]);
- config={raw,all,start,goal,learning:radio('learning'),boardMode:radio('boardMode'),moveDice:radio('moveDice'),learnDice:radio('learnDice'),pace:['normal','rolig','ekstra'].includes($('gamePace').value)?$('gamePace').value:'rolig',tables:$('tablesChoice').value||'auto'};
- players=setupPlayers.map((p,i)=>({...p,name:(p.name||'').trim()||`Spiller ${i+1}`,color:COLORS[i],id:`player${i+1}`,isCPU:false,pos:start,skipNextTurn:false,stats:{correct:0,attempted:0}}));
- if($('cpuCheck').checked)players.push({name:'Æslet',kind:'cpu',age:8,color:'#c18b46',id:'cpu',isCPU:true,pos:start,skipNextTurn:false,stats:{correct:0,attempted:0}});
+ config={raw,all,start,goal,learning:radio('learning'),boardMode:radio('boardMode'),moveDice:radio('moveDice'),learnDice:radio('learnDice'),pace:['normal','rolig','ekstra'].includes($('gamePace').value)?$('gamePace').value:'rolig',tables:$('tablesChoice').value||'auto',adaptive:$('adaptiveCheck').checked};
+ players=setupPlayers.map((p,i)=>({...p,name:(p.name||'').trim()||`Spiller ${i+1}`,color:COLORS[i],id:`player${i+1}`,isCPU:false,pos:start,skipNextTurn:false,stats:{correct:0,attempted:0},learning:P.fresh()}));
+ if($('cpuCheck').checked)players.push({name:'Æslet',kind:'cpu',age:8,color:'#c18b46',id:'cpu',isCPU:true,pos:start,skipNextTurn:false,stats:{correct:0,attempted:0},learning:P.fresh()});
  turn=0;phase='move';challenge=null;pending=null;resultLines=[];winner=null;extraRollUsed=false;
  $('rangeTitle').textContent=all?'Hele Talstien · 1–100':`Talområde ${raw}`;
  $('boardModeLabel').textContent=config.boardMode==='physical'?'Fysisk bræt + app-overblik':'Digital spilleplade';
  show('game');buildBoard();render();setBoardExpanded(true);say(`Hov hov! Velkommen til Talstien. ${players[turn].name} starter!`);
 });
-$('newGame').addEventListener('click',()=>{if(window.confirm('Vil I afslutte spillet og starte forfra?')){resetAsync();phase='setup';show('setup')}});
+$('newGame').addEventListener('click',()=>{if(window.confirm('Vil I afslutte spillet og starte forfra? Det gemte spil slettes.')){resetAsync();G.clear(safeStorage());config=null;players=[];phase='setup';show('setup');renderResumeCard()}});
 $('editPos').addEventListener('click',()=>{
  if(busy||!config||phase==='win'||showDiceState)return;
  const p=players[turn];const requested=window.prompt(`Vælg felt for ${p.name}: ${config.start}–${config.goal}`,p.pos);
@@ -383,7 +451,7 @@ function setBoardExpanded(expanded){
  // Behold den eksisterende opgave-komponent og alle dens event listeners.
  (expanded?$('boardPanelDock'):$('turnPanelHome')).append($('turnPanel'));
  if(expanded){requestAnimationFrame(coverBoard)}
- else{$('boardBox').classList.remove('fit-view');boardFitMode=false;requestAnimationFrame(()=>scrollToTile(players[turn]?.pos??config.start,true));}
+ else{$('boardBox').classList.remove('fit-view');boardFitMode=false;requestAnimationFrame(()=>{if(config&&players[turn])scrollToTile(players[turn].pos,true)});}
  updateBoardHud();
 }
 function updateBoardHud(){
@@ -458,7 +526,7 @@ function drawBoard(){
  const layer=$('boardPlayers');if(layer)layer.innerHTML=boardTokens();
 }
 function drawScores(){
- $('scores').innerHTML=players.map((p,i)=>`<div class="score-card ${i===turn?'active':''}"><span class="mini-donkey" style="--fur:${p.color}">${donkeySvg(p.color)}</span><div><strong>${esc(p.name)}</strong><div class="meta">${p.isCPU?'Computer':p.kind==='adult'?`Voksen · ${p.difficulty==='svaer'?'Svær':p.difficulty==='let'?'Let':'Mellem'}`:`${p.age} år`}${p.skipNextTurn?' · 💧 En tur over':''}</div></div><div style="margin-left:auto;text-align:right"><span class="pos">${p.pos===config.start?'START':p.pos}</span><div class="meta">felt</div></div></div>`).join('');
+ $('scores').innerHTML=players.map((p,i)=>`<div class="score-card ${i===turn?'active':''}"><span class="mini-donkey" style="--fur:${p.color}">${donkeySvg(p.color)}</span><div><strong>${esc(p.name)}</strong><div class="meta">${p.isCPU?'Computer':p.kind==='adult'?`Voksen · ${p.difficulty==='svaer'?'Svær':p.difficulty==='let'?'Let':'Mellem'}`:`${p.age} år`}${p.skipNextTurn?' · 💧 En tur over':''}${config.adaptive&&p.kind==='child'?' · '+P.label(p.learning?.step||0):''}</div></div><div style="margin-left:auto;text-align:right"><span class="pos">${p.pos===config.start?'START':p.pos}</span><div class="meta">felt</div></div></div>`).join('');
 }
 function btn(label,action,style='main'){return `<button type="button" class="btn ${style}" data-act="${action}">${label}</button>`}
 function hideActionFlash(){
@@ -475,6 +543,7 @@ function flashAction(type,title,detail,durationMs=2300){
 
 function render(){
  if(!config)return;
+ if(phase==='win'){G.clear(safeStorage());lastSaveOk=null;}else if(safePhase())saveCheckpoint();
  drawScores();drawBoard();updateBoardHud();const p=players[turn];
  $('turnTitle').textContent=phase==='win'?'🏆 Talstien er gennemført!':`${p.isCPU?'🫏 ':''}${p.name}s tur`;
  $('turnSubtitle').textContent=phase==='win'?'Hov hov! Vi har en vinder!':`${p.name} står på ${p.pos===config.start?'START':`felt ${p.pos}`} · målet er ${config.goal}.`;
@@ -491,7 +560,7 @@ function render(){
   return;
  }
  if(phase==='question'){
-  panel.innerHTML=`<h2>🫏 ${pending?.superTask?'🎯 Superopgave':p.isCPU?'Æslet tænker …':'Æslet spørger!'}</h2><span class="age-chip">${esc(challenge.tier)} ${p.kind==='adult'?'· Tid på opgaven':'· Uden tidsgrænse'}</span><div class="prompt ${p.kind==='child'&&p.age<=4?'early':''}"><div class="tiny">${esc(challenge.tableLabel||S.TASKS[challenge.type-1].name)} · felt ${p.pos}</div><h3>${esc(challenge.question)}</h3>${challenge.adapted?'<p class="hint">Opgaven er gjort lettere til dit niveau.</p>':''}</div>${pending?.superTask?'<p class="super-prize">🎯 Frivillig bonus: +3 felter for et rigtigt svar · ingen straf for fejl</p>':''}
+  panel.innerHTML=`<h2>🫏 ${pending?.superTask?'🎯 Superopgave':p.isCPU?'Æslet tænker …':'Æslet spørger!'}</h2><span class="age-chip">${esc(challenge.tier)} ${p.kind==='adult'?'· Tid på opgaven':'· Uden tidsgrænse'}</span><div class="prompt ${p.kind==='child'&&p.age<=4?'early':''}"><div class="tiny">${esc(challenge.tableLabel||S.TASKS[challenge.type-1].name)} · felt ${p.pos}</div><h3>${esc(challenge.question)}</h3>${challenge.adapted?'<p class="hint">Opgaven er gjort lettere til dit niveau.</p>':''}${config.adaptive&&p.kind==='child'?`<p class="adapt-level">🧠 ${esc(P.label(p.learning?.step||0))}</p>`:''}</div>${pending?.superTask?'<p class="super-prize">🎯 Frivillig bonus: +3 felter for et rigtigt svar · ingen straf for fejl</p>':''}
    ${!p.isCPU&&p.kind==='adult'?`<div class="question-time" id="questionTime"><span>⏱️ Du har</span><strong id="clock" class="clock-big">${challenge.timeLimit||30} sek.</strong><div class="time-track"><div id="timeFill" class="time-fill"></div></div></div>`:''}
    <div class="choices">${challenge.options.map((opt,i)=>`<button class="choice ${p.kind==='child'&&p.age<=4?'early':''}" ${p.isCPU?'disabled':''} data-act="answer-${i}">${esc(opt)}</button>`).join('')}</div>
    ${p.isCPU?'<p class="hint">Æslet prøver selv – det kan også svare forkert!</p>':`<div class="voicebar">${btn('🔊 Læs op','read','soft')} ${btn('💡 Få et tip','help','soft')}</div><div id="tip" class="help" hidden>${esc(challenge.help)}</div>`}`;
@@ -590,7 +659,7 @@ async function moveFirst(){
 function receiveLearnRoll(type,forceTable=false){
  if(phase!=='learn'||busy)return;
  const p=players[turn];
- challenge=S.makeChallenge({player:p,type,field:p.pos,roll:pending.roll,tables:config.tables,forceTable});
+ challenge=S.makeChallenge({player:p,type,field:p.pos,roll:pending.roll,tables:config.tables,forceTable,skillStep:config.adaptive?p.learning?.step||0:0});helpUsed=false;
  phase='question';render();
  const task=challenge;const g=gameToken;
  const spoken=say(`${p.name}! ${challenge.question}`);
@@ -601,7 +670,7 @@ function startAdultTimer(resume=false){
  clearInterval(taskTimer);taskTimer=null;
  const p=players[turn];if(p.kind!=='adult'||phase!=='question')return;
  const sec=challenge.timeLimit||30;
- if(!resume)taskDeadline=Date.now()+sec*1000;
+ if(!resume){taskDeadline=Date.now()+(resumeAdultMs!==null?Math.max(1000,resumeAdultMs):sec*1000);resumeAdultMs=null;}
  // iOS may put the web app in the background mid-question. Time is paused there.
  if(document.hidden){taskPausedAt=Date.now();return;}
  const tick=()=>{
@@ -629,7 +698,7 @@ function resumeAdultTimer(){
  }
 }
 document.addEventListener('visibilitychange',()=>{
- if(document.hidden)pauseAdultTimer();else resumeAdultTimer();
+ if(document.hidden){pauseAdultTimer();if(config&&safePhase())saveCheckpoint();}else resumeAdultTimer();
 });
 function processAnswer(idx,timedOut=false){
  if(phase!=='question')return;
@@ -644,10 +713,17 @@ function processAnswer(idx,timedOut=false){
  resultLines.push(correct?`✅ Rigtigt svar: +${prize} felter.`:timedOut?'⏱️ Tiden gik! Intet ekstra felt.':'🫏 Forkert svar: intet ekstra felt.');
  p.stats ||= {correct:0,attempted:0};
  p.stats.attempted++;if(correct)p.stats.correct++;
+ let learningNotice='';
+ if(config.adaptive&&p.kind==='child'&&!p.isCPU){
+  const update=P.note(p.learning,correct,{helped:helpUsed});p.learning=update.state;
+  if(update.change>0)learningNotice='Du klarer dig godt! De næste opgaver bliver lidt sværere.';
+  else if(update.change<0)learningNotice='Vi prøver med lidt lettere opgaver næste gang.';
+  if(learningNotice){pending.feedback+=' '+learningNotice;resultLines.push('🧠 '+learningNotice)}
+ }
  phase='feedback';render();
  const g=gameToken;
  void (async()=>{
-   if(correct)await say(`${p.name}, det er rigtigt. Godt klaret!`);
+   if(correct)await say(`${p.name}, det er rigtigt. Godt klaret! ${learningNotice}`);
    else await playBray();
    await pauseBeat();
    if(g===gameToken&&phase==='feedback')await (isSuper?finishSuper():finishLearning());
@@ -761,7 +837,7 @@ function chooseSuper(yes){
  pending.superTask=true;
  // Små børn får et simpelt tal; ældre børn og voksne får et regnestykke.
  const type=(p.kind==='child'&&p.age<=4)?1:6;
- challenge=S.makeChallenge({player:p,type,field:p.pos,roll:pending.roll,tables:config.tables});
+ challenge=S.makeChallenge({player:p,type,field:p.pos,roll:pending.roll,tables:config.tables,skillStep:config.adaptive?p.learning?.step||0:0});helpUsed=false;
  phase='question';render();const task=challenge,g=gameToken;
  const spoken=say(`${p.name}! Her kommer din superopgave: ${challenge.question}`);
  if(p.isCPU)scheduleCPU('question');else void spoken.then(()=>{if(g===gameToken&&phase==='question'&&challenge===task)startAdultTimer()});
@@ -804,7 +880,7 @@ function celebrateWin(){
 }
 function declareWin(p){
  if(phase==='win')return;
- winner=p;phase='win';
+ winner=p;phase='win';G.clear(safeStorage());
  if(L){try{L.record(safeStorage(),players,p.id)}catch(e){console.warn('Topscore kunne ikke gemmes',e)}}
  render();celebrateWin();say(`Hov hov! Tillykke ${p.name}! Du vandt ÆselKlog Talstien!`);
 }
@@ -846,7 +922,7 @@ $('turnPanel').addEventListener('click',e=>{
  else if(a.startsWith('task-')&&phase==='learn')receiveLearnRoll(Number(a.slice(5)));
  else if(a.startsWith('answer-')&&phase==='question')processAnswer(Number(a.slice(7)));
  else if(a==='read'&&phase==='question')say(challenge.question);
- else if(a==='help'&&phase==='question'){$('tip').hidden=!$('tip').hidden;say(challenge.help)}
+ else if(a==='help'&&phase==='question'){helpUsed=true;$('tip').hidden=!$('tip').hidden;say(challenge.help)}
  else if(a==='skip')skipChallenge();
  else if(a.startsWith('swap-')&&phase==='swap')swapWith(a.slice(5));
  else if(a==='swap-none'&&phase==='swap'){resultLines.push('🔄 Ingen bytte.');phase='result';render()}
@@ -854,7 +930,7 @@ $('turnPanel').addEventListener('click',e=>{
  else if(a==='super-no'&&phase==='super-offer')chooseSuper(false);
  else if(a==='next')nextTurn();
  else if(a==='topscore')openTopscore();
- else if(a==='restart'){resetAsync();phase='setup';show('setup')}
+ else if(a==='restart'){resetAsync();G.clear(safeStorage());config=null;players=[];phase='setup';show('setup');renderResumeCard()}
 });
 if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
 })();
