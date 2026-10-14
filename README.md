@@ -1,61 +1,52 @@
-# 🫏 ÆselKlog – Talstien v0.8-C
+# 🫏 ÆselKlog – Talstien v0.8-D
 
-**Spil:** https://driftportal-platform.github.io/aeselklog-talstien/  
-**GitHub:** https://github.com/driftportal-platform/aeselklog-talstien  
-**Status:** v0.8-C er udviklet som pakke til GitHub og testet med automatiske Node-tests. **Den er ikke live, før de nye filer er uploadet**, og skal afprøves på en rigtig iPhone.
+**App:** https://driftportal-platform.github.io/aeselklog-talstien/  
+**Repository:** https://github.com/driftportal-platform/aeselklog-talstien  
+**Status:** Denne v0.8-D er en **udviklet prøvepakke til manuel GitHub-upload**. Den er endnu ikke automatisk udgivet på GitHub Pages.
 
-## Hvad er nyt i v0.8-C?
+## Nyheder i 0.8-D
 
-Den snoede bane med 100 korrekte tal har nu **25 actionfelter (fem i hvert talområde)**. Nye felter:
+1. **Gangetabeller og valgfri TABELTRÆNING:** Under spilopsætning kan I vælge én bestemt gangetabel fra 2 til 12, en blanding eller automatisk opgavemiks. Vælges TABELTRÆNING, kommer en opgave hver tur uden først at kaste læringsterningen. I LÆR/UDFORDRING kan tabelopgaver også dukke op ved regne-siden på terningen. De yngste (3–6 år) beholder alderspassende talopgaver og enkle plus/minus-regnestykker.
+2. **Roligere tempo:** Vælg *Normalt*, *Roligt* (standard) eller *Ekstra roligt*. Æsler hopper nu langsommere fra felt til felt. CPU-æslet venter på, at AI-/telefonoplæsningen er **færdig**, før det svarer eller kaster igen.
+3. **Oplæsning styrer spilflowet:** Også den almindelige flytning afventer den korte annoncering af slaget. Feedback ved rigtigt svar afventer tale, og ved fejl afventes den ægte æsellyd. **Voksnes opgavetimer starter først, når oplæsningen er færdig.** Lyden kan stadig slås fra, og afbrudt tale spærrer ikke spillet.
+4. **🏆 Topscore:** Åbn listen fra opsætningen eller den store spilleplade. Vis de mest vindende spillere, antal gennemførte spil og antal rigtige svar. Et afsluttet spil tælles én gang for alle deltagere, også CPU. Resultater gemmes **kun i browserens lokale lager**, uden navn/aldersdata til en server. Brug kaldenavne. Der er en knap til at slette listen.
 
-| Ikon | Navn | Handling |
-| --- | --- | --- |
-| 🥕 | Gulerod | Ét ekstra almindeligt terningkast, **maks. én gang i samme tur** |
-| 💧 | Vandpyt | Spillerens **næste tur** springes over. Gælder også CPU |
-| 🎁 | Overraskelse | Tilfældig gevinst/straf: **+3, +2, −1 eller −2 felter** |
-| 🌉 | Bro | Fire felter frem (aldrig forbi målet i valgt talområde) |
-| 🎯 | Superopgave | Helt **frivillig**, også i LEG. Alderspassende spørgsmål giver **+3 felter** ved rigtigt svar; nej tak/fejl giver ingen ekstra felter og ingen anden straf |
+## Eksisterende funktioner – beholdt
 
-De gamle actionfelter **Bonus (+2), Hov hov! (−2), Byt og Talmester (+1)** fungerer fortsat. Der er en lille **🎁 Felter**-hjælpemenu på den store spilleplade, og ved specialfelter vises en kort animation med tekst.
-
-### Spilleregler for actionfelter
-
-- Efter almindeligt terningkast bevæger æslet sig først, og en valgt læringsopgave kommer derefter. Actionfeltet afvikles **på slutpositionen** efter en eventuel læringsbonus.
-- Et actionfelt udløses **kun én gang**, og et frem-/tilbagehop til et nyt actionfelt aktiverer det **ikke** igen.
-- Et ekstra Gulerod-kast kan føre til en ny handling, men **ikke endnu et ekstra Gulerod-kast** samme tur.
-- **CPU-æslet** deltager i alle handlinger, også Gulerod, Vandpyt og frivillig Superopgave.
-- Læring er altid frivillig. LEG kan spilles uden matematik, og Superopgave kan altid afvises uden straf.
-- Der bruges lokale matematikopgaver fra `engine.js` med gradvist sværere opgaver fra 3 år til voksen. Voksne har fortsat deres 60/30/10-sekunders timer.
-
-## Bevarede funktioner
-
-Fuldskærmsbane i liggende mobilformat, touch-zoom og følg æslet; farvede æselbrikker; fysiske/digitale terninger; CPU-modstander der kaster synligt og indimellem svarer forkert; aldersopgaver, voksen-timer, ægte æsellyd og dansk AI-tale med automatisk Cloudflare-adresse, Mia og andre stemmer fra brugerens ElevenLabs-konto.
-
-**Ingen ændringer er nødvendige i Cloudflare Workeren for v0.8-C.** Din ElevenLabs API-nøgle må aldrig uploades til GitHub.
+- Fuldskærms, snoet 1–100-bane med fem talområder og 25 specialfelter.
+- Fysisk/digital almindelig terning og læringsterning, synlig CPU-terning og farvede æselbrikker.
+- Gulerod, vandpyt, overraskelse, bro, superopgave samt de klassiske felter.
+- Almindeligt spil (LEG) **uden påkrævet matematik**.
+- Aldersopgaver til børn fra 3 år; voksne vælger sværhedsgrad med 60/30/10 sekunder.
+- ElevenLabs Mia og andre godkendte stemmer via eksisterende Cloudflare-Worker. Der bruges **samme adresse** som før, uden adressefelt og uden nye secrets.
+- Ægte æsellyd ved fejl og indbygget dansk telefonstemme som reserve/offline.
 
 ## Upload til GitHub
 
-1. Download og udpak ZIP-filen med v0.8-C.
-2. Åbn eksisterende repository `driftportal-platform/aeselklog-talstien`.
-3. Upload **alle filerne i roden**, særligt **NYE `actions.js`**, ændrede `app.js`, `board.js`, `index.html` og `sw.js`.
-4. Erstat eksisterende filer, og upload dokumenterne `README.md`, `UDVIKLINGSPLAN.md`, `AGENTS.md`. Testfiler kan lægges i `tests/` som de fremgår af ZIP-filen.
-5. Vælg **Commit changes** og genindlæs GitHub Pages. En installeret PWA kan skulle lukkes helt og åbnes igen for at hente nyt cache-indhold.
+1. Pak ZIP-pakken ud.
+2. Upload alle appfiler i ZIP'ens rod til repository **`driftportal-platform/aeselklog-talstien`**, og erstat filer med samme navn. Den nye **`leaderboard.js`** skal også med.
+3. Upload `tests/` (valgfri for selve appen, god idé for projektstatus), `README.md`, `UDVIKLINGSPLAN.md` og `AGENTS.md`.
+4. Commit ændringerne og genindlæs GitHub Pages på telefonen. PWA-cachen hedder nu `aeselklog-talstien-v08d-tables-voice-topscore`.
 
-## Tests og begrænsninger
+**Cloudflare skal IKKE opdateres** for denne version. Du må ikke uploade API-nøgler til GitHub.
 
-Kør i projektmappen:
+## Sådan tester du på telefonen
 
-```bash
-node tests/actions.test.js
-node tests/board.test.js
-node tests/flow.test.js
-```
+- Vælg TABELTRÆNING + 7-tabellen, og tjek, at næste opgave efter et slag er i 7-tabellen. Prøv også *2-tabellen* og *Bland tabellerne*.
+- Prøv et barn på 6 år, som stadig skal få enkle regneopgaver uden tidspres.
+- Sæt tempoet til *Ekstra roligt*, og spil mod Æslet. Lad Mia læse helt færdigt; prøv også at slå lyd fra.
+- Vælg en voksen på sværere niveau og kontroller, at nedtællingen først starter, efter talen er færdig.
+- Gennemfør et kort spil, og kontrollér at sejre og antal rigtige svar dukker op under Topscore. Genstart appen og tjek, at de stadig er der.
+- Prøv den ægte æsellyd ved et forkert svar.
 
-- ✅ Nodeskript-tests for actionfelter, banenumre og et simuleret spilforløb inkl. CPU.
-- ✅ Syntakskontrol (`node --check`) af alle JavaScript-filer.
-- ⚠️ **Rigtig browser-/iPhone-test mangler**. Test-browseren i det aktuelle arbejdsmiljø blokerer navigation, så visuel rendering, touch og virkelig lyd kunne ikke gennemtestes her.
-- ⚠️ **AI-tale er ikke forbrugs-/integrationstestet i denne pakke**. Den eksisterende Cloudflare-forbindelse er bevaret uændret og fungerer ifølge brugertest.
+## Tests udført lokalt
+
+- Node: `tests/board.test.js`, `actions.test.js`, `flow.test.js`, `tables.test.js`, `leaderboard.test.js`.
+- Chromium via indlæst HTML (lokal webnavigation er blokeret i testmiljøet): mobil-landscape fuldskærm, åbning af Topscore, almindelig tur og CPU-tur, tabeltræning og ingen JavaScript-fejl i de gennemgåede cases.
+- Tale: simuleret AI-lyd, hvor Promise først afsluttes når lyden slutter; afbrydelse frigiver forløbet straks (`tests/speech.test.py`).
+
+**Mangler:** Reel iPhone-test og live ElevenLabs-latens/lydkvalitet efter denne opdatering; rigtig lokal top-score-lagring er dækket af unit tests, men bør også prøves på iPhone. Ingen ny Cloudflare-/API-opsætning er nødvendig.
 
 ## Projektstyring
 
-Læs [UDVIKLINGSPLAN.md](./UDVIKLINGSPLAN.md) og [AGENTS.md](./AGENTS.md) før næste ændring. Næste udviklingsfase: **v0.8-D – mere levende lyd, animationsfeedback og bedre tilgængelighed**.
+Læs altid [UDVIKLINGSPLAN.md](./UDVIKLINGSPLAN.md) og [AGENTS.md](./AGENTS.md) før nye ændringer. Næste fase: **v0.8-E – samlet test, fejlrettelser og finpudsning**.

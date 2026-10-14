@@ -1,4 +1,4 @@
-/* ÆselKlog v0.3 — spørgemotor. Ingen netværk, profiler eller tredjeparts-API. */
+/* ÆselKlog v0.8-D — spørgemotor. Ingen netværk, profiler eller tredjeparts-API. */
 (function(root,factory){
   const api=factory();
   if(typeof module !== 'undefined' && module.exports) module.exports=api;
@@ -90,12 +90,47 @@ function adult(type,difficulty,field,roll,rng){
  if(options.length<2)options=String(ans)==='Ja'?['Ja','Nej']:numericOptions(Number(ans),rng,3,0);
  return pack(type,q,ans,options,help,tier,{timeLimit:TIME_LIMITS[difficulty]||30});
 }
-function makeChallenge({player,type,field=1,roll=1,rng=Math.random}){
+/** Gangeopgaver knyttet til valgt tabel. 3–6-årige får stadig normale begynderopgaver. */
+function tableChallenge(player,tables='auto',rng=Math.random){
+ const age=player.kind==='adult'?18:Math.max(3,Math.min(17,Number(player.age)||7));
+ if(age<7)return null;
+ const selected=Number(tables);
+ const available=age<=8?[2,5,10]:Array.from({length:11},(_,i)=>i+2);
+ const fixed=Number.isInteger(selected)&&selected>=2&&selected<=12?selected:pick(available,rng);
+ let high;
+ if(player.kind==='adult')high=player.difficulty==='svaer'?20:player.difficulty==='mellem'?15:10;
+ else high=age<=7?5:age<=8?10:12;
+ const multiplier=ri(age<=8?1:2,high,rng);
+ const answer=fixed*multiplier;
+ let question=`Hvad er ${fixed} × ${multiplier}?`;
+ let correct=answer;
+ if(player.kind==='adult'&&player.difficulty==='svaer'&&rng()<.45){
+   const extra=ri(2,45,rng);correct=answer+extra;
+   question=`Hvad er (${fixed} × ${multiplier}) + ${extra}?`;
+ }
+ const label=tables==='mix'?'Blandede tabeller':`${fixed}-tabellen`;
+ return pack(6,question,correct,numericOptions(correct,rng,4,0),`Tænk på ${fixed}-tabellen. Regn ét skridt ad gangen.`,ageTier(player),{
+   table:fixed,tableLabel:label,timeLimit:player.kind==='adult'?TIME_LIMITS[player.difficulty]||30:undefined
+ });
+}
+function makeChallenge({player,type,field=1,roll=1,tables='auto',forceTable=false,rng=Math.random}){
+
  if(!player||!Number.isInteger(type)||type<1||type>6)throw new Error('Ukendt spørgsmålstype');
+ // Læringsterningens regne-side tilbyder også valgfri tabeltræning.
+ // “auto” giver en moderat andel tabeller; ét valgt tal giver altid den tabel på regne-siden.
+ if(type===6&&(forceTable||tables!=='off')){
+  const age=player.kind==='adult'?18:Number(player.age)||7;
+  if(age>=7){
+   const forced=forceTable||/^(?:[2-9]|1[0-2])$/.test(String(tables));
+   const ratio=forced?1:tables==='mix'?.72:(age<=8?.32:.48);
+   if(rng()<ratio)return tableChallenge(player,tables,rng);
+  }
+ }
+
  if(player.kind==='adult')return adult(type,player.difficulty||'mellem',field,roll,rng);
  const age=Math.max(3,Math.min(17,Number(player.age)||7));
  if(age<=6)return age<=4?toddler(type,age,rng):young(type,age,field,roll,rng);
  return child(type,age,field,roll,rng);
 }
-return {TASKS,TIME_LIMITS,makeChallenge,prime,numericOptions,ageTier};
+return {TASKS,TIME_LIMITS,makeChallenge,tableChallenge,prime,numericOptions,ageTier};
 });

@@ -37,3 +37,12 @@ Den offentlige Worker-URL ligger som konstant i `app.js`. API-nøglen findes kun
 - Gulerod giver højst ét ekstra kast på en tur. Vandpyt springer præcis næste tur over, også ved CPU. Overraskelser giver +3, +2, -1 eller -2 felter. Bro giver +4. Superopgaven er **altid frivillig** og har ingen straf ved fejl.
 - CPU skal deltage i alle handlinger, og alle bevægelser skal respektere det valgte talområdes start og mål.
 - Kør `node tests/actions.test.js`, `node tests/board.test.js` og `node tests/flow.test.js`, og kontrollér derefter på rigtig iPhone før release.
+
+## v0.8-D – særlige hensyn
+
+- Gangeopgaver ligger fortsat i `engine.js`, og valget `tablesChoice`/`learning=tabel` er globalt pr. spil. Tre- til seksårige får ikke tvungne gangestykker.
+- `say()` returnerer nu en Promise, der først afsluttes **når lydafspilningen slutter** (eller efter afbrydelse/fejl). CPU-flow og voksen-timer må ikke erstattes af faste tidsforsinkelser.
+- Bevar fallback til enhedens stemme. Brug aldrig en server-API-nøgle i kode på GitHub.
+- `leaderboard.js` gemmer udelukkende kaldenavne og statistiske resultater **lokalt** og bruger ingen server. Gem aldrig børnealder i toplisten.
+- `PACE` styrer hop/pauser; fuldskærms mobil skal bevares.
+- Nye tests: `tests/tables.test.js`, `tests/leaderboard.test.js`, `tests/browser_smoke.py`, `tests/browser_table.py`, `tests/speech.test.py`. Playwright-testene fungerer ved at indlæse inline HTML, da navigation til en lokal server er blokeret i den aktuelle browserkørsel.

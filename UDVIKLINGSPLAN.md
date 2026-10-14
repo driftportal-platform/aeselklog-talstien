@@ -3,11 +3,27 @@
 > Dette er vores **eneste løbende status- og planlægningsfil**. Læs nyeste GitHub-`main` + `README.md` + `AGENTS.md`, før du udvikler videre. Opdater status, tests og kendte fejl efter hver version.
 
 **Opdateret:** 13. oktober 2026  
-**Sidst bekræftet på GitHub `main` før ændringen:** v0.8-B.1  
-**Ny lokal udviklingspakke:** v0.8-C, **endnu ikke bekræftet live**  
-**Næste fase:** v0.8-D, mere liv i spillet (bevægelser, lyd og feedback)  
+**Sidst bekræftet på GitHub `main` før ændringen:** v0.8-C  
+**Ny lokal udviklingspakke:** v0.8-D, **endnu ikke bekræftet live**  
+**Næste fase:** v0.8-E, samlet mobiltest og polering  
 **Repository:** https://github.com/driftportal-platform/aeselklog-talstien  
 **Spil:** https://driftportal-platform.github.io/aeselklog-talstien/
+
+## Nyeste status – v0.8-D (13. oktober 2026)
+
+**Bygget i separat ZIP, endnu ikke live**, med udgangspunkt i den v0.8-C-kode, der ligger i GitHub `main`.
+
+- [x] TABELTRÆNING hver tur og valgfri 2–12-tabel, alle tabeller eller automatisk blanding. Treårige til seksårige får fortsat nemme opgaver.
+- [x] Roligt tempo som standard samt Normalt/Ekstra roligt. Hop er langsommere. CPU afventer, at der er *reelt afsluttet tale*, ikke blot en fast 2-sekunders forsinkelse.
+- [x] Flytning afventer kort oplæsning af slag; korrekt-svar-feedback afventer tale og forkert svar afventer æsellyd. Voksen-nedtælling begynder efter oplæsning.
+- [x] Topscore med sejre, gennemførte spil og rigtige svar gemt på enheden via `leaderboard.js`. Intet login eller cloud-lager; kun kaldenavne og statistik gemmes.
+- [x] Kodekontrol, Node- og Chromium-smoketests inkl. simuleret AI-lyd og tabelopgaver.
+- [ ] Upload v0.8-D på GitHub, kontrollér den nye PWA-cache og afprøv reel ElevenLabs-oplæsning på iPhone.
+- [ ] Test at en gennemført kamp gemmes og genfindes i topscoren efter genåbning på iPhone.
+
+**Vigtigt:** Den eksisterende Cloudflare Worker er **uændret**; den nye løsning bruger samme stemmevalg og serveradresse som v0.8-C.
+
+---
 
 ## 1. Grundidé – beslutninger vi bevarer
 
@@ -28,8 +44,8 @@
 | 0.8-A | Korrekt SVG-bane 1–100, bondegård, touchzoom | ✅ På GitHub og videreført |
 | 0.8-B | Fuldskærms-spilleplade, terning → hop → læring → bonus → action | ✅ På GitHub og videreført |
 | 0.8-B.1 | Automatisk ElevenLabs-URL og stemmevælger (Mia + andre) | ✅ På GitHub, **bekræftet af bruger at virke** |
-| **0.8-C** | **Nye actionfelter med regler, feedback og CPU-adfærd** | ✅ **Kodet og testet i Node**, ⬜ GitHub-upload/iPhone-test mangler |
-| 0.8-D | Polerede animations- og lydforløb, sejrs-/fejlfeedback | ⬜ Ikke startet |
+| **0.8-C** | **Nye actionfelter med regler, feedback og CPU-adfærd** | ✅ Bekræftet i GitHub `main`; brugerprøve af alle felter anbefales |
+| **0.8-D** | **Gangetabeller, roligere CPU/tale, Topscore og langsommere hop** | ✅ Bygget og testet lokalt; mangler upload/live iPhone-test |
 | 0.8-E | Helhedstest mobil, alder, CPU, lydforbrug og release | ⬜ Ikke startet |
 | 0.9 | Gem/fortsæt spil, adaptiv læring og test med familier/Hyggeonkel | 📋 Fremtidig idé |
 
@@ -84,9 +100,9 @@
 - [ ] Kontrollér CPU'ens automatiske ekstra terningkast og tur der springes over på rigtig telefon.
 - [ ] Afprøv 3-årige børn, 5–6-årige og voksen-timer under actionquizzer.
 - [ ] Bekræft AI-tale, æsellyd og om taleafbrydelser/forbrug er acceptable i dette release.
-- [ ] Opdater GitHub til v0.8-C og bekræft PWA-cachen på mobil.
+- [ ] Bekræft PWA-cachen v0.8-D på mobil efter upload.
 
-## 6. Næste fase v0.8-D
+## 6. Opfølgning efter v0.8-D
 
 - Glattere og sjovere terninge-/æselanimationer, vinder-confetti og synlig belønning.
 - Klarere opgave-overlays og hjælp til de yngste uden at skjule brættet.
@@ -101,3 +117,11 @@
 3. Udvikl ændringen i små, kontrollerbare trin, og kør relevante tests.
 4. Opdatér roadmap, README, versionsnummer og serviceworker-cache. Del ZIP/commit og vær åben om utestede funktioner.
 5. Del ALDRIG ElevenLabs-secrets; brug kaldenavne til børn, og kontroller rettigheder før salg.
+
+## 8. Version 0.8-E – foreløbige testpunkter
+
+- Afprøv reel iPhone lyd/taletiming (AI, fallback, CPU, rigtigt/forkert svar), og tilpas eventuelle lange pauser.
+- Afprøv Topscore efter et afsluttet spil og efter lukning/genåbning; dokumentér at lokal lager kan slettes uden at påvirke spillet.
+- Test alle læringsniveauer fra 3 år til voksen inkl. valgte tabeller, blandede regnestykker, tidsgrænser og LEG.
+- Test gang, vandpyt, ekstra kast, bro, overraskelse, superopgave og CPU sammen.
+- Eventuelt tilføje diskret konfetti, sejrsanimation og reduceret animationstilstand.

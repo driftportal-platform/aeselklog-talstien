@@ -284,13 +284,27 @@
       .action-toast small{font-size:.73rem}
     }
     @media(prefers-reduced-motion:reduce){.action-toast.show{animation:none;opacity:1;transform:translate(-50%,-20%)}}
+  
+    /* v0.8-D – Topscore og tempo */
+    .topscore-dialog{border:1px solid #b9d1da;border-radius:22px;box-shadow:0 25px 80px #14334970;background:#fffefa;color:var(--deep);padding:20px;max-width:min(660px,94vw);width:620px;max-height:88dvh;overflow:auto;z-index:1300}
+    .topscore-dialog::backdrop{background:rgba(9,32,58,.68);backdrop-filter:blur(4px)}
+    .topscore-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}.topscore-head h2{margin:0 0 4px}
+    .topscore-head p{margin:0 0 14px}.topscore-list{display:grid;gap:7px;list-style:none;padding:0;margin:0}
+    .topscore-item{display:grid;grid-template-columns:40px minmax(0,1fr) auto;gap:10px;align-items:center;padding:11px;border:1px solid #dbe4ee;border-radius:12px;background:#f5faff}
+    .topscore-rank{font-weight:900;color:#94611a;font-size:1.15rem}.topscore-name{font-weight:800;overflow-wrap:anywhere}
+    .topscore-meta{font-size:.8rem;color:#557083;margin-top:3px}.topscore-wins{font-size:1.1rem;font-weight:900;color:var(--navy);text-align:right}
+    .topscore-bottom{border-top:1px solid #e1e9ef;padding-top:11px;margin-top:13px;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
+    .topscore-bottom p{margin:0;max-width:430px}.topscore-empty{padding:25px;text-align:center;color:#5c7689;background:#f2f8fb;border-radius:15px}
+    .boardbox.expanded #openTopscoreGame{font-size:.79rem}
+    @media(max-width:730px) and (orientation:landscape){.boardbox.expanded #openTopscoreGame{padding:5px 7px;min-height:31px;font-size:.72rem}}
+
   </style>
 </head>
 <body>
 <div class="shell">
   <header class="top">
     <div class="brand"><div class="logo" aria-hidden="true">🫏</div><div><h1>Æsel<span class="red">Klog</span> · Talstien</h1><small>Spil, lær og grin sammen</small></div></div>
-    <div class="top-actions"><span class="pill">PRØVEVERSION 0.8-B.1</span><button id="voiceToggle" class="btn soft small" type="button" aria-pressed="true">🔊 Lyd til</button></div>
+    <div class="top-actions"><span class="pill">PRØVEVERSION 0.8-D</span><button id="voiceToggle" class="btn soft small" type="button" aria-pressed="true">🔊 Lyd til</button></div>
   </header>
 
   <details class="voice-settings" id="voiceSettings">
@@ -335,17 +349,29 @@
     <div class="grid2">
       <div class="paper"><h2>🎲 Vælg spil</h2>
         <div class="field"><label for="range">Hvilket talområde?</label><select id="range"><option value="1-100">Hele Talstien · 1–100</option><option value="1-20">Lyseblå · 1–20</option><option value="21-40">Koral · 21–40</option><option value="41-60">Gul · 41–60</option><option value="61-80">Grøn · 61–80</option><option value="81-100">Lilla · 81–100</option></select></div>
-        <div class="field"><span>Læringsniveau</span><div class="options"><label class="option"><input type="radio" name="learning" value="leg"><span><strong>LEG</strong><small>Kun spil</small></span></label><label class="option"><input type="radio" name="learning" value="laer" checked><span><strong>LÆR</strong><small>Opgave på specialfelter</small></span></label><label class="option"><input type="radio" name="learning" value="udfordring"><span><strong>UDFORDRING</strong><small>Opgave hver tur</small></span></label></div></div>
+        <div class="field"><span>Læringsniveau</span><div class="options"><label class="option"><input type="radio" name="learning" value="leg"><span><strong>LEG</strong><small>Kun spil</small></span></label><label class="option"><input type="radio" name="learning" value="laer" checked><span><strong>LÆR</strong><small>Opgave på specialfelter</small></span></label><label class="option"><input type="radio" name="learning" value="udfordring"><span><strong>UDFORDRING</strong><small>Opgave hver tur</small></span></label><label class="option"><input type="radio" name="learning" value="tabel"><span><strong>TABELTRÆNING</strong><small>Gangeopgave hver tur, fra ca. 7 år</small></span></label></div></div>
+        <div class="field"><label for="tablesChoice">✖️ Gangetabeller i læringsopgaver</label>
+          <select id="tablesChoice">
+            <option value="auto" selected>Automatisk efter alder (blandet regning)</option>
+            <option value="mix">Bland tabellerne 2–12 (mest gangeopgaver)</option>
+            <option value="off">Ingen særskilt tabeltræning (almindelig regning)</option>
+            <option value="2">2-tabellen</option><option value="3">3-tabellen</option><option value="4">4-tabellen</option><option value="5">5-tabellen</option><option value="6">6-tabellen</option><option value="7">7-tabellen</option><option value="8">8-tabellen</option><option value="9">9-tabellen</option><option value="10">10-tabellen</option><option value="11">11-tabellen</option><option value="12">12-tabellen</option></select>
+          <p class="tiny" style="margin:0">Vælg én tabel eller en blanding. I TABELTRÆNING kommer regneopgaven hver tur (uden læringsterning). 3–6-årige får stadig lette opgaver. I LEG er matematik frivillig.</p>
+        </div>
         <div class="field"><span>Spillepladen</span><div class="options"><label class="option"><input type="radio" name="boardMode" value="digital" checked><span><strong>Digital</strong><small>Se placeringerne her</small></span></label><label class="option"><input type="radio" name="boardMode" value="physical"><span><strong>Fysisk</strong><small>Brug A3-pladen</small></span></label></div></div>
       </div>
       <div class="paper"><h2>⚙️ Sådan slår I terninger</h2>
         <div class="field"><span>Almindelig terning (1–6)</span><div class="options"><label class="option"><input type="radio" name="moveDice" value="digital" checked><span><strong>I appen</strong></span></label><label class="option"><input type="radio" name="moveDice" value="physical"><span><strong>Fysisk</strong><small>Tryk tallet i appen</small></span></label></div></div>
         <div class="field"><span>Læringsterning (6 ikoner)</span><div class="options"><label class="option"><input type="radio" name="learnDice" value="digital" checked><span><strong>I appen</strong></span></label><label class="option"><input type="radio" name="learnDice" value="physical"><span><strong>Fysisk</strong><small>Tryk på ikonet</small></span></label></div></div>
+        <div class="field"><label for="gamePace">🐢 Spiltempo</label>
+          <select id="gamePace"><option value="rolig" selected>Roligt – æslet taler færdigt, langsomme hop</option><option value="ekstra">Ekstra roligt – længere pauser og hop</option><option value="normal">Normalt – kortere pauser</option></select>
+          <p class="tiny" style="margin:0">CPU venter på oplæsning og æsellyd, inden næste handling. Indstillingen gælder hele spillet.</p>
+        </div>
         <p class="hint">Når I bruger fysiske terninger, fortæller I appen resultatet ved at trykke. Kameraaflæsning kan komme senere.</p>
         <label class="option"><input type="checkbox" id="cpuCheck"><span><strong>🫏 Spil også mod Æslet</strong><small>Æslet er computerspiller og flytter sine egne brikker.</small></span></label>
       </div>
     </div>
-    <div class="paper"><div class="row between"><div><h2>👨‍👩‍👧 Spillere</h2><p class="hint">Skriv kaldenavne. Vælg alder for børn eller Voksen (18+) og sværhedsgrad.</p></div><button type="button" id="addPlayer" class="btn soft small">+ Tilføj spiller</button></div><div id="playerInputs"></div><p class="tiny">Børn fra 3 år spiller uden tidspres. Voksne får 60, 30 eller 10 sekunder pr. opgave.</p><button type="button" id="startButton" class="btn main block" style="margin-top:12px">Start spillet 🥕</button></div>
+    <div class="paper"><div class="row between"><div><h2>👨‍👩‍👧 Spillere</h2><p class="hint">Skriv kaldenavne. Vælg alder for børn eller Voksen (18+) og sværhedsgrad.</p></div><button type="button" id="addPlayer" class="btn soft small">+ Tilføj spiller</button><button type="button" id="openTopscoreSetup" class="btn soft small">🏆 Topscore</button></div><div id="playerInputs"></div><p class="tiny">Børn fra 3 år spiller uden tidspres. Voksne får 60, 30 eller 10 sekunder pr. opgave.</p><button type="button" id="startButton" class="btn main block" style="margin-top:12px">Start spillet 🥕</button></div>
     <p class="tiny">Prototype: Navne og aldre bruges lokalt til selve spillet. Vælger du AI-stemme, sendes den tekst der læses højt (eventuelt kaldenavne) til den tilsluttede stemmetjeneste. Opgaverne beregnes fortsat lokalt.</p>
   </section>
 
@@ -356,7 +382,7 @@
       <div class="board-head">
         <div class="board-heading"><h3>🗺️ Talstien · den levende bondegård</h3><span class="tiny" id="boardModeLabel">Digital spilleplade</span></div>
         <div class="board-main-actions">
-          <button class="btn soft small" type="button" id="editPos">✏️ Ret felt</button>
+          <button class="btn soft small" type="button" id="openTopscoreGame">🏆 Topscore</button><button class="btn soft small" type="button" id="editPos">✏️ Ret felt</button>
           <button class="btn main small" type="button" id="boardExpand" aria-controls="boardBox" aria-expanded="false">⛶ Stor plade</button>
           <button class="btn board-close small" type="button" id="boardClose" hidden aria-label="Luk stor spilleplade">✕ Luk</button>
         </div>
@@ -383,13 +409,19 @@
       <div class="board-panel-dock" id="boardPanelDock" role="region" aria-label="Tur og matematikopgave"></div>
       <div class="legend"><span>🟦 1–20</span><span>🌷 21–40</span><span>🟨 41–60</span><span>🟩 61–80</span><span>🟪 81–100</span></div>
       <p class="board-tip tiny">Træk med én finger for at se banen, knib med to fingre for at zoome, eller brug knapperne. Feltnumrene er altid synlige – også på actionfelter.</p>
-      <p class="board-stage-note tiny">I v0.8-C får du gulerødder, vandpytter, overraskelser, broer og frivillige superopgaver.</p>
+      <p class="board-stage-note tiny">I v0.8-D kan du desuden øve gangetabeller, sænke tempoet og samle sejre på Topscorelisten.</p>
     </section>
   </section>
   </main>
 
-  <footer><strong>ÆselKlog · v0.8-C · Sjove actionfelter, fuldskærmsbane, stemmevælger og CPU</strong><br>Den almindelige kortspilsvariant udvikles særskilt. Denne prøve handler om Talstien og læringsopgaverne.<div class="footer-links"><button type="button" class="btn soft small" id="testVoice">🔊 Prøv æslets stemme</button></div></footer>
+  <footer><strong>ÆselKlog · v0.8-D · Roligt tempo, tabeltræning og Topscore</strong><br>Den almindelige kortspilsvariant udvikles særskilt. Denne prøve handler om Talstien og læringsopgaverne.<div class="footer-links"><button type="button" class="btn soft small" id="testVoice">🔊 Prøv æslets stemme</button></div></footer>
 </div>
+
+<dialog id="topscoreDialog" class="topscore-dialog" aria-labelledby="topscoreTitle">
+ <div class="topscore-head"><div><h2 id="topscoreTitle">🏆 ÆselKlog Topscore</h2><p class="tiny">Lokale resultater på denne enhed – ingen konto eller server.</p></div><button id="closeTopscore" class="btn soft small" type="button">✕ Luk</button></div>
+ <div class="topscore-content" id="topscoreContent"></div>
+ <div class="topscore-bottom"><p class="tiny">Topscoren tæller kun afsluttede spil og gemmer kaldenavne, sejre og rigtige svar – ikke alder.</p><button class="btn danger small" id="clearTopscore" type="button">Slet topscoren</button></div>
+</dialog>
 
 <div id="diceOverlay" class="dice-overlay" hidden role="dialog" aria-modal="true" aria-label="Terningeskærm">
  <div class="dice-playing-card">
@@ -406,5 +438,6 @@
 <script src="./engine.js" defer></script>
 <script src="./board.js" defer></script>
 <script src="./actions.js" defer></script>
+<script src="./leaderboard.js" defer></script>
 <script src="./app.js" defer></script>
 </body></html>

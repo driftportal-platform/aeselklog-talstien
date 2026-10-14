@@ -1,4 +1,4 @@
-/* ÆselKlog Talstien v0.8-C: fem nye actiontyper, synlige hændelser og sikkert CPU/turflow. */
+/* ÆselKlog Talstien v0.8-D: tabeltræning, roligere CPU, vent på tale og lokal Topscore. */
 (()=>{'use strict';
 const $=id=>document.getElementById(id);
 const qs=sel=>document.querySelector(sel);
@@ -8,6 +8,7 @@ const S=window.AeselEngine;
 const B=window.AeselBoard;
 if(!B||!B.validate()){document.body.textContent='ÆselKlog kan ikke starte: board.js mangler eller har ugyldige felter.';return;}
 if(!S){document.body.textContent='ÆselKlog kan ikke starte: engine.js mangler.';return;}
+const L=window.AeselLeaderboard;
 const A=window.AeselActions;
 if(!A||!A.validate()){document.body.textContent='ÆselKlog kan ikke starte: actions.js mangler eller har ugyldige felter.';return;}
 const SPECIAL=A.FIELDS;
@@ -27,6 +28,11 @@ let setupPlayers=[{name:'Spiller 1',age:6,kind:'child',difficulty:'mellem'},{nam
 let players=[],config=null,turn=0,phase='setup',challenge=null,pending=null,resultLines=[],winner=null;
 let busy=false,gameToken=0,showDiceState=null,taskTimer=null,taskDeadline=0;
 let extraRollUsed=false,actionBannerSerial=0;
+let lastNarration=Promise.resolve();
+let activeVoiceDone=null;
+const PACE={normal:{hop:380,rest:240,roll:1100},rolig:{hop:630,rest:460,roll:1450},ekstra:{hop:900,rest:800,roll:1800}};
+function pace(){return PACE[config?.pace]||PACE.rolig;}
+function pauseBeat(){return defer(prefersLessMotion?120:pace().rest);}
 const prefersLessMotion=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 let boardScale=0.73,followActive=true,boardExpanded=false,boardFitMode=false;
 let bray=null;
@@ -102,20 +108,36 @@ function saveVoice(){
 }
 function stopCurrentVoice(){
  speechSerial++;
+ // Løs også de afventende Promise'er ved en afbrudt tale, så CPU aldrig fryser.
+ if(activeVoiceDone){const done=activeVoiceDone;activeVoiceDone=null;done();}
  if(aiFetch){aiFetch.abort();aiFetch=null}
  if(aiSource){try{aiSource.stop()}catch(e){}aiSource.disconnect();aiSource=null}
  if(aiHtmlAudio){aiHtmlAudio.pause();if(aiHtmlAudio._blobUrl)URL.revokeObjectURL(aiHtmlAudio._blobUrl);aiHtmlAudio.src='';aiHtmlAudio=null}
  try{window.speechSynthesis?.cancel?.()}catch(e){}
 }
+function waitForPlayback(begin,maxMs){
+ return new Promise(resolve=>{
+  let finished=false,timer;
+  const finish=()=>{
+   if(finished)return;
+   finished=true;clearTimeout(timer);
+   if(activeVoiceDone===finish)activeVoiceDone=null;
+   resolve();
+  };
+  activeVoiceDone=finish;
+  timer=setTimeout(finish,maxMs);
+  try{begin(finish)}catch(e){console.warn('Oplæsning kunne ikke afspilles',e);finish()}
+ });
+}
 function speakLocally(text){
- if(!('speechSynthesis' in window)||!sound.on)return;
+ if(!('speechSynthesis' in window)||!sound.on)return Promise.resolve();
  try{
-  speechSynthesis.cancel();
-  const u=new SpeechSynthesisUtterance(normalizedSpeech(text));
+  const sentence=normalizedSpeech(text);
+  const u=new SpeechSynthesisUtterance(sentence);
   u.lang='da-DK';u.rate=sound.rate;u.pitch=sound.pitch;
   const ds=danishVoices();u.voice=ds.find(v=>(v.voiceURI||v.name)===sound.selected)||ds.find(v=>/premium|enhanced/i.test(v.name))||ds.find(v=>v.default)||ds[0]||null;
-  speechSynthesis.speak(u);
- }catch(e){console.warn('Lokal oplæsning kunne ikke starte',e)}
+  return waitForPlayback(done=>{u.onend=done;u.onerror=done;speechSynthesis.speak(u)},Math.min(28000,4000+sentence.length*160));
+ }catch(e){console.warn('Lokal oplæsning kunne ikke starte',e);return Promise.resolve()}
 }
 function ensureAudioContext(){
  const C=window.AudioContext||window.webkitAudioContext;
@@ -129,19 +151,20 @@ document.addEventListener('pointerdown',()=>{if(sound.on&&sound.mode==='ai')ensu
 document.addEventListener('keydown',()=>{if(sound.on&&sound.mode==='ai')ensureAudioContext()}, {passive:true});
 async function speakAI(text,id){
  const endpoint=AI_TTS_ENDPOINT;
- let bytes;
  const key=endpoint+'|'+sound.aiVoice+'|'+text;
+ let bytes;
  try{
   if(speechCache.has(key))bytes=speechCache.get(key);
   else{
    const abort=new AbortController();aiFetch=abort;
    const timeout=setTimeout(()=>abort.abort(),25000);
    let response;
-   try{response=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text,voice:sound.aiVoice}),signal:abort.signal,cache:'no-store'});
-   if(!response.ok)throw new Error(`HTTP ${response.status}`);
-   if(!String(response.headers.get('Content-Type')||'').includes('audio/'))throw new Error('Svaret indeholdt ikke lyd');
-   bytes=await response.arrayBuffer();}
-   finally{clearTimeout(timeout)}
+   try{
+    response=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text,voice:sound.aiVoice}),signal:abort.signal,cache:'no-store'});
+    if(!response.ok)throw new Error(`HTTP ${response.status}`);
+    if(!String(response.headers.get('Content-Type')||'').includes('audio/'))throw new Error('Svaret indeholdt ikke lyd');
+    bytes=await response.arrayBuffer();
+   }finally{clearTimeout(timeout)}
    if(bytes.byteLength<500||bytes.byteLength>2_500_000)throw new Error('Lydfilens størrelse var ugyldig');
    if(id===speechSerial){speechCache.set(key,bytes);if(speechCache.size>24)speechCache.delete(speechCache.keys().next().value)}
   }
@@ -152,34 +175,45 @@ async function speakAI(text,id){
    const decoded=await ctx.decodeAudioData(bytes.slice(0));
    if(id!==speechSerial||!sound.on)return;
    const node=ctx.createBufferSource();node.buffer=decoded;node.connect(ctx.destination);aiSource=node;
-   node.onended=()=>{if(aiSource===node)aiSource=null};node.start();
+   aiStatus('AI-lyd afspilles: '+(aiVoices.find(v=>v.id===sound.aiVoice)?.name||'ÆselKlog-stemme')+'.');
+   await waitForPlayback(done=>{node.onended=()=>{if(aiSource===node)aiSource=null;done()};node.start()},Math.min(45000,Math.max(2000,decoded.duration*1000+2000)));
   }else{
    const blob=new Blob([bytes],{type:'audio/mpeg'});
    const objectUrl=URL.createObjectURL(blob);
    const audio=new Audio(objectUrl);audio._blobUrl=objectUrl;aiHtmlAudio=audio;
-   audio.onended=()=>{URL.revokeObjectURL(objectUrl);if(aiHtmlAudio===audio)aiHtmlAudio=null};
-   try{await audio.play()}catch(err){URL.revokeObjectURL(objectUrl);throw err}
+   aiStatus('AI-lyd afspilles: '+(aiVoices.find(v=>v.id===sound.aiVoice)?.name||'ÆselKlog-stemme')+'.');
+   try{
+    await waitForPlayback(done=>{
+     audio.onended=done;audio.onerror=done;
+     audio.play().catch(done);
+    },45000);
+   }finally{URL.revokeObjectURL(objectUrl);if(aiHtmlAudio===audio)aiHtmlAudio=null;audio.src='';}
   }
-  if(id===speechSerial)aiStatus('AI-lyd afspilles: '+(aiVoices.find(v=>v.id===sound.aiVoice)?.name||'ÆselKlog-stemme')+'.');
  }catch(e){
   if(id!==speechSerial||e.name==='AbortError')return;
   console.warn('Kunne ikke hente AI-lyd',e);
   aiStatus('AI-lyden kunne ikke hentes ('+e.message+'). Telefonstemmen bruges i stedet.');
-  speakLocally(text);
+  return speakLocally(text);
  }finally{if(id===speechSerial)aiFetch=null}
 }
 function say(text){
  sound.last=text;
  stopCurrentVoice();
- if(!sound.on)return;
+ if(!sound.on){lastNarration=Promise.resolve();return lastNarration}
  const t=normalizedSpeech(text),id=speechSerial;
- if(sound.mode==='ai')void speakAI(t,id);
- else speakLocally(t);
+ lastNarration=sound.mode==='ai'?speakAI(t,id):speakLocally(t);
+ return lastNarration;
 }
 function playBray(){
- if(!sound.on||!bray)return;
  stopCurrentVoice();
- try{bray.pause();bray.currentTime=0;bray.play().catch(()=>{})}catch(e){}
+ if(!sound.on||!bray)return Promise.resolve();
+ try{
+  bray.pause();bray.currentTime=0;
+  return waitForPlayback(done=>{
+    bray.onended=done;bray.onerror=done;
+    bray.play().catch(done);
+  },Math.min(8500,Math.max(3500,(Number(bray.duration)||3.5)*1000+1200)));
+ }catch(e){return Promise.resolve()}
 }
 function loadVoice(){
  try{
@@ -217,6 +251,23 @@ $('voiceToggle').addEventListener('click',()=>{sound.on=!sound.on;$('voiceToggle
 $('testVoice').addEventListener('click',()=>say('Hov hov! Jeg er ÆselKlog, og jeg glæder mig til at spille med jer!'));
 $('speakAgain').addEventListener('click',()=>say(sound.last||'Hov hov! Nu er det din tur.'));
 
+function safeStorage(){try{return window.localStorage}catch(_){return null}}
+function refreshTopscore(){
+ const root=$('topscoreContent');
+ if(!L){root.innerHTML='<p class="topscore-empty">Topscoren er ikke tilgængelig.</p>';return}
+ const records=L.sorted(L.read(safeStorage()));
+ if(!records.length){root.innerHTML='<p class="topscore-empty">Ingen færdige spil endnu. Første vinder får en plads her! 🥕</p>';return}
+ root.innerHTML=`<ol class="topscore-list">${records.slice(0,20).map((r,i)=>`<li class="topscore-item"><span class="topscore-rank">${i===0?'🥇':i===1?'🥈':i===2?'🥉':i+1+'.'}</span><div><div class="topscore-name">${r.isCPU?'🫏 ':''}${esc(r.name)}</div><div class="topscore-meta">${r.games} spil · ${r.correct}/${r.attempted} rigtige svar</div></div><span class="topscore-wins">${r.wins} ${r.wins===1?'sejr':'sejre'}</span></li>`).join('')}</ol>`;
+}
+function openTopscore(){refreshTopscore();const dlg=$('topscoreDialog');if(typeof dlg.showModal==='function'&&!dlg.open)dlg.showModal();else dlg.hidden=false}
+function closeTopscore(){const dlg=$('topscoreDialog');if(typeof dlg.close==='function'&&dlg.open)dlg.close();else dlg.hidden=true}
+$('openTopscoreSetup').addEventListener('click',openTopscore);
+$('openTopscoreGame').addEventListener('click',openTopscore);
+$('closeTopscore').addEventListener('click',closeTopscore);
+$('clearTopscore').addEventListener('click',()=>{
+ if(!window.confirm('Vil du slette alle lokale ÆselKlog-resultater på denne enhed?'))return;
+ L?.clear(safeStorage());refreshTopscore();
+});
 function renderSetupPlayers(){
  const holder=$('playerInputs');holder.innerHTML='';
  setupPlayers.forEach((p,i)=>{
@@ -245,9 +296,9 @@ $('startButton').addEventListener('click',()=>{
  resetAsync();
  const raw=$('range').value,all=raw==='1-100';
  const start=all?0:Number(raw.split('-')[0])-1,goal=all?100:Number(raw.split('-')[1]);
- config={raw,all,start,goal,learning:radio('learning'),boardMode:radio('boardMode'),moveDice:radio('moveDice'),learnDice:radio('learnDice')};
- players=setupPlayers.map((p,i)=>({...p,name:(p.name||'').trim()||`Spiller ${i+1}`,color:COLORS[i],id:`player${i+1}`,isCPU:false,pos:start,skipNextTurn:false}));
- if($('cpuCheck').checked)players.push({name:'Æslet',kind:'cpu',age:8,color:'#c18b46',id:'cpu',isCPU:true,pos:start,skipNextTurn:false});
+ config={raw,all,start,goal,learning:radio('learning'),boardMode:radio('boardMode'),moveDice:radio('moveDice'),learnDice:radio('learnDice'),pace:['normal','rolig','ekstra'].includes($('gamePace').value)?$('gamePace').value:'rolig',tables:$('tablesChoice').value||'auto'};
+ players=setupPlayers.map((p,i)=>({...p,name:(p.name||'').trim()||`Spiller ${i+1}`,color:COLORS[i],id:`player${i+1}`,isCPU:false,pos:start,skipNextTurn:false,stats:{correct:0,attempted:0}}));
+ if($('cpuCheck').checked)players.push({name:'Æslet',kind:'cpu',age:8,color:'#c18b46',id:'cpu',isCPU:true,pos:start,skipNextTurn:false,stats:{correct:0,attempted:0}});
  turn=0;phase='move';challenge=null;pending=null;resultLines=[];winner=null;extraRollUsed=false;
  $('rangeTitle').textContent=all?'Hele Talstien · 1–100':`Talområde ${raw}`;
  $('boardModeLabel').textContent=config.boardMode==='physical'?'Fysisk bræt + app-overblik':'Digital spilleplade';
@@ -431,7 +482,7 @@ function render(){
   return;
  }
  if(phase==='question'){
-  panel.innerHTML=`<h2>🫏 ${pending?.superTask?'🎯 Superopgave':p.isCPU?'Æslet tænker …':'Æslet spørger!'}</h2><span class="age-chip">${esc(challenge.tier)} ${p.kind==='adult'?'· Tid på opgaven':'· Uden tidsgrænse'}</span><div class="prompt ${p.kind==='child'&&p.age<=4?'early':''}"><div class="tiny">${esc(S.TASKS[challenge.type-1].name)} · felt ${p.pos}</div><h3>${esc(challenge.question)}</h3>${challenge.adapted?'<p class="hint">Opgaven er gjort lettere til dit niveau.</p>':''}</div>${pending?.superTask?'<p class="super-prize">🎯 Frivillig bonus: +3 felter for et rigtigt svar · ingen straf for fejl</p>':''}
+  panel.innerHTML=`<h2>🫏 ${pending?.superTask?'🎯 Superopgave':p.isCPU?'Æslet tænker …':'Æslet spørger!'}</h2><span class="age-chip">${esc(challenge.tier)} ${p.kind==='adult'?'· Tid på opgaven':'· Uden tidsgrænse'}</span><div class="prompt ${p.kind==='child'&&p.age<=4?'early':''}"><div class="tiny">${esc(challenge.tableLabel||S.TASKS[challenge.type-1].name)} · felt ${p.pos}</div><h3>${esc(challenge.question)}</h3>${challenge.adapted?'<p class="hint">Opgaven er gjort lettere til dit niveau.</p>':''}</div>${pending?.superTask?'<p class="super-prize">🎯 Frivillig bonus: +3 felter for et rigtigt svar · ingen straf for fejl</p>':''}
    ${!p.isCPU&&p.kind==='adult'?`<div class="question-time" id="questionTime"><span>⏱️ Du har</span><strong id="clock" class="clock-big">${challenge.timeLimit||30} sek.</strong><div class="time-track"><div id="timeFill" class="time-fill"></div></div></div>`:''}
    <div class="choices">${challenge.options.map((opt,i)=>`<button class="choice ${p.kind==='child'&&p.age<=4?'early':''}" ${p.isCPU?'disabled':''} data-act="answer-${i}">${esc(opt)}</button>`).join('')}</div>
    ${p.isCPU?'<p class="hint">Æslet prøver selv – det kan også svare forkert!</p>':`<div class="voicebar">${btn('🔊 Læs op','read','soft')} ${btn('💡 Få et tip','help','soft')}</div><div id="tip" class="help" hidden>${esc(challenge.help)}</div>`}`;
@@ -487,7 +538,7 @@ async function animateDie(){
  $('dicePrompt').textContent='Terningen hopper …';
  $('diceMain').classList.remove('is-rolling');void $('diceMain').offsetWidth;$('diceMain').classList.add('is-rolling');
  const start=Date.now();
- while(Date.now()-start<1250){
+ while(Date.now()-start<(prefersLessMotion?200:pace().roll)){
   const temporary=rand(1,6);
   if(kind==='move')$('dicePips').className=`dice-face face-${temporary}`;
   else $('diceLearnIcon').textContent=diceIcon(temporary);
@@ -498,7 +549,7 @@ async function animateDie(){
  else $('diceLearnIcon').textContent=diceIcon(final);
  $('diceMain').classList.remove('is-rolling');
  $('dicePrompt').textContent=kind==='move'?`🎲 ${final} øjne!`:`🧠 ${S.TASKS[final-1].name}`;
- await defer(950);if(g!==gameToken)return;
+ await defer(prefersLessMotion?130:pace().rest+650);if(g!==gameToken)return;
  showDiceState=null;hideDice();
  if(kind==='move')receiveMoveRoll(final);else receiveLearnRoll(final);
 }
@@ -513,22 +564,28 @@ async function moveFirst(){
  if(busy||!pending)return;
  const g=gameToken,p=players[turn];
  busy=true;phase='moving';render();
+ await say(`${p.name} slog ${pending.roll}. Nu hopper vi!`);
+ if(g!==gameToken)return;
  await hopSteps(p,pending.landing);
  if(g!==gameToken)return;
  busy=false;
  if(p.pos>=config.goal){declareWin(p);return;}
- const wantsTask=config.learning==='udfordring'||(config.learning==='laer'&&Boolean(SPECIAL[p.pos]));
+ const wantsTask=['udfordring','tabel'].includes(config.learning)||(config.learning==='laer'&&Boolean(SPECIAL[p.pos]));
  if(wantsTask){
-  phase='learn';render();say(`${p.name} er landet på felt ${p.pos}. Nu kommer læringsterningen!`);
-  if(p.isCPU)scheduleCPU('learn');
+  phase='learn';render();
+  if(config.learning==='tabel')receiveLearnRoll(6,true);
+  else {say(`${p.name} er landet på felt ${p.pos}. Nu kommer læringsterningen!`);if(p.isCPU)scheduleCPU('learn')}
  }else void resolveLandingAction();
 }
-function receiveLearnRoll(type){
+function receiveLearnRoll(type,forceTable=false){
  if(phase!=='learn'||busy)return;
  const p=players[turn];
- challenge=S.makeChallenge({player:p,type,field:p.pos,roll:pending.roll});
- phase='question';render();say(`${p.name}! ${challenge.question}`);
- if(p.isCPU)scheduleCPU('question');else startAdultTimer();
+ challenge=S.makeChallenge({player:p,type,field:p.pos,roll:pending.roll,tables:config.tables,forceTable});
+ phase='question';render();
+ const task=challenge;const g=gameToken;
+ const spoken=say(`${p.name}! ${challenge.question}`);
+ if(p.isCPU)scheduleCPU('question');
+ else void spoken.then(()=>{if(g===gameToken&&phase==='question'&&challenge===task)startAdultTimer()});
 }
 function startAdultTimer(){
  clearInterval(taskTimer);const p=players[turn];if(p.kind!=='adult'||phase!=='question')return;
@@ -553,12 +610,20 @@ function processAnswer(idx,timedOut=false){
  pending.feedback=timedOut?`Tiden løb ud! Det rigtige svar var ${challenge.correct}.`:
     correct?`Det er rigtigt, ${p.name}! Du får ${prize} ekstra ${prize===1?'skridt':'felter'}.`:`${p.name} svarede ${got}. Det rigtige svar var ${challenge.correct}.`;
  resultLines.push(correct?`✅ Rigtigt svar: +${prize} felter.`:timedOut?'⏱️ Tiden gik! Intet ekstra felt.':'🫏 Forkert svar: intet ekstra felt.');
- phase='feedback';render();if(!correct)playBray();else say(`${p.name}, det er rigtigt. Godt klaret!`);
+ p.stats ||= {correct:0,attempted:0};
+ p.stats.attempted++;if(correct)p.stats.correct++;
+ phase='feedback';render();
  const g=gameToken;
- setTimeout(()=>{if(g===gameToken&&phase==='feedback')void (isSuper?finishSuper():finishLearning())},correct?1000:(sound.on?3550:850));
+ void (async()=>{
+   if(correct)await say(`${p.name}, det er rigtigt. Godt klaret!`);
+   else await playBray();
+   await pauseBeat();
+   if(g===gameToken&&phase==='feedback')await (isSuper?finishSuper():finishLearning());
+ })();
 }
 function skipChallenge(){if(phase!=='learn')return;pending.skip=true;pending.correct=false;resultLines.push('Opgaven blev sprunget over.');void finishLearning()}
-async function hopSteps(p,to,speed=245){
+async function hopSteps(p,to,speed){
+ speed=Number(speed)||pace().hop;
  const g=gameToken;
  const goal=Math.max(config.start,Math.min(config.goal,to));
  if(p.pos===goal)return;
@@ -578,7 +643,7 @@ async function finishLearning(){
  if(pending.correct){
   pending.target=Math.min(config.goal,p.pos+1);
   phase='moving';render();
-  await hopSteps(p,pending.target,310);
+  await hopSteps(p,pending.target);
   if(g!==gameToken)return;
  }
  busy=false;
@@ -602,29 +667,28 @@ async function resolveLandingAction(){
  flashAction(special,d.label,d.description);
  resultLines.push(`${d.icon} ${d.label} på felt ${p.pos}.`);
  // Kun én oplæsning pr. handling: undgå at afbryde AI-stemmen og forbruge ekstra credits.
- if(['bonus','hov','mester','byt','bro'].includes(special))say(`${p.name}! ${d.label}. ${d.description}.`);
- await defer(prefersLessMotion?100:850);
+ await say(`${p.name}! ${d.label}. ${d.description}.`);
+ if(g!==gameToken)return;
+ await pauseBeat();
  if(g!==gameToken)return;
  if(special==='gulerod'){
   if(!extraRollUsed){
    extraRollUsed=true;resultLines.push('🥕 Du får ét ekstra almindeligt terningkast!');
    pending=null;challenge=null;busy=false;phase='move';render();
-   say(`Hov hov! ${p.name} får et ekstra terningkast. Slå igen!`);
    if(p.isCPU)scheduleCPU('move');
    return;
   }
   resultLines.push('🥕 Du har allerede fået dit ekstra kast på denne tur.');
-  say(`Hov hov, ${p.name}! Du har allerede fået dit ekstra kast denne tur.`);
+
  }
  if(special==='vandpyt'){
   p.skipNextTurn=true;
   resultLines.push('💧 Våde hove: du står over din næste tur.');
-  say(`Plask! ${p.name} har våde hove og må stå over næste gang!`);
+
  }
  if(special==='super'){
   busy=false;phase='super-offer';render();
-  say(`${p.name}, vil du prøve en frivillig superopgave og vinde tre ekstra felter?`);
-  if(p.isCPU){setTimeout(()=>{if(g===gameToken&&phase==='super-offer'&&players[turn]===p)chooseSuper(Math.random()<.75)},1000)}
+  if(p.isCPU){setTimeout(()=>{if(g===gameToken&&phase==='super-offer'&&players[turn]===p)chooseSuper(Math.random()<.75)},Math.max(450,pace().rest))}
   return;
  }
  if(special==='bonus'||special==='hov'||special==='mester'||special==='bro'||special==='overraskelse'){
@@ -633,7 +697,8 @@ async function resolveLandingAction(){
    const surprise=A.surprise();delta=surprise.delta;
    resultLines.push(`🎁 ${surprise.title}: ${delta>0?'+':''}${delta} felter.`);
    flashAction(special,surprise.title,surprise.speech);
-   say(surprise.speech);
+   await say(surprise.speech);
+   if(g!==gameToken)return;
   }else {
    resultLines.push(`${d.icon} ${delta>0?'+':''}${delta} felter.`);
   }
@@ -663,16 +728,17 @@ function chooseSuper(yes){
  pending.superTask=true;
  // Små børn får et simpelt tal; ældre børn og voksne får et regnestykke.
  const type=(p.kind==='child'&&p.age<=4)?1:6;
- challenge=S.makeChallenge({player:p,type,field:p.pos,roll:pending.roll});
- phase='question';render();say(`${p.name}! Her kommer din superopgave: ${challenge.question}`);
- if(p.isCPU)scheduleCPU('question');else startAdultTimer();
+ challenge=S.makeChallenge({player:p,type,field:p.pos,roll:pending.roll,tables:config.tables});
+ phase='question';render();const task=challenge,g=gameToken;
+ const spoken=say(`${p.name}! Her kommer din superopgave: ${challenge.question}`);
+ if(p.isCPU)scheduleCPU('question');else void spoken.then(()=>{if(g===gameToken&&phase==='question'&&challenge===task)startAdultTimer()});
 }
 async function finishSuper(){
  if(!pending||busy)return;
  const g=gameToken,p=players[turn];busy=true;
  if(pending.superCorrect){
   pending.target=A.destination(p.pos,3,config.start,config.goal);
-  phase='moving';render();await hopSteps(p,pending.target,300);
+  phase='moving';render();await hopSteps(p,pending.target);
   if(g!==gameToken)return;
  }
  busy=false;completeTurn({announce:false});
@@ -687,7 +753,12 @@ async function swapWith(playerId){
  if(p.pos>=config.goal){declareWin(p);return;}
  phase='result';render();say(`Hov hov! I byttede pladser.`);
 }
-function declareWin(p){winner=p;phase='win';render();say(`Hov hov! Tillykke ${p.name}! Du vandt ÆselKlog Talstien!`)}
+function declareWin(p){
+ if(phase==='win')return;
+ winner=p;phase='win';
+ if(L){try{L.record(safeStorage(),players,p.id)}catch(e){console.warn('Topscore kunne ikke gemmes',e)}}
+ render();say(`Hov hov! Tillykke ${p.name}! Du vandt ÆselKlog Talstien!`);
+}
 function nextTurn(){
  if(busy||(phase!=='result'&&phase!=='skipped'))return;
  turn=(turn+1)%players.length;phase='move';pending=null;challenge=null;resultLines=[];extraRollUsed=false;
@@ -695,22 +766,26 @@ function nextTurn(){
  if(p.skipNextTurn){
   p.skipNextTurn=false;phase='skipped';resultLines=[`💧 ${p.name} springer denne tur over efter vandpytten.`];
   render();say(`${p.name} har våde hove og står over denne tur!`);
-  if(p.isCPU){const g=gameToken;setTimeout(()=>{if(g===gameToken&&phase==='skipped'&&players[turn]===p)nextTurn()},1550)}
+  if(p.isCPU){const g=gameToken;void (async()=>{await lastNarration;await pauseBeat();if(g===gameToken&&phase==='skipped'&&players[turn]===p)nextTurn()})()}
   return;
  }
  render();say(`Hov hov! Nu er det ${p.name}s tur.`);
  if(p.isCPU)scheduleCPU('move');
 }
 function scheduleCPU(which){
- const g=gameToken;
- if(which==='question'){
-  setTimeout(()=>{if(g!==gameToken||phase!=='question'||!players[turn].isCPU)return;
-    const pass=Math.random()>.30;const idx=pass?challenge.options.indexOf(challenge.correct):challenge.options.findIndex(v=>v!==challenge.correct);
-    processAnswer(idx);
-  },2300);
- }else{
-  setTimeout(()=>{if(g===gameToken&&phase===which&&players[turn].isCPU)showDie(which)},800);
- }
+ const g=gameToken,p=players[turn];
+ // CPU må ikke fortsætte, mens Mia stadig læser spillerens tur eller opgaven højt.
+ const speaking=lastNarration;
+ void (async()=>{
+  await speaking;
+  await pauseBeat();
+  if(g!==gameToken||phase!==which||players[turn]!==p||!p.isCPU||busy)return;
+  if(which==='question'){
+   const pass=Math.random()>.30;
+   const idx=pass?challenge.options.indexOf(challenge.correct):challenge.options.findIndex(v=>v!==challenge.correct);
+   processAnswer(idx);
+  }else showDie(which);
+ })();
 }
 $('turnPanel').addEventListener('click',e=>{
  const target=e.target.closest('button[data-act]');if(!target||busy||showDiceState)return;
