@@ -1,3 +1,8 @@
+## v0.9.3 – forside og spilmenu (15. oktober 2026)
+- Ét samlet æselmotiv i toppen uden gentagne sideudsnit.
+- Kortere spilmenu med kun nødvendige valg og uden ekstra forklaringer.
+- Indstillinger og øvrige spilfunktioner bevaret.
+
 # ÆselKlog – udviklingsplan og fælles status
 
 ## 15. oktober 2026 – v0.9.2: Forside og enkel spilstart

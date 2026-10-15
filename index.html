@@ -333,7 +333,7 @@ body.home-active .shell{max-width:1100px;padding:12px 14px 26px}
 .home-layout{overflow:hidden;border:1px solid #d6d7ad;border-radius:25px;background:linear-gradient(140deg,#fffdf3,#edf7dc);box-shadow:0 12px 40px #4457311f}
 .home-poster{background:#c7e4c2}
 .home-poster picture,.home-poster img{display:block;width:100%}
-.home-poster img{height:auto;object-fit:cover}
+.home-poster img{height:auto;object-fit:contain;max-height:310px;margin:auto}.home-poster{display:grid;place-items:center;padding:12px;background:linear-gradient(145deg,#f8eac8,#e0f2cf)}
 .home-content{padding:18px clamp(17px,4vw,38px) 26px;text-align:center}
 .home-native-logo{display:none;font-size:clamp(2.4rem,5vw,3.4rem);line-height:1.05;color:#db2940;font-weight:1000;letter-spacing:-.055em;margin-bottom:11px;text-shadow:0 3px #ffe7d8}
 .home-native-logo span{color:#135a39}
@@ -367,9 +367,9 @@ body.home-active .shell{max-width:1100px;padding:12px 14px 26px}
 #setup .player-input .remove-player{min-height:42px}
 #setup .player-input .age-select{min-width:0}
 #setup .player-input input{min-width:0}
-@media(min-width:920px){.home-native-logo{display:block}.home-layout{display:grid;grid-template-columns:1.18fr 1fr;align-items:center}.home-poster{height:100%}.home-poster picture,.home-poster img{height:100%;object-fit:cover;object-position:37% center}.home-content{padding:30px}.home-buttons{margin-top:22px}}
+@media(min-width:920px){.home-native-logo{display:block}.home-layout{display:grid;grid-template-columns:1.18fr 1fr;align-items:center}.home-poster{height:100%}.home-poster img{height:auto;max-height:360px;max-width:100%;object-fit:contain}.home-content{padding:30px}.home-buttons{margin-top:22px}}
 @media(max-width:650px){body.home-active .shell{padding:0 0 14px}.home-layout{border-radius:0 0 25px 25px;border:0;border-bottom:1px solid #d6d7ad}.home-content{padding:14px 16px 20px}.home-buttons{gap:9px;margin-top:16px}.home-button{min-height:72px;padding:9px 14px;grid-template-columns:39px minmax(0,1fr) 22px}.home-button .home-icon{font-size:1.75rem}.home-button strong{font-size:1.02rem}.home-button small{font-size:.74rem}.home-active .resume-card{margin:12px 12px 0}.home-note{margin:10px 8px}.settings-glance{flex-wrap:wrap}.settings-glance .btn{flex:1}#setup .player-input{grid-template-columns:19px minmax(0,1fr) minmax(90px,.8fr) 32px;gap:5px;padding:6px}#setup .player-input input,#setup .player-input select{padding:8px 6px;font-size:.85rem}#setup .player-dot{width:15px;height:15px}}
-@media(max-height:460px) and (orientation:landscape) {body.home-active .shell{max-width:950px;padding:4px 10px}.home-layout{grid-template-columns:47% 53%;display:grid}.home-poster{height:100%}.home-poster picture,.home-poster img{height:100%;object-fit:cover;object-position:41% 48%}.home-content{padding:8px 17px}.home-content h2{font-size:1.1rem}.home-content .home-eyebrow{font-size:.63rem}.home-content>p{font-size:.77rem}.home-buttons{margin-top:8px;gap:7px}.home-button{min-height:49px;padding:5px 9px;grid-template-columns:31px 1fr 15px}.home-button .home-icon{font-size:1.35rem}.home-button strong{font-size:.8rem}.home-button small{font-size:.64rem;margin-top:0}.home-arrow{font-size:1rem}}
+@media(max-height:460px) and (orientation:landscape) {body.home-active .shell{max-width:950px;padding:4px 10px}.home-layout{grid-template-columns:47% 53%;display:grid}.home-poster{height:100%}.home-poster img{height:auto;max-height:310px;max-width:100%;object-fit:contain}.home-content{padding:8px 17px}.home-content h2{font-size:1.1rem}.home-content .home-eyebrow{font-size:.63rem}.home-content>p{font-size:.77rem}.home-buttons{margin-top:8px;gap:7px}.home-button{min-height:49px;padding:5px 9px;grid-template-columns:31px 1fr 15px}.home-button .home-icon{font-size:1.35rem}.home-button strong{font-size:.8rem}.home-button small{font-size:.64rem;margin-top:0}.home-arrow{font-size:1rem}}
 @media(prefers-reduced-motion:reduce){.home-button{transition:none}}
 
 </style>
@@ -378,7 +378,7 @@ body.home-active .shell{max-width:1100px;padding:12px 14px 26px}
 <div class="shell">
   <header class="top">
     <div class="brand"><div class="logo" aria-hidden="true">🫏</div><div><h1>Æsel<span class="red">Klog</span> · Talstien</h1><small>Spil, lær og grin sammen</small></div></div>
-    <div class="top-actions"><span class="pill">PRØVEVERSION 0.9.2</span><button id="voiceToggle" class="btn soft small" type="button" aria-pressed="true">🔊 Lyd til</button></div>
+    <div class="top-actions"><span class="pill">PRØVEVERSION 0.9.3</span><button id="voiceToggle" class="btn soft small" type="button" aria-pressed="true">🔊 Lyd til</button></div>
   </header>
 
 
@@ -486,11 +486,11 @@ body.home-active .shell{max-width:1100px;padding:12px 14px 26px}
   </section>
 
   <section id="setup" class="view" aria-label="Vælg spillere">
-    <div class="page-heading"><button type="button" class="btn soft small" id="setupBack">← Forside</button><h2>🎲 Hvem skal spille?</h2><p>Vælg navne og aldre. Resten har vi allerede gjort klar til jer!</p></div>
+    <div class="page-heading"><button type="button" class="btn soft small" id="setupBack">← Forside</button><h2>🎲 Hvem skal spille?</h2></div>
     <div class="settings-glance" id="settingsSummary" aria-live="polite"><span>⚙️ Spillet er klar med dine indstillinger.</span><button type="button" id="setupEditSettings" class="btn soft small">Skift indstillinger</button></div>
-    <div class="paper"><div class="row between"><div><h2>👨‍👩‍👧 Spillere</h2><p class="hint">Skriv kaldenavne. Vælg alder for børn eller Voksen (18+).</p></div><button type="button" id="addPlayer" class="btn soft small">+ Tilføj spiller</button></div><div id="playerInputs"></div><p class="tiny">Børn fra 3 år spiller uden tidspres. Voksnes regneniveau og resten af reglerne vælges under Indstillinger.</p>
-      <label class="option cpu-quick-toggle"><input type="checkbox" id="cpuCheck"><span><strong>🫏 Spil mod ÆselKlog (CPU)</strong><small>Æslet kaster, svarer og kan også tage fejl.</small></span></label><button type="button" id="startButton" class="btn main block" style="margin-top:12px">Start spillet 🥕</button></div>
-    <p class="tiny">Prototype: Navne og aldre bruges lokalt til selve spillet. Vælger du AI-stemme, sendes den tekst der læses højt (eventuelt kaldenavne) til den tilsluttede stemmetjeneste. Opgaverne beregnes fortsat lokalt.</p>
+    <div class="paper"><div class="row between"><div><h2>👨‍👩‍👧 Spillere</h2></div><button type="button" id="addPlayer" class="btn soft small">+ Tilføj spiller</button></div><div id="playerInputs"></div>
+      <label class="option cpu-quick-toggle"><input type="checkbox" id="cpuCheck"><span><strong>🫏 Spil mod ÆselKlog (CPU)</strong></span></label><button type="button" id="startButton" class="btn main block" style="margin-top:12px">Start spillet 🥕</button></div>
+
   </section>
 
   <section id="game" class="view" aria-label="Talstien spil">
