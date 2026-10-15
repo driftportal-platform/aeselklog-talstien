@@ -1,3 +1,16 @@
+# ÆselKlog – udviklernote v0.9.14 (16. oktober 2026)
+
+1. Kontroller **aktuel GitHub `main`**, `README.md`, `AGENTS.md`, `TESTPLAN.md`, `UDVIKLINGSPLAN.md` før enhver videreudvikling. v0.9.14 bygger på verificeret `main` v0.9.13, ikke en ældre ZIP.
+2. **Afslut-menuen** (`#exitGameDialog`) bruges via `#gameExit` i normal visning og `#boardExit` på stor plade. `#boardClose` lukker kun stor plade, ikke spillet. **Gem og afslut** genbruger `saveAndLeave()` i sikre faser; afslut uden gemning kræver bekræftelse, annullerer asynkront spil via `resetAsync()`, og sletter kun den aktuelle lokale savegame. Topscore/læringsprofiler og lydcache røres ikke.
+3. Mens afslutningsdialogen er åben, venter `waitUntilVisible` også på `!exitDialogActive`, og en aktiv voksen-timer sættes på pause. `aeselklog-exit-resume` frigiver vente-promise ved annullering. CPU- og taleforløb må ikke fortsætte bag modal. Foretag ændringer med særlig omtanke om `gameToken`-annullering.
+4. **Fysisk A3** bruger eksisterende `A.FIELDS`, vises ikke automatisk i stor digital plade, viser `#physicalGuide`, holder stadig den digitale tur/position og alderssikre læring, og hopper straks til digitalt registreret slutposition, så spillerne selv kan flytte deres A3-brikker. Knappen `#physicalShowBoard` giver valgfrit digitalt overblik. Nye digitale spil bruger uændret `A.generateLayout()`. **Ældre gemte spil bruger altid `specialFields` fra gemningen**, aldrig ny generering ved resume.
+5. Der er endnu ikke garanteret identitet mellem `A.FIELDS` og alle historiske trykte A3-prototyper. Fysisk bruger må kontrollere markeringerne; printdesigns skal harmoniseres før endelig v1.0.
+6. `styles.css` fjerner liste-/nummermarkør for `.voice-settings>summary` med eksplicit `list-style:none`, `::marker` og webkit-regel. Ændr ikke den godkendte forside.
+7. **Kortspillet udskydes** efter v0.9.14. 21–40 kortprototype har 20 talkort og 8 æselkort. Standard: flere æselkort beholdes af modtageren; senere vandrevariant: ét æselkort. Regler for talkortenes aflægning skal stadig afklares. Læringsfunktioner er valgfrie.
+8. Kør `node --check` på appens JS, alle `tests/*.test.js`, `python tests/physical_exit_browser.py` og alle relevante gamle browserregressioner. Ingen påstand om rigtig Safari/iPhone-PWA eller ægte ElevenLabs ud fra Chromium-mocks.
+
+---
+
 # ÆselKlog – udviklernote v0.9.13 (randomiserede specialfelter)
 
 1. Start altid fra **nyeste GitHub `main`**, og sammenlign byte-hashes med lokale ZIP'er. Læs `README.md`, `AGENTS.md`, `TESTPLAN.md`, `UDVIKLINGSPLAN.md`.

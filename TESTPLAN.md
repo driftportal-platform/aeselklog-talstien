@@ -1,3 +1,31 @@
+# ÆselKlog v0.9.14 – testplan (16. oktober 2026)
+
+## Automatiserede tests udført
+
+- [x] `node --check` af alle projektets JavaScript-filer.
+- [x] **18 Node-tests** (`tests/*.test.js`) inkl. PWA-cache, frivillig LEG, actionregler, lydcache, læring, profilsikkerhed og gamle gemte spil.
+- [x] **13 Chromium-browsertests**: `physical_exit_browser.py`, `test_home_v092.py`, `test_home_v096.py`, `actionfx_browser.py`, `random_actions_browser.py`, `narration_browser.py`, `parent_overview_browser.py`, `subject_learning_browser.py`, `voice_cache_browser.py`, `voice_fallback_browser.py`, `cpu_voice_browser.py`, `persistence_browser.py`, `browser_smoke.py`.
+- [x] Afslut-knap er klikbar og synlig øverst på stor og lille spilleplade (390×844, 844×390, 1280×800), med korrekt modal **Gem og afslut / Afslut uden at gemme / Fortsæt**.
+- [x] Fysisk A3 åbner *uden* automatisk udvidet bræt og med vejledning/position; appen bruger fast `A.FIELDS`, digital mode bruger randomiserede specialfelter.
+- [x] Fysisk spil gemmes/genoptages med samme felt og spillemåde; en digital kamp kan stadig startes og gemmes fra den udvidede plade.
+- [x] CPU-æslets næste handling afventer lukning af Afslut-dialogen; voksen-timer stopper under dialog og genoptager korrekt.
+- [x] HTML/CSS-forklaringen ved Stemme og lyd har ingen nummermarkør i testede skærmstørrelser.
+- [ ] Ingen test på **rigtig iPhone/Safari-PWA**, faktisk A3-prototypetryk eller live ElevenLabs udført i denne release.
+
+## Manuel afprøvning efter GitHub-upload
+
+- [ ] Bekræft versionsmærket 0.9.14 i Spil/Indstillinger, og kontrollér uændret godkendt forside.
+- [ ] Digital bane: Afslut-menuen øverst, prøv Gem og afslut / Fortsæt spil; prøv Afslut uden at gemme og se, at den aktuelle kamp forsvinder, men Topscore og forældreoversigt består.
+- [ ] Prøv under voksenopgave med tidtager: lad Afslut-dialogen stå åben 10 sekunder, luk den og kontrollér, at tiden ikke blev brugt.
+- [ ] Prøv på installeret iPhone, både stående og liggende, med VoiceOver og lyd tændt/slukket.
+- [ ] Stemmeindstillinger skal have ren pil uden en lille "0." til venstre for boksen.
+- [ ] Fysisk A3: Spilledervisning vises, ikke fuldskærmsbræt. Kast en fysisk terning, tryk øjnene i appen og flyt den rigtige brik til den position, appen viser. Prøv også den digitale terning sammen med den fysiske plade.
+- [ ] Sammenlign den faste fysiske feltfordeling i appen med **det rigtige print** af jeres A3-plade. Felterne kan variere mellem prototypeprint. Justér før v1.0, hvis de ikke matcher.
+- [ ] Fortsæt et ældre gemt spil fra v0.9.13 i fysisk/digital mode og kontrollér at felterne ikke flytter sig.
+- [ ] Test offline-genstart, sikker gemning, CPU, lydcache og ElevenLabs efter opdatering af iPhone-PWA.
+
+---
+
 # ÆselKlog v0.9.13 – tests af tilfældige specialfelter, roser og æselknapper
 
 ## Automatiske tests gennemført i lokalt udviklingsmiljø

@@ -66,7 +66,7 @@ with sync_playwright() as playwright:
   profile=page.evaluate('()=>JSON.parse(window.__localItems["aeselklog-laereprofiler-v1"])')
   assert profile['profiles']['karla']['progress']['areas']['plus']['step']==1
   assert 'age' not in str(profile)
-  page.locator('#saveGame').click(force=True)
+  page.locator('#boardExit').click();page.locator('#exitSave').click()
   assert page.locator('#resumeCard').is_visible()
   # New game with same nickname picks up progress, not old turn/position.
   page.locator('#homePlay').click()
@@ -76,7 +76,7 @@ with sync_playwright() as playwright:
   assert second['players'][0]['learning']['areas']['plus']['step']==1
   assert second['players'][0]['learning']['areas']['minus']['step']==0
   # Offline / manual wipe from the settings menu.
-  page.locator('#saveGame').click(force=True)
+  page.locator('#boardExit').click();page.locator('#exitSave').click()
   page.locator('#homeSettings').click()
   page.locator('#clearLearningProfiles').click()
   assert page.evaluate('window.__localItems["aeselklog-laereprofiler-v1"]') is None

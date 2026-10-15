@@ -12,7 +12,11 @@
     .finish{background:linear-gradient(115deg,#effbea,#fff1b6);border-radius:17px;border:2px solid #aadb9a;text-align:center;padding:20px}.finish h2{font-size:1.5rem}.finish .donkey{font-size:64px}.result-text{font-size:1.04rem;white-space:pre-line}
     footer{margin-top:20px;color:var(--muted);font-size:.82rem}.footer-links{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}
     .voice-settings{margin-bottom:15px;background:#fff;border:1px solid #cbddee;border-radius:16px;box-shadow:var(--shadow)}
-    .voice-settings summary{padding:13px 16px;cursor:pointer;list-style:auto;color:var(--navy);font-weight:800}
+    .voice-settings>summary{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:13px 16px;cursor:pointer;list-style:none!important;color:var(--navy);font-weight:800}
+    .voice-settings>summary::marker{content:""}
+    .voice-settings>summary::-webkit-details-marker{display:none}
+    .voice-settings>summary::after{content:"⌄";font-size:1.25rem;line-height:1;color:var(--navy);margin-left:auto}
+    .voice-settings[open]>summary::after{content:"⌃"}
     .voice-settings summary .settings-hint{font-size:.77rem;color:var(--muted);font-weight:500;margin-left:7px}
     .voice-settings-body{padding:3px 16px 15px}
     .voice-settings input[type=range]{width:100%;min-height:40px;accent-color:var(--blue)}
@@ -601,3 +605,32 @@ body.home-active #resumeCard button:active{filter:brightness(.94)}
 .boardbox .board-bray{right:clamp(18px,2.2vw,32px);bottom:18px}
 .boardbox.expanded .board-bray{right:calc(env(safe-area-inset-right,0px) + clamp(20px,2.4vw,38px));top:calc(env(safe-area-inset-top,0px) + 78px)}
 @media(max-width:680px){.boardbox .board-bray{right:19px;bottom:18px}.boardbox.expanded .board-bray{right:calc(env(safe-area-inset-right,0px) + 20px);top:calc(env(safe-area-inset-top,0px) + 68px)}}
+
+
+/* v0.9.14: fysisk spilleleder, enkel udgang og ren stemme-menu. */
+.physical-guide[hidden]{display:none!important}
+.physical-guide{background:linear-gradient(110deg,#f3fae5,#fff9e9);border:2px solid #cee4c3;border-radius:18px;padding:15px 18px;margin:0 0 16px;color:#173b57;box-shadow:0 4px 12px #20442312}
+.physical-guide-header{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;font-size:1.16rem;color:var(--navy)}
+.physical-guide-pill{border-radius:100px;background:#e1f2d2;color:#385e36;font-size:.72rem;font-weight:850;padding:4px 10px}
+.physical-guide p{margin:8px 0;font-size:.94rem}
+.physical-guide-position{font-weight:850;background:#fffef9;border:1px solid #c7dcbd;border-radius:13px;padding:11px 12px;font-size:1.04rem!important}
+.physical-guide-note{font-size:.79rem!important;color:#5e725f}
+#game.physical-game .boardbox:not(.expanded){display:none!important}
+#game.physical-game .board-scroll{height:min(35vh,315px);min-height:175px}
+#game.physical-game .board-tip{display:none}
+#game.physical-game .board-heading h3{font-size:1rem}
+#game.physical-game .boardbox:not(.expanded) .board-bray{bottom:15px}
+#game .exit-shortcut,#game .board-exit{background:#fff0e8;color:#953a20;border:1px solid #eeb99f;min-height:35px;box-shadow:0 2px 8px #472f1d18}
+#game .board-exit[hidden]{display:none!important}
+#game .boardbox:not(.expanded) .board-exit{display:none!important}
+#game .boardbox.expanded #saveGame{display:none!important}
+#game .boardbox.expanded #boardExit{display:inline-flex!important;align-items:center}
+.exit-game-dialog{border:0;border-radius:23px;padding:23px;width:min(430px,calc(100vw - 30px));max-height:90dvh;overflow:auto;background:#fffdfa;box-shadow:0 18px 70px #122d4770;color:#173f68}
+.exit-game-dialog::backdrop{background:#0a274690}
+.exit-game-dialog h2{margin:0 0 12px}
+.exit-game-dialog p{line-height:1.45}
+.exit-game-options{display:grid;gap:11px;margin-top:15px}
+.exit-game-options .btn{min-height:48px;text-align:center;white-space:normal}
+.exit-game-dialog #exitGameWarning:not(:empty){background:#fff0dd;padding:8px 10px;border-radius:11px;color:#8a4a17}
+@media(max-width:520px){#game .status .row.between>.row{gap:6px}#game .status .row.between>.row .btn{padding:7px 9px;font-size:.78rem}#game .boardbox.expanded .board-main-actions{gap:5px}#game .boardbox.expanded .board-main-actions .btn{padding:5px 8px;font-size:.73rem}#game .boardbox.expanded #boardExit{padding:5px 8px!important}}
+@media(orientation:landscape) and (max-height:450px){#game .boardbox.expanded #openTopscoreGame{display:none!important}#game .boardbox.expanded .board-main-actions .btn{font-size:.71rem;padding:5px 7px}}

@@ -47,7 +47,7 @@ with sync_playwright() as p:
     key='aeselklog-igangvaerende-v1'
     out=page.evaluate('(key)=>JSON.parse(window.__localItems[key])',key)
     assert out['phase']=='result' and out['players'][0]['pos']==21,out
-    page.locator('#saveGame').click()
+    page.locator('#boardExit').click();page.locator('#exitSave').click()
     assert page.locator('#resumeCard').is_visible(),'Resume card not shown after leaving'
     page.screenshot(path=str(ROOT/'preview_resume_setup.png'))
     current=page.evaluate('()=>window.__localItems');page.close()
@@ -130,7 +130,7 @@ with sync_playwright() as p:
     adult.locator('#turnPanel [data-act="move-2"]').click();phase(adult,'learn')
     adult.locator('#turnPanel [data-act="task-6"]').click();phase(adult,'question')
     adult.wait_for_timeout(1400)
-    adult.locator('#saveGame').click()
+    adult.locator('#boardExit').click();adult.locator('#exitSave').click()
     saved=adult.evaluate('(key)=>JSON.parse(window.__localItems[key])',key)
     assert saved['phase']=='question' and 54000<=saved['timeLeftMs']<60000,saved
     current=adult.evaluate('()=>window.__localItems');adult.close()

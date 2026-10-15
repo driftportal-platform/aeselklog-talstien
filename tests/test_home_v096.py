@@ -74,7 +74,7 @@ with sync_playwright() as playwright:
     assert setup.locator('#resumeCard').is_hidden(), 'Resume is shown with no saved game'
     setup.locator('#homePlay').click()
     setup.locator('#startButton').click()
-    setup.locator('#saveGame').click(force=True)
+    setup.locator('#boardExit').click();setup.locator('#exitSave').click()
     assert setup.locator('#resumeCard').is_visible(), 'Save does not reveal resume action'
     saved = setup.evaluate('() => ({...window.__localItems})')
     assert 'aeselklog-igangvaerende-v1' in saved
@@ -113,7 +113,7 @@ with sync_playwright() as playwright:
             if with_save:
                 page.locator('#resumeGame').click()
                 assert page.locator('#game').is_visible(), 'Resume failed'
-                page.locator('#saveGame').click(force=True)
+                page.locator('#boardExit').click();page.locator('#exitSave').click()
                 assert page.locator('#home').is_visible()
                 page.locator('#deleteSave').click()
                 assert page.locator('#resumeCard').is_hidden(), 'Delete did not hide resume'

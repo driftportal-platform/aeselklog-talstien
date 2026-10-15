@@ -54,7 +54,7 @@ with sync_playwright() as p:
         page.locator('#startButton').click();page.wait_for_timeout(200)
         assert page.locator('#game').is_visible()
         assert page.locator('#boardBox.expanded').count()==1
-        page.locator('#saveGame').click(force=True)
+        page.locator('#boardExit').click();page.locator('#exitSave').click()
         page.wait_for_timeout(50)
         assert page.locator('#home').is_visible(),'Save did not return to home'
         assert page.locator('#resumeCard').is_visible(),'missing resume card'
@@ -65,7 +65,7 @@ with sync_playwright() as p:
         assert page2.locator('#home').is_visible() and page2.locator('#resumeCard').is_visible(),'not persisted'
         page2.locator('#resumeGame').click();page2.wait_for_timeout(70)
         assert page2.locator('#game').is_visible()
-        page2.locator('#saveGame').click(force=True)
+        page2.locator('#boardExit').click();page2.locator('#exitSave').click()
         page2.locator('#homeTopscore').click();assert page2.locator('#topscoreDialog').is_visible()
         page2.locator('#closeTopscore').click(); assert not page2.locator('#topscoreDialog').is_visible()
         assert not errors,f'JS errors in {name}: {errors}'

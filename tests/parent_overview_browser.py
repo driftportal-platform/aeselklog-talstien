@@ -83,7 +83,7 @@ with sync_playwright() as playwright:
     assert len(profile['profiles']['karla']['history'])==3
     assert all(e['area']=='plus' and e['correct'] for e in profile['profiles']['karla']['history'])
     assert '"age"' not in str(profile) and '"question"' not in str(profile)
-    page.locator('#saveGame').click(force=True)
+    page.locator('#boardExit').click();page.locator('#exitSave').click()
     assert page.locator('#resumeCard').is_visible()
     page.locator('#homeSettings').click()
     page.locator('#openParentReport').click()

@@ -1,4 +1,4 @@
-/* ÆselKlog Talstien v0.9.13: nye variable specialfelter pr. spil. */
+/* ÆselKlog Talstien v0.9.14: afslutmenu og fysisk A3-spilleleder. */
 (()=>{'use strict';
 const $=id=>document.getElementById(id);
 const qs=sel=>document.querySelector(sel);
@@ -39,6 +39,7 @@ let busy=false,gameToken=0,showDiceState=null,taskTimer=null,taskDeadline=0,task
 let extraRollUsed=false,actionBannerSerial=0;
 let resumeAdultMs=null,helpUsed=false,restoringGame=false,lastSaveOk=null,saveStatusTimer=null;
 let lastNarration=Promise.resolve();
+let exitDialogActive=false;
 let activeVoiceDone=null;
 const PACE={normal:{hop:380,rest:240,roll:1100},rolig:{hop:630,rest:460,roll:1450},ekstra:{hop:900,rest:800,roll:1800}};
 function pace(){return PACE[config?.pace]||PACE.rolig;}
@@ -46,10 +47,17 @@ function pauseBeat(){return defer(prefersLessMotion?120:pace().rest);}
 // A game may be interrupted by calls or screen locks. Do not let CPU actions
 // or animations rush ahead while the tab/app is in the background.
 function waitUntilVisible(){
- if(!document.hidden)return Promise.resolve();
+ if(!document.hidden&&!exitDialogActive)return Promise.resolve();
  return new Promise(resolve=>{
-  const visible=()=>{if(!document.hidden){document.removeEventListener('visibilitychange',visible);resolve()}};
+  const visible=()=>{
+   if(!document.hidden&&!exitDialogActive){
+    document.removeEventListener('visibilitychange',visible);
+    document.removeEventListener('aeselklog-exit-resume',visible);
+    resolve();
+   }
+  };
   document.addEventListener('visibilitychange',visible);
+  document.addEventListener('aeselklog-exit-resume',visible);
  });
 }
 const prefersLessMotion=window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
@@ -363,6 +371,53 @@ function renderResumeCard(){
  const names=record.players.map(p=>p.name).slice(0,5).join(', ');
  $('resumeInfo').textContent=`${record.config.raw} · ${names} · ${time}`;
 }
+function syncBoardMode(){
+ if(!config)return;
+ const physical=config.boardMode==='physical';
+ $('game').classList.toggle('physical-game',physical);
+ $('physicalGuide').hidden=!physical;
+ $('boardModeLabel').textContent=physical?'Fysisk A3-plade · app-overblik':'Digital spilleplade';
+ $('boardExpand').textContent=physical?'🗺 Digitalt overblik':'⛶ Stor plade';
+ updatePhysicalGuide();
+}
+function updatePhysicalGuide(){
+ if(!config||config.boardMode!=='physical'||!players[turn])return;
+ const p=players[turn];
+ const position=p.pos===config.start?'START':`felt ${p.pos}`;
+ const action={move:'Klar til næste terningkast',moving:'Flyt brikken på A3-pladen',learn:'Vælg opgave',question:'Besvar opgaven',feedback:'Svar afgjort',result:'Klar til næste spiller',skipped:'Tur springes over',swap:'Byt brikkerne fysisk',win:'Mål!', 'super-offer':'Frivillig opgave'}[phase]||'Følg turen i appen';
+ $('physicalGuidePosition').textContent=`${p.name}: ${position} · ${action}.`;
+}
+function closeExitDialog(){
+ const dlg=$('exitGameDialog');
+ if(dlg.open){if(typeof dlg.close==='function')dlg.close();else dlg.removeAttribute('open');}
+ if(!exitDialogActive)return;
+ exitDialogActive=false;
+ document.dispatchEvent(new Event('aeselklog-exit-resume'));
+ resumeAdultTimer();
+}
+function openExitDialog(){
+ if(!config||exitDialogActive)return;
+ exitDialogActive=true;
+ pauseAdultTimer();
+ const safe=!busy&&!showDiceState&&safePhase();
+ $('exitSave').disabled=!safe;
+ $('exitGameWarning').textContent=safe?'':phase==='win'?'Spillet er afsluttet. Resultatet er gemt i Topscore.':'Vent til den igangværende handling er færdig, hvis du vil gemme spillet.';
+ const dlg=$('exitGameDialog');
+ if(typeof dlg.showModal==='function')dlg.showModal();else dlg.setAttribute('open','');
+}
+$('gameExit').addEventListener('click',openExitDialog);
+$('boardExit').addEventListener('click',openExitDialog);
+$('exitCancel').addEventListener('click',closeExitDialog);
+$('exitGameDialog').addEventListener('cancel',event=>{event.preventDefault();closeExitDialog()});
+$('exitSave').addEventListener('click',()=>{if($('exitSave').disabled)return;closeExitDialog();saveAndLeave()});
+$('exitDiscard').addEventListener('click',()=>{
+ if(!window.confirm('Afslutte uden at gemme? Det nuværende spil kan så ikke fortsættes.'))return;
+ closeExitDialog();resetAsync();G.clear(safeStorage());
+ config=null;players=[];phase='setup';winner=null;pending=null;challenge=null;
+ show('home');renderResumeCard();
+});
+$('physicalShowBoard').addEventListener('click',()=>setBoardExpanded(true));
+
 function saveAndLeave(){
  if(!config)return;
  if(busy||!safePhase()||showDiceState){updateSaveBadge('🫏 Gem spillet efter den igangværende handling.');return;}
@@ -379,8 +434,8 @@ async function resumeSavedGame(){
  resultLines=state.resultLines;winner=null;extraRollUsed=state.extraRollUsed;
  helpUsed=false;resumeAdultMs=state.phase==='question'&&players[turn]?.kind==='adult'?state.timeLeftMs:null;
  $('rangeTitle').textContent=config.all?'Hele Talstien · 1–100':`Talområde ${config.raw}`;
- $('boardModeLabel').textContent=config.boardMode==='physical'?'Fysisk bræt + app-overblik':'Digital spilleplade';
- show('game');buildBoard();render();setBoardExpanded(true);restoringGame=false;
+ syncBoardMode();
+ show('game');buildBoard();render();setBoardExpanded(config.boardMode!=='physical');restoringGame=false;
  updateSaveBadge('💾 Spillet blev fortsat fra et lokalt gemt punkt.');
  const player=players[turn],g=gameToken;
  const line=phase==='question'?`${player.name}, vi fortsætter med din opgave. ${challenge.question}`:`Hov hov! Velkommen tilbage, ${player.name}. Vi er på felt ${player.pos}.`;
@@ -538,7 +593,7 @@ $('startButton').addEventListener('click',()=>{
  const raw=$('range').value,all=raw==='1-100';
  const start=all?0:Number(raw.split('-')[0])-1,goal=all?100:Number(raw.split('-')[1]);
  config={raw,all,start,goal,learning:radio('learning'),boardMode:radio('boardMode'),moveDice:radio('moveDice'),learnDice:radio('learnDice'),pace:['normal','rolig','ekstra'].includes($('gamePace').value)?$('gamePace').value:'rolig',tables:$('tablesChoice').value||'auto',adaptive:$('adaptiveCheck').checked,rememberLearning:$('rememberLearning').checked};
- SPECIAL=A.generateLayout();
+ SPECIAL=config.boardMode==='physical'?A.FIELDS:A.generateLayout();
  const named=setupPlayers.map((p,i)=>(p.name||'').trim()||`Spiller ${i+1}`);
  const duplicateNames=new Set(named.map(name=>LP.normName(name)).filter(name=>name&&named.filter(n=>LP.normName(n)===name).length>1));
  players=setupPlayers.map((p,i)=>{
@@ -550,8 +605,8 @@ $('startButton').addEventListener('click',()=>{
  if($('cpuCheck').checked&&sound.mode==='ai')void loadAIVoices();
  turn=0;phase='move';challenge=null;pending=null;resultLines=[];winner=null;extraRollUsed=false;
  $('rangeTitle').textContent=all?'Hele Talstien · 1–100':`Talområde ${raw}`;
- $('boardModeLabel').textContent=config.boardMode==='physical'?'Fysisk bræt + app-overblik':'Digital spilleplade';
- show('game');buildBoard();render();setBoardExpanded(true);say(`Hov hov! Velkommen til Talstien. ${players[turn].name} starter!`);
+ syncBoardMode();
+ show('game');buildBoard();render();setBoardExpanded(config.boardMode!=='physical');say(`Hov hov! Velkommen til Talstien. ${players[turn].name} starter!`);
 });
 $('newGame').addEventListener('click',()=>{if(window.confirm('Vil I afslutte spillet og starte forfra? Det gemte spil slettes.')){resetAsync();G.clear(safeStorage());config=null;players=[];phase='setup';show('home');renderResumeCard()}});
 $('editPos').addEventListener('click',()=>{
@@ -619,6 +674,7 @@ function setBoardExpanded(expanded){
  document.body.classList.toggle('board-expanded',expanded);
  $('boardExpand').hidden=expanded;
  $('boardClose').hidden=!expanded;
+ $('boardExit').hidden=!expanded;
  $('boardExpand').setAttribute('aria-expanded',String(expanded));
  // Behold den eksisterende opgave-komponent og alle dens event listeners.
  (expanded?$('boardPanelDock'):$('turnPanelHome')).append($('turnPanel'));
@@ -724,7 +780,7 @@ function flashAction(type,title,detail,durationMs=2300,opts={}){
 function render(){
  if(!config)return;
  if(phase==='win'){G.clear(safeStorage());lastSaveOk=null;}else if(safePhase())saveCheckpoint();
- drawScores();drawBoard();updateBoardHud();const p=players[turn];
+ drawScores();drawBoard();updateBoardHud();updatePhysicalGuide();const p=players[turn];
  $('turnTitle').textContent=phase==='win'?'🏆 Talstien er gennemført!':`${p.isCPU?'🫏 ':''}${p.name}s tur`;
  $('turnSubtitle').textContent=phase==='win'?'Hov hov! Vi har en vinder!':`${p.name} står på ${p.pos===config.start?'START':`felt ${p.pos}`} · målet er ${config.goal}.`;
  const panel=$('turnPanel');
@@ -751,7 +807,9 @@ function render(){
   panel.innerHTML=`<div class="feedback ${good?'':'error'}"><h2>${good?(pending?.superTask?'🎯 Superklaret!':'✅ Godt svaret!'):'🫏 Iiiih-åååh! Iiiih-åååh!'}</h2><p>${esc(pending.feedback)}</p><p class="hint">${p.isCPU?'Æslet skal også hoppe på banen.':'Nu ser vi om du får et ekstra skridt …'}</p></div>`;return;
  }
  if(phase==='moving'){
-  panel.innerHTML=`<div class="move-message"><div class="moving-donkey" style="--fur:${p.color}">${donkeySvg(p.color)}</div><div><h2>Hop, hop, hop! 🥕</h2><p id="moveProgress">${esc(p.name)} hopper fra felt ${p.pos} mod felt ${pending?.target??pending?.landing??'?'} …</p><p class="hint">Følg det farvede æsel, mens det hopper felt for felt.</p></div></div>`;return;
+  panel.innerHTML=config.boardMode==='physical'
+   ?`<div class="move-message"><div><h2>🏡 Flyt brikken på A3-pladen</h2><p id="moveProgress">${esc(p.name)}: gå fra ${p.pos===config.start?'START':'felt '+p.pos} mod felt ${pending?.target??pending?.landing??'?'}.</p><p class="hint">Appen registrerer placeringen, mens I flytter den rigtige brik.</p></div></div>`
+   :`<div class="move-message"><div class="moving-donkey" style="--fur:${p.color}">${donkeySvg(p.color)}</div><div><h2>Hop, hop, hop! 🥕</h2><p id="moveProgress">${esc(p.name)} hopper fra felt ${p.pos} mod felt ${pending?.target??pending?.landing??'?'} …</p><p class="hint">Følg det farvede æsel, mens det hopper felt for felt.</p></div></div>`;return;
  }
  if(phase==='swap'){
   const others=players.filter((_,i)=>i!==turn);
@@ -860,10 +918,10 @@ function startAdultTimer(resume=false){
  const sec=challenge.timeLimit||30;
  if(!resume){taskDeadline=Date.now()+(resumeAdultMs!==null?Math.max(1000,resumeAdultMs):sec*1000);resumeAdultMs=null;}
  // iOS may put the web app in the background mid-question. Time is paused there.
- if(document.hidden){taskPausedAt=Date.now();return;}
+ if(document.hidden||exitDialogActive){taskPausedAt=Date.now();return;}
  const tick=()=>{
   if(phase!=='question'){clearInterval(taskTimer);taskTimer=null;return;}
-  if(document.hidden){pauseAdultTimer();return;}
+  if(document.hidden||exitDialogActive){pauseAdultTimer();return;}
   const remaining=Math.max(0,taskDeadline-Date.now()),secs=Math.ceil(remaining/1000);
   if($('clock'))$('clock').textContent=`${secs} sek.`;
   if($('timeFill'))$('timeFill').style.width=(remaining/(sec*1000)*100)+'%';
@@ -886,7 +944,7 @@ function resumeAdultTimer(){
  }
 }
 document.addEventListener('visibilitychange',()=>{
- if(document.hidden){pauseAdultTimer();if(config&&safePhase())saveCheckpoint();}else resumeAdultTimer();
+ if(document.hidden){pauseAdultTimer();if(config&&safePhase())saveCheckpoint();}else if(!exitDialogActive)resumeAdultTimer();
 });
 function processAnswer(idx,timedOut=false){
  if(phase!=='question')return;
@@ -931,6 +989,14 @@ async function hopSteps(p,to,speed){
  const g=gameToken;
  const goal=Math.max(config.start,Math.min(config.goal,to));
  if(p.pos===goal)return;
+ if(config.boardMode==='physical'){
+  await waitUntilVisible();
+  if(g!==gameToken||!config)return;
+  p.pos=goal;p.moving=false;
+  drawScores();drawBoard();updateBoardHud();updatePhysicalGuide();
+  const el=$('moveProgress');if(el)el.textContent=`🏡 Flyt ${p.name}s brik til felt ${goal} på A3-pladen.`;
+  return;
+ }
  const direction=goal>p.pos?1:-1;
  // Den farvede æselbrik opdateres for hvert enkelt nummer på den digitale bane.
  while(p.pos!==goal){

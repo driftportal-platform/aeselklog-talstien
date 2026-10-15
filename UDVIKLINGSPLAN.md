@@ -1,3 +1,35 @@
+# ÆselKlog – udviklingsplan v0.9.14 (16. oktober 2026)
+
+**Grundlag:** GitHub `main` verificeret til v0.9.13; komplette kildearkiv matcher GitHub Git-blobs. v0.9.14 lokalt udviklet og automatisk testet, ikke uploadet til GitHub af assistenten. Fysisk iPhone-PWA-test afventer.
+
+## v0.9.14 – afslut, stemmemarkør og fysisk A3-spilleleder
+
+- [x] Fast **Afslut** øverst på spilleskærmen og stor plade, med Gem / Uden gemning / Fortsæt og bekræftelse ved destruktiv handling.
+- [x] Gemning kun ved stabile faser; CPU og voksen-timer afventer under Afslut-menu, og fortsætter ved annullering.
+- [x] Fjern den uønskede "0." ved stemmeindstillingernes detaljemenu (ren pil, uden nummermarkør).
+- [x] **Fysisk A3** viser spilleledervisning og flytninger på trykt bræt i stedet for at udvide den digitale plade automatisk. Den bruger en **fast specialfeltfordeling** (`A.FIELDS`). Digital mode har uændret randomiserede specialfelter.
+- [x] Valgfrit digitalt overblik i fysisk mode, stadig fysisk/digital terning uafhængigt.
+- [x] Gammelt savegame schema/lokallager intakt, gemte specialfelter bevares 1:1.
+- [x] 18 Node-tests og 13 Chromium-browserprøver gennemført, inklusive ny test for fysisk A3 og Afslut-dialogens tidsstyring. PWA-cache v0.9.14.
+- [ ] Kontrol af fast feltlayout mod brugerens **konkrete A3-print**. De fysiske tryk kan have andre symbolplaceringer end `A.FIELDS`.
+- [ ] Reel iPhone/WebKit/VoiceOver, ElevenLabs og familietest før v1.0.
+
+## Fysiske spillekort – beslutninger og næste trin (udsat efter denne release)
+
+- Den foreviste 21–40-prototype viser talkort 21–40 med lige/ulige, tiere/enere og primtal samt **otte æselkort** (63×88 mm).
+- **Grundspillet:** flere æselkort kan deles ud; når en spiller får et æselkort, beholder spilleren det resten af spillet.
+- **Senere drillevariant:** præcis ét æselkort kan gives videre mellem spillere efter særskilte regler.
+- Begge kortspilsformer skal kunne spilles uden matematik; ekstra læring er frivilligt.
+- Der mangler endelig aftale om **hvornår/hvordan talkort lægges af**, antal kort per spiller, tildeling og scoring. Integration af digitalt/fysisk kortspil og kortdesign/produktion gennemføres som eget spor efter de nuværende spilrettelser.
+
+## Foreslået næste skridt
+
+1. Upload og fysisk test af v0.9.14 på iPhone og sammen med A3-pladen. Ret eventuelle forskelle i trykt feltfordeling.
+2. Fastlæg almindelige kortspilsregler og integrér valgfrit kortspil på egen side efter godkendt design.
+3. Familietest og releasekontrol før en mulig v1.0.
+
+---
+
 # ÆselKlog – udviklingsplan v0.9.13 (15. oktober 2026)
 
 **Status:** GitHub `main` var bekræftet v0.9.12 ved start, og den komplette v0.9.12-ZIP matchede relevante kildefilers Git-hashes. v0.9.13 er kodet, testet i Node/Chromium og pakket til manuel upload. Ingen GitHub-commit eller fysisk iPhone-/ElevenLabs-test er udført i denne omgang.

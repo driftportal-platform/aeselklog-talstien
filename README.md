@@ -1,3 +1,26 @@
+# 🫏 ÆselKlog – Talstien v0.9.14 (16. oktober 2026)
+
+## Afslut-menu og reel fysisk spilleledervisning
+
+- På spilleskærmen findes nu **⏻ Afslut** øverst; i stor digital plade findes knappen også øverst. Menuen tilbyder **💾 Gem og afslut**, **✕ Afslut uden at gemme** (med ekstra bekræftelse) og **↩ Fortsæt spillet**. Den eksisterende **Gem & afslut**-knap bevares i almindelig brætvisning; på stor plade bruges Afslut-menuen for at give plads til betjeningen.
+- Ved en igangværende animation/terning, hvor spillet endnu ikke er sikkert at gemme, er **Gem og afslut** midlertidigt slået fra med forklaring. Man kan stadig annullere eller afslutte uden gemning. Mens Afslut-menuen er åben, venter CPU-æslet og voksenopgavens tidtager. Ved **Fortsæt spillet** går tur og tid videre.
+- Valget **Digital plade** fungerer som før: stor levende digital bane, farvede brikker og **ny tilfældig fordeling** af specialfelter ved nyt spil.
+- Valget **Fysisk A3-plade** er nu en reel, separat spilleledertilstand: appen starter i almindelig spilvisning med et tydeligt felt om, hvem der er på tur, og hvor den fysiske brik skal stå; **brikkerne flyttes af spillerne på A3-pladen**. Appen styrer stadig tur, regler, læringsopgaver, terninger, lyd, CPU og resultater; den digitale bane er tilgængelig som et frivilligt **Digitalt overblik**. Brikkerne animeres ikke felt-for-felt på appskærmen i fysisk mode.
+- Fysisk A3 benytter den **eksisterende faste specialfeltfordeling** (`A.FIELDS`), mens ny digital bane bruger det tilfældige feltlayout. **Kontrollér på jeres konkrete print af A3-pladen, at markeringerne matcher appens faste felter**; tidligere prototypetryk kan afvige. Gemte spil fra ældre versioner beholder nøjagtigt deres gemte specialfelter, også hvis fysisk mode tidligere brugte tilfældig fordeling.
+- Spillepladen og den almindelige læringsterning har stadig uafhængige valg af **fysisk eller digital terning**.
+- Den uønskede **"0."-markør** ved **Stemme og lyd** er fjernet ved at normalisere detaljemenuens markør; en tydelig pil viser åben/luk.
+- **Kortspillet er ikke ændret i denne release.** De fotograferede 21–40-talkort og æselkort indgår som reference til senere udvikling. Aftalte kortregler: standardspillet kan bruge flere af de 8 æselkort, der beholdes når man får dem; en separat variant med ét æselkort kan lade kortet vandre mellem spillerne. Matematik er altid valgfri.
+
+**Sikkerhed og kompatibilitet:** Den godkendte illustration `home-fullscreen.webp` er byte-identisk med v0.9.13. Eksisterende lagernøgle og save-schema er uændret; forældreoversigt, offline-lydcache, stemmevalg og Cloudflare/ElevenLabs-integrationen ændres ikke.
+
+**Kilde:** Verificeret GitHub `main` v0.9.13 mod den komplette tidligere leverede ZIP (matchende Git-blobs). v0.9.14 er udviklet oven på den kode, ikke en ældre pakke. GitHub er ikke automatisk opdateret.
+
+**Tests:** 18 Node-tests samt 13 Chromium-browsertests gennemført lokalt. Den nye `tests/physical_exit_browser.py` tester 390×844, 844×390 og 1280×800, fysisk start, faste specialfelter, gem/genoptag, afslut med/uden lagring, separat digital mode, CPU-pause, voksen-timer og stemmemarkør. Browserlyd og lokallager er simuleret; ingen reelle ElevenLabs-credits er brugt. Fysisk iPhone/WebKit, ægte lydbetjening og placering på den konkrete trykte A3-plade kræver manuel test.
+
+**Installation:** Pak hele ZIP-filen ud og upload filerne direkte til roden af `driftportal-platform/aeselklog-talstien`, også `styles.css`, `app.js`, `index.html` og den opdaterede `sw.js` med cache `aeselklog-talstien-v0914-exit-physical-board`. Genåbn den installerede PWA efter GitHub Pages-opdatering og kontrollér v0.9.14.
+
+---
+
 # 🫏 ÆselKlog – Talstien v0.9.13 (15. oktober 2026)
 
 ## Nye varierende specialfelter og fem farvede roser
