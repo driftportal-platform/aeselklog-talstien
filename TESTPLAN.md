@@ -1,3 +1,27 @@
+# ÆselKlog v0.9.15 – Kortspil med fem talområder
+
+## Automatisk udført i lokalt testmiljø
+
+- [x] `node --check` for projektets JavaScript og alle testfiler.
+- [x] **19 Node-tests** inklusive `tests/cardgame.test.js` (100 kort pr. niveau, fem eksemplarer pr. tal, 2–6 spillere, to æselkortvarianter, ekstra straf, kortplacering og validering af ugyldige gemninger).
+- [x] **14 Chromium-browsertests bestået** inklusive `tests/cardgame_browser.py`: Spil → Kortspil, valg mellem alle fem intervaller, start af kortspil 21–40 med tre spillere, lukkede/åbne bunker, korttræk, manuel straf, gem/fortsæt og den overdragelige ét-æsel-variant i 390×844, 844×390 og 1280×800.
+- [x] Eksisterende Talstien-tests: godkendt forside, A3/afslut-menu, gem/fortsæt, randomiserede specialfelter, voksen-timer, CPU-stemme, AI-reserve, stemmecache, individuelle læringsprofiler og forældreoversigt.
+- [x] `tests/pwa_cache.test.js`: nye `cardgame-engine.js` og `cardgame-ui.js` præcaches med version v0.9.15; gamle projekters caches berøres ikke.
+
+**Grænse:** Browserregressionerne bruger Chromium med simuleret lyd/browserlager. Ingen reel ElevenLabs eller WebKit/Safari/iPhone-test. Den særskilte HTTP/Service Worker-installationstest kunne ikke gennemføres, da browseren i dette miljø blokerer `127.0.0.1` (`ERR_BLOCKED_BY_ADMINISTRATOR`).
+
+## Manuel test efter upload
+
+- [ ] Åbn Spil og kontrollér, at Talstien stadig kan startes som før; Kortspil-menuen findes ved siden af.
+- [ ] Start kortspil i alle fem intervaller og kontrollér, at det laveste tal (1/21/41/61/81) kan begynde en midterstak.
+- [ ] Prøv to spillere, tre spillere og evt. seks spillere på én enhed; børn skal forstå kortene og turenes placering.
+- [ ] Prøv standard æselkort (4, 6 eller 8), overdragelse af ét æselkort og valgfrie ekstra kort fra andre.
+- [ ] Gem et kortspil, luk PWA helt, genåbn og fortsæt. Bekræft, at en Talstien-gemning ikke ændres.
+- [ ] Prøv helt offline efter første installation. Test også ElevenLabs, voksen-timer og specialfelter i Talstien efter opdateringen.
+- [ ] Sammenlign digitale talkort med de trykte 21–40-kort og aftal evt. ændringer inden kortspillet får endelige produktionsregler.
+
+---
+
 # ÆselKlog v0.9.14 – testplan (16. oktober 2026)
 
 ## Automatiserede tests udført

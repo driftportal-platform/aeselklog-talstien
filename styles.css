@@ -634,3 +634,63 @@ body.home-active #resumeCard button:active{filter:brightness(.94)}
 .exit-game-dialog #exitGameWarning:not(:empty){background:#fff0dd;padding:8px 10px;border-radius:11px;color:#8a4a17}
 @media(max-width:520px){#game .status .row.between>.row{gap:6px}#game .status .row.between>.row .btn{padding:7px 9px;font-size:.78rem}#game .boardbox.expanded .board-main-actions{gap:5px}#game .boardbox.expanded .board-main-actions .btn{padding:5px 8px;font-size:.73rem}#game .boardbox.expanded #boardExit{padding:5px 8px!important}}
 @media(orientation:landscape) and (max-height:450px){#game .boardbox.expanded #openTopscoreGame{display:none!important}#game .boardbox.expanded .board-main-actions .btn{font-size:.71rem;padding:5px 7px}}
+
+/* v0.9.15 – selvstændigt ÆselKlog-kortspil. Rører ikke den godkendte forside. */
+.mode-chooser{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin-bottom:17px}
+.mode-current,.mode-cards-button{display:flex;flex-direction:column;gap:4px;text-align:left;min-height:84px;padding:15px 16px;border:2px solid #cbddef;border-radius:17px;background:#eff8ff;color:#153e70}
+.mode-current{border-color:#85bceb;background:#e8f4ff}
+.mode-cards-button{cursor:pointer;background:linear-gradient(115deg,#fff6e8,#ffebd8);border-color:#e9c28b;font:inherit;box-shadow:0 4px 13px #73521a12}
+.mode-chooser strong{font-size:1.16rem}.mode-chooser span{font-size:.83rem;color:#526778;line-height:1.4}
+.mode-cards-button:focus-visible{outline:3px solid #246ca4;outline-offset:2px}
+.card-setup-intro{display:flex;gap:17px;align-items:center;padding:15px;background:linear-gradient(100deg,#fff8ed,#edf7ec);border:1px solid #e3ddc6;border-radius:20px;margin-bottom:15px}
+.card-setup-intro img{width:83px;height:106px;object-fit:contain;border-radius:10px;flex:none}.card-setup-intro strong{font-size:1.18rem;color:#174878}.card-setup-intro p{margin:6px 0;color:#58677a;font-size:.91rem}
+.card-setup-grid .paper h3{margin:14px 0 9px}.card-setup-grid .paper h3:first-child{margin-top:0}
+.card-setup-grid .field{margin-bottom:12px}.card-name-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:4px 9px}
+.card-player-field{font-weight:700;color:#174873;font-size:.82rem}.card-player-field input{font-weight:650}
+.card-error{color:#ac2020;font-weight:800;min-height:1em}.card-extra-rule{margin:10px 0}
+.card-resume{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;background:#fff6dd}
+.card-resume[hidden],#cardDonkeySetting[hidden],.card-penalty[hidden]{display:none!important}
+.card-resume p{margin:6px 0 0}.card-start{margin:8px 0 24px;min-height:58px;font-size:1.08rem}
+.card-game-top{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap;background:#fff8ee;border-radius:19px;padding:15px 18px;margin-bottom:11px;border:1px solid #e9dac1}
+.card-game-top h2{margin:0 0 5px}.card-game-top p{margin:0}.card-game-top .row{gap:7px}
+.card-game-status{background:linear-gradient(110deg,#e7f4ff,#f3f7e3);border:1px solid #cdded7;border-radius:18px;padding:14px 17px;margin-bottom:12px}
+.card-game-status h3{margin-bottom:5px}.card-game-status p{margin:0;color:#385774;line-height:1.4;font-weight:650}
+.card-game-layout{display:grid;grid-template-columns:minmax(240px,36%) minmax(0,1fr);gap:14px}
+.card-game-turn,.card-game-center{min-width:0}.card-game-turn{background:#fff8ec}.card-game-turn h3,.card-game-center h3{margin-bottom:10px}
+.card-pending{display:flex;flex-flow:column;align-items:center;justify-content:center;min-height:210px;gap:8px}
+.card-pending-title{font-size:.89rem;font-weight:750;color:#5b4c3d}.card-pending-quiet{text-align:center;max-width:230px;line-height:1.6;color:#5d6a77}
+.card-move-buttons{display:grid;gap:9px;margin-top:10px}.card-move-buttons button{white-space:normal;line-height:1.3}
+.number-card{--card-shade:#fbe3e2;display:flex;flex-direction:column;justify-content:space-between;flex:0 0 auto;width:155px;height:214px;padding:10px 8px;border:2px solid #e3c4c3;border-radius:15px;background:linear-gradient(145deg,#fff4f0,var(--card-shade));box-shadow:0 6px 13px #725b5740;user-select:none}
+.number-card--1{--card-shade:#ddebff}.number-card--2{--card-shade:#fbe0df}.number-card--3{--card-shade:#fff0ba}.number-card--4{--card-shade:#d9f2d8}.number-card--5{--card-shade:#eeddfd}
+.number-card strong{font-size:4.3rem;font-weight:900;line-height:1;color:#cd1432;text-align:center;font-variant-numeric:tabular-nums;text-shadow:0 2px 1px #fff9}
+.number-card-info,.number-card-foot{display:flex;justify-content:space-between;align-items:center;gap:4px;padding:6px 5px;border-radius:9px;background:#d9edff;color:#1c5087;font-size:.67rem;font-weight:850;line-height:1.23}
+.number-card-foot{background:#eff3fd}.number-card-foot span:first-child{color:#1e609e}
+.number-card--small{width:94px;height:132px;padding:5px;border-radius:11px;border-width:1px;box-shadow:0 3px 6px #725b573d}
+.number-card--small strong{font-size:2.5rem}.number-card--small .number-card-info,.number-card--small .number-card-foot{font-size:.48rem;padding:3px}
+.card-center-piles{display:flex;gap:11px;overflow-x:auto;align-items:stretch;min-height:171px;padding:4px 1px 14px;scrollbar-width:thin}
+.card-center-stack{display:flex;flex-flow:column;align-items:center;gap:5px;min-width:99px;font-weight:800;font-size:.76rem;color:#184b81}
+.card-center-stack small{text-align:center;color:#657b90;font-weight:600;font-size:.66rem}
+.card-center-empty{display:grid;place-items:center;min-height:145px;padding:18px;text-align:center;color:#647c8c;border:2px dashed #cbdaeb;border-radius:16px;width:100%}
+.card-game-players{margin-top:13px}.card-game-players h3{margin-bottom:6px}
+.card-players-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px}
+.card-person{background:#f6faff;border:2px solid #d5e4f3;border-radius:16px;padding:11px;min-width:0}
+.card-person--active{border-color:#dca443;background:#fff7e6;box-shadow:0 0 0 2px #fff4d9}
+.card-person-top{display:flex;justify-content:space-between;gap:8px;align-items:start;font-size:.81rem;color:#17426f}
+.card-person-top span{color:#627589;font-weight:750;white-space:nowrap}
+.card-person-cards{display:flex;gap:11px;justify-content:center;align-items:start;padding:9px 0}
+.card-person-closed,.card-person-open{display:flex;flex-flow:column;align-items:center;gap:5px;min-width:94px;max-width:110px}
+.card-person-closed small,.card-person-open small{color:#5e768e;font-size:.7rem;text-align:center}
+.card-back{width:94px;height:132px;flex:none;border-radius:11px;display:grid;place-content:center;text-align:center;gap:4px;font-size:2.2rem;background:linear-gradient(145deg,#eff9ff,#a8d4f4);border:3px double #2163a2;box-shadow:0 2px 7px #445e803b}
+.card-back small{color:#0b488d;font-size:.73rem;font-weight:900}
+.card-blank{display:grid;place-items:center;width:94px;height:132px;border:1px dashed #c8d2d8;border-radius:11px;color:#899aa5;font-size:.82rem}
+.card-person-donkeys{text-align:center;color:#6f4420;font-size:.91rem;font-weight:700;min-height:24px;overflow-wrap:anywhere}
+.card-person-donkeys small{color:#7a7873;font-size:.69rem}
+.card-penalty{margin:10px 0 15px;background:#fff7f2}.card-penalty summary{font-weight:850;color:#6b3e23;cursor:pointer;list-style-position:inside;font-size:1.05rem}
+.card-penalty .row{margin:9px 0}.card-penalty select{max-width:240px}.card-rules-dialog{max-width:min(90vw,540px);max-height:82dvh;overflow:auto;border:0;border-radius:20px;padding:24px;background:#fffaf2;color:#183f68;box-shadow:0 20px 60px #123a6080}
+.card-rules-dialog::backdrop{background:#092d48a1}.card-rules-dialog p{line-height:1.55}
+.card-win-text{font-weight:900;color:#1c7345;background:#e2f6e2;border-radius:11px;padding:12px}
+@media(max-width:760px){.card-game-layout{grid-template-columns:1fr}.card-pending{min-height:170px}.mode-chooser{gap:7px}.mode-current,.mode-cards-button{padding:11px;min-height:91px}.mode-chooser strong{font-size:1rem}.mode-chooser span{font-size:.75rem}.card-game-top{padding:12px}.card-game-status{padding:12px}.card-center-piles{min-height:160px}}
+@media(max-width:390px){.card-players-grid{grid-template-columns:repeat(1,minmax(0,1fr))}.card-name-grid{grid-template-columns:1fr}.card-person-cards{gap:18px}}
+
+.card-donkey-icons{display:flex;justify-content:center;align-items:center;gap:3px;flex-wrap:wrap;margin-top:4px}
+.card-donkey-icons img{width:29px;height:42px;border-radius:5px;object-fit:cover;border:1px solid #d9b5ad;box-shadow:0 2px 4px #53483b34}

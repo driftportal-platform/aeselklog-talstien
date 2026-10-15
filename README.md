@@ -1,3 +1,26 @@
+# 🫏 ÆselKlog v0.9.15 – kortspil med fem talområder (16. oktober 2026)
+
+## Nyt: selvstændigt digitalt kortspil ved siden af Talstien
+
+- Tryk **Spil** på den godkendte forside. I spillermenuen vises nu **Talstien** (den eksisterende, uændrede spiltype) og **Kortspil**. Kortspillet har selvstændig opsætning og fuldt digitalt spil på én enhed (2–6 menneskelige spillere, som skiftes).
+- Vælg præcis ét af de fem farveområder: **1–20, 21–40, 41–60, 61–80, 81–100**. Hvert valg giver 100 talkort: **fem kopier af hvert af de 20 tal**. Laveste tal i området starter en række i midten (1, 21, 41, 61 eller 81). Der kan påbegyndes indtil fem sådanne rækker. I midten lægges kun næste tal i stigende rækkefølge.
+- Har kortet ikke en plads i midten, kan det lægges ovenpå en anden spillers åbne bunke, hvis tallet er ét højere eller ét lavere. Appen prioriterer midten og ellers nærmeste åbne bunke til venstre. Spilleren kan lægge fra toppen af sin egen åbne bunke eller vende det øverste af den lukkede. Hvis et nyt vendt kort ikke passer, lægges det på spillerens åbne bunke, og turen går videre. Når lukkede kort slipper op, vendes den åbne bunke om igen. Den første uden **talkort** vinder.
+- **Klassisk ÆselKlog** (standard): 4, 6 eller 8 æselkort som strafkort. Når en spiller får et æselkort, beholdes det. Der findes højst det valgte antal æselkort i alt. Æselkort tælles ikke som talkort i vinderreglen.
+- **Send æslet videre**: Ét æselkort i hele spillet. Ved en fejl går det til den nye spiller, der skal have straf, og forsvinder fra den tidligere ejer.
+- **Valgfri ekstra straf**, slået fra som standard: ved en fejl modtager spilleren også ét kort fra hver af de andres *lukkede* bunker, hvis de har kort. Da appen ikke kan se, om nogen overser et muligt træk ved et fysisk bord, aktiveres straffen manuelt med bekræftelse. I det digitale spil viser appen kun lovlige placeringer, så fejlstraffen er tiltænkt familiens egne aftaler.
+- Talkortene i appen har store tal, rigtige farver, lige/ulige, tiere/enere og primtalsmarkering. Illustrationerne er inspireret af den tidligere 21–40-prototype og er endnu ikke pixel-identiske med den trykte kortgrafik. Kortspillet har **ingen obligatoriske matematikopgaver**; frivillige læringsvarianter og fysisk printintegration kan udvides senere.
+- Kortspillet bruger `cardgame-engine.js` (regler) og `cardgame-ui.js` (visning). Én lokal kortspilsgemmning gemmes i `aeselklog-kortspil-v1` – uafhængigt af Talstiens `aeselklog-igangvaerende-v1`. Automatisk gemning efter stabile træk og knapperne Fortsæt kortspil, Gem og tilbage og Slet gemt kortspil. Ingen konto, server eller API-nøgle.
+
+**Vigtig afgrænsning:** Første digitale kortspil er en spilbar *pass-and-play-prototype* (ikke online multiplayer og endnu ingen CPU-modstander eller ElevenLabs-oplæsning i kortspillet). Det trykte kortsæt fra billederne omfatter 21–40 og æselkort som prototypetryk. En komplet fysisk pakke med fem kopier af hvert tal, tryk, præcise fysiske regler og en særskilt fysisk kortspil-assistent færdiggøres senere. Den oprindelige Talstien-PWA, stemmer, læring, fysik/digital plade, gemning og forside bevares.
+
+**Kilde:** GitHub `main` v0.9.14 blev verificeret sammen med `README.md`, `AGENTS.md`, `TESTPLAN.md` og `UDVIKLINGSPLAN.md`. Den lokale ZIP fra v0.9.14 matchede GitHub på de kontrollerede kildefilers Git-SHA. Ingen direkte ændring af GitHub `main` er udført i denne leverance.
+
+**Test:** `node --check` og 19 Node-tests inklusive `cardgame.test.js`; 14 Chromium-browsertests bestået, herunder `cardgame_browser.py` i 390×844, 844×390 og 1280×800. Gammel Talstien-forside, CPU, voksen-timer, stemmecache, profilhistorik, forældreoversigt, fysiske A3-plade, sikker gemning og PWA præcache er regressionsprøvet. Ingen faktiske ElevenLabs-kald. Den særskilte HTTP/Service Worker-installationstest kunne ikke gennemføres: Chromium i dette miljø blokerer `127.0.0.1` med `ERR_BLOCKED_BY_ADMINISTRATOR`. Fysisk iPhone-PWA/WebKit, fysisk kortprototypetest og realistiske familietests er fortsat udestående.
+
+**Upload:** Pak hele ZIP-filen ud og upload alle filer til GitHub-repositoryets rod, især de nye `cardgame-engine.js` og `cardgame-ui.js`, samt ændrede `index.html`, `styles.css`, `app.js` og `sw.js`. Upload ikke ZIP-filen alene. Vent på GitHub Pages og genåbn den installerede PWA. Verificér **PRØVEVERSION 0.9.15**.
+
+---
+
 # 🫏 ÆselKlog – Talstien v0.9.14 (16. oktober 2026)
 
 ## Afslut-menu og reel fysisk spilleledervisning

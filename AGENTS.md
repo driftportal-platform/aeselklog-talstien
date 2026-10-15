@@ -1,3 +1,15 @@
+# ÆselKlog – udviklernote v0.9.15 (selvstændigt kortspil)
+
+- Start altid fra seneste GitHub `main`. Læs de fire projektdokumenter, og sammenlign aktuelle kilde-hashes, før videre udvikling.
+- Nye `cardgame-engine.js` og `cardgame-ui.js` er selvstændige moduler. `index.html` viser **Talstien** og **Kortspil** under eksisterende `#setup`; `app.js` udvider sin visningsnavigator med `#cardsSetup` og `#cardsGame` men ændrer ikke Talstiens fase- eller turmotor.
+- Kortspillet har præcis fem gyldige `RANGES`, 20 tal per række, fem kopier af hvert tal; standardvarianten har 4,6,8 beholdte strafkort, `passing` har ét overdrageligt strafkort. Frivillig ekstra straf tager kun kort fra andre spillers lukkede bunker. Matematik er ikke obligatorisk.
+- Æselkort gives *manuelt* via bekræftet strafknap, fordi et overset lovligt træk ikke kan afgøres ved en fysisk bordoplevelse. Kort-appens digitale træk er automatisk lovlige. Central stak prioriteres; derefter en anden spillers åbne stak efter rækkefølgen til venstre. Regelvarianten justeres efter fysiske tests, ikke ved gæt.
+- `cardgame-engine.js` er testbart i Node og browser og validerer input ved indlæsning. `SAVE_KEY=aeselklog-kortspil-v1` er helt separat fra `savegame.js`/Talstien. Konverter ikke automatisk mellem kortspil og Talstien.
+- Bevar originale billedfiler og alle eksisterende funktioner: CPU, IA-stemmer via Cloudflare Worker, 35 % Hov hov, farvede roser, actionfelter, fysisk A3, læringsprofiler, forældreoversigt og PWA-tilgængelighed. Ingen ElevenLabs-secrets i GitHub.
+- `sw.js` skal indeholde begge nye JS-moduler. `tests/cardgame.test.js` og `tests/cardgame_browser.py` skal bestå sammen med eksisterende Node/Chromium-tests. De faktiske trykte kort og iPhone-PWA kræver særskilt kontrol.
+
+---
+
 # ÆselKlog – udviklernote v0.9.14 (16. oktober 2026)
 
 1. Kontroller **aktuel GitHub `main`**, `README.md`, `AGENTS.md`, `TESTPLAN.md`, `UDVIKLINGSPLAN.md` før enhver videreudvikling. v0.9.14 bygger på verificeret `main` v0.9.13, ikke en ældre ZIP.

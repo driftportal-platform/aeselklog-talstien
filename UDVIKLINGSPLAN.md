@@ -1,3 +1,27 @@
+# ÆselKlog – udviklingsplan v0.9.15 (16. oktober 2026)
+
+**Status:** GitHub `main` bekræftet v0.9.14 før udviklingen. v0.9.15 udviklet og automatisk testet lokalt. Afventer manuel GitHub-upload, fysisk iPhone-PWA, familietest og afprøvning med trykte kort.
+
+## Kortspil v0.9.15 – implementeret
+
+- [x] Eksisterende godkendt forside og Talstien-flow bevaret. Under **Spil** kan man nu vælge **Kortspil** ved siden af Talstien.
+- [x] Fem kortniveauer 1–20, 21–40, 41–60, 61–80, 81–100, med fem af hvert tal pr. niveau (100 talkort). Kort vist med lige/ulige, tiere/enere og primtal.
+- [x] Digital pass-and-play for 2–6 spillere med lukkede/åbne bunker, korrekt rækkefølge, op til fem rækker i midten, åbne bunker hos modspillere, genvending og vinderregistrering i kortspiltilstanden.
+- [x] **Behold æselkort** (4/6/8 kort, standard 8) og **Send æslet videre** (præcis ét kort). Manuel bekræftet straf ved fejl, valgfrit ekstra kort fra hver anden spillers lukkede bunke.
+- [x] Kortspil gemmes lokalt under selvstændig nøgle, ikke i Talstiens gemning; fuld fortsæt/slet i Kortspil-menu. Ingen API-kald eller aldersdata.
+- [x] Ny PWA-cache v0.9.15 med begge kortmoduler. Tidligere spilmotor, den godkendte forside, stemmer, actionfelter, fysisk/digital A3-plade og individuelle læringsprofiler bevares.
+- [x] 19 Node-tests og relevante Chromium-browsertests inkl. tre mobil/desktop-størrelser.
+- [ ] Fysisk iPhone-Safari/WebKit, offline-genstart og rigtig brugertest med de fem kortområder.
+
+## Mangler før kortspil v1.0
+
+1. Afprøv og justér de præcise **fysiske** kortregler sammen med børn og voksne, især placering på åbne bunker, kortprioritet og frivillige strafregler. Første digitale version er ikke en endelig officiel regelbog.
+2. Færdiggør trykklare kort for samtlige fem områder med korrekt antal kopier, original grafik og kortbagsider. Prototypebillederne viser kun 21–40 og æselkort.
+3. Beslut om fysisk kortspil skal have en spilassistent i appen, og om der ønskes CPU i kortspilsvarianten. Første version er lokal pass-and-play.
+4. Gennemfør VoiceOver, større skrifter, rigtig iPhone-PWA, offline-opdatering og familietest før markering som v1.0.
+
+---
+
 # ÆselKlog – udviklingsplan v0.9.14 (16. oktober 2026)
 
 **Grundlag:** GitHub `main` verificeret til v0.9.13; komplette kildearkiv matcher GitHub Git-blobs. v0.9.14 lokalt udviklet og automatisk testet, ikke uploadet til GitHub af assistenten. Fysisk iPhone-PWA-test afventer.
