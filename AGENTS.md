@@ -1,3 +1,15 @@
+# ÆselKlog – udviklernote v0.9.13 (randomiserede specialfelter)
+
+1. Start altid fra **nyeste GitHub `main`**, og sammenlign byte-hashes med lokale ZIP'er. Læs `README.md`, `AGENTS.md`, `TESTPLAN.md`, `UDVIKLINGSPLAN.md`.
+2. `actions.js` eksporterer fortsat **det gamle** `FIELDS`-layout (for gamle savegames og legacy-tests), men nye spil bruger `generateLayout(rng)` og `validateLayout(layout)`. Samme generator bruges til LEG, LÆR, UDFORDRING, TABELTRÆNING, fulde 100 felter og kortere udvalgte talområder. Antallene varierer inden for de faste intervaller og felterne er fordelt over alle fem 20-bands. Ingen nabo-felter og frie ind-/udgange til hvert talområde.
+3. `app.js` holder `SPECIAL` som en variabel, genbrugt af både SVG (`B.render`) og tur-/actionregler. **Nyt spil:** `A.generateLayout()` én gang. **Fortsæt:** `state.specialFields || A.FIELDS`. Aldrig generér igen ved render, app-baggrund, gem eller genoptagelse.
+4. `savegame.js` beholder lokal lagernøgle `aeselklog-igangvaerende-v1` og schema 1. Det nye valgfri `specialFields`-objekt normaliseres til kendte feltnumre og godkendte actiontyper. Manglende felt i gamle gemninger repræsenteres som `null` og bruger **historisk `A.FIELDS`**, så gamle aktive spil bevarer deres bane. Ikke ændre API-nøgler, profiler, Topscore eller Cloudflare Worker.
+5. Spilreglerne ændres ikke: ingen rekursive specialhandlinger, ét ekstra gulerodskast per tur, frivillige spørgsmål, CPU følger samme regler, timer/oplæsning og pauser respekteres. Børnenes aldersloft, forældreoversigt, AI-cache og 'Hov hov!' 35 % skal fortsat testes.
+6. Legendeforklaringen bruger fem ens SVG-roser med fem CSS-farver; **brug ikke platformfarvede emoji-roser**, der kan se ens ud. Terningskærmens æselbillede har ingen `clip-path`; æsellyd-knappen må ikke gå ud over viewport på lille mobil.
+7. Kør `node tests/random_actions.test.js`, `python tests/random_actions_browser.py`, alle tidligere Node-/Chromium-tests og PWA unit-test før hver release. Fysisk iPhone/WebKit og live ElevenLabs tæller først som test, når de er udført på rigtige enheder.
+
+---
+
 # ÆselKlog – udviklernote v0.9.12 (levende specialfelter)
 
 1. Brug **aktuel GitHub `main`**, læs `README.md`, `AGENTS.md`, `TESTPLAN.md` og `UDVIKLINGSPLAN.md`. Release v0.9.12 bygger på verificeret `main` v0.9.11, ikke gamle ZIP'er.

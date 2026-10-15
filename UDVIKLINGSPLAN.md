@@ -1,3 +1,26 @@
+# ÆselKlog – udviklingsplan v0.9.13 (15. oktober 2026)
+
+**Status:** GitHub `main` var bekræftet v0.9.12 ved start, og den komplette v0.9.12-ZIP matchede relevante kildefilers Git-hashes. v0.9.13 er kodet, testet i Node/Chromium og pakket til manuel upload. Ingen GitHub-commit eller fysisk iPhone-/ElevenLabs-test er udført i denne omgang.
+
+## v0.9.13 – varieret antal og placering af actionfelter
+
+- [x] Gulerod 3–5, Bro 2–4, Vandpyt 2–4, Bonus 4–6; Hov hov 2–4, Byt 1–3, Talmester 1–3, Overraskelse 1–3, Superopgave 1–2. Både antallet og feltplaceringerne trækkes tilfældigt ved nyt spil.
+- [x] Alle fem talområder har omtrent lige mange specialfelter, fri plads nær start/slut og ingen nabofelter. Samme regelsæt og pop-up-effekter fra v0.9.12.
+- [x] Ny tilfældig bane gemmes og indlæses eksakt i schema-1 `aeselklog-igangvaerende-v1`. Gammel gemning uden layout bevarer den originale faste bane fra v0.9.12 og ældre.
+- [x] Alle fem farveforklaringer er roser (originale SVG-ikoner) med blå, lyserød, gul, grøn og lilla farve.
+- [x] Æsellyd-knap får ekstra margin til kanten, og det beskårne æsel på terningeskærmen vises i sin helhed.
+- [x] PWA-cache opdateret til `aeselklog-talstien-v0913-random-action-layout`, projektets dokumenter og tests opdateret.
+- [x] 18 Node-tests og 12 Chromium-browserprøver. Alle AI-opkald er simuleret; ingen påstand om fysisk iOS test.
+- [ ] Test med installeret iPhone-PWA og familier, særligt variation i opgavenes balance, nye feltplaceringer og bevarelse af gemte spil.
+
+## Næste skridt
+
+1. Upload v0.9.13, prøv 3 nye spil og én gem/fortsæt på iPhone.
+2. Brugertest med et par familier før v1.0: forstår børn roserne, nye specialfelter og læringsopgaverne?
+3. Udbedr observerede fejl, især små skærme, iOS-opdateringer og talepauser. Ingen ændring af den godkendte forside uden ny reference.
+
+---
+
 # ÆselKlog – udviklingsplan v0.9.12 (15. oktober 2026)
 
 **Ved start:** GitHub `main` blev bekræftet som v0.9.11. Denne release er udviklet lokalt på de samme kilder. GitHub-upload og rigtig iPhone-test afventer.

@@ -1,3 +1,24 @@
+# 🫏 ÆselKlog – Talstien v0.9.13 (15. oktober 2026)
+
+## Nye varierende specialfelter og fem farvede roser
+
+- **Hvert nyt spil får sin egen tilfældige fordeling** af de ni typer specialfelter på banen 1–100, både med varieret antal og positioner. Intervaller: **Gulerod 3–5**, **Bro 2–4**, **Vandpyt 2–4**, **Bonus 4–6**, **Hov hov 2–4**, **Byt 1–3**, **Talmester 1–3**, **Overraskelse 1–3**, **Superopgave 1–2**. Det er muligt, at et antal gentages tilfældigt fra ét spil til det næste – det er ikke et fast antal.
+- Fordelingen er balanceret over de fem farvezoner (højst ét specialfelt til forskel pr. område). Start og mål holdes fri, også i spil med ét valgt talområde (fx 21–40). **Specialfelter ligger aldrig direkte ved siden af hinanden.** Ved 5 eller færre i et talområde forsøges større indbyrdes afstand.
+- **Gem & fortsæt** opbevarer den eksakte fordeling i den eksisterende schema-1-spilgemning. **Gemte spil fra v0.9.12 og ældre får den gamle faste fordeling**, så en opdatering ikke flytter specialfelter midt i en kamp. Ved start af et nyt spil laves den tilfældige bane.
+- I forklaringen under spillepladen vises **fem ens SVG-roser** – blå 1–20, lyserød 21–40, gul 41–60, grøn 61–80, lilla 81–100. SVG bruges for at bevare farverne på iPhone og Windows.
+- Det **fulde æselbillede på terningeskærmen** vises nu uden beskæring. Den runde **Æsellyd-knap** har ekstra afstand fra kanten, både på stor spilleplade og i normal visning.
+- Alle tidligere spilregler er bevaret: ingen action-kædereaktioner, frivillig matematik i LEG, CPU følger samme regler, maksimal ét ekstra Gulerod-kast per tur, vindermål, stemmevalg/ventetider, Cloudflare Worker, 35 % “Hov hov!”, lydcache, adaptiv læring, forældreoversigt og den godkendte illustration på forsiden.
+
+**Arkitektur:** `actions.js` har nu `COUNT_RANGES`, `generateLayout()` og `validateLayout()`. `savegame.js` gemmer det valgfri, validerede `specialFields`, uden at ændre lagernøgle eller schema. `app.js` genererer fordeling ved nyt spil, genskaber den ved Fortsæt, og bruger samme kort til både SVG og handlingsreglerne. `styles.css`/`index.html` indeholder roser og de to visuelle rettelser. PWA-cache opdateret til `aeselklog-talstien-v0913-random-action-layout`.
+
+**Kilde:** Nyeste GitHub `main` blev kontrolleret til v0.9.12, og nøglekildefiler i den anvendte komplette v0.9.12-ZIP blev sammenlignet med GitHub via Git-blob-SHA. ZIP-filen her er ikke automatisk publiceret.
+
+**Tests:** 18 Node-tests og 12 Chromium-browsertests, inklusive 700 syntetiske randomiserede baner, 3 skærmstørrelser, bonus-regel, lydknap-geometri, five roser, gem/fortsæt og ældre gemning. AI/telefonlyd er simuleret i browserprøverne. En rigtig iPhone-PWA, WebKit/VoiceOver og live ElevenLabs mangler stadig fysisk test efter upload. Se `TESTPLAN.md`.
+
+**Upload:** Pak hele ZIP-filen ud og upload **indholdet** til roden af `driftportal-platform/aeselklog-talstien`. Bevar eksisterende filer, og sørg for at alle opdaterede `actions.js`, `app.js`, `savegame.js`, `styles.css`, `index.html`, `sw.js` og tests kommer med. Genåbn iPhone-PWA efter GitHub Pages er opdateret.
+
+---
+
 # 🫏 ÆselKlog – Talstien v0.9.12 (15. oktober 2026)
 
 ## Nyt: levende specialfelter, uden ændringer i spilreglerne

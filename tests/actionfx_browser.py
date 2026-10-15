@@ -24,7 +24,12 @@ def load(page):
        window.speechSynthesis.cancel=()=>{};
        window.confirm=()=>true;
     }''')
-    for file in FILES: page.add_script_tag(content=(ROOT/file).read_text('utf-8'))
+    for file in FILES:
+        # Denne regression tester den kendte bonus på felt 5 fra ældre spil;
+        # nye tilfældige placeringer testes særskilt i random_actions_browser.py.
+        if file=='app.js':
+            page.evaluate('window.AeselActions.generateLayout=()=>({...window.AeselActions.FIELDS})')
+        page.add_script_tag(content=(ROOT/file).read_text('utf-8'))
 
 def test(page,w,h,reduced=True):
     errors=[]
@@ -51,6 +56,9 @@ def test(page,w,h,reduced=True):
     assert '+2' in effect.inner_text()
     assert 'Bonus' in effect.inner_text()
     assert effect.get_attribute('aria-atomic')=='true'
+    # Mål pop-up straks, mens den er synlig: den skjules automatisk efter få sekunder.
+    box=effect.bounding_box()
+    assert box and box['width']>130 and box['x']>=0 and box['x']+box['width']<=w+2,(w,h,box)
     if reduced and (w,h)==(390,844):
         page.screenshot(path='/mnt/data/AeselKlog_v0912_Specialfelt_iPhone.png')
     if reduced and (w,h)==(844,390):
@@ -60,8 +68,6 @@ def test(page,w,h,reduced=True):
     if w<h:
         moving=page.locator('#boardPanelDock').bounding_box()
         assert moving and moving['width']>=w*.75, (w,h,'turpanel for smalt',moving)
-    box=effect.bounding_box()
-    assert box and box['width']>130 and box['x']>=0 and box['x']+box['width']<=w+2,(w,h,box)
     page.wait_for_function('()=>document.querySelector("#boardPanelDock").dataset.phase==="result"',timeout=18000)
     assert page.locator('#actionToast').is_hidden()
     assert page.locator('#boardSvg').is_visible()

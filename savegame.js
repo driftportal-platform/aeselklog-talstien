@@ -14,6 +14,20 @@
  const clamp=(n,a,b)=>Math.min(b,Math.max(a,n));
  function boundedNumber(n,a,b,defaultValue=a){const k=Number(n);return Number.isFinite(k)?clamp(Math.floor(k),a,b):defaultValue}
  const txt=(t,n=150)=>String(t??'').slice(0,n);
+ const ACTION_TYPES=new Set(['bonus','hov','byt','mester','gulerod','vandpyt','overraskelse','bro','super']);
+ function normalizeSpecialFields(fields){
+  if(fields==null)return null; // Gammelt spil – det oprindelige faste A.FIELDS-kort.
+  if(!fields||typeof fields!=='object'||Array.isArray(fields))return null;
+  const entries=Object.entries(fields);
+  if(entries.length<1||entries.length>40)return null;
+  const normalized={};
+  for(const [key,type] of entries){
+   const n=Number(key);
+   if(!Number.isInteger(n)||n<1||n>100||String(n)!==key||!ACTION_TYPES.has(type))return null;
+   normalized[key]=type;
+  }
+  return normalized;
+ }
  function normalize(snapshot){
   if(!snapshot||typeof snapshot!=='object'||snapshot.schema!==SCHEMA)return null;
   const c=snapshot.config;
@@ -61,7 +75,8 @@
   const resultLines=(Array.isArray(snapshot.resultLines)?snapshot.resultLines:[]).slice(0,18).map(t=>txt(t,240));
   return {schema:SCHEMA,savedAt:boundedNumber(snapshot.savedAt,0,Date.now()+86400000,Date.now()),
    config,players,turn,phase,pending,challenge:phase==='question'?challenge:null,resultLines,
-   extraRollUsed:Boolean(snapshot.extraRollUsed),timeLeftMs:boundedNumber(snapshot.timeLeftMs,0,60000,0)};
+   extraRollUsed:Boolean(snapshot.extraRollUsed),timeLeftMs:boundedNumber(snapshot.timeLeftMs,0,60000,0),
+   specialFields:normalizeSpecialFields(snapshot.specialFields)};
  }
  function normalizePending(p,start,goal){
   if(!p||typeof p!=='object')return null;
@@ -91,5 +106,5 @@
   }catch(_){return false}
  }
  function clear(storage){try{storage?.removeItem(KEY);return true}catch(_){return false}}
- return {KEY,SCHEMA,PHASES,normalize,read,write,clear};
+ return {KEY,SCHEMA,PHASES,normalize,normalizeSpecialFields,read,write,clear};
 });

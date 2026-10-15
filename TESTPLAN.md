@@ -1,3 +1,29 @@
+# ÆselKlog v0.9.13 – tests af tilfældige specialfelter, roser og æselknapper
+
+## Automatiske tests gennemført i lokalt udviklingsmiljø
+
+- [x] `node --check` på alle appens JavaScript-filer og Node-testfiler.
+- [x] **18 Node-tests** inklusive `tests/random_actions.test.js`: 700 deterministiske baner, varieret antal, alle ni intervalkrav, ingen nabo-felter, fri zoneind-/udgang, højst ét felt i forskel per farvezone, 100 SVG-tal og korrekt gemning.
+- [x] **12 Chromium-browsertests**, herunder den nye `tests/random_actions_browser.py`: ny bane for LEG, præcis gem/fortsæt efter lukning, action-reglen for tilfældig Bonus (+2), historisk v0.9.12-spil uden `specialFields`, 390×844, 844×390 og 1280×800. Fem forskellige farvede SVG-roser, uden afklippet dice-billede, og Æsellyd-knap inden for viewport.
+- [x] `tests/actionfx_browser.py` regresserer action-pop-up på den historiske bonusposition via test-only legacy-opsætning. Testen måler mens pop-up'en er synlig og kontrollerer reduceret bevægelse.
+- [x] Eksisterende test for frivillig LEG, CPU, individuel læring, forældreoversigt, tale, lokal lydcache, gemning, PWA-version og offline-asset-liste.
+- [ ] **Rigtig installeret iPhone-PWA, live ElevenLabs, WebKit/VoiceOver og offline-genstart**: ikke testet her; kræver fysisk enhed. Browserprøverne benytter simuleret lyd og lagring.
+
+## Manuel iPhone-/familietest efter upload
+
+- [ ] Opdatér PWA'en, og kontrollér PRØVEVERSION **0.9.13** på Spil-siden.
+- [ ] Start to eller tre **nye** spil og se, at specialfelterne varierer i både antal og placering. Typisk varierer Gulerod mellem 3–5, Bro 2–4, Vandpyt 2–4, Bonus 4–6. Der skal ikke være felter lige ved siden af hinanden.
+- [ ] Start nyt spil i fx **21–40** og kontrollér at de første tre og sidste to felter i området ikke er specialfelter.
+- [ ] Gem et nyt spil, luk den installerede PWA helt, åbn igen og tryk Fortsæt spil. **Den samme fordeling** og spillerposition skal være bevaret.
+- [ ] Fortsæt en gemning fra **v0.9.12** og kontrollér at de eksisterende felter ikke flytter sig.
+- [ ] Kig på de fem roser i forklaringen: én rose i hver af blå, lyserød, gul, grøn og lilla.
+- [ ] Vis terningen og kontrollér at **hele ÆselKlog-æslet** øverst til højre er synligt, uden at billedet skæres af.
+- [ ] Se den runde Æsellyd-knap i både stor spilleplade og normal visning, stående/liggende, og afspil lyden.
+- [ ] Prøv Gulerod (højst ét ekstra kast), Bro, Vandpyt, Bonus, Superopgave og Overraskelse; ingen action-kædereaktioner.
+- [ ] Test CPU-æslet, voksne med tidtagning, reduceret bevægelse, de forskellige AI-stemmer, lydcache og forældreoversigt. Ingen nye ElevenLabs-API-nøgler må kræves.
+
+---
+
 # ÆselKlog v0.9.12 – levende specialfelter, testplan
 
 ## Automatiske tests

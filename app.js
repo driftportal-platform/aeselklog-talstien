@@ -1,4 +1,4 @@
-/* ÆselKlog Talstien v0.9.12: lokal, valgfri forældreoversigt. */
+/* ÆselKlog Talstien v0.9.13: nye variable specialfelter pr. spil. */
 (()=>{'use strict';
 const $=id=>document.getElementById(id);
 const qs=sel=>document.querySelector(sel);
@@ -19,7 +19,7 @@ const VC=window.AeselVoiceCache;
 if(!G||!P||!LP||!PR||!CV||!VC||!N){document.body.textContent='ÆselKlog kan ikke starte: et af spillets moduler mangler.';return;}
 const A=window.AeselActions;
 if(!A||!A.validate()){document.body.textContent='ÆselKlog kan ikke starte: actions.js mangler eller har ugyldige felter.';return;}
-const SPECIAL=A.FIELDS;
+let SPECIAL=A.FIELDS; // Den gamle bane bruges kun til eksisterende gemninger uden eget layout.
 const SPECIAL_ICON=Object.fromEntries(Object.entries(A.DETAILS).map(([key,d])=>[key,d.icon]));
 const AF=window.AeselActionFX; // Præsentation alene; ingen ekstra AI-kald eller turændringer.
 const LEARN_DIE=['1 2 3','L / U','10 + 1','👑','> <','+ −'];
@@ -342,7 +342,7 @@ function timeLeftForSave(){
  return Math.max(0,taskDeadline-(taskPausedAt??Date.now()));
 }
 function snapshot(){
- return {config,players,turn,phase,pending,challenge,resultLines,extraRollUsed,timeLeftMs:timeLeftForSave()};
+ return {config,players,turn,phase,pending,challenge,resultLines,extraRollUsed,timeLeftMs:timeLeftForSave(),specialFields:SPECIAL};
 }
 function updateSaveBadge(message){
  const badge=$('saveStatus');if(!badge)return;clearTimeout(saveStatusTimer);badge.textContent=message;
@@ -374,7 +374,7 @@ async function resumeSavedGame(){
  if(busy)return;
  const state=G.read(safeStorage());if(!state){renderResumeCard();window.alert('Det gemte spil kunne ikke læses.');return;}
  resetAsync();restoringGame=true;
- config=state.config;players=state.players.map(p=>({...p,learning:P.cleanProgress(p.learning)}));
+ config=state.config;SPECIAL=state.specialFields||A.FIELDS;players=state.players.map(p=>({...p,learning:P.cleanProgress(p.learning)}));
  turn=state.turn;phase=state.phase;pending=state.pending;challenge=state.challenge;
  resultLines=state.resultLines;winner=null;extraRollUsed=state.extraRollUsed;
  helpUsed=false;resumeAdultMs=state.phase==='question'&&players[turn]?.kind==='adult'?state.timeLeftMs:null;
@@ -538,6 +538,7 @@ $('startButton').addEventListener('click',()=>{
  const raw=$('range').value,all=raw==='1-100';
  const start=all?0:Number(raw.split('-')[0])-1,goal=all?100:Number(raw.split('-')[1]);
  config={raw,all,start,goal,learning:radio('learning'),boardMode:radio('boardMode'),moveDice:radio('moveDice'),learnDice:radio('learnDice'),pace:['normal','rolig','ekstra'].includes($('gamePace').value)?$('gamePace').value:'rolig',tables:$('tablesChoice').value||'auto',adaptive:$('adaptiveCheck').checked,rememberLearning:$('rememberLearning').checked};
+ SPECIAL=A.generateLayout();
  const named=setupPlayers.map((p,i)=>(p.name||'').trim()||`Spiller ${i+1}`);
  const duplicateNames=new Set(named.map(name=>LP.normName(name)).filter(name=>name&&named.filter(n=>LP.normName(n)===name).length>1));
  players=setupPlayers.map((p,i)=>{

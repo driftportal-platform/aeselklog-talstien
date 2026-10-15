@@ -582,3 +582,22 @@ body.home-active #resumeCard button:active{filter:brightness(.94)}
   width:auto;max-height:min(48dvh,410px)
  }
 }
+
+/* v0.9.13: en ensartet rose for hvert talområde i samme farve som banen.
+   SVG frem for emoji, da emoji altid får standardfarve på nogle iPhones. */
+.legend{align-items:center;gap:clamp(8px,1.5vw,20px)}
+.legend-range{display:inline-flex;align-items:center;gap:4px;white-space:nowrap;color:#456279}
+.legend-rose{width:19px;height:23px;display:block;flex:none}
+.rose-blue .legend-rose{color:#338fe2}
+.rose-pink .legend-rose{color:#e994aa}
+.rose-yellow .legend-rose{color:#f0c144}
+.rose-green .legend-rose{color:#4aa768}
+.rose-purple .legend-rose{color:#aa69d9}
+/* Før var æslets billede beskåret med clip-path:inset(...32%). */
+.dice-playing-card .dice-mascot{width:clamp(65px,10vw,104px);height:auto;top:clamp(60px,8vh,78px);right:clamp(12px,2vw,22px);overflow:visible}
+.dice-playing-card .dice-mascot img{display:block;width:100%;height:auto;object-fit:contain;object-position:center;clip-path:none;border-radius:14px}
+@media(max-width:680px){.dice-playing-card .dice-mascot{top:57px;width:clamp(56px,18vw,79px)}}
+@media(max-width:700px) and (orientation:landscape){.dice-playing-card .dice-mascot{width:54px;height:auto;top:14px;right:17px}}
+.boardbox .board-bray{right:clamp(18px,2.2vw,32px);bottom:18px}
+.boardbox.expanded .board-bray{right:calc(env(safe-area-inset-right,0px) + clamp(20px,2.4vw,38px));top:calc(env(safe-area-inset-top,0px) + 78px)}
+@media(max-width:680px){.boardbox .board-bray{right:19px;bottom:18px}.boardbox.expanded .board-bray{right:calc(env(safe-area-inset-right,0px) + 20px);top:calc(env(safe-area-inset-top,0px) + 68px)}}
