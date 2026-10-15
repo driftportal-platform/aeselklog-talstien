@@ -1,3 +1,17 @@
+# V0.9.2 – test af ny forside
+
+- [x] Første besøg åbner **Forside** med logo og Spil/Indstillinger/Topscore.
+- [x] Spil viser kun navn, alder, CPU og start, ikke alle indstillingsfelter.
+- [x] Indstillinger vælger talområde, læringstilstand, tempo, tabel, fysik/digitalt, voksen-niveau samt AI-/CPU-stemmer.
+- [x] Indstillinger overføres korrekt til start og opbevares lokalt.
+- [x] Gem & afslut går hjem, fortsæt-knappen genoptager gemt spil; Topscore-dialog åbner/lukker.
+- [x] Der er testes browser-flow ved 390×844, 844×390 og 1280×800.
+- [x] Tidligere action-, voksen-, gemme- og CPU-spiltests bestået.
+- [ ] Test med rigtig iPhone og tilsluttet ElevenLabs, inklusive PWA-cache.
+- [ ] Test sammen med mindre børn: er de tre forsideknapper lette at forstå?
+
+---
+
 # 🧪 ÆselKlog – praktisk test på iPhone og computer
 
 **Test denne version:** v0.9 (grundtest fra 0.8-E + nye testpunkter)  

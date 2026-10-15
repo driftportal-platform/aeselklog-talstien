@@ -1,3 +1,45 @@
+# 🫏 ÆselKlog Talstien – v0.9.2 (ny forside)
+
+**App:** https://driftportal-platform.github.io/aeselklog-talstien/  
+**GitHub:** https://github.com/driftportal-platform/aeselklog-talstien  
+**Status:** v0.9.2 er bygget og testet lokalt på baggrund af GitHub-main v0.9.1. Skal uploades manuelt, før ændringen er live.
+
+## Nyt i v0.9.2
+
+- **Rigtig forside** med ÆselKlog-logo/bondegårdsmotiv samt tre store, tydelige knapper: **🎲 Spil, ⚙️ Indstillinger og 🏆 Topscore**.
+- **Spil** åbner kun enkel tilmelding: 1–4 spillere, kaldenavn, alder (3–17 eller voksen) og tilvalg af CPU-æslet. Start-knap under spillerne.
+- **Indstillinger** samler talområde (1–100 eller et niveau), LEG/LÆR/UDFORDRING/TABELTRÆNING, tabelvalg, adaptiv læring, fysisk/digital bane, terninger, tempo, voksnes sværhedsgrad og alle stemmeindstillinger (inkl. Mia og CPU-æsel).
+- Spilindstillinger gemmes automatisk på **den pågældende enhed**. Voksnes sværhedsgrad vælges nu i Indstillinger og gælder de voksne i næste spil, mens alder vælges på Spil-siden.
+- **Topscore** kan åbnes fra forsiden. **Fortsæt spillet** ses også på forsiden, hvis der ligger et gemt spil.
+- **Gem & afslut**, **Nyt spil** og **Spil igen** vender tilbage til forsiden, uden at ændre de eksisterende spilregler.
+- Mobil, tablet og computer har tilpassede menulayouts. Forsiden bruger billedgrafik til udsmykning og rigtige HTML-knapper til betjening.
+- Ingen ændring i Cloudflare/ElevenLabs. API-nøgler findes kun på serversiden.
+
+## Test og forbehold
+
+- ✅ Alle eksisterende 8 Node-regressionstests bestået: bane, actionfelter, voksen/børneopgaver, gangetabeller, CPU, gemning, adaptiv læring og topscore.
+- ✅ Browser-smoketests med simuleret oplæsning bestået (mobil liggende, mobil stående, computer).
+- ✅ CPU-tale og save/resume-browserregressioner bestået.
+- ✅ Ny navigationstest: Forside → Indstillinger → Spil → Gem → Forside → Fortsæt → Topscore.
+- ⚠️ Live ElevenLabs-lyd og rigtig iPhone-installation er ikke testet i denne version; eksisterende stemmefunktion er bevaret.
+- ⚠️ Test af brugervenlighed hos 3–7-årige og voksne er næste skridt.
+
+## Sådan opdateres GitHub Pages
+
+1. Pak den medfølgende ZIP ud.
+2. Upload **alle rod-filerne** til det eksisterende GitHub-repository (erstat samme filnavne), herunder **de tre nye WebP-billeder** (`home-hero-wide.webp`, `home-hero-mobile.webp`, `home-mascot.webp`).
+3. Bevar eksisterende mapper og upload også README, udviklingsplan og tests, hvis du vil beholde testhistorik.
+4. Commit ændringerne. Service worker får ny cacheversion og henter de nye filer.
+5. Genindlæs appen (evt. luk og genåbn hjemmeskærms-appen) og kontrollér versionsmærket `PRØVEVERSION 0.9.2`.
+
+## For tidligere funktioner
+
+v0.9.1 har fortsat: ElevenLabs Mia og CPU-stemmevalg, ægte æsellyd, synlig CPU-terning, 100 felter, 25 actions, gangetabeller, tempo, topscore og gem/fortsæt. Se `UDVIKLINGSPLAN.md` og `AGENTS.md`.
+
+---
+
+## Historik: v0.9.1
+
 # 🫏 ÆselKlog Talstien – v0.9.1 (CPU-æslet taler selv)
 
 **App:** https://driftportal-platform.github.io/aeselklog-talstien/  

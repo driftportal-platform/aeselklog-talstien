@@ -1,4 +1,4 @@
-/* ÆselKlog Talstien v0.9.1: sjov CPU-stemme oven på v0.9 gem/fortsæt og adaptiv læring. */
+/* ÆselKlog Talstien v0.9.2: sjov CPU-stemme oven på v0.9 gem/fortsæt og adaptiv læring. */
 (()=>{'use strict';
 const $=id=>document.getElementById(id);
 const qs=sel=>document.querySelector(sel);
@@ -317,7 +317,7 @@ function saveAndLeave(){
  if(busy||!safePhase()||showDiceState){updateSaveBadge('🫏 Gem spillet efter den igangværende handling.');return;}
  if(!saveCheckpoint({notify:true})){window.alert('Spillet kunne ikke gemmes. Kontrollér, at privat browsing eller browserlager ikke blokerer.');return;}
  resetAsync();config=null;players=[];phase='setup';winner=null;pending=null;challenge=null;
- show('setup');renderResumeCard();
+ show('home');renderResumeCard();
 }
 async function resumeSavedGame(){
  if(busy)return;
@@ -357,7 +357,7 @@ function refreshTopscore(){
 }
 function openTopscore(){refreshTopscore();const dlg=$('topscoreDialog');if(typeof dlg.showModal==='function'&&!dlg.open)dlg.showModal();else dlg.hidden=false}
 function closeTopscore(){const dlg=$('topscoreDialog');if(typeof dlg.close==='function'&&dlg.open)dlg.close();else dlg.hidden=true}
-$('openTopscoreSetup').addEventListener('click',openTopscore);
+$('openTopscoreSetup')?.addEventListener('click',openTopscore);
 $('openTopscoreGame').addEventListener('click',openTopscore);
 $('closeTopscore').addEventListener('click',closeTopscore);
 $('clearTopscore').addEventListener('click',()=>{
@@ -371,29 +371,67 @@ function renderSetupPlayers(){
   row.innerHTML=`<span class="player-dot" style="background:${COLORS[i]}"></span>
     <input type="text" aria-label="Navn for spiller ${i+1}" maxlength="24" value="${esc(p.name)}">
     <select aria-label="Alder for spiller ${i+1}" class="age-select">${Array.from({length:15},(_,j)=>`<option value="${j+3}" ${p.kind!=='adult'&&p.age===j+3?'selected':''}>${j+3} år</option>`).join('')}<option value="adult" ${p.kind==='adult'?'selected':''}>Voksen (18+)</option></select>
-    <select class="difficulty ${p.kind==='adult'?'show':''}" aria-label="Sværhedsgrad for spiller ${i+1}"><option value="let" ${p.difficulty==='let'?'selected':''}>Let · 60 sek.</option><option value="mellem" ${p.difficulty==='mellem'?'selected':''}>Mellem · 30 sek.</option><option value="svaer" ${p.difficulty==='svaer'?'selected':''}>Svær · 10 sek.</option></select>
     <button type="button" class="remove-player" aria-label="Fjern spiller ${i+1}" title="Fjern spiller">×</button>`;
   const name=row.querySelector('input');name.addEventListener('input',e=>p.name=e.target.value);
   const age=row.querySelector('.age-select');age.addEventListener('change',e=>{
    p.kind=e.target.value==='adult'?'adult':'child';if(p.kind==='child')p.age=Number(e.target.value);
-   row.querySelector('.difficulty').classList.toggle('show',p.kind==='adult');
   });
-  row.querySelector('.difficulty').addEventListener('change',e=>p.difficulty=e.target.value);
   row.querySelector('.remove-player').addEventListener('click',()=>{if(setupPlayers.length>1){setupPlayers.splice(i,1);renderSetupPlayers()}});
   holder.append(row);
  });
  $('addPlayer').disabled=setupPlayers.length>=4;
 }
 renderSetupPlayers();
+
+// Spilvalg sættes under Indstillinger og gemmes lokalt. Ingen spilleraldre lagres her.
+const SETTINGS_KEY='aeselklog-praferencer-v092';
+const GAME_SELECT_IDS=['range','tablesChoice','gamePace','adultDifficultySetting'];
+const GAME_CHECK_IDS=['adaptiveCheck'];
+const GAME_RADIOS=['learning','boardMode','moveDice','learnDice'];
+function saveGameOptions(){
+ const state={};
+ GAME_SELECT_IDS.forEach(id=>state[id]=$(id).value);
+ GAME_CHECK_IDS.forEach(id=>state[id]=$(id).checked);
+ GAME_RADIOS.forEach(name=>state[name]=radio(name));
+ try{localStorage.setItem(SETTINGS_KEY,JSON.stringify(state))}catch(_){/* privat browsing */}
+}
+function restoreGameOptions(){
+ let state;try{state=JSON.parse(localStorage.getItem(SETTINGS_KEY)||'null')}catch(_){return}
+ if(!state||typeof state!=='object')return;
+ GAME_SELECT_IDS.forEach(id=>{const v=state[id],el=$(id);if(typeof v==='string'&&Array.from(el.options).some(opt=>opt.value===v))el.value=v});
+ GAME_CHECK_IDS.forEach(id=>{if(typeof state[id]==='boolean')$(id).checked=state[id]});
+ GAME_RADIOS.forEach(name=>{let value=state[name];if(typeof value!=='string')return;const choice=Array.from(document.querySelectorAll(`input[name="${name}"]`)).find(el=>el.value===value);if(choice)choice.checked=true});
+}
+function updateSettingsSummary(){
+ const type={leg:'Kun leg',laer:'Lær',udfordring:'Udfordring',tabel:'Tabeltræning'}[radio('learning')]||'Lær';
+ const range=$('range').value==='1-100'?'1–100':$('range').value.replace('-', '–');
+ $('settingsSummary').querySelector('span').textContent=`⚙️ ${type} · Tal ${range} · ${$('gamePace').selectedOptions[0].textContent.split('–')[0].trim()} tempo`;
+}
+restoreGameOptions();
+$('gameOptions').addEventListener('change',saveGameOptions);
+$('homePlay').addEventListener('click',()=>show('setup'));
+$('homeSettings').addEventListener('click',()=>show('settings'));
+$('homeTopscore').addEventListener('click',openTopscore);
+$('settingsBack').addEventListener('click',()=>{saveGameOptions();show('home')});
+$('settingsDone').addEventListener('click',()=>{saveGameOptions();show('home')});
+$('setupBack').addEventListener('click',()=>show('home'));
+$('setupEditSettings').addEventListener('click',()=>show('settings'));
+
 $('addPlayer').addEventListener('click',()=>{if(setupPlayers.length<4){setupPlayers.push({name:`Spiller ${setupPlayers.length+1}`,age:7,kind:'child',difficulty:'mellem'});renderSetupPlayers()}});
-function show(view){['setup','game'].forEach(id=>$(id).classList.toggle('active',view===id));window.scrollTo({top:0,behavior:'instant'})}
+function show(view){
+ ['home','setup','settings','game'].forEach(id=>$(id).classList.toggle('active',view===id));
+ document.body.classList.toggle('home-active',view==='home');
+ if(view==='setup')updateSettingsSummary();
+ if(view==='home')renderResumeCard();
+ window.scrollTo({top:0,behavior:'instant'});
+}
 function resetAsync(){gameToken++;resumeAdultMs=null;helpUsed=false;const fanfare=$('victoryFanfare');if(fanfare)fanfare.remove();clearInterval(taskTimer);taskTimer=null;taskPausedAt=null;taskDeadline=0;busy=false;extraRollUsed=false;showDiceState=null;hideDice();hideActionFlash();if(boardExpanded)setBoardExpanded(false);stopCurrentVoice();bray?.pause();}
 $('startButton').addEventListener('click',()=>{
  resetAsync();G.clear(safeStorage());renderResumeCard();
  const raw=$('range').value,all=raw==='1-100';
  const start=all?0:Number(raw.split('-')[0])-1,goal=all?100:Number(raw.split('-')[1]);
  config={raw,all,start,goal,learning:radio('learning'),boardMode:radio('boardMode'),moveDice:radio('moveDice'),learnDice:radio('learnDice'),pace:['normal','rolig','ekstra'].includes($('gamePace').value)?$('gamePace').value:'rolig',tables:$('tablesChoice').value||'auto',adaptive:$('adaptiveCheck').checked};
- players=setupPlayers.map((p,i)=>({...p,name:(p.name||'').trim()||`Spiller ${i+1}`,color:COLORS[i],id:`player${i+1}`,isCPU:false,pos:start,skipNextTurn:false,stats:{correct:0,attempted:0},learning:P.fresh()}));
+ players=setupPlayers.map((p,i)=>({...p,difficulty:p.kind==='adult'?$('adultDifficultySetting').value:p.difficulty,name:(p.name||'').trim()||`Spiller ${i+1}`,color:COLORS[i],id:`player${i+1}`,isCPU:false,pos:start,skipNextTurn:false,stats:{correct:0,attempted:0},learning:P.fresh()}));
  if($('cpuCheck').checked)players.push({name:'Æslet',kind:'cpu',age:8,color:'#c18b46',id:'cpu',isCPU:true,pos:start,skipNextTurn:false,stats:{correct:0,attempted:0},learning:P.fresh()});
  if($('cpuCheck').checked&&sound.mode==='ai')void loadAIVoices();
  turn=0;phase='move';challenge=null;pending=null;resultLines=[];winner=null;extraRollUsed=false;
@@ -401,7 +439,7 @@ $('startButton').addEventListener('click',()=>{
  $('boardModeLabel').textContent=config.boardMode==='physical'?'Fysisk bræt + app-overblik':'Digital spilleplade';
  show('game');buildBoard();render();setBoardExpanded(true);say(`Hov hov! Velkommen til Talstien. ${players[turn].name} starter!`);
 });
-$('newGame').addEventListener('click',()=>{if(window.confirm('Vil I afslutte spillet og starte forfra? Det gemte spil slettes.')){resetAsync();G.clear(safeStorage());config=null;players=[];phase='setup';show('setup');renderResumeCard()}});
+$('newGame').addEventListener('click',()=>{if(window.confirm('Vil I afslutte spillet og starte forfra? Det gemte spil slettes.')){resetAsync();G.clear(safeStorage());config=null;players=[];phase='setup';show('home');renderResumeCard()}});
 $('editPos').addEventListener('click',()=>{
  if(busy||!config||phase==='win'||showDiceState)return;
  const p=players[turn];const requested=window.prompt(`Vælg felt for ${p.name}: ${config.start}–${config.goal}`,p.pos);
@@ -959,7 +997,7 @@ $('turnPanel').addEventListener('click',e=>{
  else if(a==='super-no'&&phase==='super-offer')chooseSuper(false);
  else if(a==='next')nextTurn();
  else if(a==='topscore')openTopscore();
- else if(a==='restart'){resetAsync();G.clear(safeStorage());config=null;players=[];phase='setup';show('setup');renderResumeCard()}
+ else if(a==='restart'){resetAsync();G.clear(safeStorage());config=null;players=[];phase='setup';show('home');renderResumeCard()}
 });
 if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
 })();

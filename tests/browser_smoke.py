@@ -22,11 +22,14 @@ def load(page):
 
 
 def config_game(page, learning='udfordring', cpu=False, range_name='21-40', adult=False):
+    page.locator('#homeSettings').click()
     page.locator('#range').select_option(range_name)
     page.locator(f'input[name="learning"][value="{learning}"]').check()
     page.locator('input[name="moveDice"][value="physical"]').check()
     page.locator('input[name="learnDice"][value="physical"]').check()
     page.locator('#gamePace').select_option('normal')
+    page.locator('#settingsDone').click()
+    page.locator('#homePlay').click()
     if cpu:
         page.locator('.remove-player').last.click()
         page.locator('#cpuCheck').check()
@@ -45,7 +48,7 @@ with sync_playwright() as p:
         errors=[]
         page.on('pageerror',lambda e:errors.append(str(e)))
         load(page)
-        assert page.locator('#startButton').is_visible()
+        assert page.locator('#homePlay').is_visible()
         config_game(page)
         assert page.locator('#boardBox').evaluate('(el)=>el.classList.contains("expanded")')
         assert page.locator('#boardSvg').is_visible()

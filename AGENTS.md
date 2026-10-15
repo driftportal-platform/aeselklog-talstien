@@ -1,3 +1,13 @@
+# ÆselKlog – udviklernote v0.9.2
+
+**Ny navigation:** `#home` (forside), `#settings` (alle indstillinger), `#setup` (kun spillernavne, aldersvalg, CPU), `#game` (spillepladen). `app.js` har navigation via `show(view)`; gemt spil står på forsiden. `#voiceSettings` er flyttet til `#settings`, men alle tidligere stemme-ID'er og den sikre Cloudflare-Worker er beholdt.
+
+**Vigtigt:** Felter til `range`, `learning`, `tablesChoice`, `adaptiveCheck`, `boardMode`, `moveDice`, `learnDice`, `gamePace` og `adultDifficultySetting` er under `#gameOptions`. Deres værdier gemmes lokalt med `aeselklog-praferencer-v092`; kun alder/navn/CPU vælges på `#setup`. Adressen og ElevenLabs-secrets må ikke offentliggøres ud over den allerede offentlige Worker-URL.
+
+**Test før ændringer:** `python tests/test_home_v092.py`, `python tests/browser_smoke.py`, `python tests/cpu_voice_browser.py`, `python tests/persistence_browser.py` og alle `node tests/*.test.js`. De tre WebP-illustrationer skal med i GitHub-upload og serviceworker-cache.
+
+---
+
 # ÆselKlog – faste instruktioner for udvikling
 
 **Start altid med aktuelle GitHub `main`, og læs `UDVIKLINGSPLAN.md`, `README.md` og `TESTPLAN.md`.** Brug ikke gamle ZIP-filer uden sammenligning.

@@ -1,3 +1,35 @@
+# ÆselKlog – udviklingsplan og fælles status
+
+## 15. oktober 2026 – v0.9.2: Forside og enkel spilstart
+
+**Status:** Kode og pakke lavet, lokale regressionstests gennemført. **Afventer upload til GitHub Pages og test på rigtig iPhone.**
+
+- [x] Ny original ÆselKlog-forside med hyggelig bondegårdsillustration og rigtige knapper.
+- [x] Forsideknapper: **Spil**, **Indstillinger**, **Topscore**.
+- [x] **Spil** er nu kun spillernavne, aldre, CPU-tilvalg og Start. Voksnes sværhedsgrad vælges globalt under Indstillinger.
+- [x] **Indstillinger** rummer alle valgmuligheder (talområde, læringsmode, tabeller, adaptiv, bræt, terninger, tempo, voksenniveau og stemmer).
+- [x] Spilindstillinger gemmes lokalt og bruges automatisk næste gang.
+- [x] Tidligere gemte spil vises på forsiden; Gem & afslut, Nyt spil og Spil igen vender til forsiden.
+- [x] WebP-billeder til desktop og mobil; tilpasset landskab/portræt.
+- [x] Node-teste, browser-smoke, CPU-stemme-flow og save/resume bestået uden virkelige ElevenLabs-kald.
+- [ ] Kontroller navigation, farver, knapper og stemmer i fysisk iPhone-app.
+- [ ] Familietest: kan en 3–6-årig starte spillet uden hjælp, og kan voksne finde alle indstillinger?
+- [ ] Vurdér om en ekstra **Regler**-knap skal på forsiden senere.
+- [ ] Tjek navne, billeder, illustrationer og rettigheder før kommerciel lancering.
+
+**Næste kandidat:** v0.9.3 med brugerfeedback fra familiens prøvespil, evt. bedre individuel profil og overskueligere rundemenu.
+
+### Opgaveregel til næste udvikler
+
+1. Hent altid nyeste GitHub-main, læs README/AGENTS/UDVIKLINGSPLAN.
+2. Bevar `#home`, `#settings`, `#setup`, `#game` og klikbare knapper.
+3. Indstillinger gemmes i `aeselklog-praferencer-v092`; stemme- og gemt-spil-data har fortsat deres egne lokale nøgler.
+4. Ingen API-nøgler på GitHub. ElevenLabs-Worker og CPU-kode er uændret i denne release.
+5. Test valg af voksen: globalt voksenniveau under Indstillinger, alder på Spil-siden.
+6. Efter udvikling: versionsnummer, cache, docs, tests og ærlige statusbeskeder skal opdateres.
+
+---
+
 # 🫏 ÆselKlog – udviklingsplan og projektstatus
 
 ## Opdatering 14. oktober 2026 – v0.9.1 (CPU-stemme)

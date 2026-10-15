@@ -39,6 +39,7 @@ with sync_playwright() as p:
     }''',encoded)
     for name in ['engine.js','board.js','actions.js','leaderboard.js','adaptive.js','savegame.js','cpuvoice.js','app.js']:
         page.add_script_tag(content=(ROOT/name).read_text())
+    page.locator('#homeSettings').click()
     page.locator('#voiceSettings summary').click()
     page.wait_for_function("()=>document.querySelector('#cpuVoiceChoice').options.length>=3",timeout=8000)
     assert page.locator('#cpuVoiceChoice').input_value()=='auto'
@@ -52,12 +53,14 @@ with sync_playwright() as p:
     page.locator('#cpuVoiceChoice').select_option('auto')
     page.evaluate("window.__ttsLog=[]")
     # One human and the donkey CPU on the 21–40 segment.
-    page.locator('.remove-player').last.click()
     page.locator('#range').select_option('21-40')
     page.locator('input[name="learning"][value="tabel"]').check()
     page.locator('input[name="moveDice"][value="physical"]').check()
     page.locator('input[name="learnDice"][value="physical"]').check()
     page.locator('#gamePace').select_option('normal')
+    page.locator('#settingsDone').click()
+    page.locator('#homePlay').click()
+    page.locator('.remove-player').last.click()
     page.locator('#cpuCheck').check()
     page.locator('#startButton').click()
     page.locator('#turnPanel button[data-act="move-1"]').click()
