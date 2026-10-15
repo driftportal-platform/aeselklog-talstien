@@ -1,3 +1,13 @@
+# v0.9.4 – Rettet forside efter godkendte skærmbilleder
+
+- Forsiden bruger ét samlet motiv fra godkendt design (ingen halve sidebilleder).
+- Tre klikbare menuknapper: Spil, Indstillinger, Topscore.
+- Spilmenu: kun spillere, alder og CPU, med øvrige valg under Indstillinger.
+- Ingen ændringer i spilmotor, ElevenLabs eller gem/fortsæt.
+- Kontrolleret på kode- og filniveau; rigtig iPhone-visning skal afprøves efter upload.
+
+---
+
 ## v0.9.3 – forside og spilmenu (15. oktober 2026)
 - Ét samlet æselmotiv i toppen uden gentagne sideudsnit.
 - Kortere spilmenu med kun nødvendige valg og uden ekstra forklaringer.

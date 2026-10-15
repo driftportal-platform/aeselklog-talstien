@@ -1,5 +1,5 @@
-const CACHE='aeselklog-talstien-v093-home';
-const CORE=['./','./index.html','./app.js','./engine.js','./board.js','./actions.js','./leaderboard.js','./adaptive.js','./savegame.js','./cpuvoice.js','./manifest.webmanifest','./icon.svg','./aeselklog-card.webp','./donkey-bray.wav','./home-hero-wide.webp','./home-hero-mobile.webp','./home-mascot.webp'];
+const CACHE='aeselklog-talstien-v094-one-illustration';
+const CORE=['./','./index.html','./app.js','./engine.js','./board.js','./actions.js','./leaderboard.js','./adaptive.js','./savegame.js','./cpuvoice.js','./manifest.webmanifest','./icon.svg','./aeselklog-card.webp','./donkey-bray.wav','./home-illustration.webp'];
 self.addEventListener('install',ev=>ev.waitUntil(caches.open(CACHE).then(c=>c.addAll(CORE)).then(()=>self.skipWaiting())));
 self.addEventListener('activate',ev=>ev.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))).then(()=>self.clients.claim())));
 self.addEventListener('fetch',ev=>{if(ev.request.method!=='GET'||new URL(ev.request.url).origin!==location.origin)return;
