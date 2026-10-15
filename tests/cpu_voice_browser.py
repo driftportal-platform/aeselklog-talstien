@@ -38,7 +38,7 @@ with sync_playwright() as p:
         const items={};
         Object.defineProperty(window,'localStorage',{configurable:true,value:{getItem:k=>items[k]??null,setItem:(k,v)=>items[k]=String(v),removeItem:k=>delete items[k]}});
     }''',encoded)
-    for name in ['engine.js','board.js','actions.js','leaderboard.js','adaptive.js','savegame.js','cpuvoice.js','voicecache.js','app.js']:
+    for name in ['engine.js','board.js','actions.js','leaderboard.js','adaptive.js','profiles.js','savegame.js','cpuvoice.js','voicecache.js','app.js']:
         page.add_script_tag(content=(ROOT/name).read_text())
     page.locator('#homeSettings').click()
     page.locator('#voiceSettings summary').click()

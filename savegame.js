@@ -1,4 +1,4 @@
-/* ÆselKlog v0.9: lokalt kontrolpunkt. Ingen server og ingen hemmelige nøgler. */
+/* ÆselKlog v0.9.10: bagudkompatible kontrolpunkter med områdebaseret læring. */
 (function(root,factory){
  const api=factory();
  if(typeof module!=='undefined'&&module.exports)module.exports=api;
@@ -23,7 +23,7 @@
   const config={raw:c.raw,all,start,goal,learning:LEARNING.has(c.learning)?c.learning:'leg',
    boardMode:c.boardMode==='physical'?'physical':'digital',moveDice:DICE.has(c.moveDice)?c.moveDice:'digital',
    learnDice:DICE.has(c.learnDice)?c.learnDice:'digital',pace:PACE.has(c.pace)?c.pace:'rolig',
-   tables:TABLES.has(String(c.tables))?String(c.tables):'auto',adaptive:c.adaptive!==false};
+   tables:TABLES.has(String(c.tables))?String(c.tables):'auto',adaptive:c.adaptive!==false,rememberLearning:c.rememberLearning!==false};
   if(!Array.isArray(snapshot.players)||snapshot.players.length<1||snapshot.players.length>5)return null;
   let cpuCount=0;
   const players=[];
@@ -36,14 +36,19 @@
    if(!/^[a-zA-Z0-9_-]{1,24}$/.test(id))return null;
    const stats=p.stats||{};const attempted=boundedNumber(stats.attempted,0,200000,0);
    const learning=p.learning||{};
+   const legacyStep=boundedNumber(learning.step,-2,2,0);
+   const sanitizeArea=v=>({step:boundedNumber(v?.step,-2,2,legacyStep),
+    rightStreak:boundedNumber(v?.rightStreak,0,2,0),wrongStreak:boundedNumber(v?.wrongStreak,0,1,0),
+    attempted:boundedNumber(v?.attempted,0,200000,0),correct:boundedNumber(v?.correct,0,200000,0)});
+   const areas=Object.fromEntries(['numbers','plus','minus','tables'].map(area=>[area,sanitizeArea(learning.areas?.[area])]));
    players.push({id,name,kind:isCPU?'cpu':adult?'adult':'child',isCPU,
     age:isCPU?8:adult?18:boundedNumber(p.age,3,17,7),
     difficulty:['let','mellem','svaer'].includes(p.difficulty)?p.difficulty:'mellem',
     color:/^#[0-9a-f]{6}$/i.test(String(p.color))?p.color:(isCPU?'#c18b46':['#d84464','#227fcb','#24a667','#9361c9'][i%4]),
     pos:boundedNumber(p.pos,start,goal,start),skipNextTurn:Boolean(p.skipNextTurn),
     stats:{attempted,correct:boundedNumber(stats.correct,0,attempted,0)},
-    learning:{step:boundedNumber(learning.step,-2,2,0),rightStreak:boundedNumber(learning.rightStreak,0,2,0),
-     wrongStreak:boundedNumber(learning.wrongStreak,0,1,0),attempted:boundedNumber(learning.attempted,0,200000,0),correct:boundedNumber(learning.correct,0,200000,0)} });
+    learning:{step:legacyStep,rightStreak:boundedNumber(learning.rightStreak,0,2,0),
+     wrongStreak:boundedNumber(learning.wrongStreak,0,1,0),attempted:boundedNumber(learning.attempted,0,200000,0),correct:boundedNumber(learning.correct,0,200000,0),areas} });
   }
   if(cpuCount>1||new Set(players.map(x=>x.id)).size!==players.length)return null;
   let phase=PHASES.has(snapshot.phase)?snapshot.phase:'move';
@@ -73,7 +78,9 @@
   if(options.length<2||new Set(options).size!==options.length||!options.includes(txt(q.correct,120)))return null;
   return {type,question:txt(q.question,360),correct:txt(q.correct,120),options,help:txt(q.help,300),
    tier:txt(q.tier,60),timeLimit:boundedNumber(q.timeLimit,0,60,0),tableLabel:txt(q.tableLabel,80),
-   adapted:Boolean(q.adapted),adaptiveStep:boundedNumber(q.adaptiveStep,-2,2,0)};
+   adapted:Boolean(q.adapted),adaptiveStep:boundedNumber(q.adaptiveStep,-2,2,0),
+   skillArea:['numbers','plus','minus','tables'].includes(q.skillArea)?q.skillArea:'',
+   exerciseId:/^[a-zA-Z0-9_-]{1,80}$/.test(String(q.exerciseId||''))?q.exerciseId:''};
  }
  function read(storage){
   try{const raw=storage?.getItem(KEY);return raw&&raw.length<40000?normalize(JSON.parse(raw)):null}catch(_){return null}

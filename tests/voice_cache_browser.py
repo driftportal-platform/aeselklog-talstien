@@ -7,7 +7,7 @@ from pathlib import Path
 from io import BytesIO
 from playwright.sync_api import sync_playwright
 ROOT=Path(__file__).resolve().parents[1]
-JS=['engine.js','board.js','actions.js','leaderboard.js','adaptive.js','savegame.js','cpuvoice.js','voicecache.js','app.js','home-ui.js']
+JS=['engine.js','board.js','actions.js','leaderboard.js','adaptive.js','profiles.js','savegame.js','cpuvoice.js','voicecache.js','app.js','home-ui.js']
 buf=BytesIO()
 with wave.open(buf,'wb') as wav:
     wav.setnchannels(1);wav.setsampwidth(2);wav.setframerate(16000);wav.writeframes(b'\0\0'*7000)
@@ -82,14 +82,16 @@ with sync_playwright() as p:
   page.set_content('<div>initial state</div>');page.evaluate(MOCK,WAV)
   inject(page)
   page.locator('#aiVoiceChoice').select_option('mia')
-  page.locator('#testVoice').click(force=True)
+  page.locator('#cpuVoiceChoice').select_option('mia')
+  page.locator('#cpuVoicePreview').click(force=True)
   page.wait_for_function('()=>window.__idbStore.size===1',timeout=7000)
   assert count(page)==1,'First Mia clip must call worker once'
-  page.locator('#testVoice').click(force=True)
+  page.locator('#cpuVoicePreview').click(force=True)
   page.wait_for_timeout(350)
   assert count(page)==1,'Repeat same clip and voice must reuse audio'
   page.locator('#aiVoiceChoice').select_option('mads123')
-  page.locator('#testVoice').click(force=True)
+  page.locator('#cpuVoiceChoice').select_option('mads123')
+  page.locator('#cpuVoicePreview').click(force=True)
   page.wait_for_function('()=>window.__idbStore.size===2',timeout=7000)
   assert count(page)==2,'Mads must not reuse Mia voice clip'
   page.locator('#cpuVoiceChoice').select_option('cpu123')
@@ -104,13 +106,14 @@ with sync_playwright() as p:
   page.evaluate('window.__online=false')
   inject(page)
   page.locator('#aiVoiceChoice').select_option('mads123')
-  page.locator('#testVoice').click(force=True)
+  page.locator('#cpuVoiceChoice').select_option('mads123')
+  page.locator('#cpuVoicePreview').click(force=True)
   page.wait_for_function('()=>document.querySelector("#aiVoiceStatus").textContent.includes("Gemte AI-lyde")',timeout=7000)
   assert count(page)==3,'Offline repeat must use stored AI audio, not worker'
   assert page.evaluate('window.__localSpeechCount')==0,'Offline cached audio must not downgrade to device voice'
   page.locator('#clearAudioCache').click(force=True)
   page.wait_for_function('()=>window.__idbStore.size===0',timeout=5000)
-  page.locator('#testVoice').click(force=True)
+  page.locator('#cpuVoicePreview').click(force=True)
   page.wait_for_function('()=>window.__localSpeechCount===1',timeout=5000)
   assert count(page)==3,'Offline after clearing must not make network request'
   # Quota/LRU-like FIFO eviction: keep total stored audio at most 15 MB.

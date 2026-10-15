@@ -1,3 +1,29 @@
+# ÆselKlog – udviklingsplan v0.9.10 (15. oktober 2026)
+
+**Status:** Kode implementeret og testet lokalt fra nyeste GitHub `main` v0.9.9. Komplet ZIP til manuel upload. Live GitHub Pages og fysisk iPhone-PWA er ikke opdateret/testet herfra.
+
+## v0.9.10 – individuel udvikling pr. regneart
+
+- [x] Fire forskellige niveauer pr. barn: `numbers`, `plus`, `minus`, `tables` (−2 til +2).
+- [x] 3 rigtige uden tip øger kun eget område, 2 forkerte sænker det. Tip tæller ikke til streak. Barnets alder er altid primær begrænsning.
+- [x] Opgavegenerator med nye `skillSteps` og `skillArea`; gammel `skillStep` fungerer stadig.
+- [x] Bagudkompatibel schema-1 migrering af gemte v0.9.9-spil; opgave og voksen-timer bevares.
+- [x] Valgfri **Husk barnets niveau mellem spil** (lokal profil pr. unikt kaldenavn); man kan slette profiler under Indstillinger. Ingen alder, cloud eller API-nøgler i profil-lageret.
+- [x] Fortsat LEG uden obligatorisk matematik, CPU-ægte stemmer, ElevenLabs-cache, specialfelter og godkendt forside.
+- [x] Node og Chromium regressioner, mobil-hitfelter, gem/fortsæt, CPU-stemmer, per-område UI og profil-lagring.
+- [x] Service Worker versioneret til `aeselklog-talstien-v0910-subject-learning`; `profiles.js` med i offline-pakke.
+- [ ] Upload til GitHub `main` og fysisk iPhone-test, inkl. lokal lagring på rigtig Safari-PWA.
+- [ ] Familietest, især om børnene oplever passende sværhedsgrad over flere spilleaftener.
+
+## Fremadrettet (ikke med i denne version)
+
+1. **v0.9.11 – Forældreoversigt** med udviklingen for alle fire områder på den enkelte enhed, samt slet/privatliv. Beslut evt. om en lokal valgfri graf er relevant.
+2. Bedre stemme-pauser, flere faste lydklip og billigere credits uden at ændre på det sikre Cloudflare-secret.
+3. Tilgængelighed og animationer på spillepladen, uden at SVG-felter forskydes.
+4. Afprøvning med børn og familier inden mulig v1.0.
+
+---
+
 # ÆselKlog – udviklingsplan, v0.9.9 (15. oktober 2026)
 
 **Grundlag:** Senest kontrollerede GitHub `main` = v0.9.6. Bygget videre på den lokalt leverede komplette v0.9.7, uden ændringer i det godkendte forsidebillede eller spilmotorens regler. Ikke uploadet til GitHub af assistenten.

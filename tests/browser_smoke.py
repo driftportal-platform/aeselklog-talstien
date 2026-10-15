@@ -18,7 +18,7 @@ def load(page):
       const data={};window.__localItems=data;
       Object.defineProperty(window,'localStorage',{configurable:true,value:{getItem:k=>data[k]??null,setItem:(k,v)=>data[k]=String(v),removeItem:k=>delete data[k]}});
     }''')
-    for name in ['engine.js','board.js','actions.js','leaderboard.js','adaptive.js','savegame.js','cpuvoice.js','voicecache.js','app.js']:
+    for name in ['engine.js','board.js','actions.js','leaderboard.js','adaptive.js','profiles.js','savegame.js','cpuvoice.js','voicecache.js','app.js']:
         page.add_script_tag(content=(ROOT/name).read_text(encoding='utf-8'))
 
 
@@ -83,8 +83,8 @@ with sync_playwright() as p:
     assert page.locator('#boardPanelDock').get_attribute('data-phase')=='move', 'CPU moved while hidden'
     page.evaluate('''() => {window.__fakeHidden=false;document.dispatchEvent(new Event('visibilitychange'));}''')
     # CPU may roll extra carrots etc.; wait until its result or human's next turn.
-    page.wait_for_function('() => document.querySelector("#turnTitle").textContent.includes("Æslet")',timeout=7000)
-    page.wait_for_function('() => {const t=document.querySelector("#boardPanelDock").dataset.phase;return t === "result" || t === "move" && !document.querySelector("#turnTitle").textContent.includes("Æslet")}',timeout=15000)
+    page.wait_for_function('() => document.querySelector("#turnTitle").textContent.includes("Æsel")',timeout=7000)
+    page.wait_for_function('() => {const t=document.querySelector("#boardPanelDock").dataset.phase;return t === "result" || t === "move" && !document.querySelector("#turnTitle").textContent.includes("Æsel")}',timeout=15000)
     assert not errors,errors
     page.screenshot(path=str(ROOT/'preview_cpu.png'))
     print('OK CPU dice round')

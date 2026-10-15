@@ -6,7 +6,7 @@ import re
 
 ROOT = Path(__file__).parents[1]
 JS = ['engine.js', 'board.js', 'actions.js', 'leaderboard.js',
-      'adaptive.js', 'savegame.js', 'cpuvoice.js', 'voicecache.js', 'app.js', 'home-ui.js']
+      'adaptive.js', 'profiles.js', 'savegame.js', 'cpuvoice.js', 'voicecache.js', 'app.js', 'home-ui.js']
 
 
 def inline_html():
@@ -98,8 +98,12 @@ with sync_playwright() as playwright:
                 if width < height or height > 550:
                     play=page.locator('#homePlay').bounding_box()
                     settings=page.locator('#homeSettings').bounding_box()
-                    assert box['y'] >= play['y']+play['height']*.85, (width,height,'too high on Spil')
-                    assert box['y']+box['height'] < settings['y']+settings['height']*.30, (width,height,'covers Settings label')
+                    # Since v0.9.9 the continue action is below all four menu buttons;
+                    # the backdrop artwork stays untouched and all hit regions are separate.
+                    for menu in ['homePlay','homeSettings','homeTopscore','homeAbout']:
+                        hit=page.locator('#'+menu).bounding_box()
+                        separated=box['y']>=hit['y']+hit['height'] or box['y']+box['height']<=hit['y']
+                        assert separated, (width,height,'Continue overlaps '+menu,box,hit)
                 else:
                     play=page.locator('#homePlay').bounding_box()
                     settings=page.locator('#homeSettings').bounding_box()

@@ -1,3 +1,33 @@
+# ÆselKlog v0.9.10 – testplan og status (15. oktober 2026)
+
+## Automatisk gennemført
+
+- [x] GitHub `main` v0.9.9 verificeret, lokal kilde matches på de vigtigste Git-hashes.
+- [x] `node --check` af alle JS-filer.
+- [x] `tests/subject_progress.test.js`: uafhængige fire niveauer, tip, migrering af v0.9.9-gemning, korrekt regneart på gamle spørgsmål.
+- [x] `tests/subject_engine.test.js`: talforståelse, plus, minus, tabeller, alder 3–6, voksnes tid.
+- [x] `tests/profiles.test.js`: lokal profil pr. unikt kaldenavn, sletning, navnebegrænsninger, sikker lagring, dubletbeskyttelse.
+- [x] Eksisterende Node-tests, inklusive `tests/pwa_cache.test.js`: ny JS med i PWA-forudlagring, kun ÆselKlog-caches ryddes.
+- [x] Chromium `tests/test_home_v092.py`, `tests/test_home_v096.py`: alle fire menu-hitfelter og Fortsæt/Slet adskilt i 6 skærmstørrelser med/uden gemt spil.
+- [x] Chromium `tests/browser_smoke.py`, `tests/persistence_browser.py`: børn, voksne, CPU, pauser, gem/fortsæt og eksisterende spilflow.
+- [x] Chromium `tests/cpu_voice_browser.py`, `tests/voice_fallback_browser.py`, `tests/voice_cache_browser.py`: simulerede AI-lyde, stemmespecifik cache, pause/fallback og rydning.
+- [x] Chromium `tests/subject_learning_browser.py`: tre rigtige plusopgaver, minus uændret, ny kamp genbruger samme kaldenavn, læringshukommelse kan ryddes og slås fra.
+
+**Grænse for tests:** Playwright kører Chromium med mockede stemmer og browserlager, ikke den installerede Safari-PWA. Ingen rigtige ElevenLabs-kald/credits. Service Worker er testet med unit-mocks, ikke på fysisk telefon.
+
+## Test fysisk på iPhone efter upload
+
+- [ ] Bekræft `PRØVEVERSION 0.9.10`, den godkendte forside, ikke-overlappende Fortsæt spil i stående/liggende, og alle fire menuer.
+- [ ] Start med kaldenavnet fx "Karla", slå talterninger fysisk, vælg UDFORDRING og få tre rigtige plusopgaver. Bekræft at skærmen viser plusområdet som et særskilt niveau.
+- [ ] Gem/afslut, genåbn PWA og fortsæt; position, tur og spørgsmål skal være bevaret. Start ny kamp med samme kaldenavn: plusniveauet skal fortsætte, minus på eget niveau.
+- [ ] Under Indstillinger: slå `Husk barnets niveau mellem spil` fra; genstart en kamp, som begynder fra neutralt niveau. Slå til igen hvis ønsket.
+- [ ] Test `Slet læringsprofiler`; det må ikke fjerne Topscore eller igangværende gemt spil. Prøv to børn med forskellige kaldenavne.
+- [ ] Prøv LEG helt uden tvungen matematik, CPU modstander, voksen-timeouts og æsellyd fra den runde knap på spillepladen.
+- [ ] Test rigtig AI-oplæsning med to forskellige godkendte stemmer og offline/online skifte, uden ekstra forsinkelse i turstyringen.
+- [ ] Kontrollér PWA-offlinegenstart og opdatering af Service Worker på iPhone, samt eventuelle pladsproblemer i skærmretningerne.
+
+---
+
 # ÆselKlog v0.9.9 – UI-oprydning og lydcache-regression
 
 ## Automatiske tests udført 15. oktober 2026

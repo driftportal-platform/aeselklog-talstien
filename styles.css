@@ -423,9 +423,9 @@ body.home-active .home-note{display:none!important}
 body.home-active #resumeCard.resume-compact:not([hidden]){
   position:absolute!important;
   z-index:5!important;
-  top:85.1%!important;left:14%!important;right:auto!important;bottom:auto!important;
-  transform:none!important;width:72%!important;height:4.2%!important;
-  min-height:0!important;max-height:none!important;max-width:none!important;
+  top:86.2%!important;left:14%!important;right:auto!important;bottom:auto!important;
+  transform:none!important;width:72%!important;height:5.8%!important;
+  min-height:44px!important;max-height:none!important;max-width:none!important;
   margin:0!important;padding:0!important;overflow:visible!important;
   border:0!important;border-radius:0!important;background:transparent!important;
   box-shadow:none!important;display:block!important;
@@ -461,7 +461,7 @@ body.home-active #resumeCard button:active{filter:brightness(.94)}
     position:relative!important;inset:auto!important;top:auto!important;left:auto!important;
     right:auto!important;bottom:auto!important;
     width:100%!important;height:100%!important;
-    grid-column:1/-1;grid-row:2;padding:0 4%!important;
+    grid-column:1/-1;grid-row:2;padding:0 4%!important;min-height:0!important;
   }
   body.home-active #resumeCard .resume-play,
   body.home-active #resumeCard .resume-delete{font-size:clamp(12px,3.5dvh,16px)}
@@ -484,3 +484,10 @@ body.home-active #resumeCard button:active{filter:brightness(.94)}
 .ai-audio-cache .row{gap:8px;margin-top:7px}
 .ai-audio-cache #audioCacheStatus{flex:1 1 170px;margin:0}
 .ai-audio-cache #clearAudioCache{flex:0 1 auto}
+
+/* v0.9.10 – diskret lokal læringshukommelse i Indstillinger */
+.local-learning-settings{margin:10px 0 12px;padding:10px;border-radius:14px;background:#f3f9ff;border:1px solid #d4e3f3}
+.local-learning-settings .option{margin:0}
+.local-learning-row{margin:9px 2px 0;align-items:center;gap:8px}
+.local-learning-row p{flex:1 1 165px;margin:0}
+.local-learning-row .btn{flex:0 0 auto}

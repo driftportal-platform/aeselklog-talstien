@@ -30,6 +30,7 @@ const window={
  AeselCpuVoice:require(path.join(root,'cpuvoice.js')),
  AeselVoiceCache:require(path.join(root,'voicecache.js')),
  AeselAdaptive:require(path.join(root,'adaptive.js')),
+ AeselProfiles:require(path.join(root,'profiles.js')),
  AeselSave:require(path.join(root,'savegame.js')),
  matchMedia:()=>({matches:false}),
  addEventListener:()=>{},scrollTo:()=>{},

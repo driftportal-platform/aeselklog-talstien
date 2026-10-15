@@ -1,9 +1,9 @@
-/* ÆselKlog v0.9.9 – versioneret offline-cache. Ingen Cloudflare/ElevenLabs-data caches. */
+/* ÆselKlog v0.9.10 – versioneret offline-cache. Ingen Cloudflare/ElevenLabs-data caches. */
 const CACHE_PREFIX='aeselklog-talstien-';
-const CACHE='aeselklog-talstien-v099-voice-cache';
+const CACHE='aeselklog-talstien-v0910-subject-learning';
 const CORE=['./','./index.html','./styles.css','./home-ui.js','./home-fullscreen.webp',
  './app.js','./engine.js','./board.js','./actions.js','./leaderboard.js',
- './adaptive.js','./savegame.js','./cpuvoice.js','./voicecache.js','./manifest.webmanifest',
+ './adaptive.js','./profiles.js','./savegame.js','./cpuvoice.js','./voicecache.js','./manifest.webmanifest',
  './icon.svg','./aeselklog-card.webp','./donkey-bray.wav',
  './home-illustration.webp','./home-hero-mobile.webp','./home-hero-wide.webp','./home-mascot.webp'];
 self.addEventListener('install',event=>{

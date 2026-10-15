@@ -12,7 +12,7 @@ const cache={
 };
 const caches={
   open:async name=>{cacheMap.set(name,cache);return cache},
-  keys:async()=>['unrelated-app-cache','aeselklog-talstien-v096-compact-resume','aeselklog-talstien-v097-offline','aeselklog-talstien-v098-voice-cache'],
+  keys:async()=>['unrelated-app-cache','aeselklog-talstien-v096-compact-resume','aeselklog-talstien-v097-offline','aeselklog-talstien-v098-voice-cache','aeselklog-talstien-v099-voice-cache'],
   delete:async name=>{deleted.push(name);return true},
   match:async req=>typeof req==='string'&&req==='./index.html' ? {ok:true,from:'index-offline'} : req.mode==='navigate' ? undefined : (req.url||'').endsWith('home-fullscreen.webp') ? {ok:true,from:'media-cache'} : {ok:true,from:'asset-offline'}
 };
@@ -41,6 +41,8 @@ async function dispatch(name,request){
   await dispatch('install');
   assert(precached.includes('./styles.css'),'external CSS must be available offline');
   assert(precached.includes('./voicecache.js'),'voice cache module must be available offline');
+  assert(precached.includes('./profiles.js'),'learning profiles module must be available offline');
+  assert(worker.includes('aeselklog-talstien-v0910-subject-learning'),'PWA must use v0.9.10 cache');
   for(const asset of precached){
     const relative=asset.replace(/^\.\//,'');
     if(relative)assert(fs.existsSync(path.join(root,relative)),`missing precached file ${asset}`);
@@ -48,6 +50,7 @@ async function dispatch(name,request){
   await dispatch('activate');
   assert(deleted.includes('aeselklog-talstien-v096-compact-resume'));
   assert(deleted.includes('aeselklog-talstien-v097-offline'));
+  assert(deleted.includes('aeselklog-talstien-v099-voice-cache'));
   assert(!deleted.includes('unrelated-app-cache'),'SW must not delete other sites caches');
   const art=await dispatch('fetch',{method:'GET',url:scope+'home-fullscreen.webp',mode:'same-origin'});
   assert.equal(art.from,'media-cache');assert.equal(fetches,0,'image must use pre-cache first');

@@ -14,7 +14,7 @@
 <div class="shell">
   <header class="top">
     <div class="brand"><div class="logo" aria-hidden="true">🫏</div><div><h1>Æsel<span class="red">Klog</span> · Talstien</h1><small>Spil, lær og grin sammen</small></div></div>
-    <div class="top-actions"><span class="pill">PRØVEVERSION 0.9.9</span><button id="voiceToggle" class="btn soft small" type="button" aria-pressed="true">🔊 Lyd til</button></div>
+    <div class="top-actions"><span class="pill">PRØVEVERSION 0.9.10</span><button id="voiceToggle" class="btn soft small" type="button" aria-pressed="true">🔊 Lyd til</button></div>
   </header>
 
 
@@ -55,7 +55,11 @@
             <option value="2">2-tabellen</option><option value="3">3-tabellen</option><option value="4">4-tabellen</option><option value="5">5-tabellen</option><option value="6">6-tabellen</option><option value="7">7-tabellen</option><option value="8">8-tabellen</option><option value="9">9-tabellen</option><option value="10">10-tabellen</option><option value="11">11-tabellen</option><option value="12">12-tabellen</option></select>
           <p class="tiny" style="margin:0">Vælg én tabel eller en blanding. I TABELTRÆNING kommer regneopgaven hver tur (uden læringsterning). 3–6-årige får stadig lette opgaver. I LEG er matematik frivillig.</p>
         </div>
-        <label class="option adaptive-setting"><input type="checkbox" id="adaptiveCheck" checked><span><strong>🧠 Tilpas opgaver automatisk</strong><small>For børn: 3 rigtige svar i træk giver lidt sværere opgaver, 2 forkerte i træk giver lettere opgaver. Voksnes valgte niveau ændres ikke.</small></span></label>
+        <label class="option adaptive-setting"><input type="checkbox" id="adaptiveCheck" checked><span><strong>🧠 Tilpas opgaver automatisk</strong><small>Hvert barn har særskilt niveau i talforståelse, plus, minus og gangetabeller. 3 rigtige uden tip gør det lidt sværere, 2 forkerte lidt lettere. Ingen tvungen matematik i LEG.</small></span></label>
+        <div class="local-learning-settings">
+          <label class="option"><input type="checkbox" id="rememberLearning" checked><span><strong>Husk barnets niveau mellem spil</strong><small>Kun på denne enhed og kun for kaldenavne, I selv skriver. Der gemmes ikke alder eller oplysninger på en server. Slå fra for kun at huske i det aktuelle spil.</small></span></label>
+          <div class="row local-learning-row"><p class="tiny" id="learningProfileStatus" role="status" aria-live="polite">Ingen lokale læringsprofiler endnu.</p><button class="btn danger small" type="button" id="clearLearningProfiles">Slet læringsprofiler</button></div>
+        </div>
         <div class="field"><span>Spillepladen</span><div class="options"><label class="option"><input type="radio" name="boardMode" value="digital" checked><span><strong>Digital</strong><small>Se placeringerne her</small></span></label><label class="option"><input type="radio" name="boardMode" value="physical"><span><strong>Fysisk</strong><small>Brug A3-pladen</small></span></label></div></div>
       </div>
       <div class="paper"><h2>⚙️ Sådan slår I terninger</h2>
@@ -212,6 +216,7 @@
 <script src="./actions.js" defer></script>
 <script src="./leaderboard.js" defer></script>
 <script src="./adaptive.js" defer></script>
+<script src="./profiles.js" defer></script>
 <script src="./savegame.js" defer></script>
 <script src="./cpuvoice.js" defer></script>
 <script src="./voicecache.js" defer></script>

@@ -1,3 +1,16 @@
+# ÆselKlog – udviklernote v0.9.10 (15. oktober 2026)
+
+1. **Hent nyeste GitHub `main` og sammenlign med eventuelle ZIP'er**, og læs `README.md`, `UDVIKLINGSPLAN.md`, `TESTPLAN.md` og hele denne fil, før ny udvikling.
+2. I `adaptive.js` er `fresh`, `clean`, `note` og `label` bibeholdt til bagudkompatibilitet. `freshProgress`, `cleanProgress`, `noteArea`, `areaStep` og `challengeArea` implementerer fire uafhængige områder: `numbers`, `plus`, `minus`, `tables`. **Aldersloftet vinder altid** over progressionsniveauet.
+3. `engine.js` tager et valgfrit `skillSteps`-objekt og fortsat gammelt `skillStep`. Hvert nyt børnespørgsmål returnerer `skillArea` og `adaptiveStep`. Multiplikation/division er `tables`; småbørns tal-tælling er `numbers`. Voksnes niveau påvirkes ikke.
+4. `savegame.js` bruger fortsat **schema 1** og lagernøglen `aeselklog-igangvaerende-v1`. Tilføjede felter er bagudkompatible og klampes/valideres. Gamle spørgsmål uden `skillArea` kan klassificeres af `adaptive.challengeArea`.
+5. `profiles.js` gemmer kun kaldenavn, faglige niveauer og opgave-ID'er lokalt i `aeselklog-laereprofiler-v1`; ikke alder, API-nøgler, lydoptagelser eller serverdata. Børn skal kunne spille uden profil og ved blokering af localStorage. Gemte spil og Topscore bruger fortsat separate nøgler.
+6. De faste produktregler er uændrede: LEG frivillig, ingen tvungne svære opgaver 3–6 år, CPU har samme turregler, pause ved app i baggrunden, voksen-timer 60/30/10 efter oplæsning, stemmevalg og ElevenLabs via eksisterende sikre Worker, ingen actionkæder.
+7. Bevar godkendte `home-fullscreen.webp`, design og den runde knap på spillepladen. PWA-cache skal versionsopdateres og indeholde `profiles.js`. Ryd kun egne caches, ikke de andre GitHub Pages-apps.
+8. Før release: kør `node --check` på JS, alle `node tests/*.test.js`, de vigtigste Python Playwright tests og nye `tests/subject_learning_browser.py`. Ingen påstand om rigtig telefon- eller ElevenLabs-test uden at den er gennemført.
+
+---
+
 # ÆselKlog – udviklernote v0.9.9
 
 - **Start altid på nyeste GitHub `main`.** Lokal v0.9.9 bygger videre på v0.9.8 med fokus på UI-oprydning. Ingen direkte GitHub-upload udført.

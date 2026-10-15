@@ -1,3 +1,26 @@
+# 🫏 ÆselKlog – Talstien v0.9.10 (15. oktober 2026)
+
+## Nyhed: hvert barn har fire separate læringsniveauer
+
+- **Talforståelse**, **plus**, **minus** og **gangetabeller** styres nu uafhængigt med trin fra −2 til +2. Tre rigtige i træk uden tip øger kun niveauet i det relevante område; to forkerte reducerer kun samme område. Resultater med tip registreres, men øger ikke en rigtig-streak.
+- Opgavegeneratoren markerer hvert nyt spørgsmål med område, og tilpasser sværhedsgraden *efter denne type opgave*. Børnenes alder sætter fortsat den overordnede grænse. 3–6-årige får ikke tvungne gangestykker. Voksnes 60/30/10 sekunder er uændrede.
+- **Husk barnets niveau mellem spil** under Indstillinger er slået til som udgangspunkt og kan slås fra. Den lokale hukommelse bruger kun et selvvalgt **kaldenavn**, ikke alder eller login. Standardnavne som "Spiller 1" opretter ikke en vedvarende profil. To spillere med samme kaldenavn i samme spil får ikke fælles profil. På delt enhed anbefales forskellige kaldenavne.
+- Knappen **Slet læringsprofiler** sletter kun profilerne på den aktuelle enhed, ikke Topscore eller igangværende gemt spil. Samlet højst 12 lokale navne; ingen cloud-synkronisering.
+- Gamle gemte spil med schema v1 kan fortsættes uden at miste tur, spørgsmål eller positioner. Historisk *samlet* sværhedsgrad fra v0.9.9 bruges som startniveau i hvert område, men gamle forsøgsantal fordeles **ikke** på regnearter, som de ikke kan dokumentere.
+- **LEG kræver fortsat ingen matematik**, bortset fra helt frivillige superopgaver. Fysiske/digitale terninger, CPU-æsel, specialfelter, den godkendte forside, kompakt Fortsæt spil, rund æsellyd-knap og alle ElevenLabs-stemmevalg er bevaret.
+- **Lydcachen fra v0.9.8/v0.9.9 er bevaret** og ændrer ikke på de nye niveauer.
+- Filer: nyt `profiles.js`, ændret `adaptive.js`, `engine.js`, `savegame.js`, `app.js`, `index.html`, `styles.css`, `sw.js`, tests og dokumentation. PWA-cache: `aeselklog-talstien-v0910-subject-learning`.
+
+**Kilde:** GitHub `main` (v0.9.9) verificeret 15.10.2026; den seneste v0.9.9-ZIP matchede `main` på filernes Git-hashes. Denne ZIP bygger på den kode. Ingen direkte GitHub-commit er udført.
+
+**Teststatus:** Alle Node-unit/regressionstests og Chromium-browserflow (inkl. spil, CPU, lydcache, stemme-reserve, gem/fortsæt, forside i 6 størrelser og læringsprofiler) er bestået med simuleret tale. Rigtig iOS-PWA og faktisk ElevenLabs skal testes på en fysisk enhed efter upload. Service Worker er undersøgt med Node-mock; den er endnu ikke testet installeret i iOS.
+
+**Installation:** Pak ZIP'en ud, og upload *filerne fra arkivets rod* til GitHub-repositoryets rod – inklusive `profiles.js`. Behold ikke bare ZIP-filen på GitHub. Opdater/genåbn den installerede PWA, kontrollér versionsmærket **0.9.10**, og test indstillingen "Husk barnets niveau mellem spil" med et unikt kaldenavn.
+
+**Næste idé:** En forældreoversigt, som kan vise de allerede gemte fire områder uden at samle yderligere data.
+
+---
+
 # 🫏 ÆselKlog – Talstien v0.9.9 (15. oktober 2026)
 
 ## Nyhed: UI-oprydning oven på intelligent lydcache

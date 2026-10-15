@@ -3,7 +3,7 @@ from pathlib import Path
 from playwright.sync_api import sync_playwright
 import base64,re
 ROOT=Path(__file__).parents[1]
-JS=['engine.js','board.js','actions.js','leaderboard.js','adaptive.js','savegame.js','cpuvoice.js','voicecache.js','app.js']
+JS=['engine.js','board.js','actions.js','leaderboard.js','adaptive.js','profiles.js','savegame.js','cpuvoice.js','voicecache.js','app.js']
 
 def load(page,previous=None):
     html=(ROOT/'index.html').read_text('utf-8')
