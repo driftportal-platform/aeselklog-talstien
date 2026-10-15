@@ -7,6 +7,7 @@ ROOT=Path(__file__).parents[1]
 
 def bootstrap(page,store=None):
     html=(ROOT/'index.html').read_text(encoding='utf-8')
+    html=html.replace('<link rel="stylesheet" href="./styles.css">','<style>'+ (ROOT/'styles.css').read_text(encoding='utf-8')+'</style>')
     html=re.sub(r'<script\s+src="[^"]+"\s+defer></script>','',html)
     page.set_content(html,wait_until='load')
     page.evaluate('''(initial) => {
@@ -19,7 +20,7 @@ def bootstrap(page,store=None):
       }});
       window.confirm=()=>true;
     }''',store or {})
-    for name in ['engine.js','board.js','actions.js','leaderboard.js','adaptive.js','savegame.js','cpuvoice.js','app.js']:
+    for name in ['engine.js','board.js','actions.js','leaderboard.js','adaptive.js','savegame.js','cpuvoice.js','voicecache.js','app.js']:
         page.add_script_tag(content=(ROOT/name).read_text(encoding='utf-8'))
 
 

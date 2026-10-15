@@ -7,6 +7,7 @@ ROOT=Path(__file__).parents[1]
 
 def load(page):
     html=(ROOT/'index.html').read_text(encoding='utf-8')
+    html=html.replace('<link rel="stylesheet" href="./styles.css">','<style>'+ (ROOT/'styles.css').read_text(encoding='utf-8')+'</style>')
     # App scripts run as injected text, keeping tests entirely offline and avoiding any API credits.
     html=re.sub(r'<script\s+src="[^\"]+"\s+defer></script>','',html)
     page.set_content(html, wait_until='load')
@@ -17,7 +18,7 @@ def load(page):
       const data={};window.__localItems=data;
       Object.defineProperty(window,'localStorage',{configurable:true,value:{getItem:k=>data[k]??null,setItem:(k,v)=>data[k]=String(v),removeItem:k=>delete data[k]}});
     }''')
-    for name in ['engine.js','board.js','actions.js','leaderboard.js','adaptive.js','savegame.js','cpuvoice.js','app.js']:
+    for name in ['engine.js','board.js','actions.js','leaderboard.js','adaptive.js','savegame.js','cpuvoice.js','voicecache.js','app.js']:
         page.add_script_tag(content=(ROOT/name).read_text(encoding='utf-8'))
 
 

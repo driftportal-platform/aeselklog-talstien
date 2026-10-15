@@ -1,4 +1,4 @@
-/* ÆselKlog Talstien v0.9.2: sjov CPU-stemme oven på v0.9 gem/fortsæt og adaptiv læring. */
+/* ÆselKlog Talstien v0.9.8: sikker stemmespecifik lydcache på v0.9.7. */
 (()=>{'use strict';
 const $=id=>document.getElementById(id);
 const qs=sel=>document.querySelector(sel);
@@ -12,7 +12,8 @@ const L=window.AeselLeaderboard;
 const G=window.AeselSave;
 const P=window.AeselAdaptive;
 const CV=window.AeselCpuVoice;
-if(!G||!P||!CV){document.body.textContent='ÆselKlog kan ikke starte: savegame.js, adaptive.js eller cpuvoice.js mangler.';return;}
+const VC=window.AeselVoiceCache;
+if(!G||!P||!CV||!VC){document.body.textContent='ÆselKlog kan ikke starte: et af spillets moduler mangler.';return;}
 const A=window.AeselActions;
 if(!A||!A.validate()){document.body.textContent='ÆselKlog kan ikke starte: actions.js mangler eller har ugyldige felter.';return;}
 const SPECIAL=A.FIELDS;
@@ -54,7 +55,11 @@ try{bray=new Audio('./donkey-bray.wav');bray.preload='auto';bray.volume=.78;}cat
 
 // AI-tale kræver HTTPS-stemmetjeneste. API-nøglen findes ALDRIG på telefonen.
 let speechSerial=0,aiFetch=null,aiSource=null,aiHtmlAudio=null,audioContext=null;
-const speechCache=new Map();
+// Ved fejl bruger vi kortvarigt telefonstemmen uden at ændre brugerens valgte AI-stemme.
+let aiRetryAfter=0;
+const AI_RETRY_COOLDOWN_MS=60_000;
+const speechCache=new Map(); // 24 klip i RAM under spillet.
+// Kun de faste, anonyme udsagn i voicecache.js må gemmes permanent.
 function normalizedSpeech(text){return String(text).replace(/ÆselKlog/g,'Æsel Klog').replace(/Hov hov!/g,'Hov, hov!').trim().slice(0,350)}
 function voiceOptions(){return ('speechSynthesis' in window)?window.speechSynthesis.getVoices():[]}
 function danishVoices(){return voiceOptions().filter(v=>String(v.lang||'').toLowerCase().startsWith('da'))}
@@ -176,52 +181,77 @@ document.addEventListener('pointerdown',()=>{if(sound.on&&sound.mode==='ai')ensu
 document.addEventListener('keydown',()=>{if(sound.on&&sound.mode==='ai')ensureAudioContext()}, {passive:true});
 async function speakAI(text,id,{cpu=false}={}){
  const endpoint=AI_TTS_ENDPOINT;
+ // Brug det faktisk valgte ID (inkl. CPU'ens eget valg), ikke rollen eller standardnavnet.
  const voiceId=cpu?CV.chooseVoice(aiVoices,sound.aiVoice,sound.cpuVoice):sound.aiVoice;
+ const clip={endpoint,voiceId,text};
  const key=endpoint+'|'+voiceId+'|'+text;
- let bytes;
+ let bytes=null,downloaded=false,fromStoredCache=false;
  try{
   if(speechCache.has(key))bytes=speechCache.get(key);
-  else{
+  else if(VC.isSafePhrase(text)){
+   bytes=await VC.get(clip);
+   fromStoredCache=!!bytes;
+   if(bytes){speechCache.set(key,bytes);if(speechCache.size>24)speechCache.delete(speechCache.keys().next().value)}
+  }
+  // Appen kan være skiftet til en ny tur/stemme, mens IndexedDB blev læst.
+  if(id!==speechSerial||!sound.on)return;
+  if(!bytes){
+   // Lokal cache kontrolleres FØR offline/cooldown – gemte AI-lyde virker også uden net.
+   if(navigator.onLine===false||Date.now()<aiRetryAfter){
+    aiStatus('🫏 Denne oplæsning er ikke gemt. Telefonens stemme bruges midlertidigt.');
+    return speakLocally(text,{cpu});
+   }
    const abort=new AbortController();aiFetch=abort;
    const timeout=setTimeout(()=>abort.abort(),25000);
-   let response;
    try{
-    response=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text,voice:voiceId}),signal:abort.signal,cache:'no-store'});
+    const response=await fetch(endpoint,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text,voice:voiceId}),signal:abort.signal,cache:'no-store'});
     if(!response.ok)throw new Error(`HTTP ${response.status}`);
     if(!String(response.headers.get('Content-Type')||'').includes('audio/'))throw new Error('Svaret indeholdt ikke lyd');
     bytes=await response.arrayBuffer();
    }finally{clearTimeout(timeout)}
    if(bytes.byteLength<500||bytes.byteLength>2_500_000)throw new Error('Lydfilens størrelse var ugyldig');
-   if(id===speechSerial){speechCache.set(key,bytes);if(speechCache.size>24)speechCache.delete(speechCache.keys().next().value)}
+   if(id!==speechSerial||!sound.on)return;
+   downloaded=true;
+   speechCache.set(key,bytes);if(speechCache.size>24)speechCache.delete(speechCache.keys().next().value);
   }
   if(id!==speechSerial||!sound.on)return;
+  const chosen=aiVoices.find(v=>v.id===voiceId)?.name||'valgt AI-stemme';
+  const cacheLabel=fromStoredCache?'Gemte AI-lyde afspilles':'AI-lyd afspilles';
   const ctx=ensureAudioContext();
   if(ctx){
    if(ctx.state==='suspended')await ctx.resume();
    const decoded=await ctx.decodeAudioData(bytes.slice(0));
    if(id!==speechSerial||!sound.on)return;
+   // Gem først når lyden er valideret af dekoderen. Fejlende lyd må ikke lagres.
+   if(downloaded&&VC.isSafePhrase(text))void VC.put(clip,bytes).then(ok=>{if(ok&&$('voiceSettings').open)void refreshAudioCacheStatus()});
    const node=ctx.createBufferSource();node.buffer=decoded;node.playbackRate.value=cpu?1.07:1;node.connect(ctx.destination);aiSource=node;
-   aiStatus('AI-lyd afspilles: '+(aiVoices.find(v=>v.id===voiceId)?.name||'ÆselKlog-stemme')+(cpu?' · CPU-æsel.':'.'));
+   aiStatus(cacheLabel+': '+chosen+(cpu?' · CPU-æsel.':'.'));
    await waitForPlayback(done=>{node.onended=()=>{if(aiSource===node)aiSource=null;done()};node.start()},Math.min(45000,Math.max(2000,decoded.duration*1000/(cpu?1.07:1)+2000)));
   }else{
    const blob=new Blob([bytes],{type:'audio/mpeg'});
    const objectUrl=URL.createObjectURL(blob);
    const audio=new Audio(objectUrl);audio._blobUrl=objectUrl;audio.playbackRate=cpu?1.07:1;aiHtmlAudio=audio;
-   aiStatus('AI-lyd afspilles: '+(aiVoices.find(v=>v.id===voiceId)?.name||'ÆselKlog-stemme')+(cpu?' · CPU-æsel.':'.'));
+   aiStatus(cacheLabel+': '+chosen+(cpu?' · CPU-æsel.':'.'));
    try{
     await waitForPlayback(done=>{
      audio.onended=done;audio.onerror=done;
      audio.play().catch(done);
     },45000);
+    if(downloaded&&VC.isSafePhrase(text))void VC.put(clip,bytes).then(ok=>{if(ok&&$('voiceSettings').open)void refreshAudioCacheStatus()});
    }finally{URL.revokeObjectURL(objectUrl);if(aiHtmlAudio===audio)aiHtmlAudio=null;audio.src='';}
   }
  }catch(e){
-  if(id!==speechSerial||e.name==='AbortError')return;
-  console.warn('Kunne ikke hente AI-lyd',e);
-  aiStatus('AI-lyden kunne ikke hentes ('+e.message+'). Telefonstemmen bruges i stedet.');
+  if(id!==speechSerial)return;
+  // Fejlagtige klip skal fjernes både i RAM og i IndexedDB.
+  if(fromStoredCache){speechCache.delete(key);void VC.remove(clip)}
+  console.warn('Kunne ikke hente eller afspille AI-lyd',e);
+  aiRetryAfter=Date.now()+AI_RETRY_COOLDOWN_MS;
+  const reason=/HTTP 502|HTTP 429|HTTP 402/.test(String(e?.message||''))?' Tjek også din ElevenLabs-creditgrænse.':'';
+  aiStatus('🫏 AI-lyden er ikke tilgængelig lige nu.'+reason+' Telefonens stemme bruges midlertidigt.');
   return speakLocally(text,{cpu});
  }finally{if(id===speechSerial)aiFetch=null}
 }
+
 function say(text,{cpu=false}={}){
  sound.last=text;
  stopCurrentVoice();
@@ -256,16 +286,29 @@ function loadVoice(){
 }
 loadVoice();
 window.speechSynthesis?.addEventListener?.('voiceschanged',refreshVoice);
+async function refreshAudioCacheStatus(){
+ const el=$('audioCacheStatus');if(!el)return;
+ const s=await VC.stats();
+ el.textContent=s.available?`${s.count} gemte lydklip · ${(s.bytes/1024/1024).toFixed(1).replace('.',',')} MB af 15 MB. Gemt kun på denne enhed.`:
+  'Lokal lydlagring er ikke tilgængelig her. Oplæsning og spil virker stadig.';
+}
+$('clearAudioCache').addEventListener('click',async()=>{
+ const btn=$('clearAudioCache');btn.disabled=true;
+ const ok=await VC.clear();speechCache.clear();
+ btn.disabled=false;
+ await refreshAudioCacheStatus();
+ if(!ok)$('audioCacheStatus').textContent='Kunne ikke rydde lydlageret på denne enhed.';
+});
 $('voiceSettings').addEventListener('toggle',()=>{
- if($('voiceSettings').open){refreshVoice();if(sound.mode==='ai')void loadAIVoices()}
+ if($('voiceSettings').open){refreshVoice();void refreshAudioCacheStatus();if(sound.mode==='ai')void loadAIVoices()}
 });
 $('voiceMode').addEventListener('change',e=>{
- stopCurrentVoice();sound.mode=e.target.value;syncVoiceControls();saveVoice();
+ stopCurrentVoice();aiRetryAfter=0;sound.mode=e.target.value;syncVoiceControls();saveVoice();
  if(sound.mode==='ai')void loadAIVoices();
  else say('Hov hov! Nu bruger jeg telefonens stemme.');
 });
 $('aiVoiceChoice').addEventListener('change',e=>{
- stopCurrentVoice();sound.aiVoice=e.target.value;saveVoice();
+ stopCurrentVoice();aiRetryAfter=0;sound.aiVoice=e.target.value;saveVoice();
  aiStatus('Valgt: '+(aiVoices.find(v=>v.id===sound.aiVoice)?.name||'AI-stemme')+'. Tryk Prøv valgt stemme.');
 });
 $('cpuVoiceChoice').addEventListener('change',e=>{
@@ -273,7 +316,7 @@ $('cpuVoiceChoice').addEventListener('change',e=>{
  aiStatus('CPU-æslets stemme er valgt. Prøv den med knappen nedenfor.');
 });
 $('cpuVoicePreview').addEventListener('click',()=>say(CV.makePreview(),{cpu:true}));
-$('reloadAIVoices').addEventListener('click',()=>void loadAIVoices(true));
+$('reloadAIVoices').addEventListener('click',()=>{aiRetryAfter=0;void loadAIVoices(true)});
 $('voiceChoice').addEventListener('change',e=>{sound.selected=e.target.value;saveVoice();say('Hov hov! Jeg glæder mig til at lege med tallene!')});
 $('voiceSpeed').addEventListener('input',e=>{sound.rate=Number(e.target.value);syncVoiceControls();saveVoice()});
 $('voicePitch').addEventListener('input',e=>{sound.pitch=Number(e.target.value);syncVoiceControls();saveVoice()});
@@ -424,6 +467,17 @@ function show(view){
  if(view==='setup')updateSettingsSummary();
  if(view==='home')renderResumeCard();
  window.scrollTo({top:0,behavior:'instant'});
+ // Flyt også tastatur- og skærmlæserfokus, når den tidligere side skjules.
+ const target={
+  home:$('homePlay'),
+  setup:document.querySelector('#setup .page-heading h2'),
+  settings:document.querySelector('#settings .page-heading h2'),
+  game:$('boardHud')
+ }[view];
+ if(target){
+  if(!target.hasAttribute('tabindex')&&target.tagName!=='BUTTON')target.setAttribute('tabindex','-1');
+  try{target.focus({preventScroll:true})}catch(_){/* Ældre browsere */}
+ }
 }
 function resetAsync(){gameToken++;resumeAdultMs=null;helpUsed=false;const fanfare=$('victoryFanfare');if(fanfare)fanfare.remove();clearInterval(taskTimer);taskTimer=null;taskPausedAt=null;taskDeadline=0;busy=false;extraRollUsed=false;showDiceState=null;hideDice();hideActionFlash();if(boardExpanded)setBoardExpanded(false);stopCurrentVoice();bray?.pause();}
 $('startButton').addEventListener('click',()=>{

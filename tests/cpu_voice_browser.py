@@ -21,6 +21,7 @@ with sync_playwright() as p:
     errors=[]
     page.on('pageerror',lambda e:errors.append(str(e)))
     html=(ROOT/'index.html').read_text()
+    html=html.replace('<link rel="stylesheet" href="./styles.css">','<style>'+ (ROOT/'styles.css').read_text(encoding='utf-8')+'</style>')
     html=re.sub(r'<script\s+src="[^"]+"\s+defer></script>','',html)
     page.set_content(html,wait_until='load')
     page.evaluate('''(data)=>{
@@ -37,7 +38,7 @@ with sync_playwright() as p:
         const items={};
         Object.defineProperty(window,'localStorage',{configurable:true,value:{getItem:k=>items[k]??null,setItem:(k,v)=>items[k]=String(v),removeItem:k=>delete items[k]}});
     }''',encoded)
-    for name in ['engine.js','board.js','actions.js','leaderboard.js','adaptive.js','savegame.js','cpuvoice.js','app.js']:
+    for name in ['engine.js','board.js','actions.js','leaderboard.js','adaptive.js','savegame.js','cpuvoice.js','voicecache.js','app.js']:
         page.add_script_tag(content=(ROOT/name).read_text())
     page.locator('#homeSettings').click()
     page.locator('#voiceSettings summary').click()

@@ -1,3 +1,15 @@
+# ÆselKlog – udviklernote v0.9.8
+
+- **Start altid på nyeste GitHub `main`.** Lokal v0.9.8 bygger på verificeret `main` v0.9.6 samt tidligere leveret v0.9.7. Ingen direkte GitHub-upload udført.
+- `voicecache.js` er nyt modul for kun **upersonlige, faste sætninger** i IndexedDB; nøglen indeholder Worker, faktisk stemme-ID, tekst og lydmodel-version. Det er IKKE en generel cache for alle spiller-/børnenavne.
+- `app.js` skal vente på cache/lydafspilning som før. CPU må først afgive/afsløre svar efter oplæsning. Test stemmeændring midt i oplæsning og i baggrunden.
+- AI-cache må aldrig indeholde ElevenLabs API-nøgler eller private spilleroplysninger. Serverens /tts og /voices anvendes fortsat via Cloudflare Worker; Workerens secrets skal forblive hos Cloudflare.
+- Hverken Service Worker eller IndexedDB må automatisk sende, uploade eller synkronisere cache til en server. Cache-grænse 15 MB/70 klip; rydning fra Indstillinger.
+- Opdater `voicecache.js`-FORMAT og Service Worker-cachen, hvis AI-model eller stemmeopsætning ændrer sig på serveren, ellers kan gamle lydklip afspilles.
+- Verificér `node tests/voicecache.test.js`, `python tests/voice_cache_browser.py`, alle eksisterende regressionstests og en fysisk iPhone-PWA efter upload. Ingen ægte AI-opkald i tests.
+
+---
+
 # ÆselKlog – udviklernote v0.9.2
 
 **Ny navigation:** `#home` (forside), `#settings` (alle indstillinger), `#setup` (kun spillernavne, aldersvalg, CPU), `#game` (spillepladen). `app.js` har navigation via `show(view)`; gemt spil står på forsiden. `#voiceSettings` er flyttet til `#settings`, men alle tidligere stemme-ID'er og den sikre Cloudflare-Worker er beholdt.
@@ -53,3 +65,12 @@
 - AI-stemmer må kun vælges blandt de stemmer, som allerede er godkendt af Cloudflare `/voices`; ingen API-nøgler i klientkode.
 - Bevar 30 % CPU-fejl, nul tvungne læringsopgaver i LEG, adaptive børneopgaver, voksen-timer, saved games og leaderboard.
 - Kør `node tests/cpuvoice.test.js`, de øvrige Node-tests og `python tests/cpu_voice_browser.py` med simuleret lyd. Rigtig mobil/ElevenLabs er en separat manuel test.
+
+
+## v0.9.7 – kildefiler og offline (15. oktober 2026)
+
+- `styles.css` indeholder al tidligere inline CSS fra `index.html`; **husk begge filer** i enhver GitHub-upload og i `sw.js`-cachelisten. Den godkendte `home-fullscreen.webp` må ikke ændres uden brugerens ønske.
+- Behold eksisterende taleintegration i `app.js`: egen CPU-stemme, cache, aktiv lyd-annullering og lokal fallback. Indsæt **ikke** eksempelfilen `voice.js` fra forbedringslisten ukritisk.
+- Ved AI-netværksfejl/timeout bruges telefonstemmen og en kort genforsøgspause på 60 sekunder. Skift i valgte stemme nulstiller pausen. Secrets forbliver i Cloudflare.
+- `sw.js` må kun rydde egne caches (`aeselklog-talstien-*`), ikke alle caches på `github.io`-domænet. App-kode er network-first, medieaktiver cache-first.
+- Browserens `set_content`-tests indlæser CSS som inlinet tekst fra `styles.css` for at fungere uden HTTP-server. Kør også `node tests/pwa_cache.test.js` og `python tests/voice_fallback_browser.py`. En rigtig offline-PWA med Service Worker kræver desuden fysisk iPhone-test eller et miljø, der tillader lokal HTTP-test.

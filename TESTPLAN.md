@@ -1,3 +1,57 @@
+# ÆselKlog v0.9.8 – lydcache og fler-stemme-regression
+
+## Automatiske tests udført 15. oktober 2026
+
+- [x] Syntaks for alle JS-filer (`node --check`).
+- [x] Alle ti `tests/*.test.js`, inklusive ny `voicecache.test.js` for adskilte stemmer, whitelist/persondata og lagerbegrænsning.
+- [x] `python tests/test_home_v092.py` og `tests/test_home_v096.py` – forsider, gem/fortsæt og mobilvisning.
+- [x] `python tests/browser_smoke.py` – børn, voksne, CPU, vindere og Topscore.
+- [x] `python tests/persistence_browser.py` – gem/fortsæt, positioner, spørgsmål og læringsprogression.
+- [x] `python tests/cpu_voice_browser.py` og `tests/voice_fallback_browser.py` – AI-CPU, separate stemmer, timeout/offline-fallback og stemmevalg.
+- [x] `python tests/voice_cache_browser.py` – simuleret IndexedDB: Mia og Mads adskilt, CPU-æslets egen stemme, cachehit efter app-geninitialisering, offline afspilning uden nyt AI-kald, rydning og ingen persongemning.
+- [x] `node tests/pwa_cache.test.js` – ny `voicecache.js` med i offline-asset-listen.
+- [ ] **Lokal HTTP/Service Worker-test:** kan ikke udføres i dette miljø; Chrome blokerer localhost med `ERR_BLOCKED_BY_ADMINISTRATOR`.
+
+Alle Playwright-browser-tests bruger Chromium og **simulerede** AI-lyde og IndexedDB. Ingen virkelige ElevenLabs-credits er brugt i tests.
+
+## På rigtig iPhone-PWA efter upload
+
+- [ ] Kontrollér versionsmærket 0.9.8, og at godkendt forside, Fortsæt/Slet og alle fire menuer er synlige.
+- [ ] Vælg fx Mia, tryk "Prøv æslets stemme" to gange: første gang bruger credits, anden gang skal bruge cache. Se antal klip under "Gemte AI-lyde".
+- [ ] Vælg Mads eller en anden *godkendt* stemme: første oplæsning med denne stemme skal være et nyt klip. Skift tilbage til Mia: lydklippet skal være den oprindelige Mia-stemme.
+- [ ] Vælg særskilt stemme til CPU-æslet og tryk "Hør CPU-æslet svare". Test at CPU'en stadig venter på, at talen afsluttes.
+- [ ] Luk PWA helt og åbn igen: gentagne faste sætninger skal afspilles uden nyt AI-kald.
+- [ ] Slå Wi-Fi og mobildata fra: et tidligere gemt klip skal bruge AI-lyden; en ikke-gemt sætning skal bruge telefonstemmen.
+- [ ] Tryk "Ryd gemte AI-lyde". Antal klip skal blive nul, og næste AI-oplæsning online skal hentes på ny.
+- [ ] Test et gemt spil, actionfelter, LEG uden tvungne opgaver og eksisterende ElevenLabs-kreditter.
+- [ ] Kontrollér, at browserens rydning af webstedsdata også fjerner stemmeklip (og kan slette andre lokale spil-data).
+
+---
+
+# ÆselKlog v0.9.7 – CSS, offline/PWA, stemme-reserve
+
+## Automatiske regressioner
+
+- [x] JavaScript-syntaks (`node --check`) og alle `tests/*.test.js`.
+- [x] `python tests/test_home_v096.py` – iPhone-forside med og uden gemt spil, menuer og knap-hitboxes.
+- [x] `python tests/test_home_v092.py`, `python tests/browser_smoke.py`, `python tests/persistence_browser.py` og `python tests/cpu_voice_browser.py`.
+- [x] `python tests/voice_fallback_browser.py` – fallback ved timeout (simuleret AbortError), offline og genforsøgspause. Annullering af samtidige sætninger er bevaret fra v0.9.6, men er ikke særskilt regressionstestet her.
+- [x] `node tests/pwa_cache.test.js` – versionscache, egne caches og offline-fallback.
+- [ ] PWA-test i lokal Chromium med HTTP-server og serviceworker (CSS og billeder skal virke offline). **Forsøgt, men værtsmiljøets browser blokerede `127.0.0.1` (ERR_BLOCKED_BY_ADMINISTRATOR). Ingen reel Service Worker-installation verificeret i denne test.**
+
+## Manuelle iPhone-tests efter upload
+
+- [ ] Kontroller PRØVEVERSION 0.9.7 på installeret PWA (genåbn appen ved behov).
+- [ ] Både med og uden gemt spil: Den godkendte forside og alle menuknapper er uændrede.
+- [ ] Slå Wi-Fi og mobildata fra efter første installation: app, illustrationer, spil og telefonstemme virker offline.
+- [ ] Slå nettet til igen: AI-stemme kan genoptages efter kort pause. Test også en ægte fejl/timeout, hvis muligt.
+- [ ] Kontroller med VoiceOver, at menuskift og stemmestatus kan navigeres meningsfuldt.
+- [ ] Kontroller, at gemte spil og Topscore stadig er bevaret efter opdatering fra v0.9.6.
+
+---
+
+## Historik – v0.9.6
+
 # ÆselKlog v0.9.6 – test af gemt-spil-knappen
 
 ## Automatisk

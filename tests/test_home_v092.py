@@ -3,10 +3,11 @@ from pathlib import Path
 from playwright.sync_api import sync_playwright
 import base64,re
 ROOT=Path(__file__).parents[1]
-JS=['engine.js','board.js','actions.js','leaderboard.js','adaptive.js','savegame.js','cpuvoice.js','app.js']
+JS=['engine.js','board.js','actions.js','leaderboard.js','adaptive.js','savegame.js','cpuvoice.js','voicecache.js','app.js']
 
 def load(page,previous=None):
     html=(ROOT/'index.html').read_text('utf-8')
+    html=html.replace('<link rel="stylesheet" href="./styles.css">','<style>'+ (ROOT/'styles.css').read_text(encoding='utf-8')+'</style>')
     html=re.sub(r'<script\s+src="[^"]+"\s+defer></script>','',html)
     for filename in ['home-hero-wide.webp','home-hero-mobile.webp','home-mascot.webp','aeselklog-card.webp']:
         data=base64.b64encode((ROOT/filename).read_bytes()).decode()

@@ -6,11 +6,12 @@ import re
 
 ROOT = Path(__file__).parents[1]
 JS = ['engine.js', 'board.js', 'actions.js', 'leaderboard.js',
-      'adaptive.js', 'savegame.js', 'cpuvoice.js', 'app.js', 'home-ui.js']
+      'adaptive.js', 'savegame.js', 'cpuvoice.js', 'voicecache.js', 'app.js', 'home-ui.js']
 
 
 def inline_html():
     html = (ROOT / 'index.html').read_text(encoding='utf-8')
+    html=html.replace('<link rel="stylesheet" href="./styles.css">','<style>'+ (ROOT/'styles.css').read_text(encoding='utf-8')+'</style>')
     html = re.sub(r'<script\s+src="[^"]+"\s+defer></script>', '', html)
     for filename in ['home-fullscreen.webp', 'home-hero-wide.webp', 'home-hero-mobile.webp',
                      'home-mascot.webp', 'home-illustration.webp', 'aeselklog-card.webp']:

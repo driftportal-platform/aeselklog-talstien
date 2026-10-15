@@ -1,3 +1,56 @@
+# ÆselKlog – udviklingsplan, v0.9.8 (15. oktober 2026)
+
+**Grundlag:** Senest kontrollerede GitHub `main` = v0.9.6. Bygget videre på den lokalt leverede komplette v0.9.7, uden ændringer i det godkendte forsidebillede eller spilmotorens regler. Ikke uploadet til GitHub af assistenten.
+
+## v0.9.8 – intelligent AI-lydcache
+
+- [x] Permanent IndexedDB-lydlagring for en lille, eksplicit liste af **upersonlige** sætninger.
+- [x] Cache-nøgler omfatter faktisk valgt Worker, AI-stemme-ID, modelcache-version og tekst. Mia, Mads og CPU-æslet kan gemmes separat.
+- [x] Gemmes kun **ved brug**, efter at den hentede lyd er valideret. Ingen forbrugsdrivende forudgenerering.
+- [x] Lokal lyd afspilles også uden internet; almindelig telefonstemme er fallback for ikke-gemte sætninger.
+- [x] Maksimum 15 MB/70 lydklip med automatisk oprydning; brugeren kan rydde cachen fra Indstillinger.
+- [x] Gem ikke spiller-/børnenavne i permanent lydcache. Gemte spil og Topscore ligger i separate, uændrede lagre.
+- [x] Udvidet browser- og Node-test, ny PWA-cache samt versionsopdateret dokumentation.
+- [ ] Manuel iPhone-test med mindst to valgte AI-stemmer og CPU-æsel, herunder test efter genstart og offline.
+- [ ] Virkelig ElevenLabs-test med kreditforbrug, når brugeren har uploadet koden.
+- [ ] Test i iOS Safari/WebKit – de automatiske browser-tests bruger Chromium og simuleret lyd/IndexedDB.
+
+## Foreslåede næste versioner
+
+1. **v0.9.9** – individuel progression i plus, minus, tabeller og talforståelse, på tværs af spil; børnenavne kræver hensyn til lokal lagring.
+2. **v0.9.10** – enkel forældreoversigt med udvikling pr. regneart, børnevenlig visning og lokal datakontrol.
+3. Efter flere familietests: levende actionfelter, gennemgang af animationer (uden at flytte SVG-felter), modulopdeling i mindre dele og tilgængelighed.
+4. Før v1.0: dansk børne-/familietest, lovligt billedmateriale, offline-genstart og fuld PWA-opdatering på rigtig telefon.
+
+---
+
+# ÆselKlog – udviklingsplan, v0.9.7 (15. oktober 2026)
+
+**Grundlag:** Den komplette, lokalt testede v0.9.6 ZIP. GitHub `main` blev sidst verificeret til v0.9.5. **Ingen automatisk GitHub-upload og ingen påstand om fysisk iPhone-test.**
+
+## v0.9.7 – vedligehold og driftsstabilitet
+
+- [x] Udskil eksisterende CSS i `styles.css` uden at røre det godkendte forsidebillede.
+- [x] Revider Service Worker: versioneret cache, lokal scope og oprydning kun i ÆselKlogs egne caches.
+- [x] Præcache CSS + tilstand ved offline-net; behold WebP og æsellyd i offline-cache.
+- [x] Ved TTS-timeout, netværksfejl eller offline: brug lokal stemme uden at afbryde CPU-flow.
+- [x] Behold AI-/CPU-stemmevalg, brug kort backoff ved gentagne stemmefejl.
+- [x] Fokus flyttes til den nye side ved menunavigation; AI-status annoncérbar.
+- [ ] Afprøv en installeret PWA fysisk på iPhone i portræt og landskab, også ved opdatering af en gemt v0.9.6.
+- [ ] Afprøv ægte ElevenLabs/Cloudflare Worker på iOS samt fejltilstand uden internet.
+- [ ] Familietest før v1.0.
+
+## Senere forslag fra forbedringslisten
+
+1. Opdel `app.js` i små, klart testbare moduler **uden** at udskifte den fungerende CPU-/lydmotor ukritisk.
+2. Forældreoverblik og læringsprogression kræver gennemgang af den faktiske leaderboard- og saved-game-datastruktur (undgå alderslagring og brud på gamle gemninger).
+3. Bedre bræt-animationer efter familietest; respekter `prefers-reduced-motion` og undgå at overskrive SVG-positionering med CSS-transform.
+4. Ingen obligatorisk onboarding-overlay på den godkendte forside, før børn/familier har ønsket det.
+
+---
+
+## Tidligere – v0.9.6
+
 # ÆselKlog – udviklingsplan, v0.9.6 (15. oktober 2026)
 
 **Senest bekræftede GitHub `main` ved udviklingsstart: v0.9.5.** Denne v0.9.6 er bygget fra identiske kildefiler og billeder, og der er tilføjet en komplet pakke med fire ellers manglende eksisterende filer. **Automatiserede lokale tests gennemført. Afventer upload til GitHub Pages og afprøvning på rigtig iPhone.**
