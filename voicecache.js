@@ -40,6 +40,12 @@
  ];
  for(const [name,description] of actionDescriptions)fixed.push(`Æslet! ${name}. ${description}.`);
  const safe=new Set(fixed.map(normalize));
+ // Begge udgaver af de samme anonyme sætninger må gemmes lokalt.
+ // Variationen tilføjer ALDRIG brugerdefinerede eller personlige sætninger.
+ for(const phrase of fixed){
+  const text=normalize(phrase);
+  if(/^Hov, hov!\s+/.test(text))safe.add(text.replace(/^Hov, hov!\s+/,''));
+ }
  function isSafePhrase(text){return safe.has(normalize(text))}
  function makeKey({endpoint,voiceId,text}={}){
   if(!isSafePhrase(text)||typeof voiceId!=='string'||!/^[a-zA-Z0-9_-]{1,50}$/.test(voiceId)||

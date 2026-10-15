@@ -1,3 +1,20 @@
+# 🫏 ÆselKlog – Talstien v0.9.10.1 (15. oktober 2026)
+
+## Mindre forbedring: Oplæseren siger ikke "Hov hov!" hele tiden
+
+- Når en **almindelig oplæsning** begynder med "Hov hov!", bevares indledningen tilfældigt med **35 % sandsynlighed**. I de øvrige 65 % starter stemmen direkte med beskeden. Det gælder alle valgte fortællerstemmer, både ElevenLabs og telefonens oplæsning.
+- Variationen sker **før** ElevenLabs-kald og opslag i lydcachen og kræver ingen ekstra kald eller credits. De eksisterende faste og anonyme sætninger kan stadig gemmes, med og uden indledningen, per valgt stemme. Ingen børnenavne optages i den permanente lydcache.
+- **CPU-æslets egne svar ændres ikke**. Hvis "Hov hov" optræder som et actionfeltnavn eller midt i en sætning, ændres det heller ikke. Æsellyden er uændret.
+- **Gentag** afspiller samme konkrete formulering igen og bruger samme CPU-/fortællerstemme som originalen.
+- Intet er ændret i spillepladen, gemte spil, individuel læring, godkendt forside eller Cloudflare/ElevenLabs-konfiguration.
+- Nyt lille `narration.js`, tilføjet til `index.html` og PWA-cache `aeselklog-talstien-v0910-1-intro-variety`. Alle filer skal uploades sammen.
+
+**Grundlag:** GitHub `main` kontrolleret til v0.9.9 ved udviklingsstart. v0.9.10.1 er bygget videre på den *komplette, tidligere leverede* v0.9.10 ZIP, fordi denne endnu ikke var på GitHub ved opstart. Upload alle filer fra **denne** ZIP for at få v0.9.10-funktionerne med. Den godkendte `home-fullscreen.webp` er uændret.
+
+**Test:** Alle 14 Node-tests og 9 Chromium-browsertests er bestået, inklusive mock-telefonstemme, stemmecache, CPU, gem/fortsæt, mobilforside og individuel læring. Ingen rigtige ElevenLabs-kald i testene. Test derefter på installeret iPhone-PWA; reel iOS-afspilning/PWA-cache kan ikke garanteres af Chromium-tests.
+
+---
+
 # 🫏 ÆselKlog – Talstien v0.9.10 (15. oktober 2026)
 
 ## Nyhed: hvert barn har fire separate læringsniveauer

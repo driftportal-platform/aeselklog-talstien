@@ -1,3 +1,29 @@
+# ÆselKlog v0.9.10.1 – "Hov hov!" indledninger
+
+## Automatiske tests udført 15. oktober 2026
+
+- [x] `node --check` på alle JS-filer og testfiler.
+- [x] 14 Node-tests, inklusive `tests/narration.test.js`: 35 % med/65 % uden indledning i deterministisk test, CPU-undtagelse, ordret Gentag, specialfeltnavn ikke ændret, sikker lydcache.
+- [x] `python tests/narration_browser.py`: mock-telefonstemme og fuldt spil, begge udfald, Gentag uændret.
+- [x] `tests/test_home_v092.py` og `tests/test_home_v096.py`: mobilforside, stående/liggende, gemt spil og alle menuer.
+- [x] `tests/browser_smoke.py`, `tests/persistence_browser.py`: spilflow og gem/fortsæt.
+- [x] `tests/cpu_voice_browser.py`: alternative AI-stemmer og CPU-tur med simuleret AI-lyd.
+- [x] `tests/voice_fallback_browser.py`, `tests/voice_cache_browser.py`: offline, timeout og per-stemme cache med simuleret AI-lyd.
+- [x] `tests/subject_learning_browser.py`: uafhængig læring og lokale profiler.
+- [x] `node tests/pwa_cache.test.js`: ny `narration.js` indeholdt i versioneret offline-cache.
+- [ ] Rigtig iOS/Safari PWA-installation, live ElevenLabs samt kredittæller: afventer manuel prøve på brugerens telefon.
+
+## Manuel iPhone-test efter GitHub-upload
+
+- [ ] Kontroller **PRØVEVERSION 0.9.10.1** på Spil-siden.
+- [ ] Start/fortsæt flere spil og skift nogle ture: "Hov hov!" bør komme indimellem, ikke hver gang (ca. 35 % over mange relevante oplæsninger).
+- [ ] Tryk **Gentag** efter en hilsen både med og uden "Hov hov!"; gentagelsen skal være identisk og bevare stemmen.
+- [ ] Test både forskellige ElevenLabs-fortællerstemmer og telefonstemme; CPU skal stadig sige sit svar før resultatet vises.
+- [ ] Test specialfeltet **Hov hov**, rund æsellyd-knap, gem/fortsæt og eksisterende læringsprofiler.
+- [ ] Tjek at cachen sparer credits ved gentagne anonyme sætninger, også efter genstart, og at den nye PWA-version indlæses.
+
+---
+
 # ÆselKlog v0.9.10 – testplan og status (15. oktober 2026)
 
 ## Automatisk gennemført

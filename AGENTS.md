@@ -1,3 +1,14 @@
+# ÆselKlog – udviklernote v0.9.10.1
+
+- Byg på den **seneste fulde ZIP** v0.9.10 (GitHub `main` viste v0.9.9 ved opstart). Sammenlign altid mod GitHub-main først.
+- Ny `narration.js` er en ren, testbar tekstfunktion. `prepare(text)` udelader *kun* et indledende "Hov hov!" med 65 % sandsynlighed; ved 35 % beholdes det. `cpu:true` og `repeat:true` ændrer aldrig talen. Den samme konkrete variant genbruges på Gentag.
+- Den reelle stemme/rolle, ventetid, CPU-turkontrol og talens afbrydelsesmekanik i `app.js` må ikke omgås; varianten vælges kun én gang pr. oplæsning.
+- `voicecache.js` må kun gemme whitelistede, anonyme sætninger. Nye indledningsvarianter i samme liste er sikre; aldrig vilkårlige spiller-/børnenavne.
+- `narration.js` skal indlæses **før `app.js`** i HTML, browserregressionerne og `sw.js`-listen. Cloudflare Worker, API-nøgler og originale illustrationer er uændrede.
+- Test `node tests/narration.test.js`, `python tests/narration_browser.py` sammen med alle øvrige tests. En fysisk iPhone-PWA- og rigtig ElevenLabs-test afventer upload.
+
+---
+
 # ÆselKlog – udviklernote v0.9.10 (15. oktober 2026)
 
 1. **Hent nyeste GitHub `main` og sammenlign med eventuelle ZIP'er**, og læs `README.md`, `UDVIKLINGSPLAN.md`, `TESTPLAN.md` og hele denne fil, før ny udvikling.

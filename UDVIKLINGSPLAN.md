@@ -1,3 +1,23 @@
+# ÆselKlog – udviklingsplan v0.9.10.1 (15. oktober 2026)
+
+**Status:** v0.9.10.1 er en lille taleopdatering bygget på den tidligere leverede komplette v0.9.10 ZIP; ved opstart viste GitHub `main` v0.9.9. Koden og automatiserede tests er gennemført lokalt. Upload til GitHub og test på installeret iPhone/ægte ElevenLabs mangler.
+
+## v0.9.10.1 – varieret "Hov hov!"
+
+- [x] Oplæserens *indledende* "Hov hov!" beholdes tilfældigt i 35 % af de hidtidige hilsener; ellers læses beskeden uden indledningen.
+- [x] CPU-svar, handlingsfeltet "Hov hov", original lyd, ElevenLabs-Worker, tidsstyring og turflow ændres ikke.
+- [x] Gentag genbruger samme variant og faktisk stemmerolle.
+- [x] Whitelistet lydcache understøtter både med/uden indledning, uden at gemme spillernavne.
+- [x] PWA-cache og alle fire projektfiler opdateret; nyt `narration.js` med automatiske regressionsprøver.
+- [x] Alle 14 Node-tests og 9 Chromium-browserprøver bestået. Ingen reelle AI-kald i tests.
+- [ ] Fysisk iPhone-/familietest, ægte ElevenLabs og GitHub-opdatering.
+
+## Næste planlagte funktion
+
+**v0.9.11 – forældreoversigt:** lokal oversigt over fremskridt i talforståelse, plus, minus og tabeller samt let tilgængelig sletning/privatliv. Matematik forbliver frivillig.
+
+---
+
 # ÆselKlog – udviklingsplan v0.9.10 (15. oktober 2026)
 
 **Status:** Kode implementeret og testet lokalt fra nyeste GitHub `main` v0.9.9. Komplet ZIP til manuel upload. Live GitHub Pages og fysisk iPhone-PWA er ikke opdateret/testet herfra.

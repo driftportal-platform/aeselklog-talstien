@@ -7,7 +7,7 @@ from pathlib import Path
 from io import BytesIO
 from playwright.sync_api import sync_playwright
 ROOT=Path(__file__).resolve().parents[1]
-JS=['engine.js','board.js','actions.js','leaderboard.js','adaptive.js','profiles.js','savegame.js','cpuvoice.js','voicecache.js','app.js','home-ui.js']
+JS=['engine.js','board.js','actions.js','leaderboard.js','adaptive.js','profiles.js','savegame.js','cpuvoice.js','voicecache.js','narration.js','app.js','home-ui.js']
 buf=BytesIO()
 with wave.open(buf,'wb') as wav:
     wav.setnchannels(1);wav.setsampwidth(2);wav.setframerate(16000);wav.writeframes(b'\0\0'*7000)

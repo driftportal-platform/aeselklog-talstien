@@ -1,4 +1,4 @@
-/* ÆselKlog Talstien v0.9.10: individuelle læringsområder og lokal læringshukommelse. */
+/* ÆselKlog Talstien v0.9.10.1: varieret Hov hov-hilsen i oplæsning. */
 (()=>{'use strict';
 const $=id=>document.getElementById(id);
 const qs=sel=>document.querySelector(sel);
@@ -13,8 +13,9 @@ const G=window.AeselSave;
 const P=window.AeselAdaptive;
 const LP=window.AeselProfiles;
 const CV=window.AeselCpuVoice;
+const N=window.AeselNarration;
 const VC=window.AeselVoiceCache;
-if(!G||!P||!LP||!CV||!VC){document.body.textContent='ÆselKlog kan ikke starte: et af spillets moduler mangler.';return;}
+if(!G||!P||!LP||!CV||!VC||!N){document.body.textContent='ÆselKlog kan ikke starte: et af spillets moduler mangler.';return;}
 const A=window.AeselActions;
 if(!A||!A.validate()){document.body.textContent='ÆselKlog kan ikke starte: actions.js mangler eller har ugyldige felter.';return;}
 const SPECIAL=A.FIELDS;
@@ -27,7 +28,7 @@ const defer=(ms)=>new Promise(ok=>setTimeout(ok,ms));
 const AI_VOICE_BASE='https://aeselklog-mia-stemme-test.driftportal-platform.workers.dev';
 const AI_TTS_ENDPOINT=AI_VOICE_BASE+'/tts';
 const AI_VOICES_ENDPOINT=AI_VOICE_BASE+'/voices';
-const sound={on:true,last:'',selected:'auto',rate:1,pitch:1,mode:'ai',aiVoice:'mia',cpuVoice:'auto'};
+const sound={on:true,last:'',lastCPU:false,selected:'auto',rate:1,pitch:1,mode:'ai',aiVoice:'mia',cpuVoice:'auto'};
 const voiceKey='aeselklog-voice-v03';
 let aiVoices=[{id:'mia',name:'Mia – varm dansk fortæller'}],aiVoicesLoadedAt=0,aiVoiceLoading=null;
 let setupPlayers=[{name:'Spiller 1',age:6,kind:'child',difficulty:'mellem'},{name:'Spiller 2',age:8,kind:'child',difficulty:'mellem'}];
@@ -253,11 +254,14 @@ async function speakAI(text,id,{cpu=false}={}){
  }finally{if(id===speechSerial)aiFetch=null}
 }
 
-function say(text,{cpu=false}={}){
- sound.last=text;
+function say(text,{cpu=false,repeat=false}={}){
+ // Variation sker præcis én gang før cacheopslag og stemmeafspilning.
+ // Ved Gentag genbruges den faktiske tidligere oplæsning ordret.
+ const line=N.prepare(text,{cpu,repeat});
+ sound.last=line;sound.lastCPU=cpu;
  stopCurrentVoice();
  if(!sound.on){lastNarration=Promise.resolve();return lastNarration}
- const t=normalizedSpeech(text),id=speechSerial;
+ const t=normalizedSpeech(line),id=speechSerial;
  lastNarration=sound.mode==='ai'?speakAI(t,id,{cpu}):speakLocally(t,{cpu});
  return lastNarration;
 }
@@ -326,7 +330,7 @@ if($('brayPreview'))$('brayPreview').addEventListener('click',playBray);
 if($('boardBray'))$('boardBray').addEventListener('click',playBray);
 $('voiceToggle').addEventListener('click',()=>{sound.on=!sound.on;$('voiceToggle').textContent=sound.on?'🔊 Lyd til':'🔇 Lyd fra';$('voiceToggle').setAttribute('aria-pressed',String(sound.on));if(sound.on)say('Hov hov! Nu kan du høre mig!');else {stopCurrentVoice();bray?.pause()}});
 if($('testVoice'))$('testVoice').addEventListener('click',()=>say('Hov hov! Jeg er ÆselKlog, og jeg glæder mig til at spille med jer!')); 
-$('speakAgain').addEventListener('click',()=>say(sound.last||'Hov hov! Nu er det din tur.'));
+$('speakAgain').addEventListener('click',()=>say(sound.last||'Nu er det din tur.',{cpu:sound.lastCPU,repeat:true}));
 
 function safeStorage(){try{return window.localStorage}catch(_){return null}}
 function timeLeftForSave(){
@@ -592,7 +596,7 @@ function updateBoardHud(){
   ' · '+({move:extraRollUsed?'Ekstra kast':'Slå terningen',learn:'Læringsterning',question:'Svar på opgaven',moving:'Æslet hopper',feedback:'Svar afgjort',result:'Næste spiller',swap:'Byt felt',skipped:'Spring tur over', 'super-offer':'Frivillig superopgave',win:'MÅL!'}[phase]||'Spil');
  $('boardPanelDock').dataset.phase=phase;
 }
-$('boardRepeat').addEventListener('click',()=>say(sound.last||`Nu er det ${players[turn]?.name||'din'} tur.`));
+$('boardRepeat').addEventListener('click',()=>say(sound.last||`Nu er det ${players[turn]?.name||'din'} tur.`,{cpu:sound.lastCPU,repeat:true}));
 window.addEventListener('resize',()=>{
  if(!boardExpanded)return;
  // Reskalér efter mobilens rotation og bevar automatisk fokus på aktivt æsel.
