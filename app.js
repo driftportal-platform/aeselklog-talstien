@@ -1,4 +1,4 @@
-/* ÆselKlog Talstien v0.9.8: sikker stemmespecifik lydcache på v0.9.7. */
+/* ÆselKlog Talstien v0.9.9: UI-oprydning og æsellyd på spillepladen. */
 (()=>{'use strict';
 const $=id=>document.getElementById(id);
 const qs=sel=>document.querySelector(sel);
@@ -321,9 +321,10 @@ $('voiceChoice').addEventListener('change',e=>{sound.selected=e.target.value;sav
 $('voiceSpeed').addEventListener('input',e=>{sound.rate=Number(e.target.value);syncVoiceControls();saveVoice()});
 $('voicePitch').addEventListener('input',e=>{sound.pitch=Number(e.target.value);syncVoiceControls();saveVoice()});
 $('voicePreview').addEventListener('click',()=>say('Hov hov! Du står på syvogtyve. Er fireogtredive større eller mindre end syvogtyve?'));
-$('brayPreview').addEventListener('click',playBray);
+if($('brayPreview'))$('brayPreview').addEventListener('click',playBray);
+if($('boardBray'))$('boardBray').addEventListener('click',playBray);
 $('voiceToggle').addEventListener('click',()=>{sound.on=!sound.on;$('voiceToggle').textContent=sound.on?'🔊 Lyd til':'🔇 Lyd fra';$('voiceToggle').setAttribute('aria-pressed',String(sound.on));if(sound.on)say('Hov hov! Nu kan du høre mig!');else {stopCurrentVoice();bray?.pause()}});
-$('testVoice').addEventListener('click',()=>say('Hov hov! Jeg er ÆselKlog, og jeg glæder mig til at spille med jer!'));
+if($('testVoice'))$('testVoice').addEventListener('click',()=>say('Hov hov! Jeg er ÆselKlog, og jeg glæder mig til at spille med jer!')); 
 $('speakAgain').addEventListener('click',()=>say(sound.last||'Hov hov! Nu er det din tur.'));
 
 function safeStorage(){try{return window.localStorage}catch(_){return null}}
@@ -486,7 +487,7 @@ $('startButton').addEventListener('click',()=>{
  const start=all?0:Number(raw.split('-')[0])-1,goal=all?100:Number(raw.split('-')[1]);
  config={raw,all,start,goal,learning:radio('learning'),boardMode:radio('boardMode'),moveDice:radio('moveDice'),learnDice:radio('learnDice'),pace:['normal','rolig','ekstra'].includes($('gamePace').value)?$('gamePace').value:'rolig',tables:$('tablesChoice').value||'auto',adaptive:$('adaptiveCheck').checked};
  players=setupPlayers.map((p,i)=>({...p,difficulty:p.kind==='adult'?$('adultDifficultySetting').value:p.difficulty,name:(p.name||'').trim()||`Spiller ${i+1}`,color:COLORS[i],id:`player${i+1}`,isCPU:false,pos:start,skipNextTurn:false,stats:{correct:0,attempted:0},learning:P.fresh()}));
- if($('cpuCheck').checked)players.push({name:'Æslet',kind:'cpu',age:8,color:'#c18b46',id:'cpu',isCPU:true,pos:start,skipNextTurn:false,stats:{correct:0,attempted:0},learning:P.fresh()});
+ if($('cpuCheck').checked)players.push({name:'Æsel',kind:'cpu',age:8,color:'#c18b46',id:'cpu',isCPU:true,pos:start,skipNextTurn:false,stats:{correct:0,attempted:0},learning:P.fresh()});
  if($('cpuCheck').checked&&sound.mode==='ai')void loadAIVoices();
  turn=0;phase='move';challenge=null;pending=null;resultLines=[];winner=null;extraRollUsed=false;
  $('rangeTitle').textContent=all?'Hele Talstien · 1–100':`Talområde ${raw}`;

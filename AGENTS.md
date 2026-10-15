@@ -1,6 +1,6 @@
-# ÆselKlog – udviklernote v0.9.8
+# ÆselKlog – udviklernote v0.9.9
 
-- **Start altid på nyeste GitHub `main`.** Lokal v0.9.8 bygger på verificeret `main` v0.9.6 samt tidligere leveret v0.9.7. Ingen direkte GitHub-upload udført.
+- **Start altid på nyeste GitHub `main`.** Lokal v0.9.9 bygger videre på v0.9.8 med fokus på UI-oprydning. Ingen direkte GitHub-upload udført.
 - `voicecache.js` er nyt modul for kun **upersonlige, faste sætninger** i IndexedDB; nøglen indeholder Worker, faktisk stemme-ID, tekst og lydmodel-version. Det er IKKE en generel cache for alle spiller-/børnenavne.
 - `app.js` skal vente på cache/lydafspilning som før. CPU må først afgive/afsløre svar efter oplæsning. Test stemmeændring midt i oplæsning og i baggrunden.
 - AI-cache må aldrig indeholde ElevenLabs API-nøgler eller private spilleroplysninger. Serverens /tts og /voices anvendes fortsat via Cloudflare Worker; Workerens secrets skal forblive hos Cloudflare.

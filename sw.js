@@ -1,6 +1,6 @@
-/* ÆselKlog v0.9.8 – versioneret offline-cache. Ingen Cloudflare/ElevenLabs-data caches. */
+/* ÆselKlog v0.9.9 – versioneret offline-cache. Ingen Cloudflare/ElevenLabs-data caches. */
 const CACHE_PREFIX='aeselklog-talstien-';
-const CACHE='aeselklog-talstien-v098-voice-cache';
+const CACHE='aeselklog-talstien-v099-voice-cache';
 const CORE=['./','./index.html','./styles.css','./home-ui.js','./home-fullscreen.webp',
  './app.js','./engine.js','./board.js','./actions.js','./leaderboard.js',
  './adaptive.js','./savegame.js','./cpuvoice.js','./voicecache.js','./manifest.webmanifest',

@@ -1,8 +1,8 @@
-# ÆselKlog – udviklingsplan, v0.9.8 (15. oktober 2026)
+# ÆselKlog – udviklingsplan, v0.9.9 (15. oktober 2026)
 
 **Grundlag:** Senest kontrollerede GitHub `main` = v0.9.6. Bygget videre på den lokalt leverede komplette v0.9.7, uden ændringer i det godkendte forsidebillede eller spilmotorens regler. Ikke uploadet til GitHub af assistenten.
 
-## v0.9.8 – intelligent AI-lydcache
+## v0.9.9 – forside og spilleplade ryddes op
 
 - [x] Permanent IndexedDB-lydlagring for en lille, eksplicit liste af **upersonlige** sætninger.
 - [x] Cache-nøgler omfatter faktisk valgt Worker, AI-stemme-ID, modelcache-version og tekst. Mia, Mads og CPU-æslet kan gemmes separat.

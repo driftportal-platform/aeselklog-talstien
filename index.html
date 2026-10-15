@@ -14,7 +14,7 @@
 <div class="shell">
   <header class="top">
     <div class="brand"><div class="logo" aria-hidden="true">🫏</div><div><h1>Æsel<span class="red">Klog</span> · Talstien</h1><small>Spil, lær og grin sammen</small></div></div>
-    <div class="top-actions"><span class="pill">PRØVEVERSION 0.9.8</span><button id="voiceToggle" class="btn soft small" type="button" aria-pressed="true">🔊 Lyd til</button></div>
+    <div class="top-actions"><span class="pill">PRØVEVERSION 0.9.9</span><button id="voiceToggle" class="btn soft small" type="button" aria-pressed="true">🔊 Lyd til</button></div>
   </header>
 
 
@@ -118,7 +118,7 @@
       </div>
       <div class="row between">
         <p class="tiny" id="voiceAvailability" style="margin:0;flex:1">Finder danske stemmer…</p>
-        <button id="voicePreview" class="btn soft small" type="button">▶ Prøv valgt stemme</button><button id="brayPreview" class="btn soft small" type="button">🫏 Prøv æsellyd</button>
+        <button id="voicePreview" class="btn soft small" type="button">▶ Prøv valgt stemme</button>
       </div>
       <p class="tiny" style="margin:7px 0 0">Telefonstemmen virker uden internet. Mia er standardvalget, og AI-stemmer kræver internet. Hvis ElevenLabs ikke svarer, skifter spillet til telefonens stemme.</p>
     </div>
@@ -131,7 +131,7 @@
     <div class="page-heading"><button type="button" class="btn soft small" id="setupBack">← Forside</button><h2>🎲 Hvem skal spille?</h2></div>
     <div class="settings-glance" id="settingsSummary" aria-live="polite"><span>⚙️ Spillet er klar med dine indstillinger.</span><button type="button" id="setupEditSettings" class="btn soft small">Skift indstillinger</button></div>
     <div class="paper"><div class="row between"><div><h2>👨‍👩‍👧 Spillere</h2></div><button type="button" id="addPlayer" class="btn soft small">+ Tilføj spiller</button></div><div id="playerInputs"></div>
-      <label class="option cpu-quick-toggle"><input type="checkbox" id="cpuCheck"><span><strong>🫏 Spil mod ÆselKlog (CPU)</strong></span></label><button type="button" id="startButton" class="btn main block" style="margin-top:12px">Start spillet 🥕</button></div>
+      <label class="option cpu-quick-toggle"><input type="checkbox" id="cpuCheck"><span><strong>🫏 Spil mod Æsel</strong></span></label><button type="button" id="startButton" class="btn main block" style="margin-top:12px">Start spillet 🥕</button></div>
 
   </section>
 
@@ -167,14 +167,19 @@
         <button class="hud-speaker" type="button" id="boardRepeat" aria-label="Gentag seneste besked">🔊</button>
       </div>
       <div class="board-panel-dock" id="boardPanelDock" role="region" aria-label="Tur og matematikopgave"></div>
+
+      <button type="button" id="boardBray" class="board-bray" aria-label="Afspil æsellyd" title="Æsellyd">
+        <span class="board-bray-icon" aria-hidden="true">🫏</span>
+        <span class="board-bray-label">Æsellyd</span>
+      </button>
       <div class="legend"><span>🟦 1–20</span><span>🌷 21–40</span><span>🟨 41–60</span><span>🟩 61–80</span><span>🟪 81–100</span></div>
       <p class="board-tip tiny">Træk med én finger for at se banen, knib med to fingre for at zoome, eller brug knapperne. Feltnumrene er altid synlige – også på actionfelter.</p>
-      <p class="board-stage-note tiny">I v0.9 kan I gemme spillet, fortsætte senere og få opgaver, der tilpasser sig barnets svar.</p>
+      
     </section>
   </section>
   </main>
 
-  <footer><strong>ÆselKlog · v0.9.8 · Gem og fortsæt · Tilpasset læring</strong><br>Den almindelige kortspilsvariant udvikles særskilt. Denne prøve handler om Talstien og læringsopgaverne.<div class="footer-links"><button type="button" class="btn soft small" id="testVoice">🔊 Prøv æslets stemme</button></div></footer>
+  <footer class="app-footer" hidden></footer>
 </div>
 
 <dialog id="aboutDialog" aria-labelledby="aboutTitle">

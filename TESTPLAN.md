@@ -1,4 +1,4 @@
-# ÆselKlog v0.9.8 – lydcache og fler-stemme-regression
+# ÆselKlog v0.9.9 – UI-oprydning og lydcache-regression
 
 ## Automatiske tests udført 15. oktober 2026
 
@@ -16,7 +16,7 @@ Alle Playwright-browser-tests bruger Chromium og **simulerede** AI-lyde og Index
 
 ## På rigtig iPhone-PWA efter upload
 
-- [ ] Kontrollér versionsmærket 0.9.8, og at godkendt forside, Fortsæt/Slet og alle fire menuer er synlige.
+- [ ] Kontrollér versionsmærket 0.9.9, og at godkendt forside, Fortsæt/Slet og alle fire menuer er synlige.
 - [ ] Vælg fx Mia, tryk "Prøv æslets stemme" to gange: første gang bruger credits, anden gang skal bruge cache. Se antal klip under "Gemte AI-lyde".
 - [ ] Vælg Mads eller en anden *godkendt* stemme: første oplæsning med denne stemme skal være et nyt klip. Skift tilbage til Mia: lydklippet skal være den oprindelige Mia-stemme.
 - [ ] Vælg særskilt stemme til CPU-æslet og tryk "Hør CPU-æslet svare". Test at CPU'en stadig venter på, at talen afsluttes.

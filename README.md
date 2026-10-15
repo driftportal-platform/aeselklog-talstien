@@ -1,14 +1,14 @@
-# 🫏 ÆselKlog – Talstien v0.9.8 (15. oktober 2026)
+# 🫏 ÆselKlog – Talstien v0.9.9 (15. oktober 2026)
 
-## Nyhed: permanent, stemmespecifik AI-lydcache
+## Nyhed: UI-oprydning oven på intelligent lydcache
 
 - `voicecache.js` gemmer **kun udvalgte, faste og upersonlige** ElevenLabs-sætninger på den aktuelle enhed i **IndexedDB**.
 - Hvert lydklip identificeres ved **Worker-endpoint + valgt AI-stemme-ID + lydmodel-version + tekst**. Spillelederens stemme (Mia, Mads eller en anden) og CPU-æslets stemme holdes adskilt, når de faktisk bruger forskellige stemme-ID'er.
-- En genkendt sætning læses fra lydcachen **før** et nyt ElevenLabs-kald – også uden internet eller under midlertidig AI-fejl.
+- Den permanente, stemmespecifikke AI-lydcache fra v0.9.8 er bevaret og uændret.
 - Nye lydklip genereres kun, når de bliver brugt første gang. **Ingen forhåndsgenerering**, der forbruger credits uden at barnet spiller.
 - Cachebegrænsning: **15 MB / 70 klip**, ældste klip slettes automatisk. Der lagres ingen spiller- eller børnenavne, personlige oplæsninger, adgangsnøgler eller fulde matematikopgaver.
 - Under **Indstillinger → Stemme og lyd → Gemte AI-lyde** vises antal klip og størrelse, og man kan trykke **Ryd gemte AI-lyde**.
-- Telefonstemmen bruges stadig, hvis AI-lyd ikke kan hentes, og en sætning endnu ikke er gemt. Hvis browseren ikke tillader IndexedDB, fungerer spillet uden permanent lydcache.
+- Forsiden er justeret, så knappen **Fortsæt spil** ikke overlapper de godkendte menuknapper.
 - Eksisterende 24-lydklips RAM-cache, ElevenLabs-Worker, CPU-turpauser, stemmevalg, godkendt forside, spil, gem/fortsæt og adaptiv matematik er bevaret.
 
 **Filer:** Ny `voicecache.js`, ændringer i `app.js`, `index.html`, `styles.css`, `sw.js`, testfiler og dokumentation. PWA-cache: `aeselklog-talstien-v098-voice-cache`.
