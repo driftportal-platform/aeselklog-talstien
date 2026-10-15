@@ -1,3 +1,25 @@
+# 🫏 ÆselKlog – Talstien v0.9.11 (15. oktober 2026)
+
+## Ny funktion: Forældreoversigt med lokal læringshistorik
+
+- Åbn **Indstillinger → Husk barnets niveau mellem spil → 📈 Forældreoversigt**. Her kan man vælge et barns selvvalgte kaldenavn og se **talforståelse, plus, minus og gangetabeller** hver for sig.
+- Hvert kort viser barnets aktuelle *spiltilpasningsniveau* (−2 til +2), antal rigtige/forsøg, de seneste 30 dages registrerede øvelser og en kurve over højst 12 nyere øvelser. Grøn prik = korrekt svar, orange = forkert svar. Dette er **ikke en faglig vurdering**.
+- Fra denne version gemmer `profiles.js` en begrænset historik på maks. **96 gennemførte læringsopgaver pr. barn**, i det eksisterende lokale v1-profilformat. Historikken indeholder kun tidspunkt, regneart, korrekt/forkert, om tip blev brugt og tilpasningsniveau. **Ikke** opgavetekst, eksakt svar, fødselsdato, alder, lyd eller API-nøgler. Ingen server, konto eller synkronisering.
+- **Gamle profiler bevares:** eksisterende niveauer og forsøgstal fra v0.9.10.1 vises straks. De nye historikkurver begynder først fra første opgave efter opgraderingen; der opfindes ingen historik.
+- **Slet dette barns læringsdata** fjerner én lokal profil med bekræftelse. Den tidligere knap **Slet læringsprofiler** fjerner fortsat alle profiler. Ingen af dem sletter Topscore, PWA-lydcache eller et gemt spil. Vær opmærksom på, at et igangværende spil stadig har sit egen midlertidige læringstilstand.
+- Data gemmes kun, når **Husk barnets niveau mellem spil** og automatisk tilpasning er slået til, barnet har et gyldigt og entydigt kaldenavn og der er blevet svaret på en opgave. Uden lokal lagring virker spillet fortsat.
+- Den godkendte forside, kompakte Fortsæt spil, rund æsellyd-knap, frivillig LEG, aldersgrænser, CPU-turpauser, varieret 'Hov hov!', stemmevalg, ElevenLabs via Cloudflare, offlinefunktion, lydcache og gemte spil er bevaret. **Ingen ændring af Cloudflare secrets eller det godkendte forsidebillede.**
+
+### Filer og installation
+
+Nyt `parentreport.js`-modul med lokal opsummering og graf samt `tests/parentreport.test.js`, `tests/profile_history.test.js` og `tests/parent_overview_browser.py`. Ændret `profiles.js`, `app.js`, `index.html`, `styles.css`, `sw.js`, browserregressioner og dokumentation. PWA-cache: `aeselklog-talstien-v0911-parent-overview`.
+
+**Kilde:** Nyeste GitHub `main` er verificeret til **v0.9.10.1** før arbejdet. Alle kildefiler i den tidligere v0.9.10.1 ZIP blev sammenlignet med GitHub på relevante Git-hashes. Denne ZIP indeholder hele projektet til manuel upload, ikke blot ændrede filer. For at installere: pak ZIP'en ud og upload indholdet til repositoryets rod, inklusive `parentreport.js`, opdater `sw.js`, og vent på GitHub Pages. Upload **ikke** kun selve ZIP-filen. Genåbn derefter iPhone-PWA og kontrollér versionsmærket v0.9.11.
+
+**Testgrænse:** Automatisk Node-/Chromium-test bruger simuleret tale og lokallager. Reel iPhone-PWA, live ElevenLabs og offline-oplevelsen bør afprøves på fysisk telefon efter upload. Se `TESTPLAN.md` for testresultater og manuelle prøver.
+
+---
+
 # 🫏 ÆselKlog – Talstien v0.9.10.1 (15. oktober 2026)
 
 ## Mindre forbedring: Oplæseren siger ikke "Hov hov!" hele tiden

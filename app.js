@@ -1,4 +1,4 @@
-/* ÆselKlog Talstien v0.9.10.1: varieret Hov hov-hilsen i oplæsning. */
+/* ÆselKlog Talstien v0.9.11: lokal, valgfri forældreoversigt. */
 (()=>{'use strict';
 const $=id=>document.getElementById(id);
 const qs=sel=>document.querySelector(sel);
@@ -12,10 +12,11 @@ const L=window.AeselLeaderboard;
 const G=window.AeselSave;
 const P=window.AeselAdaptive;
 const LP=window.AeselProfiles;
+const PR=window.AeselParentReport;
 const CV=window.AeselCpuVoice;
 const N=window.AeselNarration;
 const VC=window.AeselVoiceCache;
-if(!G||!P||!LP||!CV||!VC||!N){document.body.textContent='ÆselKlog kan ikke starte: et af spillets moduler mangler.';return;}
+if(!G||!P||!LP||!PR||!CV||!VC||!N){document.body.textContent='ÆselKlog kan ikke starte: et af spillets moduler mangler.';return;}
 const A=window.AeselActions;
 if(!A||!A.validate()){document.body.textContent='ÆselKlog kan ikke starte: actions.js mangler eller har ugyldige felter.';return;}
 const SPECIAL=A.FIELDS;
@@ -468,6 +469,41 @@ $('clearLearningProfiles').addEventListener('click',()=>{
  if(!window.confirm('Slet alle læringsprofiler på denne enhed? Gemte spil og Topscore berøres ikke.'))return;
  refreshLearningProfileStatus(LP.clear(safeStorage())?'Læringsprofilerne er slettet.':'Det lokale lager kunne ikke ryddes.');
 });
+function updateParentReportBody(){
+ const name=$('parentReportSelect').value;
+ $('parentReportContent').innerHTML=PR.renderHtml(LP.report(safeStorage(),name));
+ $('deleteParentProfile').disabled=!name;
+}
+function refreshParentReport(selectedName=''){
+ const select=$('parentReportSelect'),records=LP.list(safeStorage());
+ const key=LP.normName(selectedName||select.value);
+ select.replaceChildren();
+ if(!records.length){
+  const option=document.createElement('option');option.textContent='Ingen profiler endnu';option.value='';select.append(option);
+ }else{
+  records.forEach(({name})=>{const option=document.createElement('option');option.value=name;option.textContent=name;select.append(option)});
+  const chosen=records.find(p=>LP.normName(p.name)===key);
+  if(chosen)select.value=chosen.name;
+ }
+ select.disabled=!records.length;
+ updateParentReportBody();
+}
+$('openParentReport').addEventListener('click',()=>{
+ refreshParentReport(LP.list(safeStorage())[0]?.name||'');
+ const dlg=$('parentReportDialog');
+ if(typeof dlg.showModal==='function'&&!dlg.open)dlg.showModal();else dlg.hidden=false;
+});
+$('parentReportSelect').addEventListener('change',updateParentReportBody);
+$('closeParentReport').addEventListener('click',()=>{
+ const dlg=$('parentReportDialog');if(typeof dlg.close==='function'&&dlg.open)dlg.close();else dlg.hidden=true;
+});
+$('deleteParentProfile').addEventListener('click',()=>{
+ const name=$('parentReportSelect').value;
+ if(!name||!window.confirm('Slet læringshistorik og niveauer for '+name+'? Gemte spil og Topscore berøres ikke.'))return;
+ if(LP.remove(safeStorage(),name)){
+  refreshLearningProfileStatus();refreshParentReport();
+ }else $('parentReportContent').textContent='Profilen kunne ikke slettes på denne enhed.';
+});
 $('homePlay').addEventListener('click',()=>show('setup'));
 $('homeSettings').addEventListener('click',()=>show('settings'));
 $('homeTopscore').addEventListener('click',openTopscore);
@@ -860,7 +896,7 @@ function processAnswer(idx,timedOut=false){
   const area=P.challengeArea(challenge),update=P.noteArea(p.learning,area,correct,{helped:helpUsed});
   p.learning=update.state;
   if(config.rememberLearning&&LP.normName(p.name)&&players.filter(x=>!x.isCPU&&LP.normName(x.name)===LP.normName(p.name)).length===1){
-   const persisted=LP.record(safeStorage(),p.name,p.learning,challenge.exerciseId);
+   const persisted=LP.record(safeStorage(),p.name,p.learning,challenge.exerciseId,{area,correct,helped:helpUsed,step:update.step});
    // After a crash/resume, answering a previously recorded exercise again
    // must not count twice in a saved learning profile.
    if(persisted.duplicate)p.learning=persisted.progress;

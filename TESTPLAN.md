@@ -1,3 +1,29 @@
+# ÆselKlog v0.9.11 – test af forældreoversigt
+
+## Automatiske tests gennemført 15. oktober 2026
+
+- [x] `node --check` af projektets JavaScript og alle Node-tests.
+- [x] **16 Node-tests**, inklusive nye `tests/profile_history.test.js` og `tests/parentreport.test.js`: gamle v1-profiler uden historik, kort og sikker 96-forsøgs historik, dobbeltregistrering undgås, korrekt statistik pr. regneart, HTML-escaping mod injektion, sletning af én/alle profiler og lager uden personfølsomme felter.
+- [x] **10 Chromium-browsertests**: `tests/test_home_v092.py`, `tests/test_home_v096.py`, `tests/browser_smoke.py`, `tests/persistence_browser.py`, `tests/cpu_voice_browser.py`, `tests/voice_fallback_browser.py`, `tests/voice_cache_browser.py`, `tests/subject_learning_browser.py`, `tests/narration_browser.py`, `tests/parent_overview_browser.py`.
+- [x] Den nye browsertest starter med **ingen profiler**, viser en gammel v0.9.10.1-profil uden at opfinde historik, spiller tre plusopgaver med en navngiven barnespiller og ser dem i grafen. Herefter slettes kun den valgte profil, mens en anden profil og et gemt spil stadig findes. Der er også taget preview i mobil og desktop.
+- [x] `node tests/pwa_cache.test.js`: `parentreport.js` ligger i offline-asset-listen og PWA-cachen bruger v0.9.11.
+
+**Testgrænse:** Browserne er Chromium med mockede AI-stemmer og lokal lagring, ikke Safari på iPhone. Ingen rigtige ElevenLabs-kald, ingen live-test af Worker og ingen fysisk installeret iPhone-PWA er gennemført. PWA Service Worker-opdateringen er unit-testet; installation/offline-genstart kræver fysisk kontrol.
+
+## Afprøv efter GitHub-upload på fysisk iPhone
+
+- [ ] Åbn appen, og kontrollér versionsmærket **PRØVEVERSION 0.9.11** under Spil/Indstillinger. Forsiden skal stadig være den godkendte illustration med alle fire menuer og kompakt Fortsæt spil.
+- [ ] Åbn **Indstillinger → Forældreoversigt**. Se at en gammel profil fra v0.9.10.1 beholder sine niveauer og forsøg, men endnu ikke viser historikkurve, før barnet har svaret i v0.9.11.
+- [ ] Start et spil med ét unikt kaldenavn og automatiske opgaver. Besvar tre plusopgaver rigtigt, og åbn oversigten igen. Plusniveau og antal rigtige skal være opdateret, men minus/talforståelse/tabeller må ikke automatisk stige.
+- [ ] Prøv et forkert svar og et svar med hjælp. Statistikken tæller det registrerede resultat, og tip må fortsat ikke øge niveau-streak kunstigt.
+- [ ] Prøv at bladre/scroll i forældreoversigten i stående og liggende mobilformat. De fire kort og knappen til at lukke oversigten skal kunne bruges uden overlap.
+- [ ] Slet den ene valgte profil. Andre børns profiler skal blive. Et tidligere gemt spil og Topscore må ikke slettes. Under et fortsat, gemt spil med automatisk profilhukommelse kan en profil dog oprettes igen ved et **nyt** svar.
+- [ ] Slå **Husk barnets niveau mellem spil** fra; start et nyt spil, og kontrollér at der ikke kommer nye historikhændelser i det lokale profillager.
+- [ ] Test offline efter tidligere indlæsning: eksisterende oversigt og stemmecache skal kunne vises uden netværk. Prøv også valgte ElevenLabs-stemmer, æsellyd, pauser og 'Hov hov!' variation.
+- [ ] Rydning af iPhone-webstedsdata kan fjerne profiler, gemte spil og topscore; dette er en lokal funktion, ikke cloud-backup.
+
+---
+
 # ÆselKlog v0.9.10.1 – "Hov hov!" indledninger
 
 ## Automatiske tests udført 15. oktober 2026

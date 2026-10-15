@@ -1,3 +1,27 @@
+# ÆselKlog – udviklingsplan v0.9.11 (15. oktober 2026)
+
+**Status ved udviklingsstart:** GitHub `main` er bekræftet opdateret til v0.9.10.1. Ny v0.9.11 er udviklet fra den samme kilde; upload til GitHub Pages og fysisk iPhone-test afventer stadig.
+
+## Forældreoversigt, første version
+
+- [x] Fire læringsområder synlige enkeltvis: talforståelse, plus, minus og gangetabeller.
+- [x] Aktuelt tilpasningsniveau, rigtige/forsøg og lille visuel udvikling over de seneste opgaver.
+- [x] Begrænset, lokal historik (96 opgaver/kaldenavn) med resultat, område, trin og tidspunkt; ingen alder, facit eller opgavetekst.
+- [x] Eksisterende v1-læringsprofiler læses uden migreringsproblemer. Der vises ikke opfundet historik for gamle data.
+- [x] Forældreoversigt under Indstillinger; slet enkelt profil eller alle læringsprofiler med bekræftelse.
+- [x] Samme spilmotor, valgfri LEG, gamle gemte spil, CPU-æslets ventetid, PWA-lyd, cache og original forside.
+- [x] PWA-versionering og tests af database/visning, dublikatsikring og sletning.
+- [ ] Test på fysisk iPhone og med familier. Afprøv at grafer og tekster er forståelige, også ved meget få opgaver.
+
+## Næste forslag
+
+1. Indsaml feedback fra et par familier om brugbarheden af forældreoversigten og læringstrinene – uden at gøre matematik obligatorisk.
+2. Justér opgavernes pædagogiske progression pr. aldersgruppe, når vi har faktiske erfaringer fra spillet.
+3. Forbedr tilgængelighed og de sjove animationer uden at ændre SVG-felternes placering.
+4. Overvej en frivillig lokal eksport af læringsoversigten før en mulig v1.0. Den skal aldrig udsende data automatisk.
+
+---
+
 # ÆselKlog – udviklingsplan v0.9.10.1 (15. oktober 2026)
 
 **Status:** v0.9.10.1 er en lille taleopdatering bygget på den tidligere leverede komplette v0.9.10 ZIP; ved opstart viste GitHub `main` v0.9.9. Koden og automatiserede tests er gennemført lokalt. Upload til GitHub og test på installeret iPhone/ægte ElevenLabs mangler.

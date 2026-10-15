@@ -1,3 +1,14 @@
+# ÆselKlog – udviklernote v0.9.11 (forældreoversigt)
+
+1. Start altid med **seneste GitHub `main`**, læs `README.md`, `AGENTS.md`, `TESTPLAN.md` og `UDVIKLINGSPLAN.md`. v0.9.11 er bygget fra GitHub-verificeret v0.9.10.1 og må ikke overtage gamle ZIP'er ukritisk.
+2. `profiles.js` bevarer nøglen `aeselklog-laereprofiler-v1` og `version:1`, så gammel historikløs profil læses fortsat. Tilføjet valgfrit `history` med højst 96 hændelser; `LP.record(..., exerciseId, {area,correct,helped,step})` tilføjer én hændelse **kun efter** et nyt gennemført svar. Gentaget `exerciseId` må ikke tælle igen. `LP.report()` og `LP.remove()` er nye. Profildata indeholder ingen alder, opgavetekst, facit eller API-nøgler. Sletning ændrer ikke gemte spil/Topscore.
+3. `parentreport.js` er et rent visnings-/opsummeringsmodul med HTML-escaping. `parentReportDialog` åbnes kun fra **Indstillinger**, ikke fra den godkendte forside. Voksne og CPU får ikke læringshistorik. Ingen netværkskald fra rapporten, ingen account-oprettelse.
+4. `app.js` opdaterer læringshistorikken inde i `processAnswer`, efter `P.noteArea`, og kun når `config.adaptive`, `config.rememberLearning`, barn med unik, ikke-standard kaldenavn og et reelt svar. LEG forbliver uden tvungne spørgsmål, bortset fra frivillige superopgaver. Ingen ændringer i den eksisterende gemme-schema v1.
+5. `sw.js` må kun rydde caches med ÆselKlogs eget præfiks, indeholde `parentreport.js` og versionsmærke v0.9.11. Bevar `home-fullscreen.webp` identisk med godkendt forside. Vær særlig opmærksom på CPU-tale/ventetid, stemmevalg, 'Hov hov!' 35 %, lydcache og iPhone-viewport.
+6. Test `tests/profile_history.test.js`, `tests/parentreport.test.js` og `tests/parent_overview_browser.py` sammen med tidligere Node- og Chromium-regressioner. Kald det ikke fysisk iPhone-test, når der er brugt mockede stemmer i Chromium.
+
+---
+
 # ÆselKlog – udviklernote v0.9.10.1
 
 - Byg på den **seneste fulde ZIP** v0.9.10 (GitHub `main` viste v0.9.9 ved opstart). Sammenlign altid mod GitHub-main først.
