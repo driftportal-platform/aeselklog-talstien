@@ -1,3 +1,26 @@
+# ÆselKlog – udviklingsplan, v0.9.6 (15. oktober 2026)
+
+**Senest bekræftede GitHub `main` ved udviklingsstart: v0.9.5.** Denne v0.9.6 er bygget fra identiske kildefiler og billeder, og der er tilføjet en komplet pakke med fire ellers manglende eksisterende filer. **Automatiserede lokale tests gennemført. Afventer upload til GitHub Pages og afprøvning på rigtig iPhone.**
+
+## v0.9.6 – kompakt Fortsæt spil
+
+- [x] Fjern det store `Gemte spil`-panel fra forsiden.
+- [x] Vis kun `▶ Fortsæt spil` + `✕ Slet` ved lokalt gemt spil.
+- [x] Behold den godkendte 417×883 WebP-forside og de fire menuknapper uændrede.
+- [x] I mobil-landskab få en selvstændig lille række til Fortsæt spil uden at dække de fire hovedmenuknapper.
+- [x] Versionsmærke og Service Worker-cache opdateret til v0.9.6.
+- [x] Tilføj browser-regressionstest for mobilsynlighed, navigation, gem/fortsæt og slet.
+- [ ] **Fysisk iPhone-PWA-test**: se at opdateringen lander på hjemskærmsversionen, alle menuer kan trykkes, Fortsæt/Slet virker, og lyd fortsætter uændret.
+- [ ] Familietest før v1.0.
+
+## Næste version
+
+- v0.9.7 eller senere: lille oprydning i CSS/JS, mere stabil stemme og bedre PWA-opdateringsoplevelse. Kør regressionspakke og bevar frivillig matematik.
+
+---
+
+## Historik
+
 # ÆselKlog v0.9.5 – fuldskærmsforside som referencebilledet
 
 - Forsiden er én sammenhængende illustration fra det godkendte referencebillede (ikke et billede over gamle knapper).

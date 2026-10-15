@@ -428,13 +428,63 @@ body.home-active .home-note{display:none!important}
   .home-hit-about{background:linear-gradient(#e8f5ff,#a8d5f5)!important;color:#154f88;text-shadow:none}
 }
 
+
+/* v0.9.6: Den gemte kamp fylder kun en lille knap, aldrig et panel.
+   Billedet, de fire godkendte menufelter og deres koordinater er uændrede. */
+body.home-active #resumeCard.resume-compact:not([hidden]){
+  position:absolute!important;
+  z-index:5!important;
+  top:62.4%!important;left:18%!important;right:auto!important;bottom:auto!important;
+  transform:none!important;width:64%!important;height:4.5%!important;
+  min-height:0!important;max-height:none!important;max-width:none!important;
+  margin:0!important;padding:0!important;overflow:visible!important;
+  border:0!important;border-radius:0!important;background:transparent!important;
+  box-shadow:none!important;display:block!important;
+}
+body.home-active #resumeCard .resume-buttons{
+  display:flex!important;flex-direction:row!important;flex-wrap:nowrap!important;
+  align-items:stretch;width:100%;height:100%;gap:5px;
+}
+body.home-active #resumeCard .resume-play,
+body.home-active #resumeCard .resume-delete{
+  appearance:none;-webkit-appearance:none;display:flex;align-items:center;justify-content:center;
+  border:2px solid #fff0cf;background:linear-gradient(#fffefa,#fff5df);
+  color:#144b85;border-radius:999px;box-shadow:0 3px 6px #153d5980;
+  font-family:inherit;font-weight:850;font-size:clamp(11px,1.9dvh,16px);
+  line-height:1;min-height:0;padding:0 7px;cursor:pointer;
+}
+body.home-active #resumeCard .resume-play{flex:1;min-width:0;white-space:nowrap}
+body.home-active #resumeCard .resume-delete{flex:none;aspect-ratio:1/1;color:#a12d24;padding:0}
+body.home-active #resumeCard button:focus-visible{outline:3px solid #0a5595;outline-offset:2px}
+body.home-active #resumeCard button:active{filter:brightness(.94)}
+/* Landskab har allerede tegnede menuknapper på højre side. Ved gemt spil
+   indskydes en fjerde, kompakt grid-række MELLEM Spil og Indstillinger. */
+@media (orientation:landscape) and (max-height:550px){
+  body.home-active .home-image-actions:has(#resumeCard:not([hidden])){
+    grid-template-rows:1fr .41fr 1fr .9fr;
+    gap:clamp(5px,1.7dvh,10px);
+  }
+  body.home-active .home-image-actions:has(#resumeCard:not([hidden])) .home-hit-play{grid-row:1}
+  body.home-active .home-image-actions:has(#resumeCard:not([hidden])) .home-hit-settings{grid-row:3}
+  body.home-active .home-image-actions:has(#resumeCard:not([hidden])) .home-hit-scores,
+  body.home-active .home-image-actions:has(#resumeCard:not([hidden])) .home-hit-about{grid-row:4}
+  body.home-active #resumeCard.resume-compact:not([hidden]){
+    position:relative!important;inset:auto!important;top:auto!important;left:auto!important;
+    right:auto!important;bottom:auto!important;
+    width:100%!important;height:100%!important;
+    grid-column:1/-1;grid-row:2;padding:0 4%!important;
+  }
+  body.home-active #resumeCard .resume-play,
+  body.home-active #resumeCard .resume-delete{font-size:clamp(12px,3.5dvh,16px)}
+}
+
 </style>
 </head>
 <body class="home-active">
 <div class="shell">
   <header class="top">
     <div class="brand"><div class="logo" aria-hidden="true">🫏</div><div><h1>Æsel<span class="red">Klog</span> · Talstien</h1><small>Spil, lær og grin sammen</small></div></div>
-    <div class="top-actions"><span class="pill">PRØVEVERSION 0.9.5</span><button id="voiceToggle" class="btn soft small" type="button" aria-pressed="true">🔊 Lyd til</button></div>
+    <div class="top-actions"><span class="pill">PRØVEVERSION 0.9.6</span><button id="voiceToggle" class="btn soft small" type="button" aria-pressed="true">🔊 Lyd til</button></div>
   </header>
 
 
@@ -448,12 +498,16 @@ body.home-active .home-note{display:none!important}
         <button type="button" id="homeSettings" class="home-hit home-hit-settings" aria-label="Indstillinger – gør spillet til jeres eget"><span class="visually-hidden">Indstillinger</span></button>
         <button type="button" id="homeTopscore" class="home-hit home-hit-scores" aria-label="Topscore – se de dygtigste"><span class="visually-hidden">Topscore</span></button>
         <button type="button" id="homeAbout" class="home-hit home-hit-about" aria-label="Om spillet – sådan spiller I"><span class="visually-hidden">Om spillet</span></button>
+        <!-- Kun synlig ved lokalt gemt spil. Ligger i samme koordinatsystem som forsideillustrationen. -->
+        <section id="resumeCard" class="resume-card resume-compact" aria-label="Fortsæt gemt spil" hidden>
+          <div class="resume-copy visually-hidden"><h2>Fortsæt sidste spil</h2><p id="resumeInfo"></p></div>
+          <div class="resume-buttons">
+            <button id="resumeGame" type="button" class="resume-play" aria-label="Fortsæt det gemte spil">▶ Fortsæt spil</button>
+            <button id="deleteSave" type="button" class="resume-delete" aria-label="Slet gemt spil" title="Slet gemt spil">✕</button>
+          </div>
+        </section>
       </nav>
     </div>
-    <section id="resumeCard" class="resume-card" aria-label="Fortsæt gemt spil" hidden>
-      <div class="resume-copy"><h2>💾 Fortsæt sidste spil</h2><p id="resumeInfo"></p><p class="tiny">Spillet er gemt kun på denne enhed. Du kan fortsætte, selvom du har lukket browseren.</p></div>
-      <div class="resume-buttons"><button id="resumeGame" type="button" class="btn main">▶ Fortsæt spillet</button><button id="deleteSave" type="button" class="btn soft">Slet gemt spil</button></div>
-    </section>
     <p class="home-note">Talstien kan spilles både med eller uden læringsopgaver. 🥕</p>
   </section>
 
@@ -581,7 +635,7 @@ body.home-active .home-note{display:none!important}
   </section>
   </main>
 
-  <footer><strong>ÆselKlog · v0.9.5 · Gem og fortsæt · Tilpasset læring</strong><br>Den almindelige kortspilsvariant udvikles særskilt. Denne prøve handler om Talstien og læringsopgaverne.<div class="footer-links"><button type="button" class="btn soft small" id="testVoice">🔊 Prøv æslets stemme</button></div></footer>
+  <footer><strong>ÆselKlog · v0.9.6 · Gem og fortsæt · Tilpasset læring</strong><br>Den almindelige kortspilsvariant udvikles særskilt. Denne prøve handler om Talstien og læringsopgaverne.<div class="footer-links"><button type="button" class="btn soft small" id="testVoice">🔊 Prøv æslets stemme</button></div></footer>
 </div>
 
 <dialog id="aboutDialog" aria-labelledby="aboutTitle">

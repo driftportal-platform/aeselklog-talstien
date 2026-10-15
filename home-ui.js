@@ -1,4 +1,4 @@
-/* v0.9.5: hjælp fra den nye forside. Alle øvrige knapper styres fortsat af app.js. */
+/* v0.9.6: hjælpekode til den godkendte forside. Alle øvrige knapper styres fortsat af app.js. */
 (()=>{'use strict';
  const open=document.getElementById('homeAbout');
  const close=document.getElementById('closeAbout');

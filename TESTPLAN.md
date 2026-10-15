@@ -1,3 +1,27 @@
+# ÆselKlog v0.9.6 – test af gemt-spil-knappen
+
+## Automatisk
+
+- [x] `python tests/test_home_v096.py` – både portræt og landskab med/uden gemt spil, alle hovedmenuknapper, fortsæt og slet.
+- [x] Eksisterende Node-tests `for f in tests/*.test.js; do node "$f"; done`.
+- [x] `python tests/test_home_v092.py`, `python tests/browser_smoke.py`, `python tests/persistence_browser.py`, `python tests/cpu_voice_browser.py`.
+
+**Testet lokalt 15. oktober 2026:** Node (8/8), Playwright med mock-/offline-lyd, inklusive seks skærmstørrelser med og uden gemt spil. Ingen rigtige ElevenLabs-kald. Browser-test er Chromium, ikke WebKit/iOS Safari.
+
+## Fysisk iPhone-PWA – kræver manuel test efter upload
+
+- [ ] Luk den installerede ÆselKlog helt; genåbn og sørg for at versionen er opdateret.
+- [ ] Uden gemt spil: ingen Fortsæt-knap; Spil, Indstillinger, Topscore og Om spillet kan trykkes.
+- [ ] Start et spil, tryk **Gem & afslut**, og kontroller at Fortsæt-knappen står under den blå Spil-knap uden at dække Indstillinger.
+- [ ] Tryk på **Fortsæt spil**, og se at position, spillere og tur er uændrede.
+- [ ] Gem igen, tryk **✕**, bekræft sletning, og kontroller at fortsæt-knappen forsvinder, men Topscore ikke slettes.
+- [ ] Prøv både portræt og landskab på installeret iPhone-PWA; kontrollér også skærmudsnit/safe areas og berøring.
+- [ ] Kontrollér AI-/CPU-stemmer og offline-fallback som hidtil (ingen ændret Worker-nøgle).
+
+---
+
+## Tidligere tests
+
 # V0.9.2 – test af ny forside
 
 - [x] Første besøg åbner **Forside** med logo og Spil/Indstillinger/Topscore.
