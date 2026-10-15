@@ -1,3 +1,28 @@
+# 🫏 ÆselKlog – Talstien v0.9.12 (15. oktober 2026)
+
+## Nyt: levende specialfelter, uden ændringer i spilreglerne
+
+- Når æslet lander på et **actionfelt**, vises en tydeligere pop-up med actionens symbol og kort forklaring. Bonus, Talmester og Bro får glædes-effekter; Hov hov! får en lille rystelse; Vandpyt en vand-effekt; Byt og Superopgave en rolig effekt; Gulerod viser ekstra kast.
+- Pop-up-feltet viser det relevante antal felter (f.eks. **+2**, **−2**, **+4**). Overraskelse starter som et spørgsmål og viser derefter det faktiske resultat, også hvis banegrænsen begrænser flytningen.
+- Effekterne styres af et lille **`actionfx.js`**-modul med kun godkendte typer. Al ny animation ligger i pop-up-feltet – **ingen `transform` af SVG-brættets felter eller spillerbrikker**. Feltpositionerne ændres ikke.
+- I stående iPhone-format er turpanelet under hop rettet, så teksten ikke klemmes ned i en smal søjle.
+- **Reduceret bevægelse** på telefonen slår de nye bevægelseseffekter fra og bevarer al funktionalitet. Pop-up bliver stadig læsbar. Den er markeret som status for skærmlæsere med atomisk oplæsning.
+- **Ingen ekstra ElevenLabs-kald**: Vi genbruger den eksisterende oplæsning for hvert actionfelt. Der er ingen nye API-nøgler, dataindsamling eller lagring.
+- **Samme regler:** kun én handling pr. landing, ingen action-kædereaktioner, CPU følger samme regler, Gulerod højst ét ekstra kast, og LEG uden obligatorisk matematik.
+- **Bevaret:** godkendt forside (`home-fullscreen.webp` er byte-identisk med GitHub), kompakt Fortsæt spil, rund Æsellyd-knap, 35 % Hov hov-variation, individuelle læringsprofiler, forældreoversigt, lokal lydcache, ElevenLabs via eksisterende Cloudflare Worker, gem/fortsæt og PWA-offline.
+
+### Filer og upload
+
+Komplet ZIP til GitHub; alle eksisterende filer plus **`actionfx.js`** og **`tests/actionfx.test.js`** samt **`tests/actionfx_browser.py`**. Nye `actionfx.js` indlæses før `app.js`. Versionen af `sw.js` er `aeselklog-talstien-v0912-lively-actions` og indeholder det nye modul.
+
+**Grundlag:** Nyeste GitHub `main` blev bekræftet som v0.9.11 ved udviklingsstart. Den forrige fulde v0.9.11 ZIP matcher GitHub på de centrale kildefiler og godkendt forside. Ingen automatisk GitHub-upload er udført.
+
+**Test:** `node --check`, alle Node- og Chromium-browsertests med mockede stemmer og offlinelager. Ingen live ElevenLabs-kald eller fysisk Safari/iPhone-PWA-test; se `TESTPLAN.md` for den konkrete teststatus og manuelle kontroller.
+
+**Installation:** Pak ZIP-filen ud, upload de udpakkede projektfiler direkte i roden af `driftportal-platform/aeselklog-talstien`, inklusive `actionfx.js`, `styles.css` og `sw.js`. Upload ikke kun ZIP-filen. Vent på GitHub Pages, og genåbn den installerede iPhone-PWA. Vælg LEG, rul eksempelvis 5 fra start og se ⭐ Bonus-feltet.
+
+---
+
 # 🫏 ÆselKlog – Talstien v0.9.11 (15. oktober 2026)
 
 ## Ny funktion: Forældreoversigt med lokal læringshistorik

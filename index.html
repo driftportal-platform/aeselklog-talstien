@@ -14,7 +14,7 @@
 <div class="shell">
   <header class="top">
     <div class="brand"><div class="logo" aria-hidden="true">🫏</div><div><h1>Æsel<span class="red">Klog</span> · Talstien</h1><small>Spil, lær og grin sammen</small></div></div>
-    <div class="top-actions"><span class="pill">PRØVEVERSION 0.9.11</span><button id="voiceToggle" class="btn soft small" type="button" aria-pressed="true">🔊 Lyd til</button></div>
+    <div class="top-actions"><span class="pill">PRØVEVERSION 0.9.12</span><button id="voiceToggle" class="btn soft small" type="button" aria-pressed="true">🔊 Lyd til</button></div>
   </header>
 
 
@@ -166,7 +166,7 @@
          <div class="zoom-controls"><button type="button" id="boardZoomOut" aria-label="Zoom ud">−</button><output id="boardZoomValue" aria-live="polite">73 %</output><button type="button" id="boardZoomIn" aria-label="Zoom ind">+</button></div>
       </div>
       <div class="board-scroll" id="boardScroll" tabindex="0" aria-label="Flyt rundt på Talstien, brug zoom og Find æslet til at følge brikken"><div class="board" id="board"></div></div>
-      <div class="action-toast" id="actionToast" role="status" aria-live="polite" hidden></div><div id="saveStatus" class="save-status" aria-live="polite"></div>
+      <div class="action-toast" id="actionToast" role="status" aria-live="polite" aria-atomic="true" hidden></div><div id="saveStatus" class="save-status" aria-live="polite"></div>
       <div id="boardHud" class="board-game-hud" aria-live="polite">
         <span class="hud-player-dot" id="boardHudDot"></span>
         <div class="hud-message"><strong id="boardHudName">ÆselKlog</strong><small id="boardHudPosition">Velkommen til Talstien</small></div>
@@ -232,6 +232,7 @@
 <script src="./cpuvoice.js" defer></script>
 <script src="./voicecache.js" defer></script>
 <script src="./narration.js" defer></script>
+<script src="./actionfx.js" defer></script>
 <script src="./app.js" defer></script>
 <script src="./home-ui.js" defer></script>
 </body></html>

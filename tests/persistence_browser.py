@@ -20,7 +20,7 @@ def bootstrap(page,store=None):
       }});
       window.confirm=()=>true;
     }''',store or {})
-    for name in ['engine.js','board.js','actions.js','leaderboard.js','adaptive.js','profiles.js','parentreport.js','savegame.js','cpuvoice.js','voicecache.js','narration.js','app.js']:
+    for name in ['engine.js','board.js','actions.js','leaderboard.js','adaptive.js','profiles.js','parentreport.js','savegame.js','cpuvoice.js','voicecache.js','narration.js','actionfx.js','app.js']:
         page.add_script_tag(content=(ROOT/name).read_text(encoding='utf-8'))
 
 

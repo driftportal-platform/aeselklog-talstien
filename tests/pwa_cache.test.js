@@ -44,7 +44,8 @@ async function dispatch(name,request){
   assert(precached.includes('./narration.js'),'narrator variation must be available offline');
   assert(precached.includes('./profiles.js'),'learning profiles module must be available offline');
   assert(precached.includes('./parentreport.js'),'parent report module must be available offline');
-  assert(worker.includes('aeselklog-talstien-v0911-parent-overview'),'PWA must use v0.9.10.1 cache');
+  assert(precached.includes('./actionfx.js'),'action effects must be available offline');
+  assert(worker.includes('aeselklog-talstien-v0912-lively-actions'),'PWA must use v0.9.12 cache');
   for(const asset of precached){
     const relative=asset.replace(/^\.\//,'');
     if(relative)assert(fs.existsSync(path.join(root,relative)),`missing precached file ${asset}`);

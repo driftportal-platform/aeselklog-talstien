@@ -1,3 +1,15 @@
+# ÆselKlog – udviklernote v0.9.12 (levende specialfelter)
+
+1. Brug **aktuel GitHub `main`**, læs `README.md`, `AGENTS.md`, `TESTPLAN.md` og `UDVIKLINGSPLAN.md`. Release v0.9.12 bygger på verificeret `main` v0.9.11, ikke gamle ZIP'er.
+2. `actionfx.js` er **præsentationslogik**, ingen tur-/spilmotor. `describe(type,{delta,used})` returnerer kun godkendte CSS-toner og sikre badges. Ukendte typer falder tilbage til `choice`.
+3. `app.js` viser effekterne via `flashAction` i `#actionToast`. Den oprindelige turorden, pauser, CPU-ventetid og narration/ElevenLabs-kald ændres ikke. Overraskelser opdaterer den viste effekt **efter** tilfældig gevinst/straf; mærk reelt flyttede felter ved banegrænser.
+4. `styles.css` animerer **kun pop-up-feltets eget ikon/dekoration**, aldrig `.board-tile`, SVG-transforms eller den geometriske brikposition. Følg `prefers-reduced-motion`. Selve betjeningen/teksten skal fungere uden animation.
+5. `actionfx.js` skal ligge **før `app.js`** i `index.html`, alle test-fixtures og `sw.js` præcache. Den lille optional chaining fallback i `app.js` forhindrer total fejl, hvis iOS kortvarigt blander gamle/nye PWA-aktiver.
+6. Bevar alt fra v0.9.11: den godkendte fuldskærmsforside, Fortsæt/Slet, rund Æsellyd, frivillig LEG, CPU, Hov hov-variationen, læringsprofiler, forældreoversigt og lokal lydcache. Ingen secrets i GitHub, ingen automatisk cloud-lagring.
+7. Test `tests/actionfx.test.js`, `tests/actionfx_browser.py`, alle Node/Chromium-regressioner og PWA offline-cache-test. Fysisk iPhone og ægte ElevenLabs kræver separat manuel test.
+
+---
+
 # ÆselKlog – udviklernote v0.9.11 (forældreoversigt)
 
 1. Start altid med **seneste GitHub `main`**, læs `README.md`, `AGENTS.md`, `TESTPLAN.md` og `UDVIKLINGSPLAN.md`. v0.9.11 er bygget fra GitHub-verificeret v0.9.10.1 og må ikke overtage gamle ZIP'er ukritisk.

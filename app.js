@@ -1,4 +1,4 @@
-/* ÆselKlog Talstien v0.9.11: lokal, valgfri forældreoversigt. */
+/* ÆselKlog Talstien v0.9.12: lokal, valgfri forældreoversigt. */
 (()=>{'use strict';
 const $=id=>document.getElementById(id);
 const qs=sel=>document.querySelector(sel);
@@ -21,6 +21,7 @@ const A=window.AeselActions;
 if(!A||!A.validate()){document.body.textContent='ÆselKlog kan ikke starte: actions.js mangler eller har ugyldige felter.';return;}
 const SPECIAL=A.FIELDS;
 const SPECIAL_ICON=Object.fromEntries(Object.entries(A.DETAILS).map(([key,d])=>[key,d.icon]));
+const AF=window.AeselActionFX; // Præsentation alene; ingen ekstra AI-kald eller turændringer.
 const LEARN_DIE=['1 2 3','L / U','10 + 1','👑','> <','+ −'];
 const rand=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
 const radio=name=>qs(`input[name="${name}"]:checked`)?.value;
@@ -703,11 +704,19 @@ function hideActionFlash(){
  actionBannerSerial++;
  const toast=$('actionToast');if(toast){toast.hidden=true;toast.classList.remove('show')}
 }
-function flashAction(type,title,detail,durationMs=2300){
+function flashAction(type,title,detail,durationMs=2300,opts={}){
  const toast=$('actionToast');if(!toast)return;
  const id=++actionBannerSerial;
- toast.innerHTML=`<div class="toast-icon">${SPECIAL_ICON[type]||'⭐'}</div><div><strong>${esc(title)}</strong><small>${esc(detail)}</small></div>`;
- toast.hidden=false;toast.classList.remove('show');void toast.offsetWidth;toast.classList.add('show');
+ const fx=AF?.describe?.(type,opts)||{type:'default',tone:'choice',badge:'',symbol:SPECIAL_ICON[type]||'⭐'};
+ const decor=['reward','surprise'].includes(fx.tone)?'✨':fx.tone==='water'?'💦':fx.tone==='oops'?'💨':'✦';
+ // Kun de faste klasseværdier fra actionfx.js kan tilføjes her. Data og navne escapes.
+ toast.className='action-toast fx-'+fx.tone;
+ toast.dataset.action=fx.type;
+ toast.innerHTML=`<span class="toast-decoration" aria-hidden="true">${decor}</span>`+
+  `<div class="toast-icon" aria-hidden="true">${fx.symbol}</div>`+
+  `<div class="toast-copy"><strong>${esc(title)}</strong><small>${esc(detail)}</small>`+
+  `${fx.badge?`<span class="toast-badge" aria-hidden="true">${esc(fx.badge)}</span>`:''}</div>`;
+ toast.hidden=false;void toast.offsetWidth;toast.classList.add('show');
  if(durationMs>0)setTimeout(()=>{if(id===actionBannerSerial)hideActionFlash()},durationMs);
 }
 
@@ -959,7 +968,9 @@ async function resolveLandingAction(){
  if(!special){completeTurn();return;}
  busy=true;
  const d=A.DETAILS[special];
- flashAction(special,d.label,d.description,0);
+ const baseDelta={bonus:2,hov:-2,mester:1,bro:4}[special];
+ const displayDelta=Number.isInteger(baseDelta)?A.destination(p.pos,baseDelta,config.start,config.goal)-p.pos:undefined;
+ flashAction(special,d.label,d.description,0,{delta:displayDelta,used:special==='gulerod'&&extraRollUsed});
  resultLines.push(`${d.icon} ${d.label} på felt ${p.pos}.`);
  // Kun én oplæsning pr. handling: undgå at afbryde AI-stemmen og forbruge ekstra credits.
  await say(`${p.name}! ${d.label}. ${d.description}.`);
@@ -991,7 +1002,7 @@ async function resolveLandingAction(){
   if(special==='overraskelse'){
    const surprise=A.surprise();delta=surprise.delta;
    resultLines.push(`🎁 ${surprise.title}: ${delta>0?'+':''}${delta} felter.`);
-   flashAction(special,surprise.title,surprise.speech,0);
+   flashAction(special,surprise.title,surprise.speech,0,{delta:A.destination(p.pos,delta,config.start,config.goal)-p.pos});
    await say(surprise.speech);
    if(g!==gameToken)return;
   }else {

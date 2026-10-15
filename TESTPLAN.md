@@ -1,3 +1,26 @@
+# ÆselKlog v0.9.12 – levende specialfelter, testplan
+
+## Automatiske tests
+
+- [x] Syntaxcheck `node --check` for appen og Node-testene.
+- [x] `node tests/actionfx.test.js` – ni specialfelter, farvetone, symbolsikkerhed, korrekte plus/minus-fortegn, Gulerod brugt, ukendt type og banegrænse.
+- [x] `python tests/actionfx_browser.py` – LEG uden obligatoriske opgaver, bonusfelt +2, automatisk lukning, synlig status, reduceret bevægelse og placering i 390×844, 844×390 og 1280×800 (Chromium, offline/mock tale).
+- [x] **17 Node-tests** og **11 Chromium-browsertests** bestået (inkl. eksisterende spil, læring, CPU-stemmer, forældreoversigt, PWA-cache, gem/fortsæt og mobilforside).
+- [x] Kontrolleret at turpanelet i mobilportræt ikke bliver til en smal tekstsøjle under hop.
+- [ ] Live iPhone-PWA med ElevenLabs: skal testes på en fysisk iPhone efter upload, ikke antages fra Chromium.
+
+## Gennemgang på fysisk iPhone efter upload
+
+- [ ] Bekræft **PRØVEVERSION 0.9.12** i Spil/Indstillinger. Start med gemt spil og prøv Fortsæt, alle fire menu-hitfelter og forældreoversigt.
+- [ ] LEG, fysisk terning og 1–20: land på **⭐ 5** og se **+2**. Ingen matematik eller ekstra talesætning tvinges på. Specialfeltet på den nye position skal **ikke** udføres igen.
+- [ ] Prøv **🫏 Hov hov**, **💧 Vandpyt**, **🥕 Gulerod**, **🎁 Overraskelse**, **🌉 Bro**, **🔄 Byt**, **🏆 Talmester** og **🎯 Superopgave**. Kig efter en tydelig, kort pop-up uden at feltnumre eller brikker forskydes.
+- [ ] Skift til iOS Indstillinger → Tilgængelighed → Bevægelse → Reducer bevægelse: pop-up-teksten skal stadig vises uden nye hop/rystelser.
+- [ ] Test liggende iPhone med fuldskærmsbræt og højrefelt med opgaver. Visuelle effekter skal ikke blokere rigtige knapper eller få spillebrikker til at hoppe ud af felterne.
+- [ ] Prøv æsellyd-knappen for sjov, CPU-modstanderen og et forkert svar med rigtig ElevenLabs-stemme. CPU må fortsat først svare, når lyden er færdig; de nye effekter må ikke bruge flere credits.
+- [ ] Gem/fortsæt, skift til baggrunden, brug indstillingerne, og kontrollér at niveauer og forældreoversigt stadig findes.
+
+---
+
 # ÆselKlog v0.9.11 – test af forældreoversigt
 
 ## Automatiske tests gennemført 15. oktober 2026

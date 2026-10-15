@@ -27,6 +27,7 @@ const window={
  AeselEngine:require(path.join(root,'engine.js')),
  AeselBoard:require(path.join(root,'board.js')),
  AeselActions:require(path.join(root,'actions.js')),
+ AeselActionFX:require(path.join(root,'actionfx.js')),
  AeselCpuVoice:require(path.join(root,'cpuvoice.js')),
  AeselNarration:require(path.join(root,'narration.js')),
  AeselVoiceCache:require(path.join(root,'voicecache.js')),

@@ -530,3 +530,55 @@ body.home-active #resumeCard button:active{filter:brightness(.94)}
 .parent-report-actions p{flex:1 1 220px;margin:0}
 .parent-empty{background:#f1f8ff;border-radius:13px;padding:16px;color:#536f85}
 @media(max-width:580px){.parent-skills{grid-template-columns:1fr}.parent-report-dialog{width:calc(100vw - 16px);padding:14px}.parent-report-top .btn{flex:none}.parent-report-controls select{max-width:none}}
+
+/* v0.9.12 – levende specialfelter, udelukkende oven på spillepladen.
+   Ingen transform på .board-tile, SVG-felter eller .board-piece. */
+.action-toast{overflow:visible;box-sizing:border-box;isolation:isolate;
+  background:linear-gradient(135deg,#fffefa,#effbed);border-color:#70bb7a;
+  width:max-content;min-width:175px;max-width:min(350px,calc(100vw - 24px));
+  gap:10px;box-shadow:0 16px 38px #27472955;overflow-wrap:anywhere}
+.action-toast .toast-copy{position:relative;z-index:2;min-width:0;max-width:100%}
+.action-toast .toast-icon{z-index:2;position:relative;flex:none;filter:drop-shadow(0 3px 2px #153b4130)}
+.action-toast .toast-decoration{pointer-events:none;position:absolute;right:-10px;top:-18px;
+ font-size:2rem;opacity:0;line-height:1;z-index:0}
+.action-toast .toast-badge{display:inline-flex;padding:4px 9px;margin-top:7px;border-radius:999px;
+ font-size:.88rem;line-height:1.15;letter-spacing:.01em;font-weight:900;
+ background:#dcf6d6;color:#206642;border:1px solid #aad5a9}
+.action-toast.fx-reward{background:linear-gradient(135deg,#fff9d9,#eeffe5);border-color:#f0b744}
+.action-toast.fx-reward .toast-badge{background:#fff0af;color:#874f00;border-color:#ecce6a}
+.action-toast.fx-oops{background:linear-gradient(135deg,#fff7f1,#ffe5e4);border-color:#e6a49c}
+.action-toast.fx-oops .toast-badge{background:#ffe4dc;color:#a04437;border-color:#e6b1ab}
+.action-toast.fx-water{background:linear-gradient(135deg,#f0fbff,#daf0ff);border-color:#86bfed}
+.action-toast.fx-water .toast-badge{background:#e4f5ff;color:#16567b;border-color:#a5d1ee}
+.action-toast.fx-choice{background:linear-gradient(135deg,#f8f5ff,#f2efff);border-color:#c5b5df}
+.action-toast.fx-choice .toast-badge{background:#ebe2ff;color:#5a3f82;border-color:#ccbee6}
+.action-toast.fx-surprise{background:linear-gradient(135deg,#fff4fd,#fff2d7);border-color:#e7b4db}
+.action-toast.fx-surprise .toast-badge{background:#fce8fa;color:#783e72;border-color:#e3c2dc}
+.action-toast.show.fx-reward .toast-icon{animation:fxHappy .83s cubic-bezier(.21,1.4,.3,1) both}
+.action-toast.show.fx-oops .toast-icon{animation:fxOhNo .68s ease both}
+.action-toast.show.fx-water .toast-icon{animation:fxPuddle .92s ease both}
+.action-toast.show.fx-choice .toast-icon{animation:fxChoice .75s ease both}
+.action-toast.show.fx-surprise .toast-icon{animation:fxHappy .83s ease both}
+.action-toast.show .toast-decoration{animation:fxSpark .95s ease-out .12s both}
+@keyframes fxHappy{0%,100%{transform:translateY(0) rotate(0)}34%{transform:translateY(-13px) rotate(-9deg)}65%{transform:translateY(-5px) rotate(8deg)}}
+@keyframes fxOhNo{0%,100%{transform:translateX(0) rotate(0)}22%{transform:translateX(-5px) rotate(-7deg)}44%{transform:translateX(4px) rotate(6deg)}66%{transform:translateX(-3px) rotate(-3deg)}}
+@keyframes fxPuddle{0%,100%{transform:translateY(0)}25%{transform:translateY(6px)}55%{transform:translateY(-4px)}}
+@keyframes fxChoice{0%,100%{transform:rotate(0)}30%{transform:rotate(-10deg)}60%{transform:rotate(12deg)}}
+@keyframes fxSpark{0%{opacity:0;transform:translate(0,12px) scale(.5)}36%{opacity:1}100%{opacity:0;transform:translate(25px,-24px) scale(1.5)}}
+@media(max-width:650px){.action-toast{padding:10px 12px;gap:7px;min-width:145px;max-width:min(300px,calc(100vw - 24px))}
+ .action-toast .toast-icon{font-size:1.9rem}.action-toast .toast-badge{font-size:.8rem}}
+@media(max-width:650px) and (orientation:landscape){.action-toast{max-width:46vw;top:23%;padding:8px 10px}
+ .action-toast .toast-icon{font-size:1.55rem}.action-toast small{font-size:.69rem}}
+@media(prefers-reduced-motion:reduce){
+ .action-toast.show .toast-icon,.action-toast.show .toast-decoration{animation:none!important;transform:none!important}
+ .action-toast .toast-decoration{display:none}
+}
+/* Mobilportræt: behold hele bredden på turpanelet, også mens brikken hopper.
+   Den ældre, smallere landskabsregel må ikke presse teksten til en tynd søjle. */
+@media(orientation:portrait){
+ .boardbox.expanded .board-panel-dock[data-phase="moving"]{
+  left:calc(env(safe-area-inset-left,0px) + 10px);
+  right:calc(env(safe-area-inset-right,0px) + 10px);
+  width:auto;max-height:min(48dvh,410px)
+ }
+}

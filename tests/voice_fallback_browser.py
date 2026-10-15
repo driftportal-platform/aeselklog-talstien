@@ -6,7 +6,7 @@ from playwright.sync_api import sync_playwright
 import re
 
 ROOT=Path(__file__).parents[1]
-JS=['engine.js','board.js','actions.js','leaderboard.js','adaptive.js','profiles.js','parentreport.js','savegame.js','cpuvoice.js','voicecache.js','narration.js','app.js','home-ui.js']
+JS=['engine.js','board.js','actions.js','leaderboard.js','adaptive.js','profiles.js','parentreport.js','savegame.js','cpuvoice.js','voicecache.js','narration.js','actionfx.js','app.js','home-ui.js']
 
 def load(page, offline=False):
     html=(ROOT/'index.html').read_text('utf-8')

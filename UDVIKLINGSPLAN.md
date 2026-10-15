@@ -1,3 +1,26 @@
+# ÆselKlog – udviklingsplan v0.9.12 (15. oktober 2026)
+
+**Ved start:** GitHub `main` blev bekræftet som v0.9.11. Denne release er udviklet lokalt på de samme kilder. GitHub-upload og rigtig iPhone-test afventer.
+
+## v0.9.12 – Levende specialfelter
+
+- [x] Bedre og tydeligere visuel effekt for alle ni specialfelter med passende farver, ikoner og forklaringer.
+- [x] Fortegn og faktisk ændret feltposition ved Overraskelse og banegrænser.
+- [x] Reduceret bevægelse respekteres; ingen animation på SVG-felternes koordinattransforms.
+- [x] I mobilportræt får turpanelet sin normale bredde, også i bevægelsesfasen.
+- [x] `actionfx.js` tilføjet, `sw.js`-cache versionsopdateret, README/AGENTS/TESTPLAN opdateret.
+- [x] Bevarer stemmer, CPU/ventetid, lokal læring, forældreoversigt og alle eksisterende regler.
+- [ ] Fysisk iPhone-PWA-test med live ElevenLabs og familiefeedback.
+
+## Næste skridt frem mod v1.0
+
+1. Test med børn og familier: er effekter, spiltempo og opgaver sjove og tilpas tydelige? Ret faktiske fejl før flere funktioner.
+2. Tilgængelighed på mobil (VoiceOver/kontrast, fokus og tekststørrelser) uden at ændre forsidens godkendte reference.
+3. Overvej frivillig lokal eksport af forældreoversigten (ingen automatisk overførsel eller upload).
+4. Test komplet offline/genåbning/PWA-opdatering på rigtig iPhone før eventuel offentlig v1.0.
+
+---
+
 # ÆselKlog – udviklingsplan v0.9.11 (15. oktober 2026)
 
 **Status ved udviklingsstart:** GitHub `main` er bekræftet opdateret til v0.9.10.1. Ny v0.9.11 er udviklet fra den samme kilde; upload til GitHub Pages og fysisk iPhone-test afventer stadig.

@@ -6,7 +6,7 @@ from playwright.sync_api import sync_playwright
 import re
 ROOT=Path(__file__).resolve().parents[1]
 JS=['engine.js','board.js','actions.js','leaderboard.js','adaptive.js','profiles.js','parentreport.js',
-    'savegame.js','cpuvoice.js','voicecache.js','narration.js','app.js','home-ui.js']
+    'savegame.js','cpuvoice.js','voicecache.js','narration.js','actionfx.js','app.js','home-ui.js']
 html=(ROOT/'index.html').read_text('utf-8')
 html=html.replace('<link rel="stylesheet" href="./styles.css">','<style>'+(ROOT/'styles.css').read_text('utf-8')+'</style>')
 html=re.sub(r'<script\s+src="[^"]+"\s+defer></script>','',html)
