@@ -1,3 +1,16 @@
+# ÆselKlog – udviklernote v0.9.16: spilvælger, seks spillere og dokumentation
+
+1. **Læs altid seneste GitHub `main` før en ny version.** Relevante kilder: `README.md`, `AGENTS.md`, `TESTPLAN.md`, `UDVIKLINGSPLAN.md`, `PROJEKTSTATUS.md`, `IDEKATALOG.md`. Opdater alle seks dokumenter sammen med cache-version ved hver ny release.
+2. `#setup` indeholder to **aktive knapper** `#chooseBoardMode` (Talstien) og `#openCardSetup` (Kortspil). `#cardsSetup` indeholder tilsvarende `#cardsChooseBoard` og `#cardsChooseCards`, så begge spilvalg altid kan skiftes frem og tilbage. Skift sker via eksisterende `window.AeselShowView`. Skjul ikke den anden spiltypes kontroller med CSS-fnidder; kun den valgte `view` må være synlig.
+3. På det lille skærmformat er spilkortene stablet, desktop er to kolonner. Valgt spiltype skal fremgå med `aria-pressed`, tydelig kant og markør; bevar fokusmarkering og reduceret bevægelse. Den godkendte `home-fullscreen.webp` ændres aldrig uden brugerens nye reference.
+4. Talstien har højst **6 menneskespillere**, evt. **1 CPU**. `app.js` har seks forskellige `COLORS`; `savegame.js` `normalize()` tillader syv deltagere og højst én CPU. Skema og lokal lagernøgle `aeselklog-igangvaerende-v1` forbliver uændret. Test både 2, 4, 6 og 6+CPU, gerne på én og samme SAVE.
+5. Kortspillet har stadig 2–6 personer i sit separate modul med lagernøglen `aeselklog-kortspil-v1`; rør ikke dets regler ved at ændre Talstiens spillerantal. Stemme, CPU, pauser, A3-fysisk, PWA og actionfelter skal bestå regressionsprøver.
+6. Særligt: eksisterende serviceworker cache er `aeselklog-talstien-v0916-mode-selector-six-players`. Den precacher hele den uændrede projektfilstruktur og sletter kun egne caches.
+7. Tests: alle `node tests/*.test.js` inkl. nyt `mode_selector.test.js`, alle relevante browserregressioner plus nyt `mode_selector_browser.py` (390×844, 844×390, 1280×800). Fysisk iPhone, WebKit/VoiceOver og reel ElevenLabs er stadig MANUELT udestående.
+8. Fysiske kortspil: brugerens kortbilleder fra 21–40 og æselkort er reference. Ingen automatisk udgivelse/printproduktion før kortregler, copyright, kvalitet og oplag er godkendt.
+
+---
+
 # ÆselKlog – udviklernote v0.9.15 (selvstændigt kortspil)
 
 - Start altid fra seneste GitHub `main`. Læs de fire projektdokumenter, og sammenlign aktuelle kilde-hashes, før videre udvikling.

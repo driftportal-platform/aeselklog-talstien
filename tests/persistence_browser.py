@@ -22,6 +22,18 @@ def bootstrap(page,store=None):
     }''',store or {})
     for name in ['engine.js','board.js','actions.js','leaderboard.js','adaptive.js','profiles.js','parentreport.js','savegame.js','cpuvoice.js','voicecache.js','narration.js','actionfx.js','app.js']:
         page.add_script_tag(content=(ROOT/name).read_text(encoding='utf-8'))
+        if name=='actions.js':
+            # This is a save/resume regression, not a special-field test. Without
+            # isolating the first few landing fields, Gulerod/Super/Byt can legitimately
+            # transition to another phase instead of the expected result phase.
+            page.evaluate('''() => {
+              const api=window.AeselActions, original=api.generateLayout;
+              api.generateLayout=(...args) => {
+                const layout=original(...args);
+                for(const n of [21,22,23,24,25,26,27,28,29])delete layout[n];
+                return layout;
+              };
+            }''')
 
 
 def phase(page,phase,timeout=12000):

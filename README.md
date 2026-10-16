@@ -1,3 +1,33 @@
+# 🫏 ÆselKlog v0.9.16 – tydelig spilvælger og op til seks spillere (16. oktober 2026)
+
+**Projektets aktuelle udviklingspakke:** v0.9.16. **Senest verificerede GitHub `main` ved udviklingsstart:** v0.9.15. v0.9.16 er en komplet lokal ZIP, som skal uploades til GitHub, før den er live. Den godkendte forside og de eksisterende spilfunktioner er bevaret.
+
+## Hvad er nyt?
+
+- Under **Spil** er begge valg nu store, tastaturtilgængelige **klikbare kort** med tydelig aktiv markering: 🎲 **Talstien** og 🃏 **Kortspil**. De vises side om side på computer og stablet på mobil.
+- Man kan skifte frem og tilbage **fra begge spilmenuer**. Valg af Talstien viser kun navne/aldre/CPU og Talstiens spilindstillinger. Valg af Kortspil viser kun kortspillets talområde, strafregler og navne.
+- Talstien understøtter nu **op til seks navngivne menneskespillere samt eventuelt CPU-æslet**. Der er seks særskilte farver og en tydelig grænse ved Tilføj spiller. Kortspillet understøtter fortsat 2–6 menneskespillere.
+- `savegame.js` tillader nu **syv deltagere i alt** (6 + CPU); eksisterende schema 1, lagernøgle, gemte spil og CPU-/tale-/læringsregler bevares. Det gamle maksimum på fem deltagere i save-valideringen er løftet, uden at ændre reglerne for kortspil.
+- PWA Service Worker cache: `aeselklog-talstien-v0916-mode-selector-six-players`. `index.html`, `app.js`, `savegame.js`, `styles.css`, `sw.js` og tests opdateret. Ingen nye API-nøgler eller cloudlagring.
+
+**Automatisk test:** 20 Node-tests og 15 Chromium-browsertests er bestået lokalt. Talestemmerne er simulerede; ægte iPhone/WebKit, offline-PWA og ElevenLabs mangler stadig verificering.
+
+**Produktfokus:** ÆselKlog er stadig **to selvstændige spil**: Talstien med digital eller fysisk A3-plade og et kortspil med fem talområder. Ingen matematik er obligatorisk i grundspillet; valgfri læring og familiehygge prioriteres.
+
+**Dokumentation som altid skal opdateres ved en release:** `README.md` (detaljer og installation), `UDVIKLINGSPLAN.md` (fremdrift/næste skridt), `TESTPLAN.md` (teststatus), `AGENTS.md` (tekniske regler), **`PROJEKTSTATUS.md`** (kort aktuel status) og **`IDEKATALOG.md`** (beslutninger, uafklarede idéer). Se statusfilen før næste release, og læs altid GitHub-main som den eneste autoritative kodekilde.
+
+## Upload og kontrol
+
+1. Pak hele v0.9.16-ZIP'en ud og læg filerne i roden af `driftportal-platform/aeselklog-talstien` (upload ikke ZIP'en alene).
+2. Kontroller `PRØVEVERSION 0.9.16` på spilskærmens sideheader. Test begge store spilknapper, både mobil og desktop.
+3. Vælg Kortspil → Talstien → Kortspil. Kontroller at kun den valgte spiltypes opsætning vises.
+4. Start Talstien med **6 navne + CPU**, gem, genåbn og fortsæt; der skal stadig være syv deltagere og uændrede farver.
+5. Test på fysisk iPhone-PWA, især efter opdatering og uden netværk. Rigtig WebKit/iOS, Æsellyd og ElevenLabs kræver manuel afprøvning. Browserautomatik benytter simuleret tale.
+
+**Kendte afgrænsninger:** Kortspil er fortsat en første lokal digital pass-and-play-prototype uden CPU og uden indbygget AI-tale; den fysiske kortpakke er endnu ikke produceret for alle talområder. A3-pladens trykte specialfelter skal sammenlignes med appens faste layout. Før v1.0 mangler iPhone-/tilgængelighedstest og familieafprøvning.
+
+---
+
 # 🫏 ÆselKlog v0.9.15 – kortspil med fem talområder (16. oktober 2026)
 
 ## Nyt: selvstændigt digitalt kortspil ved siden af Talstien

@@ -1,3 +1,26 @@
+# ÆselKlog v0.9.16 – spilvalg, seks spillere og gemning
+
+## Automatiske tests (lokalt udviklingsmiljø, 16. oktober 2026)
+
+- [x] `node --check` af alle JavaScript-appmoduler.
+- [x] **20 Node-tests** inkl. nye `tests/mode_selector.test.js`: begge spilvalg som knapper, aktive ARIA-statusser, seks særskilte farver, 6 navngivne spillere + CPU med korrekt save/restore og afvisning af for mange deltagere.
+- [x] `tests/mode_selector_browser.py` – 390×844, 844×390 og 1280×800: to klikbare spilkort uden overlap, skift mellem spil, korrekt adskilte indstillinger, seks navngivne spillere, CPU samt gem/fortsæt med syv deltagere.
+- [x] **15 Chromium-browserregressioner** gennemført: begge spiltyper, fysisk/digital plade, gem/fortsæt, tilfældige specialfelter, alderssikker læring, voksen-timer, CPU-stemme, Hov hov-variation, lydcache, forældreoversigt samt seks spillere + CPU. Alt med simuleret tale.
+- [ ] Fysisk iPhone-PWA, iOS Safari/WebKit/VoiceOver, ægte ElevenLabs og offline-genstart – kræver brugertest efter GitHub-upload. Ingen rigtige AI-kald foretages i browsertests.
+
+**Testisolering:** `tests/persistence_browser.py` styrer tilfældige specialfelter væk fra de første landingsfelter i sin test, så den kan kontrollere save/resume og adaptiv fremgang uden at blive afbrudt af en tilfældig Gulerod/Byt/Super. `tests/random_actions_browser.py` og `tests/actionfx_browser.py` tester de virkelige specialfelter separat. Dette ændrer **kun test-fixturen**, ikke appens tilfældige bane.
+
+## Manuel test efter upload
+
+- [ ] På mobil: tryk Spil og se **Talstien** og **Kortspil** som store, tydelige valg. Kun den aktive er markeret.
+- [ ] Åbn Kortspil, vælg Talstien igen og derefter Kortspil; kun relevante indstillinger og navne er synlige.
+- [ ] Tilføj seks spillere i Talstien; **Tilføj spiller** skal være disabled ved seks. Hver brik har sin egen farve.
+- [ ] Markér **Spil mod Æsel**, start med 6 + CPU, gem og genstart. Syv deltagere skal fortsat være synlige.
+- [ ] Start kortspillet med 2–6 spillere; kontrol af eget gemt spil og strafvarianter.
+- [ ] Gentag på installeret iPhone, også liggende og efter en offline-genstart; test tale, familietempo og behørig afslutning.
+
+---
+
 # ÆselKlog v0.9.15 – Kortspil med fem talområder
 
 ## Automatisk udført i lokalt testmiljø

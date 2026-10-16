@@ -1,9 +1,9 @@
-/* ÆselKlog v0.9.15: Talstien preserved + separate card-game navigation. */
+/* ÆselKlog v0.9.16: stor spilvælger og 6 menneskespillere i Talstien. */
 (()=>{'use strict';
 const $=id=>document.getElementById(id);
 const qs=sel=>document.querySelector(sel);
 const esc=value=>String(value).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-const COLORS=['#d84464','#227fcb','#24a667','#9361c9','#d69c34'];
+const COLORS=['#d84464','#227fcb','#24a667','#9361c9','#d69c34','#258f9d'];
 const S=window.AeselEngine;
 const B=window.AeselBoard;
 if(!B||!B.validate()){document.body.textContent='ÆselKlog kan ikke starte: board.js mangler eller har ugyldige felter.';return;}
@@ -485,7 +485,7 @@ function renderSetupPlayers(){
   row.querySelector('.remove-player').addEventListener('click',()=>{if(setupPlayers.length>1){setupPlayers.splice(i,1);renderSetupPlayers()}});
   holder.append(row);
  });
- $('addPlayer').disabled=setupPlayers.length>=4;
+ $('addPlayer').disabled=setupPlayers.length>=6;
 }
 renderSetupPlayers();
 
@@ -568,7 +568,7 @@ $('settingsDone').addEventListener('click',()=>{saveGameOptions();show('home')})
 $('setupBack').addEventListener('click',()=>show('home'));
 $('setupEditSettings').addEventListener('click',()=>show('settings'));
 
-$('addPlayer').addEventListener('click',()=>{if(setupPlayers.length<4){setupPlayers.push({name:`Spiller ${setupPlayers.length+1}`,age:7,kind:'child',difficulty:'mellem'});renderSetupPlayers()}});
+$('addPlayer').addEventListener('click',()=>{if(setupPlayers.length<6){setupPlayers.push({name:`Spiller ${setupPlayers.length+1}`,age:7,kind:'child',difficulty:'mellem'});renderSetupPlayers()}});
 function show(view){
  ['home','setup','settings','game','cardsSetup','cardsGame'].forEach(id=>$(id).classList.toggle('active',view===id));
  document.body.classList.toggle('home-active',view==='home');
@@ -591,6 +591,9 @@ function show(view){
 }
 window.AeselShowView=show;
 $('openCardSetup').addEventListener('click',()=>show('cardsSetup'));
+$('chooseBoardMode').addEventListener('click',()=>show('setup'));
+$('cardsChooseBoard').addEventListener('click',()=>show('setup'));
+$('cardsChooseCards').addEventListener('click',()=>show('cardsSetup'));
 function resetAsync(){gameToken++;resumeAdultMs=null;helpUsed=false;const fanfare=$('victoryFanfare');if(fanfare)fanfare.remove();clearInterval(taskTimer);taskTimer=null;taskPausedAt=null;taskDeadline=0;busy=false;extraRollUsed=false;showDiceState=null;hideDice();hideActionFlash();if(boardExpanded)setBoardExpanded(false);stopCurrentVoice();bray?.pause();}
 $('startButton').addEventListener('click',()=>{
  resetAsync();G.clear(safeStorage());renderResumeCard();

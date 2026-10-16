@@ -1,3 +1,36 @@
+# ÆselKlog – udviklingsplan v0.9.16 (16. oktober 2026)
+
+**Senest verificeret på GitHub ved start:** `main` = v0.9.15. **Aktuel leverance:** v0.9.16 – kodet i komplet lokal pakke; ikke automatisk lagt på GitHub. Den godkendte illustration bevares. Se også **`PROJEKTSTATUS.md`** for status og **`IDEKATALOG.md`** for fælles beslutninger og næste idéer.
+
+## v0.9.16 – stor spilvælger og udvidet deltagerantal
+
+- [x] Gør både Talstien og Kortspil til **rigtige knapper** med tilgængeligt navn, synlig aktiv tilstand og separat opsætning.
+- [x] Spiltyper kan skiftes frem og tilbage, også når man står inde i kortspillets opsætning.
+- [x] To flottere, store kort på desktop; et kort pr. række på mobil. Fokusmarkering og reduceret bevægelse.
+- [x] Talstien udvidet fra **4 til 6 navngivne spillere + CPU**. Seks forskellige spillerfarver.
+- [x] Bagudkompatibel validering og lokal gemning af op til **7 deltagere**; gamle gemninger genoptages fortsat.
+- [x] `sw.js`, README, AGENTS, TESTPLAN, PROJEKTSTATUS og IDEKATALOG opdateret til udviklingspakke v0.9.16.
+- [x] **20 Node-tests + 15 Chromium-browsertests bestået** (simuleret lyd, ikke iOS Safari).
+- [ ] **Fysisk iPhone-/WebKit-test og produktionstest med ElevenLabs** efter GitHub-upload.
+
+## Næste trin efter v0.9.16
+
+1. **Stabilitet og familieprøver:** test 6 spillere + CPU, gem/fortsæt, lille iPhone, fysisk/digital plade og valg mellem begge spiltyper. Ret fejl fra rigtige familier før flere funktioner.
+2. **Kortspil-funktioner:** finjuster de oprindelige regler på trykte kort, afklar om der skal være en fysisk kortspil-assistent, valgfri oplæsning og senere CPU i kortspillet. Alle fem talområder er allerede tilgængelige digitalt.
+3. **Fysiske kort og A3:** trykklare sæt 1–20, 21–40, 41–60, 61–80, 81–100 med fem kopier af hvert tal; 21–40- og æselkortprototypen findes. Sammenlign trykt A3 mod faste specialfelter og gennemgå trykrettigheder.
+4. **v1.0-kvalitet:** iOS Safari/WebKit, VoiceOver, PWA-offlineopdatering, tilgængelighed, familietest og realt ElevenLabs-kreditforbrug. Release kun når disse er verificeret.
+5. **Frivillige, senere idéer:** lokal eksport af forældreoversigt, onboarding/regelforklaring, supplerende læringslege og mere avanceret kortspil. Intet af dette må gøre matematik obligatorisk.
+
+## Faste beslutninger
+
+- Talstien og Kortspil må aldrig overskrive hinandens savegame. Godkendt 1:1-forside ændres ikke.
+- Klassisk kortspil: 4/6/8 æselkort som beholdes ved straf (standard 8). Send-videre: ét æselkort. Ekstra talkortstraf er frivillig og slået fra som standard.
+- Kortspillet har fem separate områder 1–20, 21–40, 41–60, 61–80, 81–100, med fem af hvert tal i niveauet. Matematik altid frivillig.
+- Talstien digital: tilfældige specialfelter ved ny kamp. Fysisk A3: fast fordeling for at kunne matche trykt plade. Gemte kampe bevarer deres bane.
+- Cloudflare ElevenLabs-nøgle aldrig på GitHub. Lokal læringshistorik og lydcache synkroniseres ikke til cloud.
+
+---
+
 # ÆselKlog – udviklingsplan v0.9.15 (16. oktober 2026)
 
 **Status:** GitHub `main` bekræftet v0.9.14 før udviklingen. v0.9.15 udviklet og automatisk testet lokalt. Afventer manuel GitHub-upload, fysisk iPhone-PWA, familietest og afprøvning med trykte kort.

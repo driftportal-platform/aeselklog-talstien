@@ -38,7 +38,7 @@
    boardMode:c.boardMode==='physical'?'physical':'digital',moveDice:DICE.has(c.moveDice)?c.moveDice:'digital',
    learnDice:DICE.has(c.learnDice)?c.learnDice:'digital',pace:PACE.has(c.pace)?c.pace:'rolig',
    tables:TABLES.has(String(c.tables))?String(c.tables):'auto',adaptive:c.adaptive!==false,rememberLearning:c.rememberLearning!==false};
-  if(!Array.isArray(snapshot.players)||snapshot.players.length<1||snapshot.players.length>5)return null;
+  if(!Array.isArray(snapshot.players)||snapshot.players.length<1||snapshot.players.length>7)return null;
   let cpuCount=0;
   const players=[];
   for(const [i,p] of snapshot.players.entries()){

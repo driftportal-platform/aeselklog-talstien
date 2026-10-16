@@ -694,3 +694,39 @@ body.home-active #resumeCard button:active{filter:brightness(.94)}
 
 .card-donkey-icons{display:flex;justify-content:center;align-items:center;gap:3px;flex-wrap:wrap;margin-top:4px}
 .card-donkey-icons img{width:29px;height:42px;border-radius:5px;object-fit:cover;border:1px solid #d9b5ad;box-shadow:0 2px 4px #53483b34}
+
+/* v0.9.16 – begge spil kan vælges fra en rigtig, tydelig og klikbar spilvælger. */
+.mode-chooser{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px;margin:16px 0 19px}
+.game-mode-card{
+  appearance:none;-webkit-appearance:none;display:grid;grid-template-columns:62px minmax(0,1fr) 30px;
+  align-items:center;gap:15px;min-height:126px;width:100%;padding:18px 17px;
+  border:2px solid #cfdae9;border-radius:22px;cursor:pointer;text-align:left;
+  background:#fff;box-shadow:0 6px 20px #173c6020;color:#193e68;
+  font:inherit;transition:border-color .16s ease,background-color .16s ease,transform .16s ease,box-shadow .16s ease;
+}
+.game-mode-card .game-mode-icon{display:grid;place-items:center;width:62px;height:66px;font-size:2.35rem;
+  background:linear-gradient(160deg,#edf5ff,#d4e8ff);border-radius:18px;box-shadow:inset 0 0 0 1px #bdd7f6}
+.game-mode-card.game-mode-cards .game-mode-icon{background:linear-gradient(160deg,#fff8e9,#ffdfb4);box-shadow:inset 0 0 0 1px #eed4a3}
+.game-mode-card .game-mode-copy{min-width:0;display:flex;flex-flow:column;gap:5px}
+.game-mode-card .game-mode-copy strong{font-size:clamp(1.1rem,2.5vw,1.35rem);line-height:1.12;color:#123c70}
+.game-mode-card .game-mode-copy small{font-size:.87rem;line-height:1.4;font-weight:550;color:#52677b}
+.game-mode-card .game-mode-check{display:grid;place-items:center;border-radius:50%;width:28px;height:28px;
+  font-size:1.02rem;color:transparent;border:2px solid #bdcbd9;background:#fff;justify-self:end}
+.game-mode-card[aria-pressed="true"]{background:linear-gradient(125deg,#e0f1ff,#f5fbff);border-color:#1973bd;
+  box-shadow:0 5px 0 #1c6da931,0 10px 26px #235b8921}
+.game-mode-card.game-mode-cards[aria-pressed="true"]{background:linear-gradient(125deg,#fff2da,#fffaf1);border-color:#cd852d;
+  box-shadow:0 5px 0 #a56e2730,0 10px 26px #8a643221}
+.game-mode-card[aria-pressed="true"] .game-mode-check{background:#1973bd;border-color:#1973bd;color:#fff}
+.game-mode-card.game-mode-cards[aria-pressed="true"] .game-mode-check{background:#b8761f;border-color:#b8761f}
+.game-mode-card:focus-visible{outline:4px solid #df9a25;outline-offset:3px}
+@media(hover:hover){.game-mode-card:hover{transform:translateY(-2px);box-shadow:0 10px 24px #235a8230}}
+.game-mode-card:active{transform:translateY(1px)}
+.setup-player-limit{margin:2px 0 8px;color:#586b7c}
+@media(max-width:610px){
+  .mode-chooser{grid-template-columns:minmax(0,1fr);gap:11px;margin:12px 0 17px}
+  .game-mode-card{grid-template-columns:56px minmax(0,1fr) 28px;gap:12px;min-height:91px;padding:11px 12px;border-radius:18px}
+  .game-mode-card .game-mode-icon{width:56px;height:58px;font-size:2rem;border-radius:15px}
+  .game-mode-card .game-mode-copy strong{font-size:1.1rem}
+  .game-mode-card .game-mode-copy small{font-size:.81rem}
+}
+@media(prefers-reduced-motion:reduce){.game-mode-card{transition:none!important}}
