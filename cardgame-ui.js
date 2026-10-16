@@ -85,8 +85,8 @@ function act(fn){
   let line='';
   if(out?.caught)line='Hov hov! Det var en fejl. Et æselkort!';
   else if(game.finished)line='Hurra! Vi har en vinder!';
-  else if(out?.target&&Number.isFinite(out.number))line=speaker.isCPU?'Jeg lægger et kort.':'Et kort er lagt.';
-  else if(out&&Number.isFinite(out.number)&&game.pending!==null)line=speaker.isCPU?'Jeg vender et kort.':'Kortet er vendt.';
+  else if(out?.target&&Number.isFinite(out.number))line=speaker.isCPU?`Æslet lægger ${out.number}.`:`${out.number}.`;
+  else if(out&&Number.isFinite(out.number))line=`${out.number}.`;
   else if(out?.assigned!==undefined)line='Et æselkort i straf!';
   else if(game.turn!==priorTurn)line='Næste spillers tur!';
   speechDone=announceCard(line,{cpu:!!speaker?.isCPU});

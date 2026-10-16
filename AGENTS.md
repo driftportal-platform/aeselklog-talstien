@@ -210,3 +210,7 @@
 - Ved AI-netværksfejl/timeout bruges telefonstemmen og en kort genforsøgspause på 60 sekunder. Skift i valgte stemme nulstiller pausen. Secrets forbliver i Cloudflare.
 - `sw.js` må kun rydde egne caches (`aeselklog-talstien-*`), ikke alle caches på `github.io`-domænet. App-kode er network-first, medieaktiver cache-first.
 - Browserens `set_content`-tests indlæser CSS som inlinet tekst fra `styles.css` for at fungere uden HTTP-server. Kør også `node tests/pwa_cache.test.js` og `python tests/voice_fallback_browser.py`. En rigtig offline-PWA med Service Worker kræver desuden fysisk iPhone-test eller et miljø, der tillader lokal HTTP-test.
+
+
+## v0.9.20 – taloplæsning i Kortspil
+Ved vending og placering af talkort udtaler stemmen nu kortets tal i stedet for generiske vendinger som »Jeg vender et kort« og »Kortet er lagt«. CPU kan sige »Æslet lægger [tal]«. Eksisterende fælles stemmevalg, musik og offline-aktiver er bevaret. Kontrollér på fysisk iPhone efter upload.

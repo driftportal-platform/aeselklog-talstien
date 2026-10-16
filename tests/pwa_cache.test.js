@@ -45,7 +45,7 @@ async function dispatch(name,request){
   assert(precached.includes('./profiles.js'),'learning profiles module must be available offline');
   assert(precached.includes('./parentreport.js'),'parent report module must be available offline');
   assert(precached.includes('./actionfx.js'),'action effects must be available offline');
-  assert(worker.includes('aeselklog-talstien-v0919-mp3-original-voice'),'PWA must use v0.9.18 cache');
+  assert(worker.includes('aeselklog-talstien-v0920-card-numbers'),'PWA must use v0.9.18 cache');
   assert(precached.includes('./cardgame-engine.js'),'new card game rules must work offline');
   assert(precached.includes('./cardgame-ui.js'),'card game UI must work offline');
   assert(precached.includes('./music.js'),'offline music must precache');

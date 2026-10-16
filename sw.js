@@ -1,6 +1,6 @@
 /* ÆselKlog v0.9.19 – tre CC0-MP3 gemmes i PWA-cache, ingen Cloudflare/ElevenLabs-cache. */
 const CACHE_PREFIX='aeselklog-talstien-';
-const CACHE='aeselklog-talstien-v0919-mp3-original-voice';
+const CACHE='aeselklog-talstien-v0920-card-numbers';
 const CORE=['./','./index.html','./styles.css','./home-ui.js','./home-fullscreen.webp',
  './app.js','./cardgame-engine.js','./cardgame-ui.js','./music.js','./engine.js','./board.js','./actions.js','./leaderboard.js',
  './adaptive.js','./profiles.js','./parentreport.js','./actionfx.js','./savegame.js','./cpuvoice.js','./voicecache.js','./narration.js','./manifest.webmanifest',

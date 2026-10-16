@@ -448,3 +448,7 @@ Skriv ved en fejl: **enhed og browser, spiltype, valgt alder/tabel, placering p�
 7. Sammenlign AI-credits før og efter 5–10 CPU-spørgsmål. Korte svar bruger stadig separate AI-forespørgsler; kontrollér forbrugsgrænserne.
 
 **Automatiseret:** `node tests/cpuvoice.test.js` og `python tests/cpu_voice_browser.py` (mockede svar og lyd, ingen reelle API-kald).
+
+
+## v0.9.20 – taloplæsning i Kortspil
+Ved vending og placering af talkort udtaler stemmen nu kortets tal i stedet for generiske vendinger som »Jeg vender et kort« og »Kortet er lagt«. CPU kan sige »Æslet lægger [tal]«. Eksisterende fælles stemmevalg, musik og offline-aktiver er bevaret. Kontrollér på fysisk iPhone efter upload.

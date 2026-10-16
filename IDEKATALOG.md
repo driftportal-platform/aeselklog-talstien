@@ -74,3 +74,7 @@
 
 - Start altid fra seneste GitHub `main`; gamle ZIP'er er kun referencer. Opdater `README.md`, `AGENTS.md`, `TESTPLAN.md`, `UDVIKLINGSPLAN.md`, `PROJEKTSTATUS.md`, `IDEKATALOG.md`, versionsmærke og PWA-cache i alle nye releaser.
 - Del strengt mellem det, der **er kodet og testet lokalt**, og det, der faktisk **er på GitHub eller testet på en fysisk telefon**.
+
+
+## v0.9.20 – taloplæsning i Kortspil
+Ved vending og placering af talkort udtaler stemmen nu kortets tal i stedet for generiske vendinger som »Jeg vender et kort« og »Kortet er lagt«. CPU kan sige »Æslet lægger [tal]«. Eksisterende fælles stemmevalg, musik og offline-aktiver er bevaret. Kontrollér på fysisk iPhone efter upload.

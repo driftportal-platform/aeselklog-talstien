@@ -519,3 +519,7 @@ Spil: https://driftportal-platform.github.io/aeselklog-talstien/
 5. Opdatér versionsnumre i HTML/JS/PWA-cache og roadmap sammen med release.
 
 **Ingen påstand om produktion eller live-telefontest, før den er bekræftet.**
+
+
+## v0.9.20 – taloplæsning i Kortspil
+Ved vending og placering af talkort udtaler stemmen nu kortets tal i stedet for generiske vendinger som »Jeg vender et kort« og »Kortet er lagt«. CPU kan sige »Æslet lægger [tal]«. Eksisterende fælles stemmevalg, musik og offline-aktiver er bevaret. Kontrollér på fysisk iPhone efter upload.
