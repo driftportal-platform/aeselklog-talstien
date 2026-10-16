@@ -45,9 +45,10 @@ async function dispatch(name,request){
   assert(precached.includes('./profiles.js'),'learning profiles module must be available offline');
   assert(precached.includes('./parentreport.js'),'parent report module must be available offline');
   assert(precached.includes('./actionfx.js'),'action effects must be available offline');
-  assert(worker.includes('aeselklog-talstien-v0917-cards-cpu-free-moves'),'PWA must use v0.9.17 cache');
+  assert(worker.includes('aeselklog-talstien-v0918-compact-music-voice'),'PWA must use v0.9.18 cache');
   assert(precached.includes('./cardgame-engine.js'),'new card game rules must work offline');
   assert(precached.includes('./cardgame-ui.js'),'card game UI must work offline');
+  assert(precached.includes('./music.js'),'offline music must precache');
   for(const asset of precached){
     const relative=asset.replace(/^\.\//,'');
     if(relative)assert(fs.existsSync(path.join(root,relative)),`missing precached file ${asset}`);

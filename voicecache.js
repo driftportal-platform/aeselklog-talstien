@@ -28,7 +28,18 @@
   'En gulerodsmagi sender dig tre felter frem!',
   'Medvind i ørerne! Du hopper to felter frem!',
   'Ups! Der lå hø i vejen. Ét felt tilbage!',
-  'Hov, hov! To felter tilbage!'
+  'Hov, hov! To felter tilbage!',
+  // Kortspillets fælles, gentagne replikker: spar credits uden at gemme børnenavne.
+  'Velkommen til kortspillet!',
+  'Vi fortsætter kortspillet!',
+  'Jeg vender et kort.',
+  'Jeg lægger et kort.',
+  'Kortet er vendt.',
+  'Et kort er lagt.',
+  'Næste spillers tur!',
+  'Et æselkort i straf!',
+  'Hov, hov! Det var en fejl. Et æselkort!',
+  'Hurra! Vi har en vinder!'
  ];
  // CPU-æslet hedder altid "Æslet" og bruger de offentlige, faste actionbeskrivelser.
  const actionDescriptions=[

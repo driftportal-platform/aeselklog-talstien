@@ -1,3 +1,23 @@
+# 🫏 ÆselKlog v0.9.18 – kompakt kortspil, stemmer og musik (16. oktober 2026)
+
+**Status:** Komplet lokal ZIP til manuel GitHub-upload. Ved udviklingsstart var `main` v0.9.17. **Ikke publiceret automatisk**, og rigtig iPhone-PWA/ElevenLabs er ikke gennemtestet her.
+
+## Nyt i v0.9.18
+
+- **Kortspillet er mere kompakt:** Den store ekstra boks **Dit kort** er fjernet. Tryk på den lukkede bunke, så det vendte kort vises **oven på bunken**. Træk derfra til egen åbne bunke, en anden spillers åbne bunke eller en række i midten. Alternativt: tryk på kortet, dernæst på mål. En lille **Vend kort / Egen bunke**-hjælpeknap findes stadig for tilgængelighed. Spillere og midterrækker ligger tættere sammen, også på smal mobil.
+- **Stemmer også i kortspillet:** Det eksisterende, sikkert forbundne ElevenLabs-/telefonstemmevalg genbruges. Spillelederens stemme siger korte beskeder; **CPU-æslets egen valgte stemme** siger CPU-replikker. Der er en separat **Tale til/fra**-knap under kortspillet, gemt på den aktuelle enhed. CPU'en venter, indtil oplæsningen er færdig, før det næste træk. Talstiens tale og CPU er uændret.
+- **Færre ElevenLabs-credits:** Kortspillets gentagne replikker er faste, upersonlige tekster på den snævre liste i `voicecache.js`; de kan gemmes lokalt *pr. valgt stemme*. Ingen spiller- eller børnenavne føjes til permanent lydcache. Oplæsning af nye faste tekster kan stadig bruge credits første gang online; ved AI-fejl bruger appen telefonstemmen.
+- **Musik i begge spiltyper:** Tre **originale korte melodier dannet lokalt af Web Audio**: *Gårdfest*, *Gulerodsdans* og *Rolig bondegård*. Ingen eksterne sange, ophavsretsbelagt musik, API eller netværk. Musik er **slået fra som standard**, kan vælges og justeres i Indstillinger, samt slås til/fra under spillet. Den dæmpes automatisk, mens der tales, og stopper ved skift ud af et spil eller når appen skjules. Én fælles lokal indstilling `aeselklog-baggrundsmusik-v1` gælder begge spil. Den tidligere tale/lyd-knap virker selvstændigt.
+- **PWA-rettelse:** Service Worker kloner nu netværkssvaret **før** den asynkrone cachelagring, så browserfejlen `Response body is already used` undgås. Cacheversion: `aeselklog-talstien-v0918-compact-music-voice`, som forudlagrer også `music.js`.
+
+**Bevaret:** Original godkendt forside (`home-fullscreen.webp` er identisk med GitHub v0.9.17), Talstien, fem korttalområder, CPU, to æselkortvarianter, fri placering og opdaget-fejl-straf, lydcache, individuel læring, forældreoversigt og **begge separate gemmeformater**. Regler og lagernøgler er uændrede.
+
+**Test:** Alle **22 Node-tests** og **17 Chromium-browsertests** bestået med simuleret lyd/browserlager, inklusive korttræk i tre skærmstørrelser, musik/valg, CPU-stemmer, spilhukommelse, Talstien og PWA-unit. **Ægte offline-PWA via lokal HTTP blev forsøgt, men Chromium blokerede `127.0.0.1` med `ERR_BLOCKED_BY_ADMINISTRATOR`.** Rigtig iPhone/WebKit, faktisk musiklyd, ElevenLabs-credits og familietest skal fortsat prøves på fysiske enheder.
+
+**Installation:** Pak ZIP'en ud, upload indholdet til roden af `driftportal-platform/aeselklog-talstien`, inklusive ny `music.js`, opdateret `app.js`, `cardgame-ui.js`, `voicecache.js`, `styles.css`, `index.html`, `sw.js`, alle test- og statusdokumenter. Upload ikke kun ZIP-filen. Genåbn installeret iPhone-PWA, kontrollér **PRØVEVERSION 0.9.18**, og test kortspil + musik på enheden.
+
+---
+
 # 🫏 ÆselKlog v0.9.17 – Kortspil mod Æslet, frie korttræk og opdagede fejl (16. oktober 2026)
 
 **Kilde:** Samtlige eksisterende kilder og den godkendte `home-fullscreen.webp` i GitHub `main` v0.9.16 blev kontrolleret mod det komplette projektarkiv før udviklingen. Denne v0.9.17-pakke indeholder alle projektfiler; GitHub opdateres **ikke** automatisk. Ægte Safari/iPhone og ElevenLabs er endnu ikke produktionstestet i denne release.

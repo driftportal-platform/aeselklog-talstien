@@ -1,3 +1,28 @@
+# ÆselKlog v0.9.18 – testplan: kompakte kort, stemmer, musik og SW
+
+**Udført 16. oktober 2026:**
+
+- [x] `node --check` for alle appmoduler.
+- [x] **22 Node-tests**. Ny `music.test.js` kontrollerer 3 originale melodier, opt-in, lokal indstilling, skift mellem spiltyper, dæmpning og stop i baggrunden.
+- [x] **17 Chromium-browsertests**. Ny `music_cards_browser.py` kontrollerer kompakt kortbord i 390×844/844×390/1280×800, vendt kort på lukket bunke, fri tap/træk, gemning af musikvalg, music-toggle og fortæller-/CPU-stemmer (simuleret).
+- [x] Gamle `cardgame_browser.py` tilpasset til kortfladen uden stort `Dit kort`-panel; `cardgame_interaction_browser.py` gennemfører drag, indsigelse, CPU og gem/fortsæt uændret.
+- [x] Regressioner for Talstien, CPU-lydroller, Hov hov-variation, stemmecache, fysisk A3, alle ni specialfelter, 6 + CPU, gem/fortsæt, voksen-timer og forældreoversigt.
+- [x] `pwa_cache.test.js` inkluderer `music.js`, ny versionscache, offlineaktiver og cachebegrænsning. `response.clone()` sker nu før asynkron cachelagring.
+- [ ] **Lokal Service Worker/PWA offline-installation:** Forsøgt med `python tests/pwa_offline_browser.py`, men Chromium svarede `net::ERR_BLOCKED_BY_ADMINISTRATOR` på `http://127.0.0.1`. Der er derfor **ikke** dokumenteret en rigtig SW-installation/offline-genstart i denne test.
+- [ ] **Rigtig iPhone (WebKit/Safari/PWA), live ElevenLabs-credits og faktisk musiklyd:** Skal testes fysisk. Al browsertale er simuleret; ingen produktionskald eller credits under tests.
+
+## Manuel tjekliste efter GitHub-upload
+
+- [ ] iPhone PWA viser **PRØVEVERSION 0.9.18** og den godkendte forside 1:1.
+- [ ] Kortspil: Tryk lukket bunke → se det vendte kort oven på bunken. Træk til midten, egen/andres åbne bunker; prøv også tap-kort/tap-mål. Ingen stor `Dit kort`-boks.
+- [ ] Test Kortspil med 2–6 mennesker og solo med CPU; æselkort og opdaget fejl fortryder kun det forkerte træk; gem/fortsæt bevarer spillet.
+- [ ] Vælg spilleleder og særskilt CPU-stemme under Stemme/lyd. Prøv at CPU taler med eget valg og først flytter videre, når oplæsningen er færdig. Kontrollér rigtige ElevenLabs-kreditter (faste udtryk skal genbruge cache).
+- [ ] Musik er fra ved første install. Vælg **Gårdfest**, **Gulerodsdans**, **Rolig bondegård**, justér lydstyrke; prøv Musik til/fra i begge spil. Musikken må ikke overdøve tale, og den stopper ved Afslut eller app-baggrund.
+- [ ] Genstart PWA, vælg offline, kontroller at app, kortspil, læring og de lokalt genererede melodier kan åbnes, og at version/cached filer opdateres korrekt uden at slette gemte spil.
+- [ ] Test Safari/VoiceOver, touch-træk, orienteringsskift og kontroller ingen skjulte knapper eller fejl i konsollen.
+
+---
+
 # ÆselKlog v0.9.17 – CPU-kortspil, fri placering og kort-indsigelser
 
 ## Automatiske tests (16. oktober 2026)

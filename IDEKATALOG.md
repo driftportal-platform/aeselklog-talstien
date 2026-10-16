@@ -1,3 +1,26 @@
+# 🫏 ÆselKlog – idéer og godkendte produktbeslutninger (v0.9.18)
+
+**Opdateret:** 16. oktober 2026. Dette dokument adskiller **besluttede**, **implementerede** og **endnu ikke gennemførte** idéer; alle seks dokumenter opdateres ved hver release.
+
+## Besluttet og implementeret i v0.9.18
+
+- Kortspillet skal være fysisk og digitalt og fungere uden matematik; fem farveinddelte områder, fem kort af hvert tal og to æselkortvarianter. Æselkort gives ved opdagede fejl; valgfri ekstra kortstraf. Solo mod CPU er muligt.
+- Spiller skal **selv vende kort fra sin lukkede bunke og lægge det direkte på valgfrit sted**. Tryk og træk er ligeværdige alternativer. Forkerte træk må ikke forhåndsstoppes, men kan udfordres via æselkortet med tilbagekald og straf.
+- Kortspillet skal have en kompakt mobilvisning uden den separate store "Dit kort"-boks.
+- Kortspillet skal bruge samme bruger-valgte spillelederstemme og CPU-æselstemme som Talstien. Korte gentagne replikker gemmes kun som anonyme, stemmespecifikke lydklip.
+- Begge spil skal have **valgfri baggrundsmusik**, slukket som standard, lydstyrke og et udvalg af glade børnevenlige melodier. Tre små originale, offline syntetiske instrumentalmelodier er implementeret som første udgave. Musik skal dæmpes under tale og stoppe, når spillet forlades.
+- Den godkendte full-screen forside må ikke redesignes uden eksplicit godkendelse, og Cloudflare ElevenLabs API-secrets må aldrig placeres i GitHub.
+
+## Senere / endnu ikke besluttet i detaljer
+
+1. Test om de tre melodier er gode nok til børn og om de skal erstattes med længere originalt indspillede musikstykker med kontrollerede rettigheder.
+2. Endelig fysisk kortspilassistent til eksisterende fysiske kort, og eventuelt lydvalg/CPU-tempo-justering efter familietest.
+3. Trykklare kort for 1–20, 41–60, 61–80 og 81–100; æske, bagsider og endelig spilleregler. 21–40 og æselkort er eksisterende prototyper.
+4. Evt. lokal backup eller eksport af forældrerapporten uden automatisk cloud-overførsel.
+5. Fysisk iPhone, WebKit/VoiceOver og fuld offline-PWA-installation, familietest, rettigheder, sikkerhed og v1.0-forberedelse.
+
+---
+
 # 🫏 ÆselKlog – idékatalog og godkendte beslutninger
 
 **Opdateret:** 16. oktober 2026 · **Kilde:** Senest kontrollerede GitHub `main` v0.9.16 og aftaler fra udviklingsforløbet. Ny lokal udviklingspakke v0.9.17. Se `PROJEKTSTATUS.md` for faktisk status, `TESTPLAN.md` for gennemførte tests og `UDVIKLINGSPLAN.md` for rækkefølge.

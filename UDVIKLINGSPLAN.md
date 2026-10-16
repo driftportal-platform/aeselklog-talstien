@@ -1,3 +1,26 @@
+# ÆselKlog – udviklingsplan v0.9.18 (16. oktober 2026)
+
+**Status:** Verificeret GitHub `main` v0.9.17 ved udviklingsstart. v0.9.18 er en **komplet lokalt testet ZIP**, endnu ikke opdateret på GitHub eller prøvet fysisk på iPhone. Se `PROJEKTSTATUS.md` for den samlede fremdrift og `IDEKATALOG.md` for idéerne.
+
+## v0.9.18 – kortspil, musik og taleroller
+
+- [x] Fjern stort `Dit kort`-panel; træk direkte fra vendt kort oven på lukket bunke eller vælg kort/mål med tap. Giv et kompakt tospaltet overblik på små telefoner.
+- [x] Kortspil bruger valgt fortællerstemme og egen CPU-stemme fra den eksisterende Cloudflare/telefonstemme-tjeneste. CPU venter på oplæsning før sit næste korttræk.
+- [x] Faste, upersonlige kortreplikker tilføjet til lydcachen for at spare ElevenLabs-credits. Tale kan slås fra særskilt i kortspillet.
+- [x] Fælles, valgfri original syntetisk baggrundsmusik med tre melodier, lydstyrke og knapper under Kortspil og Talstien. Musikken dæmpes under tale og stopper uden for spil/baggrund.
+- [x] Ret Service Worker `Response body is already used`, cacheversion, app- og testfiler.
+- [x] 22 Node-/17 Chromium-tests bestået med simuleret lyd. Localhost/Service Worker-test forsøgt, men blokeret af browseradministrator.
+
+## Vigtigste næste trin før v1.0
+
+1. Test v0.9.18 fysisk på iPhone (musikkvalitet, lydstyrke, særskilte stemmer, CPU-timing, tryk/træk på små skærme, offline/genstart/opdatering).
+2. Test med børn og familier: virker reglerne for fejlindvending og strafkort, og er nye skærme overskuelige? Justér først med faktisk feedback.
+3. Kontroller fysisk A3-plades specialfelter mod appens faste plan. Færdiggør trykklare fysiske kort i alle fem talområder samt æske og originale illustrationer/rettigheder.
+4. Gennemgå VoiceOver, kontrast, visuel feedback, fejlrapportering, lokal databeskyttelse og ElevenLabs-kreditforbrug.
+5. Lav en releasekandidat til v1.0 først, når iOS-/familietest og copyrightkontrol er gennemført.
+
+---
+
 # ÆselKlog – udviklingsplan v0.9.17 (16. oktober 2026)
 
 **Kilde og status:** GitHub `main` er kontrolleret til v0.9.16 før koden blev ændret. v0.9.17 udvikles lokalt som komplet ZIP. Den er ikke automatisk publiceret. Se `PROJEKTSTATUS.md` for samlet fremdrift og `IDEKATALOG.md` for beslutninger.

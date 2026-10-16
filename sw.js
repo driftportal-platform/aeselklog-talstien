@@ -1,8 +1,8 @@
-/* ÆselKlog v0.9.17 – versioneret offline-cache. Ingen Cloudflare/ElevenLabs-data caches. */
+/* ÆselKlog v0.9.18 – versioneret offline-cache. Ingen Cloudflare/ElevenLabs-data caches. */
 const CACHE_PREFIX='aeselklog-talstien-';
-const CACHE='aeselklog-talstien-v0917-cards-cpu-free-moves';
+const CACHE='aeselklog-talstien-v0918-compact-music-voice';
 const CORE=['./','./index.html','./styles.css','./home-ui.js','./home-fullscreen.webp',
- './app.js','./cardgame-engine.js','./cardgame-ui.js','./engine.js','./board.js','./actions.js','./leaderboard.js',
+ './app.js','./cardgame-engine.js','./cardgame-ui.js','./music.js','./engine.js','./board.js','./actions.js','./leaderboard.js',
  './adaptive.js','./profiles.js','./parentreport.js','./actionfx.js','./savegame.js','./cpuvoice.js','./voicecache.js','./narration.js','./manifest.webmanifest',
  './icon.svg','./aeselklog-card.webp','./donkey-bray.wav',
  './home-illustration.webp','./home-hero-mobile.webp','./home-hero-wide.webp','./home-mascot.webp'];
@@ -25,13 +25,13 @@ self.addEventListener('fetch',event=>{
  const media=/\.(?:webp|png|svg|wav|ico)$/i.test(url.pathname);
  if(media){
   event.respondWith(caches.match(req).then(hit=>hit||fetch(req).then(response=>{
-   if(response.ok)event.waitUntil(caches.open(CACHE).then(cache=>cache.put(req,response.clone())));
+   if(response.ok){const copy=response.clone();event.waitUntil(caches.open(CACHE).then(cache=>cache.put(req,copy)));}
    return response;
   })));
  }else{
   // HTML, CSS og JavaScript: hent seneste ved netforbindelse, brug cache offline.
   event.respondWith(fetch(req).then(response=>{
-   if(response.ok)event.waitUntil(caches.open(CACHE).then(cache=>cache.put(req,response.clone())));
+   if(response.ok){const copy=response.clone();event.waitUntil(caches.open(CACHE).then(cache=>cache.put(req,copy)));}
    return response;
   }).catch(async()=> (await caches.match(req)) || (req.mode==='navigate' ? caches.match('./index.html') : undefined)));
  }

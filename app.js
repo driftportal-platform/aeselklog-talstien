@@ -1,4 +1,4 @@
-/* ÆselKlog v0.9.16: stor spilvælger og 6 menneskespillere i Talstien. */
+/* ÆselKlog v0.9.18: fælles stemmer og lydløs/offline musik i to spil. */
 (()=>{'use strict';
 const $=id=>document.getElementById(id);
 const qs=sel=>document.querySelector(sel);
@@ -272,9 +272,14 @@ function say(text,{cpu=false,repeat=false}={}){
  stopCurrentVoice();
  if(!sound.on){lastNarration=Promise.resolve();return lastNarration}
  const t=normalizedSpeech(line),id=speechSerial;
- lastNarration=sound.mode==='ai'?speakAI(t,id,{cpu}):speakLocally(t,{cpu});
+ const music=window.AeselMusic,duck=music?.beginSpeech?.();
+ const speaking=sound.mode==='ai'?speakAI(t,id,{cpu}):speakLocally(t,{cpu});
+ lastNarration=Promise.resolve(speaking).finally(()=>{if(duck!==undefined)music?.endSpeech?.(duck)});
  return lastNarration;
 }
+// Kortspillet bruger præcis samme valgte stemmer/Cloudflare-forbindelse som Talstien.
+// Ingen ekstra API-nøgle eller tilsvarende kopieret stemmemotor.
+window.AeselVoice={say:(text,options={})=>say(text,options),stop:stopCurrentVoice,enabled:()=>sound.on,choices:()=>({mode:sound.mode,aiVoice:sound.aiVoice,cpuVoice:sound.cpuVoice})};
 function playBray(){
  stopCurrentVoice();
  if(!sound.on||!bray)return Promise.resolve();
@@ -563,6 +568,24 @@ $('deleteParentProfile').addEventListener('click',()=>{
 $('homePlay').addEventListener('click',()=>show('setup'));
 $('homeSettings').addEventListener('click',()=>show('settings'));
 $('homeTopscore').addEventListener('click',openTopscore);
+// Musikken er slukket som udgangspunkt. Samme indstilling bruges i begge spiltyper.
+const bgMusic=window.AeselMusic;
+function syncMusicButtons(){if(!bgMusic)return;const p=bgMusic.get();
+ const enabled=$('musicEnabled'),track=$('musicTrack'),volume=$('musicVolume'),out=$('musicVolumeValue');
+ if(enabled)enabled.checked=p.enabled;if(track)track.value=p.track;if(volume)volume.value=p.volume;
+ if(out)out.textContent=p.volume+' %';
+ for(const id of ['gameMusicToggle','boardMusicToggle','cardsMusicToggle']){
+  const b=$(id);if(!b)continue;b.textContent=p.enabled?'🎵 Musik til':'🎵 Musik fra';b.setAttribute('aria-pressed',String(p.enabled));
+ }
+}
+if(bgMusic){
+ $('musicEnabled')?.addEventListener('change',e=>bgMusic.setEnabled(e.target.checked));
+ $('musicTrack')?.addEventListener('change',e=>bgMusic.setTrack(e.target.value));
+ $('musicVolume')?.addEventListener('input',e=>bgMusic.setVolume(e.target.value));
+ $('musicPreview')?.addEventListener('click',()=>{bgMusic.playPreview();});
+ for(const id of ['gameMusicToggle','boardMusicToggle','cardsMusicToggle'])$(id)?.addEventListener('click',()=>bgMusic.setEnabled(!bgMusic.get().enabled));
+ bgMusic.onChange(syncMusicButtons);syncMusicButtons();bgMusic.syncView('home');
+}
 $('settingsBack').addEventListener('click',()=>{saveGameOptions();show('home')});
 $('settingsDone').addEventListener('click',()=>{saveGameOptions();show('home')});
 $('setupBack').addEventListener('click',()=>show('home'));
@@ -572,6 +595,7 @@ $('addPlayer').addEventListener('click',()=>{if(setupPlayers.length<6){setupPlay
 function show(view){
  ['home','setup','settings','game','cardsSetup','cardsGame'].forEach(id=>$(id).classList.toggle('active',view===id));
  document.body.classList.toggle('home-active',view==='home');
+ window.AeselMusic?.syncView?.(view);
  if(view==='setup')updateSettingsSummary();
  if(view==='home')renderResumeCard();
  window.scrollTo({top:0,behavior:'instant'});

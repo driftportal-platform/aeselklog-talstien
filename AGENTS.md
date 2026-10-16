@@ -1,3 +1,16 @@
+# ÆselKlog – udviklernoter v0.9.18 (kortbord, lydroller, musik)
+
+1. **Start altid fra seneste GitHub `main`, og læs alle seks projektfiler** (`README`, `UDVIKLINGSPLAN`, `TESTPLAN`, `AGENTS`, `PROJEKTSTATUS`, `IDEKATALOG`). Ny lokal v0.9.18 bygger på verificeret v0.9.17, aldrig på en ældre ZIP som autoritativ kilde.
+2. **Kortspil i `cardgame-ui.js`:** Den gamle selvstændige `#cardsPending`-visning er fjernet. `game.pending` er stadig en del af motoren og skal vises som `data-card-source="pending"` i `.card-flipped-over` direkte oven på den aktive spillers lukkede bunke. Spillerne kan trække, tappe kort/mål eller bruge små ekstra betjeningsknapper. Bevar fri ulovlig placering, opdaget-fejl-checkpoint og et æselkort i straf.
+3. **Kortstemme:** `app.js` eksponerer et lille `window.AeselVoice`-interface (`say`, `stop`, `enabled`, `choices`). Det genbruger eksisterende ElevenLabs Worker/AI-stemmevalg eller telefonstemme; ingen API-nøgle i browseren. `cardgame-ui.js` bruger `{cpu:true}` for CPU-æsel og `{cpu:false}` for spilleleder og venter på den returnerede Promise før næste CPU-tur. Kortspillets Tale til/fra gemmes separat under `aeselklog-korttale-v1` og påvirker ikke Talstiens talevalg.
+4. **Credits/privatliv:** Kortspillets almindelige replikker er faste og anonyme og føjet til `voicecache.js`' snævre liste. Brug aldrig børnenavne eller fritekst i permanent TTS-cache. Stemmeskift skal altid føre til sin egen cache.
+5. **Original baggrundsmusik:** `music.js` genererer korte instrumentale toner lokalt via Web Audio, med tre melodier og fælles lokal opt-in. `window.AeselMusic.syncView(view)` skal stoppe musik uden for `game/cardsGame`; `beginSpeech/endSpeech` skal dæmpe lyden indtil oplæsningen er færdig. Hold intervaltimer, volumen og visibilitet under kontrol; musik skal fortsat virke helt uden netværk. Lydkontekst kan kræve brugertryk på iOS.
+6. **SW:** `sw.js` skal forudlagre `music.js` og bruge cache-ID `aeselklog-talstien-v0918-compact-music-voice`. VIGTIGT: `response.clone()` skal ske før en `await`/asynkron `cache.put`; ellers kan `Response body is already used` opstå. Ryd kun ÆselKlogs egne caches, og cache aldrig Cloudflare-/ElevenLabs-API-responser.
+7. **Regler og kompabilitet:** Talstiens motor og godkendt forside ændres ikke. Kortspil/SAVE `aeselklog-kortspil-v1`, Talstiens schema 1 samt alle lærings-/stemmeprofiler bevares. CPU/timere må vente på tale og stoppe under baggrundsvisning, og matematik er altid frivillig.
+8. **Tests:** `node --check *.js`, alle Node-tests (inkl. `music.test.js`), alle 17 Chromium-browserfiler (inkl. `music_cards_browser.py`) og PWA-unit-test. `tests/pwa_offline_browser.py` er forsøgt, men lokalt HTTP blokeres af browserens admin-politik; **påstå aldrig fysisk iPhone/WebKit-test** uden faktisk prøve.
+
+---
+
 # ÆselKlog – udviklernote v0.9.17 (kortspil med CPU og fri placering)
 
 1. **Læs seneste GitHub `main` og alle seks dokumenter først:** `README.md`, `AGENTS.md`, `TESTPLAN.md`, `UDVIKLINGSPLAN.md`, `PROJEKTSTATUS.md`, `IDEKATALOG.md`. Bevar den godkendte forside, Talstien-motoren, ElevenLabs-Worker og eksisterende gemme-/profilnøgler.

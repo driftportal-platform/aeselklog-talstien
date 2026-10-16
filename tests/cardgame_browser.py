@@ -3,7 +3,7 @@ from pathlib import Path
 from playwright.sync_api import sync_playwright, expect
 import re, json
 ROOT=Path(__file__).resolve().parents[1]
-ORDER=['engine.js','board.js','actions.js','leaderboard.js','adaptive.js','profiles.js','parentreport.js','savegame.js','cpuvoice.js','voicecache.js','narration.js','actionfx.js','cardgame-engine.js','app.js','home-ui.js','cardgame-ui.js']
+ORDER=['engine.js','board.js','actions.js','leaderboard.js','adaptive.js','profiles.js','parentreport.js','savegame.js','cpuvoice.js','voicecache.js','narration.js','actionfx.js','music.js','cardgame-engine.js','app.js','home-ui.js','cardgame-ui.js']
 
 def load(page):
     html=(ROOT/'index.html').read_text(encoding='utf-8').replace('<head>', '<head><base href="https://aeselklog.test/">')
@@ -46,10 +46,10 @@ def run(page, dimensions):
     assert page.locator('.card-person').count()==3
     assert page.evaluate('JSON.parse(localStorage.getItem("aeselklog-kortspil-v1")).players.length')==3
     assert page.evaluate('localStorage.getItem("aeselklog-igangvaerende-v1")') is None
-    page.locator('#cardFlip').click()
-    if page.locator('#cardPlayPending').count():
-        assert page.locator('.number-card:not(.number-card--small)').count()==1
-        page.locator('#cardPlayPending').click()
+    page.locator('[data-card-flip="true"]').click()
+    assert page.locator('.card-flipped-over [data-card-source="pending"]').count()==1
+    # Et vendt kort kan nu lægges direkte i egen åbne bunke, uden det gamle "Dit kort"-panel.
+    page.locator('#cardDiscard').click()
     assert page.locator('#cardsMessage').inner_text()
     page.locator('#cardPenalties summary').click()
     page.locator('#cardPenaltyPlayer').select_option('1')

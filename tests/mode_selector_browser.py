@@ -5,7 +5,7 @@ from pathlib import Path
 import re
 from playwright.sync_api import sync_playwright
 ROOT=Path(__file__).resolve().parents[1]
-SCRIPTS=['engine.js','board.js','actions.js','leaderboard.js','adaptive.js','profiles.js','parentreport.js','savegame.js','cpuvoice.js','voicecache.js','narration.js','actionfx.js','cardgame-engine.js','app.js','cardgame-ui.js','home-ui.js']
+SCRIPTS=['engine.js','board.js','actions.js','leaderboard.js','adaptive.js','profiles.js','parentreport.js','savegame.js','cpuvoice.js','voicecache.js','narration.js','actionfx.js','music.js','cardgame-engine.js','app.js','cardgame-ui.js','home-ui.js']
 
 def load(page, storage=None):
     html=(ROOT/'index.html').read_text(encoding='utf-8')

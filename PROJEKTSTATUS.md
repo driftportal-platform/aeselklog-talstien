@@ -1,3 +1,29 @@
+# 🫏 ÆselKlog – projektstatus v0.9.18
+
+**Opdateret:** 16. oktober 2026. **Senest verificerede GitHub main ved start:** v0.9.17. **Ny komplet releasepakke:** v0.9.18, lokal ZIP (ikke automatisk uploadet). Spillet og dokumenterne fortsættes altid fra nyeste GitHub main.
+
+## Færdigkodet og regressionstestet
+
+- Godkendt 1:1-forside samt to valgfrie spiltyper: **Talstien** (digital/fysisk A3) og **Kortspil** (alle fem talområder). Matematik er altid frivillig.
+- Talstien: op til seks menneskespillere + CPU, specialfelter, terninger, individuelle læringstrin, forældreoversigt, to slags plade, lyd/ElevenLabs og selvstændig savegame.
+- Kortspil: 1–6 personer + evt. CPU, egne gemte spil, to æselkortvarianter, fri kortplacering, indsigelse/fortrydelse og straf. **v0.9.18** har kompakt kortbord uden separat Dit kort-boks, tap/træk fra lukket bunke og fortæller/CPU-stemmer fra de fælles indstillinger.
+- Fælles **valgfri baggrundsmusik** med tre offline/Web Audio-melodier, lydstyrke, tænd/sluk og dæmpning under stemmer. Slukket som standard.
+- PWA-cache med sikker `response.clone`-håndtering, stemmespecifik lydcache og lokallagring uden automatisk synkronisering eller API-secrets.
+- **Automatiske prøver:** 22 Node-tests + 17 Chromium-browsertests bestået. Ingen ægte ElevenLabs-kald i tests.
+
+## Ikke bekræftet / mangler
+
+- Fysisk iPhone-PWA/WebKit, touch-træk over rulning, ægte musiklyd og tale/credits; lokal HTTP-test stoppes af `ERR_BLOCKED_BY_ADMINISTRATOR`.
+- Familietest og balance af CPU's fejl/detektion, kortspilsregler og pædagogisk sværhedsgrad.
+- Trykklare kort i de øvrige områder, kortæske/spilleregler og sammenligning af den trykte A3-plade med faste specialfelter.
+- Sikkerhed/tilgængelighed/VoiceOver, original lyd-/billedrettighed, offline-PWA-opdatering og stabil v1.0-release.
+
+## Næste handling
+
+Upload alle projektfiler fra den komplette v0.9.18 ZIP til GitHub, test på iPhone og notér konkrete fejl fra familietest. Se `IDEKATALOG.md` for besluttede og kommende funktioner.
+
+---
+
 # 🫏 ÆselKlog – fælles projektstatus v0.9.17
 
 **Opdateret:** 16. oktober 2026 · **Senest bekræftet GitHub `main` før ny kode:** v0.9.16 · **Ny udviklingspakke:** v0.9.17, lokalt udviklet og automatisk testet, **ikke uploadet til GitHub af assistenten**. Korrekt kilde ved ny udvikling er altid aktuel `main` og de seks projektdokumenter. Dokumentationen opdateres sammen med PWA-cache ved hver release.

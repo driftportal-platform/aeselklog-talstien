@@ -1,4 +1,4 @@
-/* ÆselKlog v0.9.17 – frivilligt kortspil med CPU, tryk/træk, indsigelse og fortrydning. */
+/* ÆselKlog v0.9.18 – kompakt bord, tryk/træk, valgte fortæller/CPU-stemmer. */
 (()=>{'use strict';
 const E=window.AeselCards;if(!E)return;
 const $=id=>document.getElementById(id);
@@ -7,6 +7,17 @@ const sleep=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 let game=null,focusedInputCount=2,chosenSource=null,cpuTimer=null,cpuWatchTimer=null,revision=0,ignoreTapUntil=0;
 const audio=(()=>{try{const a=new Audio('./donkey-bray.wav');a.volume=.75;return a;}catch(_){return null}})();
 function donkeySound(){if(!audio)return;try{audio.pause();audio.currentTime=0;void audio.play().catch(()=>{});}catch(_){}}
+const CARD_VOICE_KEY='aeselklog-korttale-v1';
+let cardVoiceOn=true;try{cardVoiceOn=localStorage.getItem(CARD_VOICE_KEY)!=='off'}catch(_){}
+let speechDone=Promise.resolve();
+function updateVoiceToggle(){const b=$('cardsVoiceToggle');if(!b)return;b.textContent=cardVoiceOn?'🔊 Tale til':'🔇 Tale fra';b.setAttribute('aria-pressed',String(cardVoiceOn));}
+function announceCard(message,{cpu=false}={}){
+ if(!cardVoiceOn||!window.AeselVoice?.enabled?.())return Promise.resolve();
+ const content=String(message||'').slice(0,230).trim();if(!content)return Promise.resolve();
+ try{return Promise.resolve(window.AeselVoice.say(content,{cpu})).catch(()=>{})}catch(_){return Promise.resolve()}
+}
+function stopVoice(){window.AeselVoice?.stop?.();speechDone=Promise.resolve();}
+
 function navigate(view){if(typeof window.AeselShowView==='function')window.AeselShowView(view)}
 function safeStore(){try{return window.localStorage}catch(_){return null}}
 function readSaved(){try{return E.restore(safeStore()?.getItem(E.SAVE_KEY)||null)}catch(_){return null}}
@@ -58,7 +69,7 @@ function renderStacks(){
   const openAttrs=dest?targetAttributes(dest,i):'';
   return `<div class="card-person ${active?'card-person--active':''} ${p.isCPU?'card-person--cpu':''}">
     <div class="card-person-top"><strong>${escape(p.name)}${p.isCPU?' 🫏 CPU':''} ${active&&!game.finished?'· tur':''}</strong><span>${E.remaining(game,i)} talkort</span></div>
-    <div class="card-person-cards"><div class="card-person-closed ${canFlip?'card-closed-clickable':''}" ${canFlip?'data-card-flip="true" role="button" tabindex="0" aria-label="Vend et kort fra din lukkede bunke"':''}>${p.closed.length?cardBack():'<span class="card-blank">Tom</span>'}<small>Lukket · ${p.closed.length}</small></div>
+    <div class="card-person-cards"><div class="card-person-closed ${canFlip?'card-closed-clickable':''}" ${canFlip?'data-card-flip="true" role="button" tabindex="0" aria-label="Vend et kort fra din lukkede bunke"':''}>${p.closed.length?cardBack():'<span class="card-blank">Tom</span>'}${active&&game.pending!==null?`<div class="card-flipped-over" aria-label="Vendt kort ${game.pending}">${canAct?sourceElement('pending',numCard(game.pending,true)):numCard(game.pending,true)}</div>`:''}<small>${game.pending!==null&&active?'Vendt kort · ': 'Lukket · '}${p.closed.length}</small></div>
     <div class="card-person-open ${dest?'card-dropzone':''}" ${openAttrs}>${openSource?sourceElement('open',numCard(p.open.at(-1),true)):(p.open.length?numCard(p.open.at(-1),true):'<span class="card-blank">Tom</span>')}<small>Åben · ${p.open.length}</small></div></div>
     <div class="card-person-donkeys">${p.donkeys?`<span class="card-donkey-icons">${Array.from({length:p.donkeys},()=>'<img src="./aeselklog-card.webp" alt="Æselkort">').join('')}</span>`:'Ingen æselkort'} <small>${p.donkeys?'· strafkort':''}</small></div></div>`;
  }).join('');
@@ -69,36 +80,36 @@ function chooseSource(src){if(!userTurn())return;chosenSource=chosenSource===src
 function act(fn){
  if(!game)return null;
  stopTimers();chosenSource=null;
- try{const out=fn();save();render();schedule(out);return out;}
+ try{const priorTurn=game.turn,out=fn();save();render();
+  const speaker=game.players[priorTurn];
+  let line='';
+  if(out?.caught)line='Hov hov! Det var en fejl. Et æselkort!';
+  else if(game.finished)line='Hurra! Vi har en vinder!';
+  else if(out?.target&&Number.isFinite(out.number))line=speaker.isCPU?'Jeg lægger et kort.':'Et kort er lagt.';
+  else if(out&&Number.isFinite(out.number)&&game.pending!==null)line=speaker.isCPU?'Jeg vender et kort.':'Kortet er vendt.';
+  else if(out?.assigned!==undefined)line='Et æselkort i straf!';
+  else if(game.turn!==priorTurn)line='Næste spillers tur!';
+  speechDone=announceCard(line,{cpu:!!speaker?.isCPU});
+  schedule(out);return out;}
  catch(err){$('cardsMessage').textContent=err.message||'Trækket kunne ikke udføres.';renderControls();return null;}
 }
 function place(src,target){if(!userTurn())return;act(()=>E.placeManual(game,src,target));}
 function flip(){if(!userTurn())return;act(()=>E.flipManual(game));}
 function discard(){if(!userTurn())return;act(()=>E.discardManual(game));}
 function renderControls(){
- const holder=$('cardMoveButtons');holder.replaceChildren();
+ const holder=$('cardMoveButtons');if(!holder)return;holder.replaceChildren();
  if(!game)return;
- if(game.finished){holder.innerHTML=`<p class="card-win-text">🏆 ${escape(game.players[game.winner].name)} kom af med alle talkortene! Et fejltræk kan stadig udfordres med æselkortet.</p>`;return;}
- const p=game.players[game.turn];
- if(p.isCPU){holder.innerHTML='<p class="card-cpu-thinking">🫏 Æslet tænker over sit næste kort …</p>';return;}
- if(game.pending!==null){
-  const target=E.preferredTarget(game,game.pending);
-  if(target){const btn=document.createElement('button');btn.type='button';btn.id='cardPlayPending';btn.className='btn green';btn.textContent=`✓ Læg på foreslået plads: ${target.caption}`;
-   btn.addEventListener('click',()=>place('pending',target));holder.append(btn);}
-  const leave=document.createElement('button');leave.type='button';leave.id=target?'cardDiscard':'cardPlayPending';leave.className='btn soft';leave.textContent='↪ Læg kortet i egen åbne bunke – næste tur';leave.addEventListener('click',discard);holder.append(leave);
- }else{
-  const target=E.openPlay(game);
-  if(target){const btn=document.createElement('button');btn.type='button';btn.id='cardPlayOpen';btn.className='btn green';btn.textContent=`↪ Brug dit åbne kort → ${target.caption}`;btn.addEventListener('click',()=>place('open',target));holder.append(btn);}
-  const btn=document.createElement('button');btn.type='button';btn.id='cardFlip';btn.className='btn main';btn.textContent='🃏 Vend kort (eller tryk på din lukkede bunke)';btn.addEventListener('click',flip);holder.append(btn);
- }
+ if(game.finished){holder.innerHTML=`<p class="card-win-text">🏆 ${escape(game.players[game.winner].name)} kom af med sine talkort!</p>`;return;}
+ const p=game.players[game.turn];if(p.isCPU)return;
+ const button=(label,id,act)=>{const b=document.createElement('button');b.type='button';b.id=id;b.className='btn soft small';b.textContent=label;b.addEventListener('click',act);holder.append(b)};
+ if(game.pending!==null){button('↪ Læg i egen åbne bunke','cardDiscard',discard);}
+ else{button('🃏 Vend kort','cardFlip',flip);}
 }
 function render(){if(!game)return;
  $('cardsPlayTitle').textContent=`🃏 Kortspil ${game.range.replace('-', '–')} · ${game.variant==='collect'?'Behold æslet':'Send æslet videre'}`;
  const p=game.players[game.turn];
  $('cardsTurnHeading').textContent=game.finished?'🏆 Spillet er slut':`${p.isCPU?'🫏 ': '🎲 '}${p.name}s tur`;
  $('cardsMessage').textContent=game.message;
- $('cardsPending').innerHTML=game.pending!==null?`<span class="card-pending-title">Kortet du vendte</span>${userTurn()?sourceElement('pending',numCard(game.pending)):numCard(game.pending)}`:
-  '<span class="card-pending-quiet">Tryk på din lukkede bunke for at vende kort. Træk dit kort til midten eller en anden åben bunke.</span>';
  renderStacks();renderControls();
  const sel=Number($('cardPenaltyPlayer').value);$('cardPenaltyPlayer').replaceChildren();
  game.players.forEach((x,i)=>{const opt=document.createElement('option');opt.value=String(i);opt.textContent=x.name+(x.isCPU?' (CPU)':'');$('cardPenaltyPlayer').append(opt)});
@@ -142,6 +153,9 @@ function cpuStep(){if(!game||game.finished||!game.players[game.turn].isCPU||docu
 }
 function schedule(result){if(!game||game.finished||!$('cardsGame').classList.contains('active')||document.hidden||$('cardRulesDialog').open)return;
  const thisRevision=revision;
+ void Promise.resolve(speechDone).catch(()=>{}).then(()=>{if(thisRevision!==revision||!game||game.finished||document.hidden||!$('cardsGame').classList.contains('active')||$('cardRulesDialog').open)return;runTurnTimers(thisRevision);});
+}
+function runTurnTimers(thisRevision){
  const cpuIndex=game.players.findIndex(x=>x.isCPU);
  if(cpuIndex>=0&&game.lastMove&&!game.lastMove.valid&&game.lastMove.actor!==cpuIndex){
   const actualMove=game.lastMove;
@@ -154,8 +168,8 @@ function schedule(result){if(!game||game.finished||!$('cardsGame').classList.con
   cpuTimer=setTimeout(()=>{if(thisRevision!==revision)return;cpuStep();},game.lastMove?.actor===cpuIndex?1700:1100);
  }
 }
-function begin(options){try{stopTimers();game=E.start(options);save();navigate('cardsGame');render();schedule();}catch(e){$('cardsSetupError').textContent=e.message}}
-function menu(){stopTimers();chosenSource=null;game=null;renderResume();navigate('cardsSetup')}
+function begin(options){try{stopTimers();game=E.start(options);save();navigate('cardsGame');render();speechDone=announceCard('Velkommen til kortspillet!');schedule();}catch(e){$('cardsSetupError').textContent=e.message}}
+function menu(){stopTimers();stopVoice();chosenSource=null;game=null;renderResume();navigate('cardsSetup')}
 function targetFrom(el){const t=el?.closest('[data-card-target="true"]');if(!t)return null;
  return {kind:t.dataset.targetKind,index:Number(t.dataset.targetIndex)};}
 function onBoardClick(event){if(!game)return;
@@ -212,8 +226,10 @@ $('cardStart').addEventListener('click',()=>{
  if(readSaved()&&!window.confirm('Et tidligere kortspil bliver erstattet. Vil I starte et nyt?'))return;
  begin({range:$('cardRange').value,variant:$('cardVariant').value,donkeyCount:Number($('cardDonkeyCount').value),extraPenalty:$('cardExtraPenalty').checked,names,vsCPU:$('cardCpuCheck').checked});
 });
-$('cardsContinue').addEventListener('click',()=>{const saved=readSaved();if(!saved){renderResume();return}stopTimers();game=saved;navigate('cardsGame');render();schedule()});
+$('cardsContinue').addEventListener('click',()=>{const saved=readSaved();if(!saved){renderResume();return}stopTimers();game=saved;navigate('cardsGame');render();speechDone=announceCard('Vi fortsætter kortspillet!');schedule()});
 $('cardsDeleteSave').addEventListener('click',()=>{if(!window.confirm('Slet det gemte kortspil? Talstien og læringsprofiler berøres ikke.'))return;clear();renderResume()});
+$('cardsVoiceToggle')?.addEventListener('click',()=>{cardVoiceOn=!cardVoiceOn;try{localStorage.setItem(CARD_VOICE_KEY,cardVoiceOn?'on':'off')}catch(_){};if(!cardVoiceOn)stopVoice();updateVoiceToggle();});
+updateVoiceToggle();
 $('cardsHome').addEventListener('click',()=>{save();menu()});
 $('cardsSaveHome').addEventListener('click',()=>{save();menu()});
 $('cardsChallenge').addEventListener('click',punish);
