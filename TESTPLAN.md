@@ -1,3 +1,32 @@
+# ÆselKlog v0.9.19 – test af MP3, offline-cache og original CPU-stemme
+
+**Samlet resultat:** 23 Node-tests og 18 Chromium-browserfiler bestået (mock-/simuleret tale). Den særskilte `pwa_offline_browser.py` blev ikke gennemført pga. blokering af lokal HTTP.
+
+## Automatisk kontrol (16. oktober 2026)
+
+- [x] `node --check` på appfiler samt alle `tests/*.test.js`.
+- [x] `tests/music.test.js`: tre faktiske MP3-aktiver, opt-in, lydstyrke, gemte indstillinger, migrering af gamle musikvalg, dæmpning under oplæsning, stop i baggrunden og preview.
+- [x] `tests/music_offline_range.test.js`: fuld MP3 og HTTP 206 `Range` direkte fra SW-cachen uden netværk, herunder suffix-range og 416 ved ugyldigt interval.
+- [x] `tests/cpuvoice.test.js`: Automatisk foretrækker kun den godkendte originale ÆselKlog-stemme, manuel valgt stemme respekteres, og ukendte ID'er afvises.
+- [x] `tests/original_voice_browser.py` med mockede /voices og /tts: standardstemme og manuelt CPU-override via fælles Indstillinger.
+- [x] `tests/music_cards_browser.py`: kortspilsmenu, musikvalg, kompakt kortbord og CPU-ventetid i tre Chromium-skærmstørrelser (simuleret lyd).
+- [x] `tests/pwa_cache.test.js`: v0.9.19-cache indeholder de tre MP3-filer, kun ÆselKlog-caches slettes, offline-fallback fungerer.
+- [x] MP3-filerne er validt kodet og kan afkodes med ffmpeg/ffprobe. Ingen ekstra ElevenLabs-kald ved musik.
+- [ ] **Lokalt server-hostet SW-installationsflow:** browseren i testmiljøet afviser localhost og `file://` (`ERR_BLOCKED_BY_ADMINISTRATOR`). Node-tests simulerer offlinecache. **Ikke** fysisk iPhone-test.
+
+## Manuel prøvning efter GitHub-upload
+
+- [ ] Kontrollér `PRØVEVERSION 0.9.19` og beholdt forside. Aktiver musik i Indstillinger; prøv alle tre MP3-lyde i Talstien og Kortspillet og skift lydstyrke.
+- [ ] Efter første indlæsning online: sæt iPhone i flytilstand, luk PWA helt, genåbn, og prøv at spille alle tre melodier offline. Hvis PWA'en genindlæser for hurtigt, åbn først online og gentag.
+- [ ] Slå oplæsning til og kontrollér at musikken dæmpes imens, at CPU stadig venter til talen er færdig, og at baggrundsskift stopper musikken.
+- [ ] Indstillinger → CPU-æslets egen stemme: Automatisk skal bruge **ÆselKlog-original** når den vises på stemmelisten. Ændring til en anden godkendt stemme skal virke straks, også efter en mislykket prøve.
+- [ ] Lad både Kortspil og Talstien bruge samme AI-stemmevalg. Prøv efter offline-genstart; kontrollér at ElevenLabs-brug/credits stemmer med forventet niveau.
+- [ ] Sammenlign om `Children's March Theme` giver en hørbar loop-pause i MP3-format. Eventuel OGG-løsning for seamless loop gemmes til senere behov.
+
+*Alle automatiske browsertests bruger mockede stemmer og kan ikke dokumentere ægte Safari/iOS eller produktions-ElevenLabs. Hele regressionpakken kontrolleres sammen med denne release.*
+
+---
+
 # ÆselKlog v0.9.18 – testplan: kompakte kort, stemmer, musik og SW
 
 **Udført 16. oktober 2026:**

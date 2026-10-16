@@ -1,3 +1,31 @@
+# 🫏 ÆselKlog – fælles projektstatus v0.9.19
+
+**Dato:** 16. oktober 2026. **GitHub `main` ved udviklingsstart:** verificeret v0.9.18. **Ny lokal pakke:** v0.9.19, ikke automatisk uploadet, ikke fysisk iPhone-testet. Projektet skal fortsættes fra nyeste `main` og disse dokumenter.
+
+**Automatisk teststatus:** 23 Node- og 18 Chromium-browsertests bestået med simuleret tale. Rigtig iPhone og ElevenLabs står stadig åbent.
+
+## Implementeret i v0.9.19
+
+- Tre brugerleverede, optimerede MP3-melodier i `music/` til begge spil: Gone Fishin', Children's March Theme og Beary Fishy Menu Screen, cirka 4,7 MB i alt. Tilhørende CC0-dokumentation i `MUSIC-LICENSES.md`.
+- Fælles og huskede musikindstillinger (tænd/sluk, lydstyrke, melodi), offline precache samt Safari-kompatible HTTP-206 Range-svar; Web Audio-lydstyrke og automatisk dæmpning ved tale.
+- Fælles CPU-stemme i Talstien og Kortspil med automatisk præference for den originale ÆselKlog-stemme, **kun når den vises som godkendt fra Cloudflare**. Tidligere manuelle valg respekteres. CPU-stemmeskift nulstiller cooldown efter AI-fejl.
+- V0.9.18-funktionerne uændrede: Godkendt forside, to spiltyper, kompakt kortbord, korttræk, CPU og straf, lokal gemning, Talstien-bræt, læring, forældreoversigt og lydcache.
+
+## Fortsat utestet eller åbent
+
+- Installeret fysisk iPhone-PWA: offline MP3 med Range, autoplay/user gesture, faktisk lydstyrke, stemme i Kortspil, pause ved tale, SW-cacheopdatering. Node og Chromium alene beviser ikke dette.
+- Live Cloudflare `/voices`-liste: original ÆselKlog-stemme kan kun vælges automatisk hvis ID'et faktisk er tilgængeligt dér. Kreditter/ElevenLabs testes manuelt.
+- Den korte The Reel Winner-fil (5,2 s) er et muligt vinderlyd-forslag, **ikke** integreret i denne release.
+- Familietest, endelig fysisk A3/kortproduktion, VoiceOver og kontrol af billeder/lydlicenser før v1.0.
+
+## Næste arbejdsgang
+
+1. Upload ZIP-indholdet fra v0.9.19 til GitHub `main`, herunder `music/` og `MUSIC-LICENSES.md`.
+2. Kontrollér PWA online én gang, test flytilstand/offline og alle tre melodier. Prøv CPU-æslets stemme i begge spil og bekræft 1:1-stemmerne.
+3. Registrér iPhone- og familiefeedback i `TESTPLAN.md` og `IDEKATALOG.md` før næste featurebeslutning.
+
+---
+
 # 🫏 ÆselKlog – projektstatus v0.9.18
 
 **Opdateret:** 16. oktober 2026. **Senest verificerede GitHub main ved start:** v0.9.17. **Ny komplet releasepakke:** v0.9.18, lokal ZIP (ikke automatisk uploadet). Spillet og dokumenterne fortsættes altid fra nyeste GitHub main.

@@ -1,3 +1,16 @@
+# ÆselKlog – udviklernote v0.9.19 (fælles original æselstemme og MP3)
+
+1. Start **altid** med seneste GitHub `main` og alle seks projektdokumenter. Den tidligere komplette ZIP v0.9.18 matchede GitHub på alle Git-blob-hashes. Bevar den godkendte `home-fullscreen.webp`, Talstien-/Kortspil-savegames, CPU-flow og alle eksisterende valg.
+2. `music.js`: samme `aeselklog-baggrundsmusik-v1`-lager og API (`get`, `setTrack`, `setVolume`, `setEnabled`, `syncView`, `beginSpeech`, `endSpeech`, `playPreview`, `stop`, `start`). Tre godkendte musik-ID'er: `gonefishin`, `march`, `beary`; gamle `gaardfest`, `gulerod`, `rolig` mappes til nye numre. Musik er opt-in og gemmes kun lokalt.
+3. MP3-aktiver i `music/` er 160 kbit/s, 44,1 kHz stereo fra brugerleverede CC0-kildefiler. `MUSIC-LICENSES.md` skal følge med; ikke erstatte kilde-/licensangivelse med løse antagelser. Det korte `the_reel_winner` er endnu ikke i webappen.
+4. Musikoutput skal anvende Web Audio `MediaElementAudioSource` + Gain, når det understøttes, fordi iOS-volumenkontrol på HTMLMediaElement alene kan være begrænset. Kun én musikafspiller/lydkilde, loop, pause i baggrunden og ducking ved tale. Deaktiver aldrig automatisk under kortspil; ingen skjulte eksterne requests.
+5. `sw.js`: precache `music/gone-fishin.mp3`, `music/childrens-march.mp3`, `music/beary-fishy.mp3`. SW skal kunne besvare `Range` MP3-bidder offline med HTTP 206. Cache skal kun rydde `aeselklog-talstien-*`, ikke andre GitHub-projekter.
+6. `cpuvoice.js`: `ORIGINAL_VOICE_ID=F6ZuXSkDhi5i4KLiT7Id` er et offentligt Voice ID, **ikke en API-nøgle**. `chooseVoice()` må kun bruge det automatisk, når Cloudflare `/voices` viser ID'et i den godkendte liste. Et eksplicit valg skal altid bevares. Begge spil bruger `window.AeselVoice` fra `app.js`; opret ikke separate API-nøgler eller stemmelagre.
+7. Brug af en alternativ CPU-stemme skal nulstille `aiRetryAfter`, så prøv-knappen fungerer straks efter AI-fejl. `window.AeselVoice.say(...,{cpu:true})` må først frigive CPU-spilflow, når afspilningen er afsluttet.
+8. Test `tests/music.test.js`, `tests/music_offline_range.test.js`, `tests/original_voice_browser.py`, `tests/music_cards_browser.py`, alle eksisterende Node/Chromium-regressioner og fysisk iPhone-PWA. Skeln mellem simulated og rigtig lyd, også i rapportering.
+
+---
+
 # ÆselKlog – udviklernoter v0.9.18 (kortbord, lydroller, musik)
 
 1. **Start altid fra seneste GitHub `main`, og læs alle seks projektfiler** (`README`, `UDVIKLINGSPLAN`, `TESTPLAN`, `AGENTS`, `PROJEKTSTATUS`, `IDEKATALOG`). Ny lokal v0.9.18 bygger på verificeret v0.9.17, aldrig på en ældre ZIP som autoritativ kilde.

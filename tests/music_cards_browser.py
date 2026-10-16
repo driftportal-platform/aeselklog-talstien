@@ -1,4 +1,4 @@
-"""v0.9.18: kompakt kortspil, roller i oplæsning og valgfri original musik; simuleret tale."""
+"""v0.9.19: CC0-MP3, kompakt kortspil, fælles CPU-stemme; simuleret lyd."""
 from pathlib import Path
 from playwright.sync_api import sync_playwright
 import re
@@ -15,6 +15,13 @@ def load(page):
   window.fetch=async()=>{throw Error('offline simulation')};
   window.speechSynthesis.speak=u=>setTimeout(()=>u.onend?.(),16);window.speechSynthesis.cancel=()=>{};
   window.confirm=()=>true;
+  // Fake HTMLMediaElement: træk/spilflow testes uden browserens autoplay-/codec-afhængighed.
+  window.Audio=class FakeAudio {
+   constructor(src=''){this.src=src;this.dataset={};this.paused=true;this.volume=1;this.loop=false;}
+   addEventListener(){} load(){}
+   play(){this.paused=false;return Promise.resolve()}
+   pause(){this.paused=true}
+  };
  }''')
  for f in ORDER:page.add_script_tag(content=(ROOT/f).read_text(encoding='utf-8'))
 def run(page,w,h):
@@ -24,11 +31,11 @@ def run(page,w,h):
  assert not page.locator('#musicEnabled').is_checked()
  page.locator('#homeSettings').click()
  assert page.locator('#musicTrack option').count()==3
- page.locator('#musicTrack').select_option('gulerod')
+ page.locator('#musicTrack').select_option('march')
  page.locator('#musicVolume').fill('47')
  page.locator('#musicEnabled').check()
  assert page.evaluate('JSON.parse(localStorage.getItem("aeselklog-baggrundsmusik-v1")).volume')==47
- assert page.evaluate('window.AeselMusic.get().track')=='gulerod'
+ assert page.evaluate('window.AeselMusic.get().track')=='march'
  page.locator('#settingsDone').click()
  page.evaluate('''() => {
    window.__cardSpeech=[];window.AeselVoice={say:(line,options)=>{window.__cardSpeech.push({line,cpu:!!options?.cpu});return new Promise(resolve=>setTimeout(resolve,35))},enabled:()=>true,stop:()=>{}};
@@ -61,7 +68,7 @@ def run(page,w,h):
  assert page.locator('#cardsMusicToggle').get_attribute('aria-pressed')=='false'
  page.screenshot(path=str(ROOT/f'preview_v0918_cards_{w}x{h}.png'),full_page=True)
  assert not errors,(w,h,errors)
- print('PASS v0.9.18 compact cards + shared voice + music',w,h)
+ print('PASS v0.9.19 compact cards + shared voice + MP3 music',w,h)
 def cpu_waits_for_voice(page):
     """CPU'en må ikke fortsætte før oplæsningen er afsluttet."""
     load(page)

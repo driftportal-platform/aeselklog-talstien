@@ -14,7 +14,7 @@
 <div class="shell">
   <header class="top">
     <div class="brand"><div class="logo" aria-hidden="true">🫏</div><div><h1>Æsel<span class="red">Klog</span> · Talstien</h1><small>Spil, lær og grin sammen</small></div></div>
-    <div class="top-actions"><span class="pill">PRØVEVERSION 0.9.18</span><button id="voiceToggle" class="btn soft small" type="button" aria-pressed="true">🔊 Lyd til</button></div>
+    <div class="top-actions"><span class="pill">PRØVEVERSION 0.9.19</span><button id="voiceToggle" class="btn soft small" type="button" aria-pressed="true">🔊 Lyd til</button></div>
   </header>
 
 
@@ -101,9 +101,9 @@
         <div class="field"><label for="aiVoiceChoice">Spillelederens stemme (fx Mia)</label>
           <select id="aiVoiceChoice"><option value="mia">Mia – varm dansk fortæller</option></select>
         </div>
-        <div class="field"><label for="cpuVoiceChoice">🫏 CPU-æslets egen stemme</label>
-          <select id="cpuVoiceChoice"><option value="auto">Automatisk · anden stemme end spilleleder</option></select>
-          <p class="tiny">Æslet vælger en anden AI-stemme, hvis der er en ledig. Ellers bliver stemmen lidt lysere. Det svarer højt, før facit vises.</p>
+        <div class="field"><label for="cpuVoiceChoice">🫏 CPU-æslets egen stemme (begge spil)</label>
+          <select id="cpuVoiceChoice"><option value="auto">Automatisk · ÆselKlog-original hvis tilgængelig</option></select>
+          <p class="tiny">Automatisk foretrækker den originale ÆselKlog-stemme, når den er godkendt i Cloudflare. Ellers vælges en alternativ tilgængelig stemme. Begge spil bruger samme valg.</p>
         </div>
         <button id="cpuVoicePreview" type="button" class="btn soft small">▶ Hør CPU-æslet svare</button>
         <div class="row between" style="gap:9px;align-items:center">
@@ -132,10 +132,10 @@
     </div>
     <section class="music-settings paper" aria-label="Baggrundsmusik">
       <h2>🎵 Baggrundsmusik</h2>
-      <p class="hint">Tre originale, glade instrumentalmelodier. Musikken fungerer offline i både Kortspil og Talstien og skrues automatisk ned under oplæsning.</p>
+      <p class="hint">Tre børnevenlige CC0-musiknumre, der gemmes offline i appen. Musikken virker i begge spil og dæmpes under tale. Se musikrettigheder i MUSIC-LICENSES.md.</p>
       <label class="option music-enabled-option"><input type="checkbox" id="musicEnabled"><span><strong>Spil baggrundsmusik</strong><small>Slukket som standard. Musik kan også tændes og slukkes under spillet.</small></span></label>
       <div class="music-controls">
-        <div class="field"><label for="musicTrack">Vælg melodi</label><select id="musicTrack"><option value="gaardfest">🎈 Gårdfest</option><option value="gulerod">🥕 Gulerodsdans</option><option value="rolig">🌙 Rolig bondegård</option></select></div>
+        <div class="field"><label for="musicTrack">Vælg melodi</label><select id="musicTrack"><option value="gonefishin">🎸 Gone Fishin'</option><option value="march">🥁 Children's March Theme</option><option value="beary">🌙 Beary Fishy Menu Screen</option></select></div>
         <div class="field"><label for="musicVolume">Lydstyrke <output id="musicVolumeValue">32 %</output></label><input id="musicVolume" type="range" min="0" max="100" step="1" value="32"></div>
         <button type="button" id="musicPreview" class="btn soft">▶ Hør melodi</button>
       </div>

@@ -1,3 +1,24 @@
+# 🫏 ÆselKlog v0.9.19 – tre rigtige offline-MP3'er og original æselstemme (16. oktober 2026)
+
+**Status:** GitHub `main` blev kontrolleret til v0.9.18. Samtlige tidligere v0.9.18-kildefiler i lokal ZIP matchede GitHub på deres Git-blob-SHA'er. v0.9.19 er en ny, komplet lokal udviklingspakke og er **ikke automatisk uploadet**. Test på installeret iPhone-PWA og ægte ElevenLabs-Worker skal udføres efter upload.
+
+## Ændringer i v0.9.19
+
+- **Tre rigtige baggrundsmelodier:** `Gone Fishin'` (Memoraphile), `Children's March Theme` (Cleyton Kauffman) og `Beary Fishy Menu Screen` (Memoraphile). Brugeren leverede lydfilerne. De er omkodet til 160 kbit/s MP3 (ca. 4,7 MB i alt), placeret i `music/` og samlet med PWA-cachen. Kilder og CC0-licenser: **`MUSIC-LICENSES.md`**.
+- **Samme musik i begge spil:** Vælg melodi/lydstyrke/tænd-sluk under Indstillinger → Baggrundsmusik eller brug musikknapperne i Talstien og Kortspillet. Musikken er fortsat slukket som standard, dæmpes under stemmeoplæsning og stoppes, når appen forlades eller går i baggrunden. MP3-afspilning benytter en enkelt HTML-lydafspiller og Web Audio-lydstyrke på understøttede enheder, hvilket er vigtigt på iPhone.
+- **Offline MP3:** Service Worker cacher de tre MP3-filer ved installation og kan afgive HTTP 206-byteintervaller fra den lokale cache til iOS/Safari-medieafspilleren. Brugerdata, stemmevalg og ElevenLabs-nøgle opbevares stadig ikke i SW-cachen. Hvis iOS fjerner browserens cache pga. lagerplads, må musikken hentes igen online.
+- **ÆselKlog-originalen som CPU-standard:** Den eksisterende fælles stemmeopsætning bruges i begge spil. Når CPU står på **Automatisk**, foretrækkes den oprindelige ÆselKlog Voice ID (`F6ZuXSkDhi5i4KLiT7Id`), **men kun hvis Cloudflare `/voices` angiver stemmen som godkendt**. Ellers fortsætter det hidtidige sikre fallback. Et manuelt valgt CPU-stemme-ID overstyres aldrig. Ny CPU-stemme kan prøves straks, selv efter en forudgående AI-fejl.
+- **Indstillinger fra v0.9.18 bevares:** Den eksisterende `aeselklog-baggrundsmusik-v1`-nøgle bruges fortsat. Gamle syntetiske valg `gaardfest`, `gulerod` og `rolig` oversættes til de tre nye MP3-numre. Talstien/Kortspil og alle gemte spil er bevaret.
+- **Den korte The Reel Winner** (ca. 5 sekunder) blev også leveret, men bruges **ikke** som løbende baggrundsmusik. Den er noteret som mulig fremtidig vinderfanfare.
+
+**Tekniske filer:** Opdateret `music.js`, `cpuvoice.js`, `app.js`, `index.html`, `sw.js` og musik-/PWA-tests. Tre nye MP3-aktiver i `music/`; nyt `MUSIC-LICENSES.md`. PWA-cache er `aeselklog-talstien-v0919-mp3-original-voice`. Den godkendte forside, alderssikker matematik, kortspilsregler, lydcache, CPU-timing og de separate savegames er ikke ændret.
+
+**Test i denne version:** 23 Node-tests og 18 Chromium-browsertests bestået; fysisk Safari-PWA, faktisk MP3-lyd på iPhone og live ElevenLabs er ikke testet.
+
+**Upload:** Pak hele ZIP-filen ud og upload **alle** filer direkte i GitHub-repositoryets rod, især de tre nye MP3-filer i `music/`. Upload ikke bare ZIP-filen. Efter GitHub Pages-opdatering skal PWA'en genåbnes online mindst én gang; test derefter alle tre melodier i flytilstand, skift CPU-stemme, og kontrollér talepauser/lydstyrke. Se `TESTPLAN.md`.
+
+---
+
 # 🫏 ÆselKlog v0.9.18 – kompakt kortspil, stemmer og musik (16. oktober 2026)
 
 **Status:** Komplet lokal ZIP til manuel GitHub-upload. Ved udviklingsstart var `main` v0.9.17. **Ikke publiceret automatisk**, og rigtig iPhone-PWA/ElevenLabs er ikke gennemtestet her.

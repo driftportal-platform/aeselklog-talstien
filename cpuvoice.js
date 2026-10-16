@@ -6,9 +6,12 @@
  if(root)root.AeselCpuVoice=api;
 })(typeof globalThis!=='undefined'?globalThis:null,function(){
  'use strict';
+ const ORIGINAL_VOICE_ID='F6ZuXSkDhi5i4KLiT7Id'; // ÆselKlog original, only if approved via /voices.
  function chooseVoice(voices,narrator,preference='auto'){
   const approved=(Array.isArray(voices)?voices:[]).filter(v=>v&&typeof v.id==='string'&&/^[a-zA-Z0-9_-]{1,50}$/.test(v.id));
   if(preference!=='auto'&&approved.some(v=>v.id===preference))return preference;
+   // Genkendelig æselstemme er standard i BÅDE Talstien og Kortspil.
+   if(preference==='auto'&&approved.some(v=>v.id===ORIGINAL_VOICE_ID))return ORIGINAL_VOICE_ID;
   const narratorName=approved.find(v=>v.id===narrator)?.name|| (narrator==='mia'?'Mia':'');
   const distinct=approved.find(v=>v.id!==narrator && (!narratorName||!v.name||!String(v.name).toLowerCase().includes(String(narratorName).toLowerCase().split(' ')[0])));
   return distinct?.id||narrator||'mia';
@@ -26,5 +29,5 @@
   return `${intros[index]} ${safe}.`;
  }
  function makePreview(){return 'Høhø! Jeg er Æslet. Fem gange tre? Jeg gætter på femten!';}
- return Object.freeze({chooseVoice,makeReply,makePreview});
+ return Object.freeze({ORIGINAL_VOICE_ID,chooseVoice,makeReply,makePreview});
 });

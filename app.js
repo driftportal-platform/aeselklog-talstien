@@ -1,4 +1,4 @@
-/* ÆselKlog v0.9.18: fælles stemmer og lydløs/offline musik i to spil. */
+/* ÆselKlog v0.9.19: original CPU-stemme og fælles lydvalg; CC0-MP3 i begge spil. */
 (()=>{'use strict';
 const $=id=>document.getElementById(id);
 const qs=sel=>document.querySelector(sel);
@@ -100,7 +100,9 @@ function aiStatus(message){
 function renderCPUVoices(){
  const select=$('cpuVoiceChoice'),value=sound.cpuVoice;
  if(!select)return;
- const opts=[{id:'auto',name:'Automatisk · anden stemme end spilleleder'},...aiVoices];
+ const original=CV.ORIGINAL_VOICE_ID;
+ const ordered=[...aiVoices].sort((a,b)=>Number(b.id===original)-Number(a.id===original));
+ const opts=[{id:'auto',name:'Automatisk · ÆselKlog-original hvis tilgængelig'},...ordered.map(v=>v.id===original?{...v,name:'🫏 ÆselKlog – original stemme'}:v)];
  select.replaceChildren(...opts.map(v=>{const el=document.createElement('option');el.value=v.id;el.textContent=v.name;return el}));
  if(opts.some(v=>v.id===value))select.value=value;
  else if(aiVoicesLoadedAt){sound.cpuVoice='auto';select.value='auto';saveVoice()}
@@ -332,7 +334,7 @@ $('aiVoiceChoice').addEventListener('change',e=>{
  aiStatus('Valgt: '+(aiVoices.find(v=>v.id===sound.aiVoice)?.name||'AI-stemme')+'. Tryk Prøv valgt stemme.');
 });
 $('cpuVoiceChoice').addEventListener('change',e=>{
- stopCurrentVoice();sound.cpuVoice=e.target.value;saveVoice();
+ stopCurrentVoice();aiRetryAfter=0;sound.cpuVoice=e.target.value;saveVoice();
  aiStatus('CPU-æslets stemme er valgt. Prøv den med knappen nedenfor.');
 });
 $('cpuVoicePreview').addEventListener('click',()=>say(CV.makePreview(),{cpu:true}));

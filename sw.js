@@ -1,10 +1,11 @@
-/* ÆselKlog v0.9.18 – versioneret offline-cache. Ingen Cloudflare/ElevenLabs-data caches. */
+/* ÆselKlog v0.9.19 – tre CC0-MP3 gemmes i PWA-cache, ingen Cloudflare/ElevenLabs-cache. */
 const CACHE_PREFIX='aeselklog-talstien-';
-const CACHE='aeselklog-talstien-v0918-compact-music-voice';
+const CACHE='aeselklog-talstien-v0919-mp3-original-voice';
 const CORE=['./','./index.html','./styles.css','./home-ui.js','./home-fullscreen.webp',
  './app.js','./cardgame-engine.js','./cardgame-ui.js','./music.js','./engine.js','./board.js','./actions.js','./leaderboard.js',
  './adaptive.js','./profiles.js','./parentreport.js','./actionfx.js','./savegame.js','./cpuvoice.js','./voicecache.js','./narration.js','./manifest.webmanifest',
  './icon.svg','./aeselklog-card.webp','./donkey-bray.wav',
+ './music/gone-fishin.mp3','./music/childrens-march.mp3','./music/beary-fishy.mp3',
  './home-illustration.webp','./home-hero-mobile.webp','./home-hero-wide.webp','./home-mascot.webp'];
 self.addEventListener('install',event=>{
  event.waitUntil(caches.open(CACHE).then(cache=>cache.addAll(CORE)).then(()=>self.skipWaiting()));
@@ -22,12 +23,18 @@ self.addEventListener('fetch',event=>{
  const scope=new URL(self.registration.scope);
  // Kun vores egen app under /aeselklog-talstien/, ikke andre GitHub Pages-projekter.
  if(url.origin!==self.location.origin||!url.pathname.startsWith(scope.pathname))return;
- const media=/\.(?:webp|png|svg|wav|ico)$/i.test(url.pathname);
+ const media=/\.(?:webp|png|svg|wav|ico|mp3|ogg)$/i.test(url.pathname);
  if(media){
-  event.respondWith(caches.match(req).then(hit=>hit||fetch(req).then(response=>{
-   if(response.ok){const copy=response.clone();event.waitUntil(caches.open(CACHE).then(cache=>cache.put(req,copy)));}
+  // iPhone/Safari beder ofte om byte-intervaller (Range), også mens nettet er slukket.
+  // Besvar dette fra den fulde, forudlagrede MP3, uden at cache en delvis 206-fil.
+  event.respondWith(caches.match(req).then(async hit=>{
+   if(hit)return serveRange(req,hit);
+   const response=await fetch(req);
+   if(response.ok&&response.status!==206){
+    const copy=response.clone();event.waitUntil(caches.open(CACHE).then(cache=>cache.put(req,copy)));
+   }
    return response;
-  })));
+  }));
  }else{
   // HTML, CSS og JavaScript: hent seneste ved netforbindelse, brug cache offline.
   event.respondWith(fetch(req).then(response=>{
@@ -36,3 +43,23 @@ self.addEventListener('fetch',event=>{
   }).catch(async()=> (await caches.match(req)) || (req.mode==='navigate' ? caches.match('./index.html') : undefined)));
  }
 });
+
+// Kun én bytes-range pr. forespørgsel; uændrede svar til billeder og uden Range.
+async function serveRange(req,response){
+ const header=req.headers?.get?.('range');
+ if(!header||!/\.mp3(?:$|\?)/i.test(req.url))return response;
+ const match=/^bytes=(\d*)-(\d*)$/i.exec(header.trim());if(!match)return response;
+ const full=await response.arrayBuffer(),size=full.byteLength;
+ if(!size)return response;
+ let start=match[1]?Number(match[1]):null;
+ let end=match[2]?Number(match[2]):null;
+ if(start===null){const suffix=end??0;start=Math.max(0,size-suffix);end=size-1;}
+ else end=end===null?size-1:Math.min(end,size-1);
+ if(!Number.isSafeInteger(start)||!Number.isSafeInteger(end)||start>=size||end<start){
+  return new Response(null,{status:416,headers:{'Content-Range':`bytes */${size}`}});
+ }
+ const body=full.slice(start,end+1),headers=new Headers(response.headers);
+ headers.set('Content-Type','audio/mpeg');headers.set('Accept-Ranges','bytes');
+ headers.set('Content-Range',`bytes ${start}-${end}/${size}`);headers.set('Content-Length',String(body.byteLength));
+ return new Response(body,{status:206,statusText:'Partial Content',headers});
+}

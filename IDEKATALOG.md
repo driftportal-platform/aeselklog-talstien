@@ -1,3 +1,22 @@
+# 🫏 ÆselKlog – idékatalog v0.9.19
+
+**Aftaler i v0.9.19:** Samme stemmevalg i både Kortspil og Talstien, original ÆselKlog-stemme som *automatisk* CPU-favorit når godkendt, og tre rigtige brugerleverede CC0-MP3'er som valgfri offline-baggrundsmusik. Musikvalg og lydstyrke er fælles. Matematik forbliver helt frivillig. Licens- og kildefiler dokumenteres i `MUSIC-LICENSES.md`.
+
+## Idéer, vi udskyder
+
+- **The Reel Winner** (ca. 5 sekunder) som kort vinderfanfare, eventuelt efter sejr i Talstien eller Kortspil. Bør ikke køre i endeløst loop. Kræver særskilt accept/lydtest.
+- Eventuel alternativ OGG til **Children's March Theme** for et helt sømløst loop, hvis MP3-gabet bliver mærkbart på iPhone; WAV er for stort til standard PWA-cache.
+- Flere CC0-/originalkomponerede musiknumre, playliste/shuffle og mulig musik kun under bestemte begivenheder, hvis børn/forældre efterspørger det.
+- Kortspilsintro og mere varierede CPU-replikker med stemmespecifik cache, men ikke på bekostning af ElevenLabs-credits eller CPU-ventetid.
+
+## Ufravigelige gamle beslutninger
+
+- Godkendt fuldskærmsforside uændret. Kortspil og Talstien er to selvstændige spil med egne gemninger. Fem talområder, frivillig læring og originale fysiske talkort 63×88 mm.
+- CPU-æslet har samme rolle/stemmevalg i begge spil; ingen API-secrets på GitHub. A3-pladens faste felter skal stemme med det fysiske tryk; digital Talstien har tilfældige specialfelter.
+- Før v1.0: iPhone PWA, offline, VoiceOver, ægte lyd, familietest og ophavsrettigheder skal dokumenteres. Ingen automatisk upload af persondata.
+
+---
+
 # 🫏 ÆselKlog – idéer og godkendte produktbeslutninger (v0.9.18)
 
 **Opdateret:** 16. oktober 2026. Dette dokument adskiller **besluttede**, **implementerede** og **endnu ikke gennemførte** idéer; alle seks dokumenter opdateres ved hver release.

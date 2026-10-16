@@ -1,6 +1,13 @@
 const assert=require('node:assert/strict');
 const V=require('../cpuvoice.js');
 const voices=[{id:'mia',name:'Mia'},{id:'glenn123',name:'Glenn'}];
+const original=V.ORIGINAL_VOICE_ID;
+assert.equal(original,'F6ZuXSkDhi5i4KLiT7Id');
+const approved=[...voices,{id:original,name:'ÆselKlog – original'}];
+assert.equal(V.chooseVoice(approved,'mia','auto'),original,'auto must prefer approved original donkey voice');
+assert.equal(V.chooseVoice(approved,original,'auto'),original,'CPU may use original even when narrator also has it');
+assert.equal(V.chooseVoice(approved,'mia','glenn123'),'glenn123','explicit choice stays intact');
+assert.equal(V.chooseVoice(voices,'mia',original),'glenn123','do not send unapproved original ID');
 assert.equal(V.chooseVoice(voices,'mia','auto'),'glenn123','Different voice from narrator');
 assert.equal(V.chooseVoice([{id:'mia',name:'Mia'},{id:'miaActualID',name:'Mia Danish'},{id:'glenn123',name:'Glenn'}],'mia','auto'),'glenn123','Skip duplicate alias for Mia');
 assert.equal(V.chooseVoice(voices,'glenn123','auto'),'mia','Auto prefers Mia if different');

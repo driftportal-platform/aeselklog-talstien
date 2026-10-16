@@ -1,3 +1,29 @@
+# ÆselKlog – udviklingsplan v0.9.19 (16. oktober 2026)
+
+**Ved start:** Verificeret GitHub `main` = v0.9.18. v0.9.19 er en komplet, lokalt udviklet pakke, ikke automatisk udgivet. Sammenlign `PROJEKTSTATUS.md` og `IDEKATALOG.md` ved næste udvikling.
+
+## v0.9.19 – originale stemmer og MP3-baggrundsmusik
+
+- [x] Tre brugerleverede CC0-musiknumre integreret som optimerede MP3-filer med kilde-/licensdokumentation `MUSIC-LICENSES.md`.
+- [x] Samme valgbare musik i Talstien og Kortspillet, offline-lagring, fælles lydstyrke/tænd-sluk, opt-in, dæmpning ved oplæsning og pause i baggrunden.
+- [x] Byte-range-respons (HTTP 206) fra cache til Safari/iOS-medieafspilning; gammel syntetisk musikindstilling migreres uden at miste indstillinger.
+- [x] CPU's **Automatisk** foretrækker oprindelig ÆselKlog-stemme, hvis den findes på Cloudflares godkendte liste; manuel stemme og fælles valg respekteres i begge spil.
+- [x] Fejlrettelse: ændring af CPU-stemme nulstiller den midlertidige AI-genforsøgspause.
+- [x] Opdateret Service Worker-cache, dokumentation og regressionstests.
+- [ ] **Manuel iPhone-test:** Alle tre numre efter fuld offline-genstart, volume/ducking, musikstart ved brugerklik, kortspils-CPU's originale AI-stemme og ElevenLabs-credits.
+
+## Mangler inden mulig v1.0
+
+1. Test fysisk iPhone/WebKit/PWA, VoiceOver, offline efter cacheopdatering, præcis fælles æselstemme og lydstyrke med rigtig ElevenLabs.
+2. 3–5 familier afprøver begge spil på små skærme. Afprøv især drillekort, korttræk, barnets overblik og musik under længere spil.
+3. Harmoniser faste specialfelter på trykt A3-plade og app, og færdiggør trykklare kort i alle fem talområder.
+4. Gennemgå ophavsret til alle billeder/lyde og ny musiklicensfil; dokumentér produktets rettigheder og backup af projektdokumenter.
+5. Mulig kort **The Reel Winner** som vinderfanfare (ikke en del af v0.9.19). Ingen ændring før den er valgt/godkendt.
+
+**Faste beslutninger:** Matematik er valgfri. Godkendt forside uændret. Talstien/Kortspil gemmes separat. Cloudflare/API-nøgle forbliver privat. Musikken er frivillig og offline, når den er indlæst.
+
+---
+
 # ÆselKlog – udviklingsplan v0.9.18 (16. oktober 2026)
 
 **Status:** Verificeret GitHub `main` v0.9.17 ved udviklingsstart. v0.9.18 er en **komplet lokalt testet ZIP**, endnu ikke opdateret på GitHub eller prøvet fysisk på iPhone. Se `PROJEKTSTATUS.md` for den samlede fremdrift og `IDEKATALOG.md` for idéerne.
