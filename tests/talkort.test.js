@@ -5,7 +5,7 @@ const script=fs.readFileSync(path.join(root,'talkort.js'),'utf8');
 assert(html.includes('id="talkortCard"')&&html.includes('id="talkortLanguage"'));
 for(const id of ['talkortPrev','talkortRepeat','talkortNext','talkortRange','talkortJump','talkortBack'])assert(html.includes('id="'+id+'"'),id);
 for(const z of [1,2,3,4,5])assert(fs.readFileSync(path.join(root,'styles.css'),'utf8').includes('zone-'+z));
-assert(script.includes('AeselVoice.number(number)'),'shared TTS required');
+assert(script.includes('AeselVoice.number(number,{cpu:'),'shared TTS required');
 assert(script.includes("dispatchEvent(new Event('change'"),'must synchronize number language');
 const N=require('../numbers.js');for(const l of N.keys)assert(html.includes(`value="${l}"`),l);
 for(let n=1;n<=100;n++)for(const l of ['da','en','de','es'])assert(N.word(n,l),`${n}:${l}`);

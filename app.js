@@ -285,7 +285,7 @@ function say(text,{cpu=false,repeat=false}={}){
 }
 // Kortspillet bruger præcis samme valgte stemmer/Cloudflare-forbindelse som Talstien.
 // Ingen ekstra API-nøgle eller tilsvarende kopieret stemmemotor.
-async function speakNumber(number,{repeat=false}={}){
+async function speakNumber(number,{repeat=false,cpu=false,preferSelectedVoice=false}={}){
  const n=Number(number);if(!Number.isInteger(n)||n<0||n>100)return Promise.resolve();
  lastSpokenNumber=n;
  const parts=NUM.parts(n,numberLanguage);
@@ -295,13 +295,16 @@ async function speakNumber(number,{repeat=false}={}){
  if(parts.length===1&&parts[0].lang==='da'){
   // Danske 'fem' udtales på enkelte multilingvale AI-stemmer som et engelsk ord.
   // Vælg en faktisk dansk lokal stemme når den findes, ellers behold den valgte AI-stemme.
-  if(n!==5||!('speechSynthesis' in window)||!speechSynthesis.getVoices().some(v=>/^da(?:-|$)/i.test(v.lang||'')))return say(parts[0].text,{repeat});
+  if(preferSelectedVoice||n!==5||!('speechSynthesis' in window)||!speechSynthesis.getVoices().some(v=>/^da(?:-|$)/i.test(v.lang||'')))return say(parts[0].text,{repeat,cpu});
  }
  stopCurrentVoice();
  const id=speechSerial;
  const music=window.AeselMusic,duck=music?.beginSpeech?.();
  const speakPart=part=>{
   if(id!==speechSerial||!sound.on)return Promise.resolve();
+  // Talkort: danske tal bruger den valgte ElevenLabs-/telefonstemme for rollen.
+  // Andre sprog bruger en lokalt installeret stemme med korrekt sprogkode.
+  if(part.lang==='da'&&preferSelectedVoice)return sound.mode==='ai'?speakAI(part.text,id,{cpu}):speakLocally(part.text,{cpu});
   if(!('speechSynthesis' in window))return Promise.resolve();
   const u=new SpeechSynthesisUtterance(part.text);u.lang=part.locale;u.rate=sound.rate;u.pitch=sound.pitch;
   const voices=speechSynthesis.getVoices();const choices=voices.filter(v=>(v.lang||'').toLowerCase().startsWith(part.lang));

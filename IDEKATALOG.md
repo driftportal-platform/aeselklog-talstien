@@ -1,3 +1,11 @@
+
+## v0.9.25 – Talkort-stemmevalg (16. oktober 2026)
+
+- Talkort har et lokalt gemt stemmerollevalg: **Spilleleder** eller **ÆselKlog**. Dansk taloplæsning bruger den aktuelt valgte stemme i de fælles indstillinger (ElevenLabs eller telefonstemme).
+- Ved dansk + fremmedsprog bruger den danske del den valgte stemmerolle og den udenlandske del en lokalt installeret stemme med korrekt sprogkode. Dette er tilsigtet: ElevenLabs-stemmerne kan ikke forudsættes at udtale fremmedsprog korrekt.
+- Stemmerne for Talstien og Kortspillet ændres ikke; Talkort-valget er uafhængigt af deres taleroller. Standard er Spilleleder.
+- Ny PWA-cache `aeselklog-talstien-v0925-talkort-stemme`. Test af live ElevenLabs og fysisk iPhone-PWA mangler.
+
 # ÆselKlog – idéer og beslutninger v0.9.24
 
 **Ny beslutning implementeret:** Talkort er en tredje selvstændig funktion ved siden af Brætspil/Talstien og Kortspil. Ét kort ad gangen, samme information som det fysiske kort, fem pastelfarver (1–20 blå, 21–40 lyserød, 41–60 gul, 61–80 grøn, 81–100 lilla), stor rød taltekst, sprogvalg på samme side, og Forrige / Læs igen / Næste direkte under kortet. Sprog bruger fælles indstilling.

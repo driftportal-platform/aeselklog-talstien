@@ -1,13 +1,16 @@
-/* ÆselKlog v0.9.24 – selvstændig Talkort-viser med fælles talstemme. */
+/* ÆselKlog v0.9.25 – selvstændig Talkort-viser med fælles talstemme. */
 (()=>{'use strict';
 const $=id=>document.getElementById(id), NUM=window.AeselNumbers;
 if(!NUM||!$('talkort'))return;
 let number=1,opened=false,readingToken=0;
+const ROLE_KEY='aeselklog-talkort-voice-role-v1';
+let voiceRole='narrator';
+try{voiceRole=localStorage.getItem(ROLE_KEY)==='donkey'?'donkey':'narrator'}catch(_){}
 const bounds=()=>{const r=$('talkortRange').value;if(r==='1-100')return [1,100];return r.split('-').map(Number)};
 const isPrime=n=>{if(n<2)return false;for(let i=2;i*i<=n;i++)if(n%i===0)return false;return true};
 function read(){const token=++readingToken;if(!$('talkort').classList.contains('active'))return;
  if(!window.AeselVoice?.enabled?.())return;
- void Promise.resolve(window.AeselVoice.number(number)).catch(()=>{if(token===readingToken)$('talkortVoiceInfo').textContent='Oplæsning er ikke tilgængelig på denne enhed.';});
+ void Promise.resolve(window.AeselVoice.number(number,{cpu:voiceRole==='donkey',preferSelectedVoice:true})).catch(()=>{if(token===readingToken)$('talkortVoiceInfo').textContent='Oplæsning er ikke tilgængelig på denne enhed.';});
 }
 function render(announce=true){
  const [lo,hi]=bounds();number=Math.max(lo,Math.min(hi,number));
@@ -26,12 +29,15 @@ function render(announce=true){
  $('talkortPrev').disabled=number<=lo;$('talkortNext').disabled=number>=hi;
  $('talkortProgress').textContent=`Tal ${number} · område ${lo}–${hi}`;
  $('talkortJump').value=String(number);
+ $('talkortVoiceInfo').textContent=voiceRole==='donkey'?'🫏 ÆselKlogs stemme til danske tal · fremmedsprog bruger telefonens sprogstemme.':'🎙️ Spillelederens stemme til danske tal · fremmedsprog bruger telefonens sprogstemme.';
  if(announce)read();
 }
 function fillJump(){const [lo,hi]=bounds(),select=$('talkortJump');select.replaceChildren();for(let i=lo;i<=hi;i++){const o=document.createElement('option');o.value=String(i);o.textContent=`${i}`;select.append(o);}}
 function change(delta){number+=delta;render()}
 $('talkortPrev').addEventListener('click',()=>change(-1));$('talkortNext').addEventListener('click',()=>change(1));
 $('talkortRepeat').addEventListener('click',read);
+const voiceSelect=$('talkortVoiceRole');
+if(voiceSelect){voiceSelect.value=voiceRole;voiceSelect.addEventListener('change',()=>{voiceRole=voiceSelect.value==='donkey'?'donkey':'narrator';try{localStorage.setItem(ROLE_KEY,voiceRole)}catch(_){}read()})}
 $('talkortRange').addEventListener('change',()=>{const [lo]=bounds();number=lo;fillJump();render();});
 $('talkortJump').addEventListener('change',()=>{number=Number($('talkortJump').value);render();});
 $('talkortLanguage').addEventListener('change',()=>{const s=$('numberLanguageChoice');if(s){s.value=NUM.normalize($('talkortLanguage').value);s.dispatchEvent(new Event('change',{bubbles:true}));}render();});
