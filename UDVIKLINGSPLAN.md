@@ -1,3 +1,21 @@
+# ÆselKlog udviklingsplan – v0.9.24 (16. oktober 2026)
+
+## Implementeret nu
+- [x] Selvstændig Talkort-funktion, ved siden af Talstien og Kortspillet i spilvælgeren.
+- [x] Ét stort tal ad gangen 1–100, fem farveområder og oplysninger som på de fysiske talkort.
+- [x] Forrige, Læs igen og Næste; hurtigt spring til tal eller område.
+- [x] Direkte sprogvalg: dansk, engelsk, tysk, spansk og dansk + fremmedsprog.
+- [x] Automatisk tale med fælles TTS, uden nye API-nøgler.
+- [x] Opdateret PWA cache og projektstatus.
+
+## Mangler / senere idéer
+- [ ] Test på fysisk iPhone i Safari/PWA: plads, lyd, skift af tal, VoiceOver og offline.
+- [ ] Fuld browserregression når browsermiljøet igen åbner lokal app.
+- [ ] Evt. autoplay, quiz, blandede kort, lige/ulige- eller primtalsfiltre (IKKE del af v0.9.24).
+- [ ] Familietest og frigivelseskontrol før v1.0.
+
+---
+
 # v0.9.23 – Taloplæsning og mobilknap (16. oktober 2026)
 
 - Automatisk taloplæsning i kortspillet kun ved vending, ikke ved placering.

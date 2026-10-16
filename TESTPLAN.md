@@ -1,3 +1,13 @@
+# ÆselKlog testplan v0.9.24
+
+**Kørt:** `node --test tests/*.test.js` = 29 bestået, 0 fejlet. `node --check talkort.js` og `node --check app.js` bestået.
+
+Ny `tests/talkort.test.js` bekræfter navigationsknapper, fem farvezoner, talord 1–100 på fire sprog, syv sprogvalg og integration med fælles stemme. `tests/pwa_cache.test.js` kontrollerer nu, at Talkort og eksisterende offlinefiler caches.
+
+**Ikke verificeret:** Playwright på lokal `file://` afvises af testmiljøet med `ERR_BLOCKED_BY_ADMINISTRATOR`; derfor ingen ny godkendt browsertest eller fysisk iPhone-test. Kontroller manuelt: alle 5 farveskift (20→21 osv.), 1 og 100 grænser, primtal 2 og 23, ikke-primtal 1 og 100, dansk+fremmedsprog 1,5 sek. pause, gentag-knap, offline efter PWA-opdatering, tilbage til spilmenu og at kortspillet stadig virker.
+
+---
+
 # v0.9.23 – Taloplæsning og mobilknap (16. oktober 2026)
 
 - Automatisk taloplæsning i kortspillet kun ved vending, ikke ved placering.

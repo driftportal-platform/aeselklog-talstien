@@ -1,3 +1,13 @@
+# ÆselKlog projektstatus v0.9.24
+
+**Status:** Talkort (tredje funktion) kodet og Node-testet i komplet lokal GitHub-ZIP. Ikke automatisk publiceret. Startgrundlag: v0.9.23 projekt-ZIP fra den seneste brugerleverance. Se README, TESTPLAN og UDVIKLINGSPLAN.
+
+**Færdigt:** visning af 100 talkort i samme fem områdefarver som Talstien, oplysninger om lige/ulige, tiere/enere og primtal, Forrige/Læs igen/Næste, områdevælger og talvælger, sprog direkte på siden via fælles TTS. V0.9.23-spil, musik, cache og gemning er bevaret i kilden.
+
+**Afventer:** browser- og reel iPhone-UI-test, fremmedsprogs- og ElevenLabs-lydtest samt familieafprøvning.
+
+---
+
 # v0.9.23 – Taloplæsning og mobilknap (16. oktober 2026)
 
 - Automatisk taloplæsning i kortspillet kun ved vending, ikke ved placering.

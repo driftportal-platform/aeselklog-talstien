@@ -1,3 +1,11 @@
+# ÆselKlog – idéer og beslutninger v0.9.24
+
+**Ny beslutning implementeret:** Talkort er en tredje selvstændig funktion ved siden af Brætspil/Talstien og Kortspil. Ét kort ad gangen, samme information som det fysiske kort, fem pastelfarver (1–20 blå, 21–40 lyserød, 41–60 gul, 61–80 grøn, 81–100 lilla), stor rød taltekst, sprogvalg på samme side, og Forrige / Læs igen / Næste direkte under kortet. Sprog bruger fælles indstilling.
+
+**Idéer, ikke implementeret:** valgfrit automatisk slideshow, tilfældig rækkefølge, quiz/øvelsestilstand, primtal/ulige filtre og ekstra oplysninger oplæst. Matematik er frivillig i begge eksisterende spil og Talkort er en frivillig læringsfunktion. Godkendt forside må ikke ændres.
+
+---
+
 # v0.9.23 – Taloplæsning og mobilknap (16. oktober 2026)
 
 - Automatisk taloplæsning i kortspillet kun ved vending, ikke ved placering.

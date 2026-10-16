@@ -632,7 +632,7 @@ $('setupEditSettings').addEventListener('click',()=>show('settings'));
 
 $('addPlayer').addEventListener('click',()=>{if(setupPlayers.length<6){setupPlayers.push({name:`Spiller ${setupPlayers.length+1}`,age:7,kind:'child',difficulty:'mellem'});renderSetupPlayers()}});
 function show(view){
- ['home','setup','settings','game','cardsSetup','cardsGame'].forEach(id=>$(id).classList.toggle('active',view===id));
+ ['home','setup','settings','game','cardsSetup','cardsGame','talkort'].forEach(id=>$(id).classList.toggle('active',view===id));
  document.body.classList.toggle('home-active',view==='home');
  window.AeselMusic?.syncView?.(view);
  if(view==='setup')updateSettingsSummary();
@@ -645,7 +645,8 @@ function show(view){
   settings:document.querySelector('#settings .page-heading h2'),
   game:$('boardHud'),
   cardsSetup:document.querySelector('#cardsSetup .page-heading h2'),
-  cardsGame:$('cardsTurnHeading')
+  cardsGame:$('cardsTurnHeading'),
+  talkort:$('talkortProgress')
  }[view];
  if(target){
   if(!target.hasAttribute('tabindex')&&target.tagName!=='BUTTON')target.setAttribute('tabindex','-1');
@@ -657,6 +658,8 @@ $('openCardSetup').addEventListener('click',()=>show('cardsSetup'));
 $('chooseBoardMode').addEventListener('click',()=>show('setup'));
 $('cardsChooseBoard').addEventListener('click',()=>show('setup'));
 $('cardsChooseCards').addEventListener('click',()=>show('cardsSetup'));
+$('openTalkort').addEventListener('click',()=>show('talkort'));
+$('cardsOpenTalkort').addEventListener('click',()=>show('talkort'));
 function resetAsync(){gameToken++;resumeAdultMs=null;helpUsed=false;const fanfare=$('victoryFanfare');if(fanfare)fanfare.remove();clearInterval(taskTimer);taskTimer=null;taskPausedAt=null;taskDeadline=0;busy=false;extraRollUsed=false;showDiceState=null;hideDice();hideActionFlash();if(boardExpanded)setBoardExpanded(false);stopCurrentVoice();bray?.pause();}
 $('startButton').addEventListener('click',()=>{
  resetAsync();G.clear(safeStorage());renderResumeCard();

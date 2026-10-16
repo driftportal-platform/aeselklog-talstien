@@ -1,3 +1,11 @@
+# ÆselKlog v0.9.24 – Talkort med 5 farvezoner (16. oktober 2026)
+
+Ny tredje spilfunktion **Talkort** fra Spilmenuen, ved siden af Talstien og Kortspillet. Alle tal fra 1–100, valg af hvert 20-tal-område, mulighed for at hoppe til et tal og **Forrige / Læs igen / Næste**. Samme visuelle info som de trykte kort: stort rødt tal, lige/ulige, tiere/enere og primtalsstjerne. Kortene har 5 pastelfarver som Talstien. Direkte sprogvalg på siden: dansk, engelsk, tysk, spansk samt dansk + hver af de øvrige sprog. Skiftet gemmes i den eksisterende fælles tal-sprogindstilling. Automatisk taloplæsning ved kortskift, manuelle gentagelser. Ingen ændring i de to eksisterende spilmotorer, musik, ElevenLabs secrets eller gemmeformater. PWA precacher `talkort.js`.
+
+**Test:** 29 Node-tests bestået, JavaScript-syntaks valideret; Chromium lokal fil blokkeret af administrator, og fysisk iPhone-PWA og tale ikke testet.
+
+---
+
 # v0.9.23 – Taloplæsning og mobilknap (16. oktober 2026)
 
 - Automatisk taloplæsning i kortspillet kun ved vending, ikke ved placering.

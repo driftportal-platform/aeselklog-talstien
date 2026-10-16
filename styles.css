@@ -828,3 +828,20 @@ body.home-active #resumeCard button:active{filter:brightness(.94)}
 .card-number-repeat{display:flex;justify-content:center;margin:14px 0 0;}
 .card-number-repeat .btn{min-height:48px;min-width:180px;max-width:100%;font-weight:800;}
 @media(max-width:460px){.card-number-repeat .btn{width:100%;}}
+
+/* v0.9.24 – Talkort på mobil og desktop; de fem samme farvezoner som Talstien. */
+.game-mode-card.game-mode-talkort .game-mode-icon{background:linear-gradient(160deg,#f3e4ff,#e5ceff)}
+.game-mode-card.game-mode-talkort[aria-pressed="true"]{background:#f0e5ff;border-color:#8a5eb5}
+.talkort-options{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin:14px 0;align-items:end}
+.talkort-options .field{min-width:0}
+.talkort-stage{display:flex;align-items:center;flex-direction:column;gap:13px;padding:12px 0 22px}
+.talkort-progress{font-weight:900;color:#124075;font-size:1.15rem}
+.talkort-card{--tint:#d9ecff;position:relative;isolation:isolate;width:min(100%,370px);aspect-ratio:63/88;border:3px solid #fff;border-radius:22px;background:linear-gradient(160deg,var(--tint),#fff9f4);box-shadow:0 9px 29px #243c5630,inset 0 0 0 2px #d9bfc0;display:flex;flex-direction:column;justify-content:space-between;padding:22px 18px 19px;color:#144678;overflow:hidden}
+.talkort-card.zone-1{--tint:#cce8ff}.talkort-card.zone-2{--tint:#ffdade}.talkort-card.zone-3{--tint:#fff1a6}.talkort-card.zone-4{--tint:#d6f2d4}.talkort-card.zone-5{--tint:#ebd7fa}
+.talkort-corner{font-size:1.5rem;color:#bf1024;font-weight:1000;line-height:1}.talkort-corner-bottom{align-self:flex-end;transform:rotate(180deg)}
+.talkort-info{display:grid;grid-template-columns:1fr 1.6fr auto;align-items:center;gap:7px;border-radius:13px;background:#cde8fcbb;padding:9px;font-size:.79rem;min-height:62px}
+.talkort-info>div{display:flex;flex-direction:column;gap:3px}.talkort-info b{font-size:.8rem;line-height:1.25}.talkort-parity-dots,.talkort-blocks{color:#195eaf;font-size:1rem;letter-spacing:.06em;word-break:break-word}.talkort-blocks{color:#d83142}.talkort-prime{color:#164a85;font-weight:900;min-width:66px}
+.talkort-info-bottom{transform:rotate(180deg)}.talkort-number{display:grid;place-items:center;flex:1;font-size:clamp(5rem,20vw,9.1rem);color:#d00e25;font-weight:1000;font-variant-numeric:tabular-nums;line-height:1}
+.talkort-controls{display:grid;grid-template-columns:1fr 1.15fr 1fr;gap:10px;width:min(100%,540px)}.talkort-controls .btn{white-space:normal;min-height:62px;padding:10px 8px;font-weight:900}.talkort-note{color:#667c92;text-align:center;margin:0}
+@media(max-width:720px){.talkort-options{grid-template-columns:1fr 1fr}.talkort-options .field:last-child{grid-column:1/-1}.talkort-stage{padding:6px 0 15px}.talkort-card{width:min(100%,355px);max-height:56vh;padding:14px 13px}.talkort-info{padding:6px;min-height:46px;font-size:.67rem;gap:4px}.talkort-info b{font-size:.69rem}.talkort-parity-dots,.talkort-blocks{font-size:.7rem}.talkort-number{font-size:clamp(4rem,20vw,8rem)}.talkort-controls{gap:5px}.talkort-controls .btn{font-size:.87rem;min-height:59px}}
+@media(max-width:385px){.talkort-options{grid-template-columns:1fr}.talkort-options .field:last-child{grid-column:auto}}

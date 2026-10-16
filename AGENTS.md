@@ -1,3 +1,13 @@
+# ÆselKlog udviklernoter v0.9.24
+
+**Seneste lokale udgave:** v0.9.24. Start fra den nyeste GitHub main ved næste opgave og læs alle seks projektfiler: README, UDVIKLINGSPLAN, TESTPLAN, AGENTS, PROJEKTSTATUS og IDEKATALOG.
+
+**Ny funktion:** `talkort.js` har egen view `#talkort`, åbnes fra `#openTalkort` eller `#cardsOpenTalkort` i `app.js`; alle tre spilvisninger holdes adskilt. `AeselVoice.number(n)` sørger for lokaliseret oplæsning, og select `#talkortLanguage` synkroniserer via eksisterende `#numberLanguageChoice` og dets change-event, ikke egen separat config. `numbers.js` ejer talord. `sw.js` skal indeholde både `talkort.js` og de eksisterende MP3-filer. Undgå ændringer i forsidens illustrerede layout.
+
+**Test:** Node-pakke 29 tests grøn; lokal Playwright-browser blokeret af administrator. iPhone PWA-tale og skærmbilleder kræver reel kontrol. Bevar gemte spil og alle tidligere funktioner ved videreudvikling.
+
+---
+
 # v0.9.23 – Taloplæsning og mobilknap (16. oktober 2026)
 
 - Automatisk taloplæsning i kortspillet kun ved vending, ikke ved placering.
