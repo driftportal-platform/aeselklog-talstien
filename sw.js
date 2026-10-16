@@ -1,6 +1,6 @@
-/* ÆselKlog v0.9.16 – versioneret offline-cache. Ingen Cloudflare/ElevenLabs-data caches. */
+/* ÆselKlog v0.9.17 – versioneret offline-cache. Ingen Cloudflare/ElevenLabs-data caches. */
 const CACHE_PREFIX='aeselklog-talstien-';
-const CACHE='aeselklog-talstien-v0916-mode-selector-six-players';
+const CACHE='aeselklog-talstien-v0917-cards-cpu-free-moves';
 const CORE=['./','./index.html','./styles.css','./home-ui.js','./home-fullscreen.webp',
  './app.js','./cardgame-engine.js','./cardgame-ui.js','./engine.js','./board.js','./actions.js','./leaderboard.js',
  './adaptive.js','./profiles.js','./parentreport.js','./actionfx.js','./savegame.js','./cpuvoice.js','./voicecache.js','./narration.js','./manifest.webmanifest',

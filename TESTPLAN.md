@@ -1,3 +1,28 @@
+# ÆselKlog v0.9.17 – CPU-kortspil, fri placering og kort-indsigelser
+
+## Automatiske tests (16. oktober 2026)
+
+- [x] **21 Node-tests** samt `node --check` af alle projekt- og testmoduler. Ny `tests/cardgame_interaction.test.js` tester én person + CPU, 6 + CPU, ukorrekte træk som bliver liggende (og oversete åbne kort), korrekt/ukorrekt udfordring, tilbagerulning af træk også efter turskift, æselkort, ekstra kortstraf og gamle gemninger.
+- [x] **16 Chromium-browserfiler** inklusive `tests/cardgame_interaction_browser.py`. Ny browsertest i **390×844 touch**, **844×390** og **1280×800** tester tryk på kort, valgfri målbunke, rigtig drag-and-drop, ukorrekt placering, æselkort som fortryd/straffeknap, gem/fortsæt, CPU's solo-tur og CPU, der opdager en fejl.
+- [x] Eksisterende tests: godkendt forside (seks skærmstørrelser med/uden gemning), valg mellem Talstien/Kortspil, seks personer + CPU i Talstien, fysisk A3, voksen-timer, tilfældige specialfelter, CPU-voice, AI-fallback, lokal lydcache, individuelt læringsniveau, forældreoversigt og sikre gemte spil.
+- [x] `tests/pwa_cache.test.js`: v0.9.17 cache og alle JS/CSS-/offline-filer.
+- [ ] **Rigtig iPhone-PWA i Safari/WebKit:** touch-træk med automatisk scroll mellem bunker, offline-installation/genstart, VoiceOver og kontrol af animation/scroll er ikke verificeret her.
+- [ ] Reel ElevenLabs-produktionsopkobling er ikke prøvet i denne release. Browsertests benytter simulerede stemmer/lyd og kunstigt lager.
+
+## Manuel test efter GitHub-upload
+
+- [ ] **Solo:** Kortspil → Spil mod Æslet → 1 person → Start. Æslet skal selv spille, når det bliver dets tur.
+- [ ] **Vend:** Tryk på den lukkede bunke i stedet for en traditionel vend-knap. Kontroller den vendte talkortværdi. Prøv både mobiltap og desktopklik.
+- [ ] **Træk:** Flyt det vendte kort og toppen af din åbne bunke til midterrække og andres åbne bunker; prøv både træk og tryk-kort/tryk-bunke. Prøv at scrolle ned med kortet på en smal skærm.
+- [ ] **Fejl:** Læg bevidst et forkert kort i midten. Appen må *ikke* afvise trækket med det samme. Tryk på æselkortet “Opdaget fejl!”. Kortet skal komme tilbage, og fejlspilleren skal få straf.
+- [ ] **Uopdaget fejl:** Lad et forkert kort ligge, og fortsæt; kun seneste træk kan udfordres. Hvis Æslet er med, kan det opdage fejl, men ikke altid. Prøv også at udfordre et korrekt træk, som ikke skal give straf.
+- [ ] **Æslets fejl:** Vent på at CPU forsøger et forkert træk i løbet af flere spil, og udfordr det med æselkortet. Kontrollér forskel på *Behold æslet* og *Send æslet videre*.
+- [ ] **Gem/fortsæt:** Gem mens et kort er vendt og efter en foreløbig forkert placering, luk PWA og genoptag; træk/CPU/checkpoint og både talområder samt ekstra kortstraf skal være uændrede.
+- [ ] **Eksisterende funktioner:** Talstien, CPU-stemme, lydcache og forældreoversigt er intakte; ingen nye ElevenLabs-kald i kortspillet.
+- [ ] Lad børn og voksne teste, om det er sjovt at opdage modspillernes fejl, og om udfordringsknappen er tydelig nok.
+
+---
+
 # ÆselKlog v0.9.16 – spilvalg, seks spillere og gemning
 
 ## Automatiske tests (lokalt udviklingsmiljø, 16. oktober 2026)

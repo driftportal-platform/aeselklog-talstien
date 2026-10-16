@@ -1,3 +1,16 @@
+# ÆselKlog – udviklernote v0.9.17 (kortspil med CPU og fri placering)
+
+1. **Læs seneste GitHub `main` og alle seks dokumenter først:** `README.md`, `AGENTS.md`, `TESTPLAN.md`, `UDVIKLINGSPLAN.md`, `PROJEKTSTATUS.md`, `IDEKATALOG.md`. Bevar den godkendte forside, Talstien-motoren, ElevenLabs-Worker og eksisterende gemme-/profilnøgler.
+2. `cardgame-engine.js`: Gammelt `VERSION=1` og `SAVE_KEY=aeselklog-kortspil-v1` bevares. Valgfri `isCPU` (højst én CPU) og `lastMove` med præcis ét *ikke-rekursivt* før-snapshot. Gamle kortspilsgemminger uden disse felter er gyldige. 1–6 mennesker + én CPU eller 2–6 mennesker uden CPU.
+3. Nye kortregler i motoren: `flipManual()`, `placeManual(state,source,target)`, `discardManual()` og `challenge()`. Mål valideres **kun strukturelt**, ikke som lovligt taltræk; en korrekt/ukorrekt placering registreres i `lastMove.valid`. `challenge()` verificerer fejl og tilbageruller **kun det seneste træk**, derefter `penalty()` med valgfri ekstra straf. Bevidst ulovlige midterrækker skal derfor også være strukturelt gyldige indtil udfordring. `restore()` validerer bevarede kort og checkpoint.
+4. `cardgame-ui.js`: Kort kan vælges via tryk, tastatur eller pointertræk; brug `data-card-source`, `data-card-target`. iOS kræver Pointer Events fremfor HTML5 drag/drop. Tillad scroll ved kanten under træk. Giv ikke automatisk fejl før indsigelse. **`#cardsChallenge` er trykbart æselkort.** Manuel `#cardsGivePenalty` findes som separat administrativ mulighed uden undo.
+5. CPU i kortspillet bruger udelukkende lokal regelkode: følger normale ture, kan med lav sandsynlighed selv lægge et forkert kort (~7 %) og kan spotte andres fejl (~72 %). CPU skal vente mellem handlinger, stå stille når vinduet skjules eller regeldialogen er åben, og stoppe når kortspilsmenuen åbnes. Forveksl ikke dette med den eksisterende CPU- og ElevenLabs-motor i Talstien.
+6. Gem/fortsæt skal bevare både CPU, `pending`, fejlplaceringer og sidste udfordringscheckpoint. Stop aldrig med at bevare det samlede antal talkort: 5×20 pr. talområde. Æselkort-pulje må ikke overskrides. Ved korrekt indsigelse gives ingen straf.
+7. Bevar klassisk variant med 4/6/8 æselkort, drillevariant med ét, valgfri ekstra kortstraf, frivillig matematik og forskellige lokale savegames for Talstien/Kortspil. **Ingen nye netværkskald eller persondata** i kortspillet.
+8. Kør `node --check`, alle Node-tests inkl. `tests/cardgame_interaction.test.js`, Chromium `tests/cardgame_interaction_browser.py`, alle øvrige regressioner samt `tests/pwa_cache.test.js`. Reel iPhone/WebKit og live ElevenLabs er særskilt manuelt ansvar, ikke dækket af mocks.
+
+---
+
 # ÆselKlog – udviklernote v0.9.16: spilvælger, seks spillere og dokumentation
 
 1. **Læs altid seneste GitHub `main` før en ny version.** Relevante kilder: `README.md`, `AGENTS.md`, `TESTPLAN.md`, `UDVIKLINGSPLAN.md`, `PROJEKTSTATUS.md`, `IDEKATALOG.md`. Opdater alle seks dokumenter sammen med cache-version ved hver ny release.

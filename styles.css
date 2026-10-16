@@ -730,3 +730,32 @@ body.home-active #resumeCard button:active{filter:brightness(.94)}
   .game-mode-card .game-mode-copy small{font-size:.81rem}
 }
 @media(prefers-reduced-motion:reduce){.game-mode-card{transition:none!important}}
+
+
+/* ÆselKlog v0.9.17 – tryk/træk kort, plads til solo + CPU og fair opdagede fejl. */
+.card-cpu-toggle{margin:12px 0 16px;min-height:58px;background:#fff5df!important;border:2px solid #efcd86!important}
+.card-cpu-toggle strong{font-size:1.02rem}
+.card-person--cpu{background:#f0f9ed;border-color:#afd9a5}
+.card-closed-clickable{cursor:pointer;border-radius:13px;outline:2px solid transparent}
+.card-closed-clickable:hover,.card-closed-clickable:focus-visible{outline:3px solid #2473bf;outline-offset:2px}
+.card-draggable{cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none;position:relative;border-radius:13px}
+.card-draggable:active{cursor:grabbing}
+.card-draggable:focus-visible,.card-draggable.card-selected{outline:4px solid #2473bf;outline-offset:3px;box-shadow:0 0 0 7px #d9e9ff}
+.card-dropzone{border:2px dashed #b9cee5;border-radius:15px;padding:6px;cursor:pointer;transition:background .12s ease,outline-color .12s ease}
+.card-dropzone:hover,.card-dropzone.card-hover,.card-dropzone:focus-visible{background:#e1f1ff;outline:3px solid #2a8ccb;outline-offset:1px}
+.card-center-stack.card-dropzone{min-width:110px}
+.card-new-center{min-width:102px;display:flex;flex-flow:column;justify-content:center;align-items:center;gap:6px;min-height:152px;background:#f2faf5;color:#287054;text-align:center}
+.card-new-center>span{font-size:2.25rem;font-weight:900}.card-new-center strong{font-size:.87rem}.card-new-center small{max-width:95px;font-size:.7rem}
+.card-person-open.card-dropzone{border-color:#b9cee5;padding:4px}
+.card-person-open .card-draggable{display:inline-block}
+.card-drag-ghost{position:fixed;z-index:9999;pointer-events:none;transform:translate(-50%,-50%) rotate(-6deg);opacity:.9;filter:drop-shadow(0 10px 16px #162d4590)}
+.card-interaction-hint{font-size:.78rem;line-height:1.4;color:#2e5b84;text-align:center;padding:8px;border:1px dashed #c4d7e9;border-radius:10px;background:#ecf6ff;margin:4px 0}
+.card-cpu-thinking{background:#ecf8ed;border-radius:12px;padding:12px;color:#287448;font-weight:800;text-align:center}
+.card-challenge{padding:13px 15px;background:#fff9eb;border:2px solid #f0d8aa;display:flex;flex-direction:column;gap:5px;margin:14px 0}
+.card-challenge-button{appearance:none;width:100%;display:flex;align-items:center;justify-content:center;gap:14px;text-align:left;padding:9px 12px;border:2px solid #b97645;border-radius:15px;background:linear-gradient(110deg,#fff4cf,#ffe4bd);color:#5d351c;box-shadow:0 4px 0 #94682b3b;cursor:pointer}
+.card-challenge-button>img{width:57px;height:78px;object-fit:cover;border-radius:8px;border:1px solid #d3ad87;flex-shrink:0}
+.card-challenge-button span{display:flex;flex-flow:column;gap:6px}.card-challenge-button strong{font-size:1.17rem}.card-challenge-button small{font-size:.76rem;line-height:1.32}
+.card-challenge-button:disabled{opacity:.55;cursor:default}.card-challenge-button:focus-visible{outline:3px solid #267bd0;outline-offset:3px}
+.card-challenge .tiny{margin:2px 0 0;color:#76543b}
+@media(max-width:430px){.card-challenge-button img{width:45px;height:62px}.card-challenge-button strong{font-size:1rem}.card-person-open.card-dropzone{min-width:94px}.card-center-piles{gap:7px}}
+@media(prefers-reduced-motion:reduce){.card-dropzone{transition:none}.card-drag-ghost{transform:translate(-50%,-50%)}}

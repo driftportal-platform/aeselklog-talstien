@@ -1,43 +1,34 @@
-# 🫏 ÆselKlog – idékatalog og vedtagne beslutninger
+# 🫏 ÆselKlog – idékatalog og godkendte beslutninger
 
-**Opdateret 16. oktober 2026 · Kilde:** Projektforløb, tidligere kort-/A3-prototyper og GitHub v0.9.15. Dette er vores fælles liste til næste tråd. Se `PROJEKTSTATUS.md` for det, der er implementeret, og `UDVIKLINGSPLAN.md` for prioritering.
+**Opdateret:** 16. oktober 2026 · **Kilde:** Senest kontrollerede GitHub `main` v0.9.16 og aftaler fra udviklingsforløbet. Ny lokal udviklingspakke v0.9.17. Se `PROJEKTSTATUS.md` for faktisk status, `TESTPLAN.md` for gennemførte tests og `UDVIKLINGSPLAN.md` for rækkefølge.
 
-## Faste produktbeslutninger (skal bevares)
+## Faste produktbeslutninger
 
-- ÆselKlog består af **et selvstændigt klassisk kortspil** og **Talstien** (digital eller fysisk brætspil). Der er fem talområder med egen farve: 1–20, 21–40, 41–60, 61–80, 81–100. Skift mellem to spiltyper skal være tydeligt.
-- **Matematik er altid frivillig** og kan slås helt fra. Opgaver må ikke overbelaste 3–6-årige. Voksne kan få sværere opgaver og timer.
-- De fysiske talkort måler 63×88 mm. Et talområde indeholder fem kort af hvert tal (100 talkort). 21–40 og otte æselkort er prototyper med store tal, lige/ulige, tiere/enere og primtalsmarkering.
-- **Klassisk kortspil:** Flere æselkort i spil (4, 6 eller 8; standard 8). Fejl giver ét æselkort, som spilleren beholder. **Valgfri ekstra straf:** også ét kort fra hver modspillers lukkede bunke, hvis der er et.
-- **Drillevarianten Send æslet videre:** Præcis ét æselkort i hele spillet, som overgår til den næste spiller, der laver fejl; den valgfri ekstra talkortstraf er separat.
-- Kortspillets talkort spilles stigende i fælles række(r) fra laveste tal i valgt niveau; tilladt op/ned på de andre spilleres åbne bunker. Matematik kræves ikke.
-- Talstien: 9 actiontyper; digital fordeling varierer pr. ny kamp og gemmes uændret. Fysisk A3 har fast specialfeltfordeling. Spillerne kan vælge fysisk/digital terning uafhængigt.
-- **Godkendt fuldskærmsforside skal bevares**; AI-nøgler findes kun som Cloudflare-secret; lokal lagring af spil og læring; undgå unødige persondata.
-- v0.9.16 giver seks navngivne deltagere + CPU i Talstien, 2–6 i kortspillet; alle deltagere har unikke farver.
+- ÆselKlog er både **selvstændigt kortspil** og **Talstien** på digital eller fysisk A3-plade; intet krav om matematik i de almindelige spil. Fem talområder i de samme farver: 1–20, 21–40, 41–60, 61–80, 81–100.
+- De fysiske talkort er 63×88 mm; ét niveau består af **fem af hvert tal** (100 talkort). Prototyperne 21–40 har lige/ulige, tiere/enere og primtal; der er lavet otte æselkort.
+- **Klassisk kortspil:** 4, 6 eller 8 æselkort (standard 8). Opdaget fejl giver et æselkort, som beholdes. **Drillevariant:** Ét æselkort går videre til den senest straffede. Valgfri ekstra straf (fra hver modspillers lukkede bunke) er slået fra som standard.
+- **Kortspil v0.9.17:** Som i det gamle fysiske Æselspil vælger spilleren selv bunken, uden automatisk ulovlighedsblokering. Kort kan vendes ved tryk på lukket bunke og trækkes fra vendt kort/egen åben bunke. Et andet menneske eller CPU kan opdage fejlen; et tryk på det synlige æselkort **fortryder det seneste forkerte træk og giver straf**. Et korrekt træk skal ikke straffes.
+- **CPU-kortspil:** Mindst én person og højst seks + ét CPU-æsel. Æslet spiller automatisk, kan med omtrent 72 % sandsynlighed opdage en fejl, men kan også selv tage fejl (omtrent 7 % af valg med mulige ugyldige mål). Justér først disse værdier efter familietest. Ingen AI-kald/credits kræves for kortspillets CPU.
+- Talstien digital får ny tilfældig specialfeltfordeling per spil; fysisk A3 har faste felter, som skal afstemmes mod den trykte plade. Savegames i Talstien og Kortspil må aldrig overskrive hinanden.
+- Godkendt forside som én illustration, ElevenLabs API-key kun i Cloudflare Secret, stemmer per faktisk ID og ingen automatisk sky-upload af læringsprofiler eller stemmecache.
 
-## Implementeret i den digitale app
+## Implementeret
 
-- Forside, Talstien 1–100, specialfelter, pause, æsellyd-knap, ElevenLabs og telefonstemme, lydcache, gem/fortsæt, individuelle læringsniveauer og forældreoversigt.
-- Selvstændigt digitalt Kortspil med fem talområder, lokal pass-and-play, strafregler og egen gemmeplads.
-- To store klikbare spilvalg med aktiv markering og ekstra 6.-spillerfarve i v0.9.16.
+- Talstien 1–100, flere spillere inkl. CPU, store terninger, roser, ni typer actionfelter, frivillig matematik, voksen-timer, tale/lyd, pause, lokal gemning.
+- Individuel matematik-tilpasning, forældreoversigt og lokal anonymiseret historik.
+- Kortspil med fem talområder, to æselkortvarianter, frie korttræk, kort-indsigelser med fortrydelse, valgfri ekstra kortstraf, solo mod CPU og separat gem/fortsæt.
+- Spilvælger med store Talstien/Kortspil-kort og v0.9.16-seks-farver i Talstien.
 
-## Planlagte nødvendige trin (ikke implementeret / skal afprøves)
+## Åbent til senere versioner (må ikke betragtes som implementeret)
 
-1. Rigtig iPhone-PWA-installation/genstart/offline, fysisk A3-kontrol, korrekt CPU-tale og voksen-timer.
-2. Familieafprøvning i både Talstien og kortspillet, især med 3–7-årige og voksne; notér fejl og oplevet spiltempo.
-3. Fysisk komplet kortsæt for alle områder med korrekt antal gentagelser, bagsider, æske, regler og originalt illustrationstjek.
-4. Beslut endelig fysisk standardkortregel og valgfri ekstra straf efter familieafprøvning.
-5. Gennemfør tilgængelighed (VoiceOver, zoom, kontrast), performance og produktionsrettigheder før v1.0.
+1. Fysiske kort: producér komplette originale printark og æskedesign til de manglende talområder, afprøv 63×88 mm og endelig trykkvalitet.
+2. Rigtige familietests af kortspilsregler, drillevarianter, CPU-fart, hvor ofte fejl opdages og touchtræk på små skærme. Måske justerbar CPU-sværhedsgrad, efter konkret feedback.
+3. Mulig **fysisk kortspilassistent**: Lad appen hjælpe med strafkort og turstyring uden at erstatte kortene. Ikke en del af v0.9.17.
+4. Valgfri AI-/telefonoplæsning og sjove CPU-replikker i **kortspillet**. Talstiens eksisterende stemmer fungerer, men kortspillet bruger endnu kun lokal CPU og æsellyd, ikke ny ElevenLabs-tale.
+5. Forældrerapport som frivillig lokal eksport, hjælp til de originale kortregler, bedre introduktion og valgfri pædagogiske variationer.
+6. v1.0: dokumenteret iOS/WebKit/VoiceOver, offline-opdatering, familietests, grafik-/lydrettigheder, korrekt PWA-adfærd og reale kreditgrænser.
 
-## Mulige senere funktioner (idéer – IKKE lovet til næste release)
+## Arbejdsprincipper
 
-- Valgfri oplæsning til kortspillet, ÆselKlog som CPU-kortmodstander og tydeligere tutorial med de originale regler.
-- En simpel fysisk kortspils-assistent, som tæller kort/æselstraffe uden at erstatte de trykte kort.
-- Eksport af forældreoversigt som en lokal fil uden automatisk synkronisering; eventuel sikker lokal backup/import af niveauer.
-- Flere rolige og sjove visuelle æselreaktioner, men altid med reduceret bevægelse og uden at flytte SVG-brættets felter.
-- Mere langsigtet: originale spilæsker/kort i flere talområder, test hos familier/skoler og vurdering af kommerciel udgivelse.
-
-## Historik og kildepolitik
-
-- Brug **altid** nyeste GitHub-main frem for gamle ZIP'er. Ny leverance skal være én komplet ZIP med nye cache-version og opdateret dokumentation.
-- Tidligere udkast kan foreslå regler, men de senest godkendte beslutninger i dette dokument er retningsgivende. Afklar nye regelændringer med brugeren før spilmekanik ændres.
-- Markér skarpt forskellen på: **kodet/testet lokalt**, **uploadet til GitHub**, **verificeret på rigtig iPhone**, **testet med familier**.
+- Start altid fra seneste GitHub `main`; gamle ZIP'er er kun referencer. Opdater `README.md`, `AGENTS.md`, `TESTPLAN.md`, `UDVIKLINGSPLAN.md`, `PROJEKTSTATUS.md`, `IDEKATALOG.md`, versionsmærke og PWA-cache i alle nye releaser.
+- Del strengt mellem det, der **er kodet og testet lokalt**, og det, der faktisk **er på GitHub eller testet på en fysisk telefon**.

@@ -14,7 +14,7 @@
 <div class="shell">
   <header class="top">
     <div class="brand"><div class="logo" aria-hidden="true">🫏</div><div><h1>Æsel<span class="red">Klog</span> · Talstien</h1><small>Spil, lær og grin sammen</small></div></div>
-    <div class="top-actions"><span class="pill">PRØVEVERSION 0.9.16</span><button id="voiceToggle" class="btn soft small" type="button" aria-pressed="true">🔊 Lyd til</button></div>
+    <div class="top-actions"><span class="pill">PRØVEVERSION 0.9.17</span><button id="voiceToggle" class="btn soft small" type="button" aria-pressed="true">🔊 Lyd til</button></div>
   </header>
 
 
@@ -183,9 +183,10 @@
         <label class="option card-extra-rule"><input type="checkbox" id="cardExtraPenalty"><span><strong>Ekstra kortstraf</strong><small>Ved fejl giver hver af de andre spillere ét kort fra sin lukkede bunke, hvis de har et.</small></span></label>
       </div>
       <div class="paper"><h3>👨‍👩‍👧‍👦 Spillere</h3>
-        <label class="field" for="cardPlayerCount"><span>Antal spillere</span><select id="cardPlayerCount"><option value="2">2 spillere</option><option value="3">3 spillere</option><option value="4">4 spillere</option><option value="5">5 spillere</option><option value="6">6 spillere</option></select></label>
+        <label class="field" for="cardPlayerCount"><span>Antal personer</span><select id="cardPlayerCount"><option value="1" disabled>1 person (kun mod æslet)</option><option value="2">2 personer</option><option value="3">3 personer</option><option value="4">4 personer</option><option value="5">5 personer</option><option value="6">6 personer</option></select></label>
+        <label class="option card-cpu-toggle"><input type="checkbox" id="cardCpuCheck"><span><strong>🫏 Spil mod Æslet</strong><small>Én person kan spille alene. Æslet vender og lægger kort automatisk.</small></span></label>
         <div id="cardPlayerNames" class="card-name-grid"></div>
-        <p class="tiny">Kortene fordeles automatisk. En spiller ad gangen vender kort; de andre kan følge med.</p>
+        <p class="tiny" id="cardCpuHint">I spiller på samme enhed og holder selv øje med hinandens træk.</p>
         <button type="button" id="cardPhysicalRules" class="btn soft block">🃏 Se regler til de fysiske kort</button>
       </div>
     </div>
@@ -197,11 +198,12 @@
     <div class="card-game-top"><div><h2 id="cardsPlayTitle">🃏 ÆselKlog – Kortspil</h2><p id="cardsPlayInfo" class="tiny"></p></div><div class="row"><button class="btn soft small" id="cardsRules" type="button">📖 Regler</button><button class="btn soft small" id="cardsSaveHome" type="button">💾 Gem og tilbage</button><button class="btn danger small" id="cardsFinish" type="button">✕ Afslut</button></div></div>
     <div class="card-game-status" role="status" aria-live="polite"><h3 id="cardsTurnHeading">Næste tur</h3><p id="cardsMessage"></p></div>
     <div class="card-game-layout">
-      <section class="paper card-game-turn" aria-label="Din tur"><h3>Dit kort</h3><div id="cardsPending" class="card-pending"></div><div id="cardMoveButtons" class="card-move-buttons"></div></section>
-      <section class="paper card-game-center" aria-label="Kortbunker midt på bordet"><h3>🃏 Rækker i midten</h3><p class="tiny">Start med det laveste tal, og byg opad én ad gangen.</p><div id="cardsCenter" class="card-center-piles"></div></section>
+      <section class="paper card-game-turn" aria-label="Din tur"><h3>Dit kort</h3><div id="cardsPending" class="card-pending"></div><p id="cardInteractionHint" class="card-interaction-hint" role="status" aria-live="polite">Tryk på et kort, og vælg en bunke. Du kan også trække kortet direkte.</p><div id="cardMoveButtons" class="card-move-buttons"></div></section>
+      <section class="paper card-game-center" aria-label="Kortbunker midt på bordet"><h3>🃏 Rækker i midten</h3><p class="tiny">Tryk eller træk et kort hertil. Appen stopper ikke forkerte kort – hold øje med hinanden!</p><div id="cardsCenter" class="card-center-piles"></div></section>
     </div>
-    <section class="paper card-game-players"><h3>Spillernes bunker</h3><p class="tiny">Lukket bunke = kort der skal vendes. Åben bunke = senest vendte kort, som ikke kunne bruges.</p><div id="cardsPlayers" class="card-players-grid"></div></section>
-    <details class="paper card-penalty" id="cardPenalties"><summary>🫏 Giv æselkort ved en fejl</summary><p class="tiny" id="cardPenaltyDesc"></p><div class="row"><label for="cardPenaltyPlayer">Hvem lavede fejlen?</label><select id="cardPenaltyPlayer"></select><button type="button" id="cardsGivePenalty" class="btn danger">🫏 Giv strafkort</button></div><p class="tiny">Bruges kun, hvis nogen overser et muligt træk eller lægger forkert. Appen kræver bekræftelse.</p></details>
+    <section class="paper card-game-players"><h3>Spillernes bunker</h3><p class="tiny">Tryk på din lukkede bunke for at vende. Træk fra dit vendte kort eller egen åbne bunke. Slip på en modspillers åbne bunke eller midten.</p><div id="cardsPlayers" class="card-players-grid"></div></section>
+    <section class="paper card-challenge" aria-label="Opdagede fejl"><button id="cardsChallenge" type="button" class="card-challenge-button" disabled><img src="./aeselklog-card.webp" alt=""><span><strong>🫏 Opdaget fejl!</strong><small>Tryk på æselkortet for at udfordre det seneste træk</small></span></button><p id="cardChallengeHint" class="tiny">Kortet går tilbage, hvis trækket var forkert. Straf gives derefter.</p></section>
+    <details class="paper card-penalty" id="cardPenalties"><summary>⚙️ Manuel straf (ekstra mulighed)</summary><p class="tiny" id="cardPenaltyDesc"></p><div class="row"><label for="cardPenaltyPlayer">Hvem lavede fejlen?</label><select id="cardPenaltyPlayer"></select><button type="button" id="cardsGivePenalty" class="btn danger">🫏 Giv strafkort</button></div><p class="tiny">Ved en fejl i det seneste træk: brug æselkortet ovenfor for at fortryde og give straf. Denne ekstra mulighed giver kun en manuelt aftalt straf.</p></details>
     <button id="cardsHome" type="button" class="btn soft">← Til kortspil-menuen</button>
   </section>
 
@@ -260,10 +262,10 @@
 </div>
 
 <dialog id="cardRulesDialog" class="card-rules-dialog" aria-labelledby="cardRulesTitle"><h2 id="cardRulesTitle">🃏 Sådan spiller I ÆselKlog</h2>
-  <p>Fordel talkortene med bagsiden op. Hver spiller vender et kort på sin tur. Start en række i midten med det laveste tal i det valgte område: 1, 21, 41, 61 eller 81.</p>
-  <p>Rækkerne i midten bygges kun opad, én efter én. Et kort kan også lægges på en anden spillers åbne bunke, hvis det er præcis ét tal højere eller lavere. Appen vælger automatisk den korrekte bunke: midten først, ellers nærmeste spiller til venstre.</p>
-  <p>Passer kortet, må spilleren fortsætte. Man må også lægge det øverste kort af sin åbne bunke, hvis det passer. Passer det vendte kort ingen steder, bliver det lagt åbent foran spilleren, og turen går videre. Når den lukkede bunke er tom, vendes den åbne bunke om igen.</p>
-  <p>Ved et overset eller forkert træk gives æselkort. Standard: æselkortet beholdes. Den anden variant bruger kun ét kort, der gives videre ved nye fejl. En ekstra talkortstraf fra de andre kan vælges i opsætningen.</p>
+  <p>Ved spil mod Æslet kan én person spille alene; CPU-æslet vender og lægger kort automatisk. Tryk på den lukkede bunke for at vende kort, og træk et kort eller tryk på kortet og målbunken. Fordel talkortene med bagsiden op. Hver spiller vender et kort på sin tur. Start en række i midten med det laveste tal i det valgte område: 1, 21, 41, 61 eller 81.</p>
+  <p>Rækkerne i midten bygges kun opad, én efter én. Et kort kan også lægges på en anden spillers åbne bunke, hvis det er præcis ét tal højere eller lavere. Spillerne vælger selv målbunken: midten har forrang, ellers nærmeste spiller til venstre. Appen stopper ikke en forkert placering.</p>
+  <p>Passer kortet, må spilleren fortsætte. Man må også lægge det øverste kort af sin åbne bunke, hvis det passer. Spilleren lægger selv kortet i sin åbne bunke for at afslutte turen, hvis det ikke passer. Overser man et muligt træk, kan de andre eller CPU-æslet opdage fejlen. Når den lukkede bunke er tom, vendes den åbne bunke om igen.</p>
+  <p>Når nogen opdager en fejl i det seneste træk, trykker de på det store æselkort "Opdaget fejl!". Hvis trækket var forkert, lægges kortet tilbage på sin tidligere plads, og spilleren får straf. Ved et korrekt træk sker der intet. Standard: æselkortet beholdes. Drillevarianten har kun ét kort, som gives videre. Ekstra talkortstraf er valgfri.</p>
   <p>Første spiller uden talkort vinder. Æselkortene er straf og tælles ikke med som talkort. Der er ingen obligatoriske matematikopgaver.</p>
   <button id="cardsRulesClose" type="button" class="btn main block">Forstået</button>
 </dialog>

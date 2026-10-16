@@ -1,33 +1,29 @@
-# 🫏 ÆselKlog – fælles projektstatus
+# 🫏 ÆselKlog – fælles projektstatus v0.9.17
 
-**Opdateret:** 16. oktober 2026 · **Næste komplette udviklingspakke:** v0.9.16 · **Senest verificeret GitHub `main` ved start:** v0.9.15. **v0.9.16 er ikke live, før ZIP-filerne er uploadet til `main`.**
+**Opdateret:** 16. oktober 2026 · **Senest bekræftet GitHub `main` før ny kode:** v0.9.16 · **Ny udviklingspakke:** v0.9.17, lokalt udviklet og automatisk testet, **ikke uploadet til GitHub af assistenten**. Korrekt kilde ved ny udvikling er altid aktuel `main` og de seks projektdokumenter. Dokumentationen opdateres sammen med PWA-cache ved hver release.
 
-Dette dokument er den korte sandhed om status. Se `UDVIKLINGSPLAN.md` for detaljer, `TESTPLAN.md` for evidens og `IDEKATALOG.md` for beslutninger og forslag. Start altid videreudvikling med en frisk kontrol af GitHub `main` og dokumenternes versionsnumre.
+## Implementeret og automatiseret testet
 
-## Digitalt spil – implementeret og lokalt testet
+- **Talstien:** Den godkendte illustration på forsiden, 100 felter, digital eller fysisk A3-plade, op til seks menneskelige deltagere + CPU, fysisk/digital terning, ni specialfelttyper, tilfældige specialfelter digitalt og faste ved fysisk A3, pause/fortryd, gem/fortsæt.
+- **Stemmer:** ElevenLabs gennem Cloudflare Worker uden offentlige secrets, separat CPU-stemme, 35 % Hov hov-varianter, lokal stemmespecifik lydcache og gratis/offline telefonstemme som reserve.
+- **Læring:** Valgfri LEG, talforståelse/plus/minus/tabeller med individuelle trin, lokale profiler og forældreoversigt uden konto.
+- **Kortspil:** Alle fem talområder, 100 talkort per område, 4/6/8 beholdte æselkort eller ét vandrende, valgfri ekstra straf, 2–6 mennesker eller **1–6 mennesker + CPU**, lokalt gemt spil med adskilt nøgle.
+- **v0.9.17:** Kort vendes ved tryk på lukket bunke. Vendt/åbent kort kan trækkes eller vælges og tappes på en målbunke. Regelmæssigt forkerte træk blokeres ikke. En opdaget fejl udfordres via synligt æselkort, fortryder *seneste* ugyldige træk og giver æselstraf. CPU kan også opdage fejl og kan begå egne fejl.
 
-- Godkendt ÆselKlog-forside som én illustration med Spil, Indstillinger, Topscore og Om.
-- **Talstien** på digital eller fysisk A3-plade; 100 felter, fem farveområder, roser, actionfelter med skiftende antal/placering (digital), CPU-æsel, terning, lyd og frivillige matematikopgaver.
-- **Kortspil** i første lokale digitale pass-and-play-prototype: niveauerne 1–20, 21–40, 41–60, 61–80, 81–100; 2–6 personer, to æselkort-varianter og frivillig ekstra kortstraf.
-- Gem og fortsæt i begge spiltyper med **adskilte lokale nøgler**. Talstiens ældre gemninger er fortsat kompatible.
-- ElevenLabs via Cloudflare Worker, individuel AI-stemme til spilleleder og CPU, 35 % indledende “Hov hov”, offline reserve via telefonstemme og lokal stemmespecifik lydcache.
-- Automatisk, alderssikker individuel matematik i fire fagområder samt lokal forældreoversigt; matematik er **ikke tvunget** i LEG.
-- **v0.9.16:** flot spilvælger med to rigtige klikbare valg og **6 navngivne personer + CPU** i Talstien, bevarede savegames.
+**Automatisk test:** 21 Node-tests og 16 Chromium-browsertests bestået. Tests bruger simulerede lyde og lokallager, ikke fysisk iPhone/iOS. Service Worker-testen er en unit/mock-test.
 
-**Automatiseret kontrol for v0.9.16:** 20 Node-tests og 15 Chromium-browsertests bestået. Tests med rigtig iPhone og live ElevenLabs er endnu ikke udført.
+## Mangler eller er ikke verificeret
 
-## Stadig åbent og IKKE bekræftet
+- Fysisk iPhone-PWA, iOS Safari/WebKit/VoiceOver, mobiltræk med automatisk rulning, offline-genstart og cache-udskiftning; test på den installerede app.
+- Reel ElevenLabs-kreditmåling, opdatering og fallback i fysiske telefonmiljøer.
+- Kortspilsfamilietest: korttræk, regler for afsløring af fejl, tempo for solo-CPU, antal fejl per kamp, og om "Opdaget fejl"-kortet er let at finde.
+- Sammenlign faste A3-specialfelter i appen med de faktisk trykte A3-plader.
+- Fysiske trykklare kort 1–20, 41–60, 61–80 og 81–100 samt endelig regelbog og æske. 21–40-/æselkortprototyper eksisterer.
+- Endelig sikkerheds-, tilgængeligheds- og familieafprøvning før v1.0.
 
-- Rigtig iPhone-PWA / Safari-WebKit, især serviceworker-opdateringer, offline-genstart, knappers trykflader, talepauser og VoiceOver.
-- Ægte ElevenLabs-belastning, lydtimer og credits ved familietest; kun simuleret tale i automatiske regressioner.
-- Fuld fysisk A3-sammenligning mod `A.FIELDS` for tidligere print, plus rigtige familietests.
-- Det digitale kortspils originale regler er en første prototype; fysiske kort, tryk/æske, fysisk kortspilassistent og måske CPU/kort-oplæsning mangler eller er ikke besluttet.
-- Kortene til samtlige fem områder skal færdiggøres fysisk; 21–40 og æselkort er prototypen.
-- Før v1.0: sikkerhed, rettigheder, stabilitet, kontrast, fejlrapportering, familietest og minimum test på reelle telefoner.
+## Arbejdsgang ved næste udvikling
 
-## Release og næste arbejdsgang
-
-1. Test v0.9.16 lokalt og upload komplet ZIP-indhold til GitHub `main`.
-2. Bed brugeren om at teste spilvalg, 6 spillere + CPU og gem/fortsæt på rigtig iPhone.
-3. Indsaml konkrete fejl; ret dem før yderligere funktioner. Beslut derefter om næste version er kortspilsforbedringer, fysisk materiale eller v1.0-releasekandidat.
-4. Opdater altid README, AGENTS, TESTPLAN, UDVIKLINGSPLAN, PROJEKTSTATUS, IDEKATALOG og Service Worker-cache ved hver ny versionspakke.
+1. Upload alle filer fra v0.9.17-arkivet, ikke blot ZIP-filen, til GitHub `main`.
+2. Prøv Kortspil med ét navn + CPU. Tryk på bunken, læg bevidst forkert i midten, udfordr med æselkortet, og test gem/fortsæt.
+3. Test resten af Talstien på rigtig iPhone og dokumentér konkrete fejl eller ønsker.
+4. Indsamlede idéer og beslutninger står i `IDEKATALOG.md`. Start hver ny release med at kontrollere `main`, README, TESTPLAN, AGENTS, UDVIKLINGSPLAN, PROJEKTSTATUS og IDEKATALOG.

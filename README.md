@@ -1,3 +1,33 @@
+# 🫏 ÆselKlog v0.9.17 – Kortspil mod Æslet, frie korttræk og opdagede fejl (16. oktober 2026)
+
+**Kilde:** Samtlige eksisterende kilder og den godkendte `home-fullscreen.webp` i GitHub `main` v0.9.16 blev kontrolleret mod det komplette projektarkiv før udviklingen. Denne v0.9.17-pakke indeholder alle projektfiler; GitHub opdateres **ikke** automatisk. Ægte Safari/iPhone og ElevenLabs er endnu ikke produktionstestet i denne release.
+
+## Nyheder i det digitale kortspil
+
+- **Spil alene mod Æslet:** Vælg "Spil mod Æslet" og én menneskelig spiller. Man kan også vælge 2–6 personer og tilføje CPU som modstander (op til syv deltagere). Kortspillet er stadig lokalt pass-and-play, ikke online-multiplayer. CPU'en vender og lægger kort uden ElevenLabs-forbrug.
+- **Vend kort fra bunken:** Tryk på din **lukkede bunke** for at vende det næste kort. Knappen "Vend kort" findes stadig som alternativ til fysisk og tastaturbetjening. Brug enten det nyvendte kort eller toppen af din egen åbne bunke.
+- **Træk kort frit:** Flyt kort fra din egen bunke til en række i midten eller modspillernes åbne bunker med **træk-og-slip** (Pointer Events på mus og touch), eller **tryk på kort og derefter på målbunken**. Mobiltræk ved skærmens kant kan rulle siden; det enklere tryk/tap-flow er altid tilgængeligt. Der er også en foreslået lovlig placering som frivillig genvej.
+- **Ingen automatisk afvisning af regelfejl:** Man kan lægge et kort på en forkert bunke, lægge et muligt kort i sin egen åbne bunke eller vende videre, selv om et åbent kort kunne bruges. Appen gemmer den synlige placering og retter den ikke uden indsigelse. Reglerne om lovlige træk er fortsat de klassiske: laveste tal starter opadgående midterrækker, ellers ±1 på åbne modspillerbunker med prioritet til midten.
+- **Opdaget fejl = fortryd + æselkort:** Tryk på det **store synlige æselkort "Opdaget fejl!"** for at udfordre det *senest lagte kort*. Var trækket forkert, bringes bordet præcis tilbage til tilstanden før trækket, og den ansvarlige får ét æselkort (samt eventuel tilvalgt ekstra kortstraf). Ved korrekt træk gives ingen straf. Der findes fortsat en særskilt manuel strafknap til familieaftaler, uden automatisk fortrydelse.
+- **Æslet holder øje – men ikke altid:** CPU kan opdage menneskers forkerte korttræk med en chance på cirka 72 %, efter en kort pause. Det accepterer også lovlige træk. CPU kan desuden indimellem lægge et forkert kort selv; andre kan udfordre det. Dette er en underholdende regelbaseret CPU, ikke en ufejlbarlig dommer.
+- **Gem og fortsæt:** Kortspillet benytter fortsat `aeselklog-kortspil-v1`, nu med et valgfrit enkelt checkpoint for seneste træk. En endnu ikke udfordret fejl og CPU-deltageren kan genoptages efter lukning. Gammel v0.9.15/16-gemning læses fortsat, også uden de nye felter.
+
+## Særligt bevaret
+
+- Kortspillets fem talområder (1–20, 21–40, 41–60, 61–80, 81–100), fem kort af hvert tal, begge æselkort-varianter og valgfri ekstra kortstraf. Matematik er fortsat **helt frivillig**.
+- Talstiens separate gemning, op til seks personer + CPU, den godkendte forside, fysisk A3-plade, tilfældige specialfelter, læringsprofiler, forældreoversigt, almindelige ElevenLabs-stemmer og lydcache. **Ingen ændringer i Cloudflare Worker eller API-secrets.**
+
+## Installation og test
+
+1. Pak den **komplette ZIP** ud, og læg alle filer i repositoryets rod, inklusive nye testfiler og opdaterede `cardgame-engine.js`, `cardgame-ui.js`, `index.html`, `styles.css` og `sw.js`. Upload ikke kun ZIP-filen.
+2. Opdateret cache-id: `aeselklog-talstien-v0917-cards-cpu-free-moves`. Åbn PWA igen, og se **PRØVEVERSION 0.9.17**.
+3. Prøv Kortspil med **1 person + Æslet**, vend ved bunken, læg et forkert kort i midten, og tryk **Opdaget fejl!**. Kontrollér fortrydelse og æselstraf. Prøv også træk-og-slip samt Kortspil → Gem/fortsæt.
+4. Node-test, Chromium-browserregressioner og PWA-unit-test er gennemført med **simuleret** lyd. Reel iPhone Safari/WebKit, iOS offline-installation/genstart, touch i fuld PWA og familieafprøvning af reglerne skal testes fysisk. Se `TESTPLAN.md`.
+
+Læs `PROJEKTSTATUS.md`, `UDVIKLINGSPLAN.md` og `IDEKATALOG.md` før nye versioner. Alle seks projektdokumenter er opdateret i denne pakke.
+
+---
+
 # 🫏 ÆselKlog v0.9.16 – tydelig spilvælger og op til seks spillere (16. oktober 2026)
 
 **Projektets aktuelle udviklingspakke:** v0.9.16. **Senest verificerede GitHub `main` ved udviklingsstart:** v0.9.15. v0.9.16 er en komplet lokal ZIP, som skal uploades til GitHub, før den er live. Den godkendte forside og de eksisterende spilfunktioner er bevaret.

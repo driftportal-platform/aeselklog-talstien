@@ -1,3 +1,34 @@
+# ÆselKlog – udviklingsplan v0.9.17 (16. oktober 2026)
+
+**Kilde og status:** GitHub `main` er kontrolleret til v0.9.16 før koden blev ændret. v0.9.17 udvikles lokalt som komplet ZIP. Den er ikke automatisk publiceret. Se `PROJEKTSTATUS.md` for samlet fremdrift og `IDEKATALOG.md` for beslutninger.
+
+## v0.9.17 – spil mod Æslet og klassisk fri kortplacering
+
+- [x] Kortspil understøtter **én person + CPU** (eller op til seks personer + CPU); almindeligt kortspil uden CPU kræver fortsat mindst to personer.
+- [x] Lukkede kortbunker kan trykkes direkte for at vende et kort, og åbne eller vendte kort kan flyttes med pointertræk eller tryk/valg. Mobilflow har støtte til scroll ved skærmkanten under træk.
+- [x] Alle midterrækker og andres åbne bunker er selvstændige dropmål. Regelfejl blokeres ikke i øjeblikket; spillerne kan selv opdage dem.
+- [x] Synligt Æselkort til **Opdaget fejl** ruller seneste *forkerte* træk tilbage og giver straf. Korrekte træk kan udfordres uden straf. Det gælder også overset muligt træk ved aflægning i egen åbne bunke.
+- [x] Æslet spiller automatisk og kan opdage menneskers fejl med en chance, men kan også selv lægge et forkert kort. Ingen ændring i Talstiens CPU-stemme/regelrække.
+- [x] Samme lokale kortspil-SAVE (schema 1) med checkpoint for sidste træk. Gamle gemninger, begge æselkortvarianter og tilvalgt ekstra kortstraf er bevaret. Den godkendte forside, A3 og alle fem korttalområder er uændrede.
+- [x] Alle seks status-, test- og idéfiler opdateret, Service Worker-cache versionsskiftet til `aeselklog-talstien-v0917-cards-cpu-free-moves`.
+- [x] **21 Node-tests + 16 Chromium-browsertests** gennemført med simuleret lyd. Fysisk iOS/WebKit er stadig ikke testet.
+
+## Næste opgaver
+
+1. Lad 3–5 familier teste **korttræk, CPU-modstander og æselstraffen** på både pc og rigtig iPhone. Finjustér CPU's hastighed og sandsynlighed for at opdage fejl efter feedback.
+2. Afprøv **Touch/PWA på fysisk iPhone** med rulning, tap, korrekt fortrydelse, tilbageknapper og liggende format. Kør en hel kamp solo mod CPU.
+3. Test ægte offline-genstart, Service Worker-opdateringer, VoiceOver samt Talstiens ElevenLabs ved lav og høj kreditgrænse (ingen API-secrets på GitHub).
+4. Afprøv og godkend de oprindelige kortregler sammen med fysiske kort 21–40; lav trykklare kort til de fire øvrige talområder og kontroller alle fysiske rettigheder.
+5. Før v1.0: gennemfør releasekandidatstest og dokumentér faktiske familie-/iPhone-resultater, ikke kun Chromium-tests.
+
+## Faste regler
+
+- Matematik er altid frivillig. Talstien og Kortspil er adskilte spiltyper, hver med eget savegame. Den godkendte 1:1-forside ændres ikke.
+- Behold æselkort-varianten: 4/6/8 strafkort; send-videre-varianten: ét vandrende æselkort. Ekstra talkortstraf kan slås til, men er slået fra som standard.
+- Et frit digitalt træk skal aldrig afvises alene, fordi tallet ikke passer; andre spillere eller CPU kan opdage det og aktivere **tilbagekald + straf**.
+
+---
+
 # ÆselKlog – udviklingsplan v0.9.16 (16. oktober 2026)
 
 **Senest verificeret på GitHub ved start:** `main` = v0.9.15. **Aktuel leverance:** v0.9.16 – kodet i komplet lokal pakke; ikke automatisk lagt på GitHub. Den godkendte illustration bevares. Se også **`PROJEKTSTATUS.md`** for status og **`IDEKATALOG.md`** for fælles beslutninger og næste idéer.
