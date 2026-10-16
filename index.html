@@ -14,7 +14,7 @@
 <div class="shell">
   <header class="top">
     <div class="brand"><div class="logo" aria-hidden="true">🫏</div><div><h1>Æsel<span class="red">Klog</span> · Talstien</h1><small>Spil, lær og grin sammen</small></div></div>
-    <div class="top-actions"><span class="pill">PRØVEVERSION 0.9.22</span><button id="voiceToggle" class="btn soft small" type="button" aria-pressed="true">🔊 Lyd til</button></div>
+    <div class="top-actions"><span class="pill">PRØVEVERSION 0.9.23</span><button id="voiceToggle" class="btn soft small" type="button" aria-pressed="true">🔊 Lyd til</button></div>
   </header>
 
 
@@ -212,10 +212,10 @@
   </section>
 
   <section id="cardsGame" class="view" aria-label="ÆselKlog kortspil">
-    <div class="card-game-top"><div><h2 id="cardsPlayTitle">🃏 ÆselKlog – Kortspil</h2><p id="cardsPlayInfo" class="tiny"></p></div><div class="row"><button class="btn soft small" id="cardsMusicToggle" type="button" aria-pressed="false">🎵 Musik fra</button><button class="btn soft small" id="cardsVoiceToggle" type="button" aria-pressed="true">🔊 Tale til</button><button class="btn soft small" id="cardsRepeatNumber" type="button">🔊 Hør tallet igen</button><button class="btn soft small" id="cardsRules" type="button">📖 Regler</button><button class="btn soft small" id="cardsSaveHome" type="button">💾 Gem og tilbage</button><button class="btn danger small" id="cardsFinish" type="button">✕ Afslut</button></div></div>
+    <div class="card-game-top"><div><h2 id="cardsPlayTitle">🃏 ÆselKlog – Kortspil</h2><p id="cardsPlayInfo" class="tiny"></p></div><div class="row"><button class="btn soft small" id="cardsMusicToggle" type="button" aria-pressed="false">🎵 Musik fra</button><button class="btn soft small" id="cardsVoiceToggle" type="button" aria-pressed="true">🔊 Tale til</button><button class="btn soft small" id="cardsRules" type="button">📖 Regler</button><button class="btn soft small" id="cardsSaveHome" type="button">💾 Gem og tilbage</button><button class="btn danger small" id="cardsFinish" type="button">✕ Afslut</button></div></div>
     <div class="card-game-status" role="status" aria-live="polite"><h3 id="cardsTurnHeading">Næste tur</h3><p id="cardsMessage"></p></div>
     <div class="card-table">
-      <section class="paper card-game-players" aria-label="Spillernes bunker"><div class="card-section-heading"><h3>🃏 Spillernes bunker</h3><p id="cardInteractionHint" class="card-table-hint" role="status" aria-live="polite">Tryk på bunken for at vende. Træk kortet til en anden bunke.</p></div><div id="cardsPlayers" class="card-players-grid"></div></section>
+      <section class="paper card-game-players" aria-label="Spillernes bunker"><div class="card-section-heading"><h3>🃏 Spillernes bunker</h3><p id="cardInteractionHint" class="card-table-hint" role="status" aria-live="polite">Tryk på bunken for at vende. Træk kortet til en anden bunke.</p></div><div id="cardsPlayers" class="card-players-grid"></div><div class="card-number-repeat"><button class="btn soft" id="cardsRepeatNumber" type="button">🔊 Hør tallet igen</button></div></section>
       <section class="paper card-game-center" aria-label="Kortbunker midt på bordet"><div class="card-section-heading"><h3>🌹 Rækker i midten</h3><small>Træk eller tryk et kort hertil</small></div><div id="cardsCenter" class="card-center-piles"></div></section>
     </div>
     <div class="card-quick-actions" id="cardMoveButtons" aria-label="Alternative kortkommandoer"></div>

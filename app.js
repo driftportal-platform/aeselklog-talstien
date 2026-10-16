@@ -292,7 +292,11 @@ async function speakNumber(number,{repeat=false}={}){
  // Same narrator voice for numbers on human and CPU turns; no English guessing by AI.
  // Foreign-language numbers use the device's locale-specific voice, without ElevenLabs credits.
  if(!sound.on)return Promise.resolve();
- if(parts.length===1&&parts[0].lang==='da')return say(parts[0].text,{repeat});
+ if(parts.length===1&&parts[0].lang==='da'){
+  // Danske 'fem' udtales på enkelte multilingvale AI-stemmer som et engelsk ord.
+  // Vælg en faktisk dansk lokal stemme når den findes, ellers behold den valgte AI-stemme.
+  if(n!==5||!('speechSynthesis' in window)||!speechSynthesis.getVoices().some(v=>/^da(?:-|$)/i.test(v.lang||'')))return say(parts[0].text,{repeat});
+ }
  stopCurrentVoice();
  const id=speechSerial;
  const music=window.AeselMusic,duck=music?.beginSpeech?.();
@@ -304,7 +308,11 @@ async function speakNumber(number,{repeat=false}={}){
   const selected=choices.find(v=>v.default)||choices[0];if(selected)u.voice=selected;
   return waitForPlayback(done=>{u.onend=done;u.onerror=done;speechSynthesis.speak(u)},Math.min(22000,5000+part.text.length*180));
  };
- const playing=(async()=>{for(const part of parts){if(id!==speechSerial)break;await speakPart(part)}})();
+ const playing=(async()=>{for(let i=0;i<parts.length;i++){
+  if(id!==speechSerial)break;
+  if(i>0){await new Promise(resolve=>setTimeout(resolve,1500));if(id!==speechSerial)break;}
+  await speakPart(parts[i]);
+ }})();
  return playing.finally(()=>{if(duck!==undefined)music?.endSpeech?.(duck)});
 }
 window.AeselVoice={say:(text,options={})=>say(text,options),number:(number,options={})=>speakNumber(number,options),repeatNumber:()=>lastSpokenNumber!==null?speakNumber(lastSpokenNumber,{repeat:true}):Promise.resolve(),stop:stopCurrentVoice,enabled:()=>sound.on,choices:()=>({mode:sound.mode,aiVoice:sound.aiVoice,cpuVoice:sound.cpuVoice,numberLanguage})};

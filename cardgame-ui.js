@@ -90,7 +90,7 @@ function act(fn){
   else if(out&&Number.isFinite(out.number))line=`${out.number}.`;
   else if(out?.assigned!==undefined)line='Et æselkort i straf!';
   else if(game.turn!==priorTurn)line='Næste spillers tur!';
-  if(Number.isInteger(out?.number)&&!out?.caught&&!game.finished){lastCardNumber=out.number;speechDone=window.AeselVoice?.number?.(out.number)||Promise.resolve();}
+  if(Number.isInteger(out?.number)&&!out?.caught&&!game.finished&&game.lastAction==='flip'){lastCardNumber=out.number;speechDone=window.AeselVoice?.number?.(out.number)||Promise.resolve();}
   else speechDone=announceCard(line,{cpu:!!speaker?.isCPU});
   schedule(out);return out;}
  catch(err){$('cardsMessage').textContent=err.message||'Trækket kunne ikke udføres.';renderControls();return null;}

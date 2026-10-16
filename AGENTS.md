@@ -1,3 +1,11 @@
+# v0.9.23 – Taloplæsning og mobilknap (16. oktober 2026)
+
+- Automatisk taloplæsning i kortspillet kun ved vending, ikke ved placering.
+- 1,5 sekunders pause mellem dansk og valgt fremmedsprog.
+- Hør tallet igen flyttet under spillerbunkerne.
+- Dansk fem: foretræk lokal da-DK-stemme for ordet når tilgængelig; ellers fælles AI-stemme. Rigtig iPhone-udtale skal kontrolleres.
+- 0.9.22-funktioner, gemte spil og PWA-musik bevaret.
+
 # ÆselKlog v0.9.22 – midterrækker starter med laveste tal (16. oktober 2026)
 
 - **Rettelse:** Hver ny midterbunke kan kun starte med områdets laveste tal: 1, 21, 41, 61 eller 81. Eksempel: 1 → 2 → 3 osv. på hver række. Der kan højst være fem rækker.

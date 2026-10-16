@@ -823,3 +823,8 @@ body.home-active #resumeCard button:active{filter:brightness(.94)}
  .music-controls{grid-template-columns:minmax(0,1fr)}.music-controls .btn{grid-column:1}
 }
 @media(prefers-reduced-motion:reduce){.card-table .card-draggable,.music-controls *{transition:none!important}}
+
+/* v0.9.23: talgentagelse tæt på de vendte kort, mobilvenlig. */
+.card-number-repeat{display:flex;justify-content:center;margin:14px 0 0;}
+.card-number-repeat .btn{min-height:48px;min-width:180px;max-width:100%;font-weight:800;}
+@media(max-width:460px){.card-number-repeat .btn{width:100%;}}
