@@ -13,14 +13,19 @@ function toTop(p,n){let i=p.closed.indexOf(n);if(i<0)throw Error('testkort finde
 {
  let s=game();toTop(s.players[0],31);
  assert.equal(E.flipManual(s).number,31);
- const out=E.placeManual(s,'pending',{kind:'new-center'});
- assert.equal(out.legal,false,'the deliberate invalid center play must not be blocked');
- assert.deepEqual(s.centers,[[31]]);assert(E.validate(s));
+ assert.throws(()=>E.placeManual(s,'pending',{kind:'new-center'}),/starte med 21/);
+ assert.deepEqual(s.centers,[]);assert.equal(s.pending,31);assert(E.validate(s));
+ // Forkert kort på en EKSISTERENDE række må stadig lægges og udfordres.
+ // Flyt et 21-kort til en række, uden at ødelægge antal-kort-kontrollen.
+ const source=s.players.find(p=>p.closed.includes(21));
+ s.centers.push([source.closed.splice(source.closed.indexOf(21),1)[0]]);
+ const out=E.placeManual(s,'pending',{kind:'center',index:0});
+ assert.equal(out.legal,false);assert.deepEqual(s.centers,[[21,31]]);
  const saved=E.restore(JSON.stringify(s));assert(saved.lastMove);
  const verdict=E.challenge(saved);
  assert.equal(verdict.caught,true);assert.equal(verdict.number,31);
  assert.equal(saved.players[0].donkeys,1);assert.equal(saved.pending,31);
- assert.deepEqual(saved.centers,[]);assert.equal(saved.turn,0);
+ assert.deepEqual(saved.centers,[[21]]);assert.equal(saved.turn,0);
  assert(E.validate(saved));
 }
 {

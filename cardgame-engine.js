@@ -206,6 +206,11 @@
  function normalizeDestination(state,target,source){
   if(!target||typeof target!=='object')throw Error('Vælg den bunke, som kortet skal lægges på.');
   if(target.kind==='new-center'){
+   // En helt ny række SKAL begynde med det laveste tal (1, 21, 41, 61 eller 81).
+   // Frie fejltræk på allerede eksisterende bunker håndteres stadig ved indsigelse.
+   const [first]=bounds(state.range);
+   const card=source==='pending'?state.pending:state.players[state.turn].open.at(-1);
+   if(card!==first)throw Error(`En ny række i midten skal starte med ${first}.`);
    if(state.centers.length>=5)throw Error('Der er allerede fem rækker i midten.');
    return {kind:'new-center',index:state.centers.length,caption:'Ny række i midten'};
   }

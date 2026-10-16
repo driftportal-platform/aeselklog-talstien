@@ -1,3 +1,13 @@
+# ÆselKlog v0.9.21 – midterrækker starter med laveste tal (16. oktober 2026)
+
+- **Rettelse:** Hver ny midterbunke kan kun starte med områdets laveste tal: 1, 21, 41, 61 eller 81. Eksempel: 1 → 2 → 3 osv. på hver række. Der kan højst være fem rækker.
+- Et forsøg på at oprette ny række med et andet kort ændrer ikke brættet eller turen og giver en forklaring. Bevidst fejlplacering på en allerede eksisterende bunke er fortsat mulig og kan udfordres med æselkortet.
+- De eksisterende gemninger bruger samme nøgle. Allerede gemte rækker med forkert starttal vises stadig, men ingen nye fejlstartede rækker kan oprettes.
+- Kodeændring kun i `cardgame-engine.js`; test udvidet for alle fem niveauer, `sw.js` og versionsnummer opdateret.
+- Manuel iPhone-test og fuld browserregression afventer kontrol efter upload.
+
+---
+
 # 🫏 ÆselKlog v0.9.19 – tre rigtige offline-MP3'er og original æselstemme (16. oktober 2026)
 
 **Status:** GitHub `main` blev kontrolleret til v0.9.18. Samtlige tidligere v0.9.18-kildefiler i lokal ZIP matchede GitHub på deres Git-blob-SHA'er. v0.9.19 er en ny, komplet lokal udviklingspakke og er **ikke automatisk uploadet**. Test på installeret iPhone-PWA og ægte ElevenLabs-Worker skal udføres efter upload.
