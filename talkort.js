@@ -1,4 +1,4 @@
-/* ÆselKlog v0.9.25 – selvstændig Talkort-viser med fælles talstemme. */
+/* ÆselKlog v0.9.26 – selvstændig Talkort-viser med fælles talstemme. */
 (()=>{'use strict';
 const $=id=>document.getElementById(id), NUM=window.AeselNumbers;
 if(!NUM||!$('talkort'))return;

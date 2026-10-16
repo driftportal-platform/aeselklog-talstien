@@ -197,7 +197,7 @@ function ensureAudioContext(){
 // iOS tillader pålideligt Web Audio efter en brugerhandling (tryk på spil/terning).
 document.addEventListener('pointerdown',()=>{if(sound.on&&sound.mode==='ai')ensureAudioContext()}, {passive:true});
 document.addEventListener('keydown',()=>{if(sound.on&&sound.mode==='ai')ensureAudioContext()}, {passive:true});
-async function speakAI(text,id,{cpu=false}={}){
+async function speakAI(text,id,{cpu=false,strictVoice=false,boost=1}={}){
  const endpoint=AI_TTS_ENDPOINT;
  // Brug det faktisk valgte ID (inkl. CPU'ens eget valg), ikke rollen eller standardnavnet.
  const voiceId=cpu?CV.chooseVoice(aiVoices,sound.aiVoice,sound.cpuVoice):sound.aiVoice;
@@ -217,6 +217,7 @@ async function speakAI(text,id,{cpu=false}={}){
    // Lokal cache kontrolleres FØR offline/cooldown – gemte AI-lyde virker også uden net.
    if(navigator.onLine===false||Date.now()<aiRetryAfter){
     aiStatus('🫏 Denne oplæsning er ikke gemt. Telefonens stemme bruges midlertidigt.');
+    if(strictVoice){aiStatus('⚠️ Den valgte AI-stemme er midlertidigt utilgængelig. Prøv Læs igen.');document.getElementById('talkortVoiceInfo')?.replaceChildren(document.createTextNode('⚠️ Spillelederens stemme er midlertidigt utilgængelig. Tryk Læs igen.'));return;}
     return speakLocally(text,{cpu});
    }
    const abort=new AbortController();aiFetch=abort;
@@ -242,7 +243,7 @@ async function speakAI(text,id,{cpu=false}={}){
    if(id!==speechSerial||!sound.on)return;
    // Gem først når lyden er valideret af dekoderen. Fejlende lyd må ikke lagres.
    if(downloaded&&VC.isSafePhrase(text))void VC.put(clip,bytes).then(ok=>{if(ok&&$('voiceSettings').open)void refreshAudioCacheStatus()});
-   const node=ctx.createBufferSource();node.buffer=decoded;node.playbackRate.value=cpu?1.07:1;node.connect(ctx.destination);aiSource=node;
+   const node=ctx.createBufferSource();node.buffer=decoded;node.playbackRate.value=cpu?1.07:1;if(boost!==1){const gain=ctx.createGain();gain.gain.value=boost;node.connect(gain);gain.connect(ctx.destination)}else node.connect(ctx.destination);aiSource=node;
    aiStatus(cacheLabel+': '+chosen+(cpu?' · CPU-æsel.':'.'));
    await waitForPlayback(done=>{node.onended=()=>{if(aiSource===node)aiSource=null;done()};node.start()},Math.min(45000,Math.max(2000,decoded.duration*1000/(cpu?1.07:1)+2000)));
   }else{
@@ -266,6 +267,7 @@ async function speakAI(text,id,{cpu=false}={}){
   aiRetryAfter=Date.now()+AI_RETRY_COOLDOWN_MS;
   const reason=/HTTP 502|HTTP 429|HTTP 402/.test(String(e?.message||''))?' Tjek også din ElevenLabs-creditgrænse.':'';
   aiStatus('🫏 AI-lyden er ikke tilgængelig lige nu.'+reason+' Telefonens stemme bruges midlertidigt.');
+  if(strictVoice){aiStatus('⚠️ Kunne ikke afspille den valgte AI-stemme. Tryk Læs igen for et nyt forsøg.');document.getElementById('talkortVoiceInfo')?.replaceChildren(document.createTextNode('⚠️ Spillelederens stemme er utilgængelig. Tryk Læs igen.'));return;}
   return speakLocally(text,{cpu});
  }finally{if(id===speechSerial)aiFetch=null}
 }
@@ -295,7 +297,7 @@ async function speakNumber(number,{repeat=false,cpu=false,preferSelectedVoice=fa
  if(parts.length===1&&parts[0].lang==='da'){
   // Danske 'fem' udtales på enkelte multilingvale AI-stemmer som et engelsk ord.
   // Vælg en faktisk dansk lokal stemme når den findes, ellers behold den valgte AI-stemme.
-  if(preferSelectedVoice||n!==5||!('speechSynthesis' in window)||!speechSynthesis.getVoices().some(v=>/^da(?:-|$)/i.test(v.lang||'')))return say(parts[0].text,{repeat,cpu});
+  if(preferSelectedVoice||n!==5||!('speechSynthesis' in window)||!speechSynthesis.getVoices().some(v=>/^da(?:-|$)/i.test(v.lang||'')))return say(n===5?'tallet fem':parts[0].text,{repeat,cpu});
  }
  stopCurrentVoice();
  const id=speechSerial;
@@ -304,16 +306,16 @@ async function speakNumber(number,{repeat=false,cpu=false,preferSelectedVoice=fa
   if(id!==speechSerial||!sound.on)return Promise.resolve();
   // Talkort: danske tal bruger den valgte ElevenLabs-/telefonstemme for rollen.
   // Andre sprog bruger en lokalt installeret stemme med korrekt sprogkode.
-  if(part.lang==='da'&&preferSelectedVoice)return sound.mode==='ai'?speakAI(part.text,id,{cpu}):speakLocally(part.text,{cpu});
+  if(part.lang==='da'&&preferSelectedVoice)return sound.mode==='ai'?speakAI(n===5?'tallet fem':part.text,id,{cpu,strictVoice:true,boost:cpu?1:1.14}):speakLocally(part.text,{cpu});
   if(!('speechSynthesis' in window))return Promise.resolve();
-  const u=new SpeechSynthesisUtterance(part.text);u.lang=part.locale;u.rate=sound.rate;u.pitch=sound.pitch;
+  const u=new SpeechSynthesisUtterance(part.text);u.lang=part.locale;u.rate=sound.rate;u.pitch=sound.pitch;u.volume=parts.length>1&&part.lang!=='da'?0.82:1;
   const voices=speechSynthesis.getVoices();const choices=voices.filter(v=>(v.lang||'').toLowerCase().startsWith(part.lang));
   const selected=choices.find(v=>v.default)||choices[0];if(selected)u.voice=selected;
   return waitForPlayback(done=>{u.onend=done;u.onerror=done;speechSynthesis.speak(u)},Math.min(22000,5000+part.text.length*180));
  };
  const playing=(async()=>{for(let i=0;i<parts.length;i++){
   if(id!==speechSerial)break;
-  if(i>0){await new Promise(resolve=>setTimeout(resolve,1500));if(id!==speechSerial)break;}
+  if(i>0){await new Promise(resolve=>setTimeout(resolve,650));if(id!==speechSerial)break;}
   await speakPart(parts[i]);
  }})();
  return playing.finally(()=>{if(duck!==undefined)music?.endSpeech?.(duck)});
