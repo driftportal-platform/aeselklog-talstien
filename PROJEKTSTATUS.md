@@ -1,4 +1,4 @@
-# ÆselKlog v0.9.21 – midterrækker starter med laveste tal (16. oktober 2026)
+# ÆselKlog v0.9.22 – midterrækker starter med laveste tal (16. oktober 2026)
 
 - **Rettelse:** Hver ny midterbunke kan kun starte med områdets laveste tal: 1, 21, 41, 61 eller 81. Eksempel: 1 → 2 → 3 osv. på hver række. Der kan højst være fem rækker.
 - Et forsøg på at oprette ny række med et andet kort ændrer ikke brættet eller turen og giver en forklaring. Bevidst fejlplacering på en allerede eksisterende bunke er fortsat mulig og kan udfordres med æselkortet.
@@ -95,3 +95,12 @@ Upload alle projektfiler fra den komplette v0.9.18 ZIP til GitHub, test på iPho
 
 ## v0.9.20 – taloplæsning i Kortspil
 Ved vending og placering af talkort udtaler stemmen nu kortets tal i stedet for generiske vendinger som »Jeg vender et kort« og »Kortet er lagt«. CPU kan sige »Æslet lægger [tal]«. Eksisterende fælles stemmevalg, musik og offline-aktiver er bevaret. Kontrollér på fysisk iPhone efter upload.
+
+## v0.9.22 – flersproget taloplæsning (16. oktober 2026)
+
+- Dansk er standard. Tal udtales som danske ord, ikke som cifre, så AI-stemmen ikke gætter engelsk.
+- Valgfrit engelsk, tysk, spansk og dansk + et af sprogene under Indstillinger → Taloplæsning.
+- Kortspillet bruger samme talstemme på menneske- og CPU-ture; øvrig tale bruger de eksisterende stemmeroller.
+- Udenlandske tal læses op med lokal sprogspecifik telefonstemme uden ElevenLabs-credits. Offline afhænger af installerede systemstemmer.
+- Gentag tallet-knap i begge spil, cache og versionsnummer opdateret.
+- Kræver test af faktisk iPhone og live ElevenLabs; automatiske tests dokumenteres separat.

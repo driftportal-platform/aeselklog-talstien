@@ -1,8 +1,8 @@
 /* ÆselKlog v0.9.19 – tre CC0-MP3 gemmes i PWA-cache, ingen Cloudflare/ElevenLabs-cache. */
 const CACHE_PREFIX='aeselklog-talstien-';
-const CACHE='aeselklog-talstien-v0921-center-start-rule';
+const CACHE='aeselklog-talstien-v0922-number-languages';
 const CORE=['./','./index.html','./styles.css','./home-ui.js','./home-fullscreen.webp',
- './app.js','./cardgame-engine.js','./cardgame-ui.js','./music.js','./engine.js','./board.js','./actions.js','./leaderboard.js',
+ './app.js','./numbers.js','./cardgame-engine.js','./cardgame-ui.js','./music.js','./engine.js','./board.js','./actions.js','./leaderboard.js',
  './adaptive.js','./profiles.js','./parentreport.js','./actionfx.js','./savegame.js','./cpuvoice.js','./voicecache.js','./narration.js','./manifest.webmanifest',
  './icon.svg','./aeselklog-card.webp','./donkey-bray.wav',
  './music/gone-fishin.mp3','./music/childrens-march.mp3','./music/beary-fishy.mp3',

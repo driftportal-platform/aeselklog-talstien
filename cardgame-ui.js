@@ -10,6 +10,7 @@ function donkeySound(){if(!audio)return;try{audio.pause();audio.currentTime=0;vo
 const CARD_VOICE_KEY='aeselklog-korttale-v1';
 let cardVoiceOn=true;try{cardVoiceOn=localStorage.getItem(CARD_VOICE_KEY)!=='off'}catch(_){}
 let speechDone=Promise.resolve();
+let lastCardNumber=null;
 function updateVoiceToggle(){const b=$('cardsVoiceToggle');if(!b)return;b.textContent=cardVoiceOn?'🔊 Tale til':'🔇 Tale fra';b.setAttribute('aria-pressed',String(cardVoiceOn));}
 function announceCard(message,{cpu=false}={}){
  if(!cardVoiceOn||!window.AeselVoice?.enabled?.())return Promise.resolve();
@@ -89,7 +90,8 @@ function act(fn){
   else if(out&&Number.isFinite(out.number))line=`${out.number}.`;
   else if(out?.assigned!==undefined)line='Et æselkort i straf!';
   else if(game.turn!==priorTurn)line='Næste spillers tur!';
-  speechDone=announceCard(line,{cpu:!!speaker?.isCPU});
+  if(Number.isInteger(out?.number)&&!out?.caught&&!game.finished){lastCardNumber=out.number;speechDone=window.AeselVoice?.number?.(out.number)||Promise.resolve();}
+  else speechDone=announceCard(line,{cpu:!!speaker?.isCPU});
   schedule(out);return out;}
  catch(err){$('cardsMessage').textContent=err.message||'Trækket kunne ikke udføres.';renderControls();return null;}
 }
@@ -228,6 +230,7 @@ $('cardStart').addEventListener('click',()=>{
 });
 $('cardsContinue').addEventListener('click',()=>{const saved=readSaved();if(!saved){renderResume();return}stopTimers();game=saved;navigate('cardsGame');render();speechDone=announceCard('Vi fortsætter kortspillet!');schedule()});
 $('cardsDeleteSave').addEventListener('click',()=>{if(!window.confirm('Slet det gemte kortspil? Talstien og læringsprofiler berøres ikke.'))return;clear();renderResume()});
+$('cardsRepeatNumber')?.addEventListener('click',()=>{if(lastCardNumber!==null)void window.AeselVoice?.number?.(lastCardNumber,{repeat:true});});
 $('cardsVoiceToggle')?.addEventListener('click',()=>{cardVoiceOn=!cardVoiceOn;try{localStorage.setItem(CARD_VOICE_KEY,cardVoiceOn?'on':'off')}catch(_){};if(!cardVoiceOn)stopVoice();updateVoiceToggle();});
 updateVoiceToggle();
 $('cardsHome').addEventListener('click',()=>{save();menu()});

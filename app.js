@@ -30,6 +30,10 @@ const defer=(ms)=>new Promise(ok=>setTimeout(ok,ms));
 const AI_VOICE_BASE='https://aeselklog-mia-stemme-test.driftportal-platform.workers.dev';
 const AI_TTS_ENDPOINT=AI_VOICE_BASE+'/tts';
 const AI_VOICES_ENDPOINT=AI_VOICE_BASE+'/voices';
+const NUM=window.AeselNumbers;
+const NUMBER_LANGUAGE_KEY='aeselklog-tal-sprog-v1';
+let numberLanguage='da';try{numberLanguage=NUM.normalize(localStorage.getItem(NUMBER_LANGUAGE_KEY))}catch(_){}
+let lastSpokenNumber=null;
 const sound={on:true,last:'',lastCPU:false,selected:'auto',rate:1,pitch:1,mode:'ai',aiVoice:'mia',cpuVoice:'auto'};
 const voiceKey='aeselklog-voice-v03';
 let aiVoices=[{id:'mia',name:'Mia – varm dansk fortæller'}],aiVoicesLoadedAt=0,aiVoiceLoading=null;
@@ -281,7 +285,32 @@ function say(text,{cpu=false,repeat=false}={}){
 }
 // Kortspillet bruger præcis samme valgte stemmer/Cloudflare-forbindelse som Talstien.
 // Ingen ekstra API-nøgle eller tilsvarende kopieret stemmemotor.
-window.AeselVoice={say:(text,options={})=>say(text,options),stop:stopCurrentVoice,enabled:()=>sound.on,choices:()=>({mode:sound.mode,aiVoice:sound.aiVoice,cpuVoice:sound.cpuVoice})};
+async function speakNumber(number,{repeat=false}={}){
+ const n=Number(number);if(!Number.isInteger(n)||n<0||n>100)return Promise.resolve();
+ lastSpokenNumber=n;
+ const parts=NUM.parts(n,numberLanguage);
+ // Same narrator voice for numbers on human and CPU turns; no English guessing by AI.
+ // Foreign-language numbers use the device's locale-specific voice, without ElevenLabs credits.
+ if(!sound.on)return Promise.resolve();
+ if(parts.length===1&&parts[0].lang==='da')return say(parts[0].text,{repeat});
+ stopCurrentVoice();
+ const id=speechSerial;
+ const music=window.AeselMusic,duck=music?.beginSpeech?.();
+ const speakPart=part=>{
+  if(id!==speechSerial||!sound.on)return Promise.resolve();
+  if(!('speechSynthesis' in window))return Promise.resolve();
+  const u=new SpeechSynthesisUtterance(part.text);u.lang=part.locale;u.rate=sound.rate;u.pitch=sound.pitch;
+  const voices=speechSynthesis.getVoices();const choices=voices.filter(v=>(v.lang||'').toLowerCase().startsWith(part.lang));
+  const selected=choices.find(v=>v.default)||choices[0];if(selected)u.voice=selected;
+  return waitForPlayback(done=>{u.onend=done;u.onerror=done;speechSynthesis.speak(u)},Math.min(22000,5000+part.text.length*180));
+ };
+ const playing=(async()=>{for(const part of parts){if(id!==speechSerial)break;await speakPart(part)}})();
+ return playing.finally(()=>{if(duck!==undefined)music?.endSpeech?.(duck)});
+}
+window.AeselVoice={say:(text,options={})=>say(text,options),number:(number,options={})=>speakNumber(number,options),repeatNumber:()=>lastSpokenNumber!==null?speakNumber(lastSpokenNumber,{repeat:true}):Promise.resolve(),stop:stopCurrentVoice,enabled:()=>sound.on,choices:()=>({mode:sound.mode,aiVoice:sound.aiVoice,cpuVoice:sound.cpuVoice,numberLanguage})};
+const numberSelect=$('numberLanguageChoice');if(numberSelect){numberSelect.value=numberLanguage;numberSelect.addEventListener('change',e=>{numberLanguage=NUM.normalize(e.target.value);try{localStorage.setItem(NUMBER_LANGUAGE_KEY,numberLanguage)}catch(_){};numberSelect.value=numberLanguage;});}
+$('numberPreview')?.addEventListener('click',()=>void speakNumber(14));
+$('numberRepeatBoard')?.addEventListener('click',()=>void speakNumber(players?.[turn]?.pos||1));
 function playBray(){
  stopCurrentVoice();
  if(!sound.on||!bray)return Promise.resolve();

@@ -45,10 +45,11 @@ async function dispatch(name,request){
   assert(precached.includes('./profiles.js'),'learning profiles module must be available offline');
   assert(precached.includes('./parentreport.js'),'parent report module must be available offline');
   assert(precached.includes('./actionfx.js'),'action effects must be available offline');
-  assert(worker.includes('aeselklog-talstien-v0921-center-start-rule'),'PWA must use v0.9.21 cache');
+  assert(worker.includes('aeselklog-talstien-v0922-number-languages'),'PWA must use v0.9.22 cache');
   assert(precached.includes('./cardgame-engine.js'),'new card game rules must work offline');
   assert(precached.includes('./cardgame-ui.js'),'card game UI must work offline');
   assert(precached.includes('./music.js'),'offline music must precache');
+  assert(precached.includes('./numbers.js'),'number speech must work offline');
   for(const name of ['gone-fishin.mp3','childrens-march.mp3','beary-fishy.mp3'])assert(precached.includes('./music/'+name),'PWA must precache '+name);
   for(const asset of precached){
     const relative=asset.replace(/^\.\//,'');
