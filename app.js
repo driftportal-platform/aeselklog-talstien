@@ -331,6 +331,17 @@ async function speakNumber(number,{repeat=false,cpu=false,preferSelectedVoice=fa
  }})();
  return playing.finally(()=>{if(duck!==undefined)music?.endSpeech?.(duck)});
 }
+// Separate audio profiles. Called on game-mode transitions and by each mode's audio menu.
+window.AeselApplyAudioProfile=function(profile){
+ if(!profile)return;
+ stopCurrentVoice();
+ sound.on=profile.enabled!==false;
+ numberLanguage=NUM.normalize(profile.language||'da');
+ const languageControl=$('numberLanguageChoice');if(languageControl)languageControl.value=numberLanguage;
+ const toggle=$('voiceToggle');if(toggle){toggle.textContent=sound.on?'🔊 Lyd til':'🔇 Lyd fra';toggle.setAttribute('aria-pressed',String(sound.on));}
+ const music=window.AeselMusic;
+ if(music){music.setTrack(profile.track||'gonefishin');music.setVolume(profile.volume??32);music.setEnabled(profile.music===true);}
+};
 window.AeselVoice={say:(text,options={})=>say(text,options),number:(number,options={})=>speakNumber(number,options),repeatNumber:()=>lastSpokenNumber!==null?speakNumber(lastSpokenNumber,{repeat:true}):Promise.resolve(),stop:stopCurrentVoice,enabled:()=>sound.on,choices:()=>({mode:sound.mode,aiVoice:sound.aiVoice,cpuVoice:sound.cpuVoice,numberLanguage})};
 const numberSelect=$('numberLanguageChoice');if(numberSelect){numberSelect.value=numberLanguage;numberSelect.addEventListener('change',e=>{numberLanguage=NUM.normalize(e.target.value);try{localStorage.setItem(NUMBER_LANGUAGE_KEY,numberLanguage)}catch(_){};numberSelect.value=numberLanguage;});}
 $('numberPreview')?.addEventListener('click',()=>void speakNumber(14));
@@ -650,6 +661,8 @@ $('addPlayer').addEventListener('click',()=>{if(setupPlayers.length<6){setupPlay
 function show(view){
  ['home','setup','settings','game','cardsSetup','cardsGame','talkort'].forEach(id=>$(id).classList.toggle('active',view===id));
  document.body.classList.toggle('home-active',view==='home');
+ window.AeselVoice?.stop?.();
+ window.AeselAudioSettings?.activate?.(view);
  window.AeselMusic?.syncView?.(view);
  if(view==='setup')updateSettingsSummary();
  if(view==='home')renderResumeCard();

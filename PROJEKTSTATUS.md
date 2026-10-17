@@ -147,3 +147,7 @@ Ved vending og placering af talkort udtaler stemmen nu kortets tal i stedet for 
 - Dansk + fremmedsprog afspilles i rækkefølge med 650 ms pause.
 - PWA-cachen har selvstændig lydcache, der ikke slettes ved almindelig app-opdatering.
 - Reelle iPhone-tests af offline-cache, tilgængelig lagerplads og hurtigt skift mangler stadig.
+
+
+## v0.9.31 – Lydprofiler
+Brætspil, Kortspil og Talkort har særskilte lokale lydprofiler med sprog, oplæsning, musiknummer og musikniveau. Indstillingerne åbnes med ⚙️ Lyd inde i hvert spil. Alle spil bruger de 500 eksisterende MP3-tal; de skal ikke uploades igen. Test især skift mellem spil, Auto, CPU-stemmer og offline på iPhone.

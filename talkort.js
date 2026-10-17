@@ -34,10 +34,10 @@ $('talkortPrev').addEventListener('click',()=>manual(Math.max(bounds()[0],number
 $('talkortNext').addEventListener('click',()=>manual(number===0?bounds()[0]:number+1));
 $('talkortRepeat').addEventListener('click',()=>{stopAuto();stopSound();void read()});
 $('talkortReset').addEventListener('click',()=>{stopAll();clearClip();number=0;render(false)});
-const voiceSelect=$('talkortVoiceRole');if(voiceSelect){voiceSelect.value=voiceRole;voiceSelect.addEventListener('change',()=>{stopAll();voiceRole=voiceSelect.value==='donkey'?'donkey':'narrator';try{localStorage.setItem(ROLE_KEY,voiceRole)}catch(_){};void render()})}
+const voiceSelect=$('talkortVoiceRole');if(voiceSelect){voiceSelect.value=voiceRole;voiceSelect.addEventListener('change',()=>{stopAll();voiceRole=voiceSelect.value==='donkey'?'donkey':'narrator';window.AeselAudioSettings?.update?.('talkort',{role:voiceRole});try{localStorage.setItem(ROLE_KEY,voiceRole)}catch(_){};void render()})}
 $('talkortRange').addEventListener('change',()=>{stopAll();clearClip();number=bounds()[0];fillJump();render()});
 $('talkortJump').addEventListener('change',()=>void manual(Number($('talkortJump').value)));
-$('talkortLanguage').addEventListener('change',()=>{stopAll();const s=$('numberLanguageChoice');if(s){s.value=NUM.normalize($('talkortLanguage').value);s.dispatchEvent(new Event('change',{bubbles:true}))}void render()});
+$('talkortLanguage').addEventListener('change',()=>{window.AeselAudioSettings?.update?.('talkort',{language:$('talkortLanguage').value});stopAll();const s=$('numberLanguageChoice');if(s){s.value=NUM.normalize($('talkortLanguage').value);s.dispatchEvent(new Event('change',{bubbles:true}))}void render()});
 $('talkortBack').addEventListener('click',()=>{stopAll();clearClip();window.AeselShowView?.('setup')});
 try{$('talkortDelay').value=localStorage.getItem(DELAY_KEY)||'2';$('talkortPracticeEnabled').checked=localStorage.getItem(PRACTICE_KEY)==='true'}catch(_){}
 $('talkortPractice').hidden=!$('talkortPracticeEnabled').checked;
@@ -58,6 +58,6 @@ $('talkortRecord').addEventListener('click',async()=>{
 function playMine(){if(!recordedUrl)return Promise.resolve();const clip=new Audio(recordedUrl);return new Promise(resolve=>{clip.onended=resolve;clip.onerror=resolve;clip.play().catch(resolve)})}
 $('talkortHearMine').addEventListener('click',()=>{stopAuto();stopSound();void playMine()});
 $('talkortCompare').addEventListener('click',()=>{if(!recordedUrl||number===0)return;stopAuto();stopSound();const token=++comparisonSerial;status('Afspiller først den rigtige udtale…');void(async()=>{await read();if(token!==comparisonSerial)return;await delay(400);if(token!==comparisonSerial)return;status('Afspiller din optagelse…');await playMine();if(token===comparisonSerial)status('Du kan øve dig igen!')})()});
-function activate(){if(!$('talkort').classList.contains('active')){if(opened){stopAll();clearClip()}opened=false;return}if(opened)return;opened=true;const select=$('numberLanguageChoice');$('talkortLanguage').value=NUM.normalize(select?.value||'da');fillJump();render()}
+function activate(){if(!$('talkort').classList.contains('active')){if(opened){stopAll();clearClip()}opened=false;return}if(opened)return;opened=true;const saved=window.AeselAudioSettings?.current?.();$('talkortLanguage').value=NUM.normalize(saved?.language||'da');fillJump();render()}
 new MutationObserver(activate).observe($('talkort'),{attributes:true,attributeFilter:['class']});fillJump();render(false);activate();
 })();
