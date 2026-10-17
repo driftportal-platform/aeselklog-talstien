@@ -1,3 +1,7 @@
+## v0.9.29 – Talkort: udtale, Auto og nulstil (17. oktober 2026)
+
+Talkort har nu valgfri lokal mikrofonoptagelse (kun i hukommelsen), sammenligning med den korrekte gemte talelyd, Auto med justerbar pause efter afsluttet oplæsning, Nulstil til 0 og små ÆselKlog-logoer på kortets to ledige hjørner. Auto stopper ved manuel navigation eller sideskift. De 500 eksisterende MP3-filer genbruges fra repositoryet og er ikke med i opdateringspakken. Mikrofonfunktionen skal afprøves i iPhone-PWA.
+
 
 ## v0.9.25 – Talkort-stemmevalg (16. oktober 2026)
 
