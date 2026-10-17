@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="da"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>ÆselKlog · Lydprøver</title>
+<style>
+:root{font-family:system-ui,-apple-system,sans-serif;color:#163e6b;background:#f5f9ef}*{box-sizing:border-box}main{max-width:760px;margin:20px auto;padding:22px;background:white;border:1px solid #caddec;border-radius:20px;box-shadow:0 12px 36px #1a48731c}h1{font-size:1.6rem;margin:0 0 10px}p{line-height:1.5}fieldset{border:1px solid #ccdae7;border-radius:12px;margin:18px 0;padding:14px}legend{font-weight:750}label{display:block;padding:8px 0}input[type=checkbox]{width:18px;height:18px;vertical-align:middle}button{border:0;background:#16477e;color:white;border-radius:12px;padding:14px 16px;font:700 1rem system-ui;cursor:pointer;margin:6px 6px 6px 0}button:disabled{opacity:.5;cursor:not-allowed}.secondary{background:#e9f2fe;color:#174679}#status{background:#edf7f6;border-radius:10px;padding:12px;min-height:45px;white-space:pre-wrap;word-break:break-word}#log{width:100%;height:170px;overflow:auto;background:#f3f6fa;padding:10px;font:13px monospace;white-space:pre-wrap}small{color:#60728b}.warn{color:#995321}a{color:#075b9c}</style></head><body><main>
+<h1>🫏 ÆselKlog – prøveoptagelser</h1>
+<p>Dette værktøj fremstiller MP3-tal gennem den eksisterende Cloudflare Worker. <b>Ingen API-nøgle indtastes</b>, og der bruges først credits, når du vælger <b>Generér</b>. Vælg gerne <b>én stemme ad gangen</b> for en forsigtig første prøve.</p>
+<p class="warn"><b>Vigtigt:</b> Siden skal åbnes via <code>https://driftportal-platform.github.io/aeselklog-talstien/lydproeve.html</code> efter upload. Den virker ikke ved at dobbeltklikke på HTML-filen, da Workeren kun tillader det godkendte domæne.</p>
+<fieldset><legend>Stemmer – vælg dem, du vil generere</legend><div id="voices"></div></fieldset>
+<fieldset><legend>Prøvetal</legend><label><input type="checkbox" id="n5" checked> 5</label><label><input type="checkbox" id="n11" checked> 11</label><label><input type="checkbox" id="n12" checked> 12</label><label><input type="checkbox" id="n15" checked> 15</label><label><input type="checkbox" id="n20" checked> 20</label></fieldset>
+<button class="secondary" id="check">1. Kontroller stemmer (gratis)</button><button id="generate" disabled>2. Generér valgte MP3-klip</button><button class="secondary" id="stop" disabled>Stop efter igangværende klip</button><button id="download" disabled>3. Hent ZIP (<span id="count">0</span> klip)</button>
+<p><small>Workeren kan have hastighedsgrænser. Hvis den svarer HTTP 429, stopper generatoren uden at prøve igen automatisk. Download de klip, der allerede er lavet, før du forlader siden. Generér ikke den samme gruppe igen uden at kontrollere indholdet.</small></p>
+<div id="status" aria-live="polite">Klar. Kontroller først stemmerne.</div><h2>Log</h2><pre id="log"></pre>
+</main>
+<script>
+'use strict';
+const ENDPOINT='https://aeselklog-mia-stemme-test.driftportal-platform.workers.dev';
+const DEFS=[
+ {role:'narrator',title:'🇩🇰 Dansk spilleleder',id:'4RklGmuxoAskAbGXplXN',words:['fem','elleve','tolv','femten','tyve']},
+ {role:'donkey',title:'🫏 Dansk ÆselKlog',id:'F6ZuXSkDhi5i4KLiT7Id',words:['fem','elleve','tolv','femten','tyve']},
+ {role:'en',title:'🇬🇧 Engelsk',id:'aHCytOTnUOgfGPn5n89j',words:['five','eleven','twelve','fifteen','twenty']},
+ {role:'de',title:'🇩🇪 Tysk',id:'yVKATr0ZJETwd3tQtpNG',words:['fünf','elf','zwölf','fünfzehn','zwanzig']},
+ {role:'es',title:'🇪🇸 Spansk',id:'x5IDPSl4ZUbhosMmVFTk',words:['cinco','once','doce','quince','veinte']}
+];
+const NUMBERS=[5,11,12,15,20];
+const voicesEl=document.getElementById('voices');
+DEFS.forEach((d,i)=>{const label=document.createElement('label');const ch=document.createElement('input');ch.type='checkbox';ch.value=d.role;ch.className='voice-check';ch.checked=i===0;label.append(ch,document.createTextNode(' '+d.title));voicesEl.append(label)});
+const $=id=>document.getElementById(id);
+const status=s=>{$('status').textContent=s;log(s)};
+const log=s=>{$('log').textContent+='['+new Date().toLocaleTimeString('da-DK')+'] '+s+'\n';$('log').scrollTop=$('log').scrollHeight};
+let verified=false,stopRequested=false,running=false;
+const clips=new Map();
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+function selected(){const roles=new Set([...document.querySelectorAll('.voice-check:checked')].map(el=>el.value));const nums=NUMBERS.filter(n=>$('n'+n).checked);return DEFS.filter(d=>roles.has(d.role)).flatMap(d=>nums.map(n=>({role:d.role,id:d.id,n,text:d.words[NUMBERS.indexOf(n)],key:`audio/numbers/${d.role}/${String(n).padStart(3,'0')}.mp3`})))}
+async function verify(){ $('generate').disabled=true;verified=false;try{const res=await fetch(ENDPOINT+'/voices',{cache:'no-store'});if(!res.ok)throw Error('Stemmeliste HTTP '+res.status);const data=await res.json();const available=new Set((data.voices||[]).map(v=>v.id));const missing=DEFS.filter(d=>!available.has('v_'+d.id));if(missing.length)throw Error('Følgende stemmer findes ikke i Workerens stemmeliste: '+missing.map(d=>d.title).join(', ')+'. Tjek Cloudflare og vent evt. 3 minutter.');verified=true;status('Alle fem Voice ID’er er godkendt af Workeren. Vælg de ønskede stemmer og tryk Generér.');$('generate').disabled=false;}catch(e){status('Kontrol mislykkedes: '+e.message)}}
+$('check').addEventListener('click',verify);
+$('stop').addEventListener('click',()=>{stopRequested=true;status('Stop ønsket. Det aktuelle kald afsluttes først.')});
+function uiRun(on){running=on;$('check').disabled=on;$('generate').disabled=on||!verified;$('stop').disabled=!on;document.querySelectorAll('input').forEach(x=>x.disabled=on);}
+$('generate').addEventListener('click',async()=>{
+ if(!verified||running)return;
+ const jobs=selected();if(!jobs.length){status('Vælg mindst én stemme og ét tal.');return}
+ const pending=jobs.filter(j=>!clips.has(j.key));
+ if(!pending.length){status('Alle valgte klip findes allerede i denne session. Hent ZIP.');return}
+ if(!confirm(`Vil du generere ${pending.length} nye lydklip hos ElevenLabs? Dette bruger credits.`))return;
+ stopRequested=false;uiRun(true);let complete=0;
+ for(const j of pending){if(stopRequested)break;try{
+   status(`Genererer ${j.role} – ${j.n} (${j.text}) · ${complete+1}/${pending.length}`);
+   const res=await fetch(ENDPOINT+'/tts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:j.text,voice:'v_'+j.id})});
+   if(!res.ok){const msg=await res.text();throw Error(`HTTP ${res.status}: ${msg.slice(0,350)}`)}
+   if(!(res.headers.get('Content-Type')||'').includes('audio/'))throw Error('Workeren gav ikke lyd tilbage');
+   const bytes=new Uint8Array(await res.arrayBuffer());if(bytes.length<500)throw Error('Lydfil er for lille');
+   clips.set(j.key,bytes);complete++;$('count').textContent=String(clips.size);$('download').disabled=false;
+   log('OK '+j.key+' ('+bytes.length+' bytes)');
+   if(!stopRequested)await sleep(2500);
+ }catch(err){status('Stoppet ved '+j.role+' '+j.n+' – '+err.message+'\nHent de klip, der allerede er genereret. Ingen automatisk genforsøg.');stopRequested=true;break}}
+ uiRun(false);if(!stopRequested)status(`Færdig med ${complete} nye klip. ${clips.size} samlet. Tryk Hent ZIP.`);
+});
+// ZIP format (store only; MP3 files already compressed), CRC32 IEEE.
+const enc=new TextEncoder();
+function crc32(data){let c=0xffffffff;for(const b of data){c^=b;for(let i=0;i<8;i++)c=(c>>>1)^((c&1)?0xedb88320:0)}return(c^0xffffffff)>>>0}
+function zipFiles(entries){let parts=[],central=[],offset=0;const u16=(d,o,n)=>d.setUint16(o,n,true);const u32=(d,o,n)=>d.setUint32(o,n,true);
+ for(const [path,data] of entries){const name=enc.encode(path),crc=crc32(data);const local=new Uint8Array(30+name.length);let v=new DataView(local.buffer);u32(v,0,0x04034b50);u16(v,4,20);u16(v,6,0x0800);u16(v,8,0);u32(v,14,crc);u32(v,18,data.length);u32(v,22,data.length);u16(v,26,name.length);local.set(name,30);parts.push(local,data);
+ const c=new Uint8Array(46+name.length);v=new DataView(c.buffer);u32(v,0,0x02014b50);u16(v,4,20);u16(v,6,20);u16(v,8,0x0800);u16(v,10,0);u32(v,16,crc);u32(v,20,data.length);u32(v,24,data.length);u16(v,28,name.length);u32(v,42,offset);c.set(name,46);central.push(c);offset+=local.length+data.length}
+ const centralSize=central.reduce((a,b)=>a+b.length,0),end=new Uint8Array(22),ev=new DataView(end.buffer);u32(ev,0,0x06054b50);u16(ev,8,entries.length);u16(ev,10,entries.length);u32(ev,12,centralSize);u32(ev,16,offset);return new Blob([...parts,...central,end],{type:'application/zip'})}
+$('download').addEventListener('click',()=>{if(!clips.size)return;const blob=zipFiles([...clips].sort(([a],[b])=>a.localeCompare(b)));const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='AeselKlog_Lydproever_'+clips.size+'_klip.zip';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),120000);status(`ZIP med ${clips.size} MP3-klip hentet. Upload ZIP-filen til ChatGPT til lydkontrol og normalisering.`)});
+if(location.origin!=='https://driftportal-platform.github.io')status('Siden er ikke åbnet fra det godkendte GitHub Pages-domæne. Upload filen til repoet, og åbn den derfra.');
+</script></body></html>
