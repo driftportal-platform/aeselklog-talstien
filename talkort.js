@@ -1,4 +1,4 @@
-/* ÆselKlog v0.9.29 – talkort, udtaletræning og automatisk gennemgang. */
+/* ÆselKlog v0.9.32 – MP3-only talkort, udtaletræning og automatisk gennemgang. */
 (()=>{'use strict';
 const $=id=>document.getElementById(id),NUM=window.AeselNumbers;
 if(!NUM||!$('talkort'))return;
@@ -14,8 +14,22 @@ function stopRecording(){recordingSerial++;if(recorder&&recorder.state!=='inacti
 function stopSound(){window.AeselOfflineNumbers?.stop?.();window.AeselVoice?.stop?.()}
 function stopAuto(){auto=false;autoSerial++;$('talkortAuto').textContent='▶ Auto';$('talkortAuto').setAttribute('aria-pressed','false')}
 function stopAll(){stopAuto();readingToken++;comparisonSerial++;stopSound();stopRecording()}
-function read(){const token=++readingToken;if(number<1||!$('talkort').classList.contains('active')||!window.AeselVoice?.enabled?.())return Promise.resolve();
- return Promise.resolve(window.AeselVoice.number(number,{cpu:voiceRole==='donkey',preferSelectedVoice:true})).catch(()=>{if(token===readingToken)$('talkortVoiceInfo').textContent='Oplæsning er ikke tilgængelig på denne enhed.'});}
+// Talkort uses ONLY the five saved MP3 voices. Never call ElevenLabs or device TTS.
+function read(){
+ const token=++readingToken;
+ if(number<1||!$('talkort').classList.contains('active'))return Promise.resolve();
+ const profile=window.AeselAudioSettings?.forMode?.('talkort');
+ if(profile?.enabled===false)return Promise.resolve();
+ const language=NUM.normalize($('talkortLanguage').value);
+ const role=$('talkortVoiceRole').value==='donkey'?'donkey':'narrator';
+ if(!window.AeselOfflineNumbers?.play){
+  $('talkortVoiceInfo').textContent='Gemte lydfiler er ikke indlæst. Prøv at opdatere appen.';
+  return Promise.resolve();
+ }
+ return Promise.resolve(window.AeselOfflineNumbers.play(number,language,role))
+ .then(ok=>{if(token===readingToken&&!ok)$('talkortVoiceInfo').textContent='Lydfilen kunne ikke afspilles. Hent talelyde til offlinebrug i Indstillinger.'})
+ .catch(()=>{if(token===readingToken)$('talkortVoiceInfo').textContent='Den gemte lydfil er ikke tilgængelig. Ingen anden stemme bruges.'});
+}
 function render(announce=true){const [lo,hi]=bounds();number=Math.max(number===0?0:lo,Math.min(hi,number));const z=Math.max(1,Math.ceil(number/20)),ones=number%10,tens=Math.floor(number/10),prime=isPrime(number),label=number%2===0?'Lige':'Ulige',place=`${tens} ${tens===1?'tier':'tiere'} + ${ones} ${ones===1?'ener':'enere'}`;
  $('talkortCard').className=`talkort-card zone-${z}`;$('talkortCard').setAttribute('aria-label',`Talkort ${number}. ${label}. ${place}.${prime?' Primtal.':''}`);
  $('talkortNumber').textContent=number; $('talkortCornerBottom').textContent=number; $('talkortCard').querySelector('.talkort-corner:not(.talkort-corner-bottom)').textContent=number;
@@ -26,7 +40,7 @@ function render(announce=true){const [lo,hi]=bounds();number=Math.max(number===0
  for(const id of ['talkortPrime','talkortPrimeBottom'])$(id).hidden=!prime;
  $('talkortPrev').disabled=number<=lo;$('talkortNext').disabled=number>=hi;
  $('talkortProgress').textContent=number===0?'Nulstillet · klar til start':`Tal ${number} · område ${lo}–${hi}`;
- $('talkortJump').value=String(number);$('talkortVoiceInfo').textContent=voiceRole==='donkey'?'🫏 ÆselKlogs stemme til danske tal · gemte lydklip bruges, når de findes.':'🎙️ Spillelederens stemme til danske tal · gemte lydklip bruges, når de findes.';
+ $('talkortJump').value=String(number);$('talkortVoiceInfo').textContent=voiceRole==='donkey'?'🫏 ÆselKlogs stemme til danske tal · kun gemte MP3-lyde, ingen andre stemmer.':'🎙️ Spillelederens stemme til danske tal · kun gemte MP3-lyde, ingen andre stemmer.';
  if(announce&&number>0)return read();return Promise.resolve();}
 function fillJump(){const [lo,hi]=bounds(),select=$('talkortJump');select.replaceChildren();const zero=document.createElement('option');zero.value='0';zero.textContent='0 · start';select.append(zero);for(let i=lo;i<=hi;i++){const o=document.createElement('option');o.value=String(i);o.textContent=String(i);select.append(o)}}
 function manual(target){stopAll();clearClip();number=target;return render()}

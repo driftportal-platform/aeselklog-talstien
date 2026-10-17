@@ -597,3 +597,7 @@ Ved vending og placering af talkort udtaler stemmen nu kortets tal i stedet for 
 
 ## v0.9.31 – Lydprofiler
 Brætspil, Kortspil og Talkort har særskilte lokale lydprofiler med sprog, oplæsning, musiknummer og musikniveau. Indstillingerne åbnes med ⚙️ Lyd inde i hvert spil. Alle spil bruger de 500 eksisterende MP3-tal; de skal ikke uploades igen. Test især skift mellem spil, Auto, CPU-stemmer og offline på iPhone.
+
+
+## v0.9.32 – kun gemte Talkort-stemmer
+Talkort afspiller udelukkende eksisterende offline MP3-klip fra `audio/numbers/`. Ved manglende lyd vises fejlbesked i stedet for lokal syntesestemme eller ElevenLabs-fallback. Både Auto, Læs igen og Sammenlign bruger denne afspilningsvej. De 500 MP3-filer genbruges uændret. Test på iPhone: 5, 12, 22, dansk+tysk og Auto.
