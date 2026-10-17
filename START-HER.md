@@ -1,23 +1,20 @@
-# ÆselKlog – sikker lydgenerator (25 prøveklip)
+# ÆselKlog – lydgenerator til alle 500 MP3-filer
 
-Dette er **kun en hjælpepakke** til prøveoptagelser – ikke en ny appversion. ÆselKlog/Talkort er ikke ændret.
+1. Upload **lydproeve.html** til roden af GitHub-repository `driftportal-platform/aeselklog-talstien` (overskriv den gamle prøvefil). ÆselKlog v0.9.27 skal ikke uploades for at bruge generatoren.
+2. Åbn `https://driftportal-platform.github.io/aeselklog-talstien/lydproeve.html` i en normal browser (ikke privat).
+3. **Importér** først `AeselKlog_Lydproever_15_klip.zip` og evt. andre tidligere ZIP-filer. De 15 klip tæller så med og optages ikke igen.
+4. Klik **Kontrollér stemmer**; vælg alle fem og tal 1–100.
+5. Pause 8 sekunder anbefales ved dine normale Cloudflare-grænser på 12 forespørgsler/minut. Hvis du midlertidigt øger grænserne, kan 3–5 sekunder bruges, men ElevenLabs har egne grænser.
+6. Klik **Generér manglende klip** og bekræft kreditforbruget. Hvert færdigt klip gemmes i browserens IndexedDB. Bliver du afbrudt, kan du genåbne samme adresse i samme browserprofil og fortsætte.
+7. Hent periodisk **samlet ZIP** som backup. Når indikatoren viser 500/500, hent den endelige ZIP.
+8. Sæt eventuelt forhøjede Cloudflare-grænser tilbage til `CLIENT_LIMIT=12/60s` og `GLOBAL_LIMIT=24/60s`.
+9. Upload den samlede ZIP til ChatGPT for kvalitetstjek og indbygning i ÆselKlogs PWA. Dette værktøj ændrer **ikke** selve spillet.
 
-## Sådan bruges den
+Stemmer: dansk fortæller `4RklGmuxoAskAbGXplXN`, dansk æsel `F6ZuXSkDhi5i4KLiT7Id`, engelsk `aHCytOTnUOgfGPn5n89j`, tysk `yVKATr0ZJETwd3tQtpNG`, spansk `x5IDPSl4ZUbhosMmVFTk`. Kun offentlig Voice ID; aldrig API-secret i GitHub.
 
-1. Upload `lydproeve.html` **i roden** af GitHub-repositoriet `driftportal-platform/aeselklog-talstien`, sammen med den eksisterende app. Der skal ikke ændres Worker-kode eller API-nøgler.
-2. Åbn `https://driftportal-platform.github.io/aeselklog-talstien/lydproeve.html` i browseren. Dobbeltklik på en lokal HTML-fil fungerer ikke: Workerens Origin-kontrol kræver GitHub Pages-domænet.
-3. Klik **1. Kontroller stemmer (gratis)**. Programmet kontrollerer, at alle fem faste stemmer findes på Workerens tilladte liste. Stemmelisten kan være cachet i ca. tre minutter.
-4. Kun den danske spilleleder er markeret som standard. Tryk **2. Generér valgte MP3-klip** og bekræft udgiften. Det laver fem klip i første omgang (5, 11, 12, 15, 20). Lyt og godkend, før du markerer flere stemmer.
-5. Tryk **3. Hent ZIP**. Hvis Workeren giver HTTP 429 eller anden fejl, stopper generatoren – hent en delvis ZIP med klip, der allerede er produceret. Ingen automatiske genforsøg.
-6. Gentag efter behov for øvrige stemmer. Upload ZIP-filerne til ChatGPT til kvalitetstjek. Ved samlet generation med alle fem stemmer bliver det 25 klip.
-
-## Vigtigt
-
-- **Ingen API-nøgle i browseren**. TTS-kald går til eksisterende Worker `https://aeselklog-mia-stemme-test.driftportal-platform.workers.dev/tts` fra godkendt GitHub Pages-Origin.
-- Credits bruges kun, når du aktivt starter genereringen. Stemmekontrol er et gratis katalogkald.
-- Voice-ID'er er fastlåst til de fem valgte stemmer; browseren kan ikke ændre sikkerhedskontrollen på Workeren.
-- 2,5 sekunders afstand mellem kald. Workerens grænser har forrang; ved 429 skal du ikke omgå begrænsningen eller forsøge igen straks.
-- Programmet springer færdige klip over **i den aktuelle åbne fane**. Hvis du lukker fanen, skal du bevare de ZIP-filer, du har hentet. Der er ingen gemning af MP3-filer i browseren på tværs af sessioner.
-- MP3-lydstyrke er endnu ikke normaliseret. Dette gøres efter du har godkendt optagelserne, inden filerne integreres i appen og PWA-cachen.
-- De nye MP3-filer sendes **ikke** automatisk til GitHub eller appen. Appens design er uændret.
-- Workeren tillader kun tekstlængde 2–350 tegn; prøveordene overholder dette.
+## Bemærk
+- Gemte browserdata kan blive slettet af browseren, brug derfor løbende ZIP-backups.
+- Den eksisterende Worker anvender rate limits og må ikke erstattes af en usikker batch-endpoint.
+- Eksisterende lydklip importeres uændret; de normaliseres først efter godkendt lydkontrol.
+- Et gennemført API-kald, hvor svaret går tabt inden lokal lagring, kan i sjældne tilfælde have brugt credits uden at levere filen.
+- ZIP-import kræver MP3-filer i ZIP som ukomprimerede entries (formatet fra den gamle prøve-generator).

@@ -1,66 +1,89 @@
-<!doctype html>
-<html lang="da"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>ÆselKlog · Lydprøver</title>
+<!doctype html><html lang="da"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>ÆselKlog · 500 taloptagelser</title>
 <style>
-:root{font-family:system-ui,-apple-system,sans-serif;color:#163e6b;background:#f5f9ef}*{box-sizing:border-box}main{max-width:760px;margin:20px auto;padding:22px;background:white;border:1px solid #caddec;border-radius:20px;box-shadow:0 12px 36px #1a48731c}h1{font-size:1.6rem;margin:0 0 10px}p{line-height:1.5}fieldset{border:1px solid #ccdae7;border-radius:12px;margin:18px 0;padding:14px}legend{font-weight:750}label{display:block;padding:8px 0}input[type=checkbox]{width:18px;height:18px;vertical-align:middle}button{border:0;background:#16477e;color:white;border-radius:12px;padding:14px 16px;font:700 1rem system-ui;cursor:pointer;margin:6px 6px 6px 0}button:disabled{opacity:.5;cursor:not-allowed}.secondary{background:#e9f2fe;color:#174679}#status{background:#edf7f6;border-radius:10px;padding:12px;min-height:45px;white-space:pre-wrap;word-break:break-word}#log{width:100%;height:170px;overflow:auto;background:#f3f6fa;padding:10px;font:13px monospace;white-space:pre-wrap}small{color:#60728b}.warn{color:#995321}a{color:#075b9c}</style></head><body><main>
-<h1>🫏 ÆselKlog – prøveoptagelser</h1>
-<p>Dette værktøj fremstiller MP3-tal gennem den eksisterende Cloudflare Worker. <b>Ingen API-nøgle indtastes</b>, og der bruges først credits, når du vælger <b>Generér</b>. Vælg gerne <b>én stemme ad gangen</b> for en forsigtig første prøve.</p>
-<p class="warn"><b>Vigtigt:</b> Siden skal åbnes via <code>https://driftportal-platform.github.io/aeselklog-talstien/lydproeve.html</code> efter upload. Den virker ikke ved at dobbeltklikke på HTML-filen, da Workeren kun tillader det godkendte domæne.</p>
-<fieldset><legend>Stemmer – vælg dem, du vil generere</legend><div id="voices"></div></fieldset>
-<fieldset><legend>Prøvetal</legend><label><input type="checkbox" id="n5" checked> 5</label><label><input type="checkbox" id="n11" checked> 11</label><label><input type="checkbox" id="n12" checked> 12</label><label><input type="checkbox" id="n15" checked> 15</label><label><input type="checkbox" id="n20" checked> 20</label></fieldset>
-<button class="secondary" id="check">1. Kontroller stemmer (gratis)</button><button id="generate" disabled>2. Generér valgte MP3-klip</button><button class="secondary" id="stop" disabled>Stop efter igangværende klip</button><button id="download" disabled>3. Hent ZIP (<span id="count">0</span> klip)</button>
-<p><small>Workeren kan have hastighedsgrænser. Hvis den svarer HTTP 429, stopper generatoren uden at prøve igen automatisk. Download de klip, der allerede er lavet, før du forlader siden. Generér ikke den samme gruppe igen uden at kontrollere indholdet.</small></p>
-<div id="status" aria-live="polite">Klar. Kontroller først stemmerne.</div><h2>Log</h2><pre id="log"></pre>
+:root{font-family:system-ui,-apple-system,sans-serif;color:#163e6b;background:#f5f9ef}*{box-sizing:border-box}main{max-width:760px;margin:20px auto;padding:22px;background:white;border:1px solid #caddec;border-radius:20px;box-shadow:0 12px 36px #1a48731c}h1{font-size:1.6rem;margin:0 0 10px}p{line-height:1.5}fieldset{border:1px solid #ccdae7;border-radius:12px;margin:18px 0;padding:14px}legend{font-weight:750}label{display:block;padding:8px 0}input[type=checkbox]{width:18px;height:18px;vertical-align:middle}button{border:0;background:#16477e;color:white;border-radius:12px;padding:14px 16px;font:700 1rem system-ui;cursor:pointer;margin:6px 6px 6px 0}button:disabled{opacity:.5;cursor:not-allowed}.secondary{background:#e9f2fe;color:#174679}#status{background:#edf7f6;border-radius:10px;padding:12px;min-height:45px;white-space:pre-wrap;word-break:break-word}#log{width:100%;height:170px;overflow:auto;background:#f3f6fa;padding:10px;font:13px monospace;white-space:pre-wrap}small{color:#60728b}.warn{color:#995321}a{color:#075b9c}
+.row{display:flex;flex-wrap:wrap;gap:10px;align-items:center}.row label{padding:5px}.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(145px,1fr));gap:12px}.metric{background:#f0f6fd;padding:12px;border-radius:12px}.metric strong{display:block;font-size:1.55rem}.controls{display:flex;gap:8px;flex-wrap:wrap}input[type=number]{width:90px;padding:8px;border:1px solid #bdcfe0;border-radius:8px}#progress{width:100%;height:20px}details{margin-top:18px}#status{margin-top:12px}.good{color:#137149}.hidden{display:none}
+</style></head><body><main>
+<h1>🫏 ÆselKlog – alle 500 taloptagelser</h1>
+<p>Generér tallene <b>1–100</b> på fem faste stemmer og hent <b>én samlet ZIP</b>. Optagelser gemmes efter hvert tal lokalt i denne browser. Eksisterende klip springes over, så du ikke bruger credits igen.</p>
+<p class="warn"><b>Åbn fra GitHub Pages:</b> <code>https://driftportal-platform.github.io/aeselklog-talstien/lydproeve.html</code>. Du skal ikke indtaste nogen API-nøgle. <b>Der bruges ElevenLabs-credits ved hver ny optagelse.</b></p>
+<div class="metrics"><div class="metric">Gemte lydfiler<strong id="count">0 / 500</strong></div><div class="metric">Mangler<strong id="remaining">500</strong></div><div class="metric">Samlet størrelse<strong id="size">0 MB</strong></div></div>
+<progress id="progress" max="500" value="0"></progress>
+<fieldset><legend>Stemmer</legend><div id="voices"></div><button class="secondary" id="allVoices" type="button">Vælg alle fem</button></fieldset>
+<fieldset><legend>Talområde</legend><div class="row"><label>Fra <input type="number" id="from" value="1" min="1" max="100"></label><label>Til <input type="number" id="to" value="100" min="1" max="100"></label></div><small>Med alle fem stemmer og 1–100 bliver det 500 klip. Vælg evt. 1–20 først, hvis du vil høre flere prøver.</small></fieldset>
+<fieldset><legend>Optagelseshastighed</legend><div class="row"><label>Pause mellem kald <input type="number" id="delay" min="3" max="120" value="8" step="1"> sekunder</label></div><small>Med dine normale Cloudflare-grænser på 12/minut anbefales mindst 8 sekunder. Hvis du midlertidigt hæver grænserne, kan du vælge 3–5 sekunder, men ElevenLabs kan stadig begrænse forbruget. Husk at sætte grænserne tilbage bagefter.</small></fieldset>
+<fieldset><legend>Genbrug allerede optagne klip</legend><input type="file" id="import" accept=".zip,application/zip" multiple><p><small>Vælg fx <code>AeselKlog_Lydproever_15_klip.zip</code>. Importér alle tidligere ZIP-filer her. Kun de forventede MP3-filnavne indlæses. Importér før generering.</small></p><button class="secondary" id="importButton">Importér ZIP-filer</button></fieldset>
+<div class="controls"><button class="secondary" id="check">1. Kontrollér stemmer (gratis)</button><button id="generate" disabled>2. Generér manglende klip</button><button class="secondary" id="stop" disabled>Stop efter igangværende</button><button id="download" disabled>3. Hent samlet ZIP</button></div>
+<p><small>Stoppes generatoren af HTTP 429, gemmes alle færdige optagelser. Vent til grænsen nulstilles, og tryk Generér igen. Opdatering af siden bevarer de gemte filer i samme browserprofil. Brug ikke privat browsing. Eksportér ZIP med jævne mellemrum som sikkerhedskopi.</small></p>
+<div id="status" aria-live="polite">Klar.</div><h2>Log</h2><pre id="log"></pre>
+<details><summary>Vigtigt om kvalitet og sikkerhed</summary><p>Filerne genereres ud fra talord fra ÆselKlogs eksisterende <code>numbers.js</code>, og Workeren vælger det faste sprog til hvert Voice ID. Der foretages ingen automatisk lydnormalisering her; det skal kontrolleres efter optagelse. Nye MP3-filer er ikke automatisk installeret i ÆselKlog-appen; de skal senere indbygges i en ny appversion og PWA-cache.</p><p>Den eksisterende offentlige Worker har IP- og global rate limiting. Midlertidigt højere grænser øger risikoen for misbrug og overforbrug. Hold øje med ElevenLabs-credits, og sæt grænser tilbage når du er færdig.</p></details>
 </main>
-<script>
+<script>/* ÆselKlog v0.9.22 – talord og valgfri sprogtræning, ingen netværk. */
+(function(root,factory){const api=factory();if(typeof module!=='undefined'&&module.exports)module.exports=api;if(root)root.AeselNumbers=api;})(typeof globalThis!=='undefined'?globalThis:null,function(){'use strict';
+const keys=['da','en','de','es','da-en','da-de','da-es'];
+const locale={da:'da-DK',en:'en-GB',de:'de-DE',es:'es-ES'};
+const da=['nul','en','to','tre','fire','fem','seks','syv','otte','ni','ti','elleve','tolv','tretten','fjorten','femten','seksten','sytten','atten','nitten'];
+const en=['zero','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen'];
+const de=['null','eins','zwei','drei','vier','fünf','sechs','sieben','acht','neun','zehn','elf','zwölf','dreizehn','vierzehn','fünfzehn','sechzehn','siebzehn','achtzehn','neunzehn'];
+const es=['cero','uno','dos','tres','cuatro','cinco','seis','siete','ocho','nueve','diez','once','doce','trece','catorce','quince','dieciséis','diecisiete','dieciocho','diecinueve'];
+const tens={da:['','','tyve','tredive','fyrre','halvtreds','tres','halvfjerds','firs','halvfems'],en:['','','twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety'],de:['','','zwanzig','dreißig','vierzig','fünfzig','sechzig','siebzig','achtzig','neunzig'],es:['','','veinte','treinta','cuarenta','cincuenta','sesenta','setenta','ochenta','noventa']};
+function word(n,lang='da'){
+ n=Number(n);if(!Number.isInteger(n)||n<0||n>100||!locale[lang])return null;
+ if(n===100)return {da:'hundrede',en:'one hundred',de:'hundert',es:'cien'}[lang];
+ const basics={da,en,de,es}[lang];if(n<20)return basics[n];
+ const t=Math.floor(n/10),u=n%10;if(!u)return tens[lang][t];
+ if(lang==='da')return (u===1?'en':da[u])+'og'+tens.da[t];
+ if(lang==='en')return tens.en[t]+'-'+en[u];
+ if(lang==='de')return (u===1?'ein':de[u])+'und'+tens.de[t];
+ if(t===2)return ['','veintiuno','veintidós','veintitrés','veinticuatro','veinticinco','veintiséis','veintisiete','veintiocho','veintinueve'][u];
+ return tens.es[t]+' y '+es[u];
+}
+function normalize(lang){return keys.includes(lang)?lang:'da'}
+function parts(n,lang){return normalize(lang).split('-').map(l=>({lang:l,locale:locale[l],text:word(n,l)})).filter(x=>x.text)}
+return Object.freeze({keys,locale,word,normalize,parts});
+});
+</script><script>
 'use strict';
 const ENDPOINT='https://aeselklog-mia-stemme-test.driftportal-platform.workers.dev';
 const DEFS=[
- {role:'narrator',title:'🇩🇰 Dansk spilleleder',id:'4RklGmuxoAskAbGXplXN',words:['fem','elleve','tolv','femten','tyve']},
- {role:'donkey',title:'🫏 Dansk ÆselKlog',id:'F6ZuXSkDhi5i4KLiT7Id',words:['fem','elleve','tolv','femten','tyve']},
- {role:'en',title:'🇬🇧 Engelsk',id:'aHCytOTnUOgfGPn5n89j',words:['five','eleven','twelve','fifteen','twenty']},
- {role:'de',title:'🇩🇪 Tysk',id:'yVKATr0ZJETwd3tQtpNG',words:['fünf','elf','zwölf','fünfzehn','zwanzig']},
- {role:'es',title:'🇪🇸 Spansk',id:'x5IDPSl4ZUbhosMmVFTk',words:['cinco','once','doce','quince','veinte']}
+ {role:'narrator',lang:'da',title:'🇩🇰 Dansk spilleleder',id:'4RklGmuxoAskAbGXplXN'},
+ {role:'donkey',lang:'da',title:'🫏 Dansk ÆselKlog',id:'F6ZuXSkDhi5i4KLiT7Id'},
+ {role:'en',lang:'en',title:'🇬🇧 Engelsk',id:'aHCytOTnUOgfGPn5n89j'},
+ {role:'de',lang:'de',title:'🇩🇪 Tysk',id:'yVKATr0ZJETwd3tQtpNG'},
+ {role:'es',lang:'es',title:'🇪🇸 Spansk',id:'x5IDPSl4ZUbhosMmVFTk'}
 ];
-const NUMBERS=[5,11,12,15,20];
-const voicesEl=document.getElementById('voices');
-DEFS.forEach((d,i)=>{const label=document.createElement('label');const ch=document.createElement('input');ch.type='checkbox';ch.value=d.role;ch.className='voice-check';ch.checked=i===0;label.append(ch,document.createTextNode(' '+d.title));voicesEl.append(label)});
 const $=id=>document.getElementById(id);
-const status=s=>{$('status').textContent=s;log(s)};
+const el=$('voices');DEFS.forEach((d,i)=>{let l=document.createElement('label'),c=document.createElement('input');c.type='checkbox';c.value=d.role;c.className='voice-check';c.checked=true;l.append(c,document.createTextNode(' '+d.title));el.append(l)});
+$('allVoices').onclick=()=>document.querySelectorAll('.voice-check').forEach(c=>c.checked=true);
 const log=s=>{$('log').textContent+='['+new Date().toLocaleTimeString('da-DK')+'] '+s+'\n';$('log').scrollTop=$('log').scrollHeight};
-let verified=false,stopRequested=false,running=false;
-const clips=new Map();
+const status=s=>{$('status').textContent=s;log(s)};
 const sleep=ms=>new Promise(r=>setTimeout(r,ms));
-function selected(){const roles=new Set([...document.querySelectorAll('.voice-check:checked')].map(el=>el.value));const nums=NUMBERS.filter(n=>$('n'+n).checked);return DEFS.filter(d=>roles.has(d.role)).flatMap(d=>nums.map(n=>({role:d.role,id:d.id,n,text:d.words[NUMBERS.indexOf(n)],key:`audio/numbers/${d.role}/${String(n).padStart(3,'0')}.mp3`})))}
-async function verify(){ $('generate').disabled=true;verified=false;try{const res=await fetch(ENDPOINT+'/voices',{cache:'no-store'});if(!res.ok)throw Error('Stemmeliste HTTP '+res.status);const data=await res.json();const available=new Set((data.voices||[]).map(v=>v.id));const missing=DEFS.filter(d=>!available.has('v_'+d.id));if(missing.length)throw Error('Følgende stemmer findes ikke i Workerens stemmeliste: '+missing.map(d=>d.title).join(', ')+'. Tjek Cloudflare og vent evt. 3 minutter.');verified=true;status('Alle fem Voice ID’er er godkendt af Workeren. Vælg de ønskede stemmer og tryk Generér.');$('generate').disabled=false;}catch(e){status('Kontrol mislykkedes: '+e.message)}}
-$('check').addEventListener('click',verify);
-$('stop').addEventListener('click',()=>{stopRequested=true;status('Stop ønsket. Det aktuelle kald afsluttes først.')});
-function uiRun(on){running=on;$('check').disabled=on;$('generate').disabled=on||!verified;$('stop').disabled=!on;document.querySelectorAll('input').forEach(x=>x.disabled=on);}
-$('generate').addEventListener('click',async()=>{
- if(!verified||running)return;
- const jobs=selected();if(!jobs.length){status('Vælg mindst én stemme og ét tal.');return}
- const pending=jobs.filter(j=>!clips.has(j.key));
- if(!pending.length){status('Alle valgte klip findes allerede i denne session. Hent ZIP.');return}
- if(!confirm(`Vil du generere ${pending.length} nye lydklip hos ElevenLabs? Dette bruger credits.`))return;
- stopRequested=false;uiRun(true);let complete=0;
- for(const j of pending){if(stopRequested)break;try{
-   status(`Genererer ${j.role} – ${j.n} (${j.text}) · ${complete+1}/${pending.length}`);
-   const res=await fetch(ENDPOINT+'/tts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:j.text,voice:'v_'+j.id})});
-   if(!res.ok){const msg=await res.text();throw Error(`HTTP ${res.status}: ${msg.slice(0,350)}`)}
-   if(!(res.headers.get('Content-Type')||'').includes('audio/'))throw Error('Workeren gav ikke lyd tilbage');
-   const bytes=new Uint8Array(await res.arrayBuffer());if(bytes.length<500)throw Error('Lydfil er for lille');
-   clips.set(j.key,bytes);complete++;$('count').textContent=String(clips.size);$('download').disabled=false;
-   log('OK '+j.key+' ('+bytes.length+' bytes)');
-   if(!stopRequested)await sleep(2500);
- }catch(err){status('Stoppet ved '+j.role+' '+j.n+' – '+err.message+'\nHent de klip, der allerede er genereret. Ingen automatisk genforsøg.');stopRequested=true;break}}
- uiRun(false);if(!stopRequested)status(`Færdig med ${complete} nye klip. ${clips.size} samlet. Tryk Hent ZIP.`);
-});
-// ZIP format (store only; MP3 files already compressed), CRC32 IEEE.
-const enc=new TextEncoder();
-function crc32(data){let c=0xffffffff;for(const b of data){c^=b;for(let i=0;i<8;i++)c=(c>>>1)^((c&1)?0xedb88320:0)}return(c^0xffffffff)>>>0}
-function zipFiles(entries){let parts=[],central=[],offset=0;const u16=(d,o,n)=>d.setUint16(o,n,true);const u32=(d,o,n)=>d.setUint32(o,n,true);
- for(const [path,data] of entries){const name=enc.encode(path),crc=crc32(data);const local=new Uint8Array(30+name.length);let v=new DataView(local.buffer);u32(v,0,0x04034b50);u16(v,4,20);u16(v,6,0x0800);u16(v,8,0);u32(v,14,crc);u32(v,18,data.length);u32(v,22,data.length);u16(v,26,name.length);local.set(name,30);parts.push(local,data);
- const c=new Uint8Array(46+name.length);v=new DataView(c.buffer);u32(v,0,0x02014b50);u16(v,4,20);u16(v,6,20);u16(v,8,0x0800);u16(v,10,0);u32(v,16,crc);u32(v,20,data.length);u32(v,24,data.length);u16(v,28,name.length);u32(v,42,offset);c.set(name,46);central.push(c);offset+=local.length+data.length}
- const centralSize=central.reduce((a,b)=>a+b.length,0),end=new Uint8Array(22),ev=new DataView(end.buffer);u32(ev,0,0x06054b50);u16(ev,8,entries.length);u16(ev,10,entries.length);u32(ev,12,centralSize);u32(ev,16,offset);return new Blob([...parts,...central,end],{type:'application/zip'})}
-$('download').addEventListener('click',()=>{if(!clips.size)return;const blob=zipFiles([...clips].sort(([a],[b])=>a.localeCompare(b)));const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='AeselKlog_Lydproever_'+clips.size+'_klip.zip';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),120000);status(`ZIP med ${clips.size} MP3-klip hentet. Upload ZIP-filen til ChatGPT til lydkontrol og normalisering.`)});
-if(location.origin!=='https://driftportal-platform.github.io')status('Siden er ikke åbnet fra det godkendte GitHub Pages-domæne. Upload filen til repoet, og åbn den derfra.');
+const keyFor=(d,n)=>'audio/numbers/'+d.role+'/'+String(n).padStart(3,'0')+'.mp3';
+const EXPECTED=new Set(DEFS.flatMap(d=>Array.from({length:100},(_,i)=>keyFor(d,i+1))));
+let verified=false,running=false,stopRequested=false;
+let db;
+const openDatabase=()=>new Promise((resolve,reject)=>{const req=indexedDB.open('aeselklog-mp3-generator',1);req.onupgradeneeded=()=>req.result.createObjectStore('clips');req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error)});
+const transact=(mode,op)=>new Promise((resolve,reject)=>{const tx=db.transaction('clips',mode),req=op(tx.objectStore('clips'));req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);tx.onerror=()=>reject(tx.error)});
+const putClip=(k,v)=>transact('readwrite',s=>s.put(v,k));
+const getClip=k=>transact('readonly',s=>s.get(k));
+const allKeys=()=>transact('readonly',s=>s.getAllKeys());
+const allValues=()=>transact('readonly',s=>s.getAll());
+let stored=new Set();
+async function refresh(){stored=new Set(await allKeys());const num=stored.size;$('count').textContent=num+' / 500';$('remaining').textContent=500-num;$('progress').value=num;$('download').disabled=num===0;}
+function jobs(){const roles=new Set([...document.querySelectorAll('.voice-check:checked')].map(x=>x.value));const from=Number($('from').value),to=Number($('to').value);if(!Number.isInteger(from)||!Number.isInteger(to)||from<1||to>100||from>to)throw Error('Talområdet skal være mellem 1 og 100, og Fra må ikke være større end Til.');return DEFS.filter(d=>roles.has(d.role)).flatMap(d=>Array.from({length:to-from+1},(_,i)=>{const n=from+i;return{...d,n,key:keyFor(d,n),text:AeselNumbers.word(n,d.lang)}}));}
+async function verify(){try{verified=false;$('generate').disabled=true;const res=await fetch(ENDPOINT+'/voices',{cache:'no-store'});if(!res.ok)throw Error('HTTP '+res.status);const data=await res.json();const ids=new Set((data.voices||[]).map(x=>x.id));const absent=DEFS.filter(d=>!ids.has('v_'+d.id));if(absent.length)throw Error('Disse stemmer mangler hos Workeren: '+absent.map(x=>x.title).join(', '));verified=true;$('generate').disabled=false;status('Alle fem stemmer er godkendt af Workeren. Vælg Generér for de manglende MP3-filer.')}catch(e){status('Kontrol af stemmer fejlede: '+e.message)}}
+$('check').onclick=verify;
+$('stop').onclick=()=>{stopRequested=true;status('Stop er bestilt. Det aktuelle lydklip afsluttes først.')};
+function lock(on){running=on;for(const id of ['check','generate','importButton','import','from','to','delay','allVoices'])$(id).disabled=on;document.querySelectorAll('.voice-check').forEach(x=>x.disabled=on);$('stop').disabled=!on;$('download').disabled=on||!stored.size;if(!on)$('generate').disabled=!verified;}
+$('generate').onclick=async()=>{if(running||!verified)return;let queue;try{queue=jobs().filter(j=>!stored.has(j.key));}catch(e){status(e.message);return}if(!queue.length){status('Alle valgte klip findes allerede. Hent den samlede ZIP.');return}const delay=Number($('delay').value);if(!Number.isFinite(delay)||delay<3||delay>120){status('Pausen skal være 3–120 sekunder.');return}if(!confirm('Du er ved at generere '+queue.length+' NYE MP3-filer med ElevenLabs, som koster credits. Gemte filer springes over. Fortsæt?'))return;lock(true);stopRequested=false;let added=0;
+ for(const j of queue){if(stopRequested)break;try{status('Optager '+j.title+' · '+j.n+' ('+j.text+') · '+(added+1)+' / '+queue.length+' nye');const res=await fetch(ENDPOINT+'/tts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:j.text,voice:'v_'+j.id})});if(!res.ok)throw Error('HTTP '+res.status+': '+(await res.text()).slice(0,250));if(!(res.headers.get('Content-Type')||'').includes('audio/'))throw Error('Intet MP3-svar');const bytes=new Uint8Array(await res.arrayBuffer());if(bytes.length<500)throw Error('MP3-filen er for lille');await putClip(j.key,bytes);stored.add(j.key);added++;$('count').textContent=stored.size+' / 500';$('remaining').textContent=500-stored.size;$('progress').value=stored.size;$('download').disabled=false;log('Gemt '+j.key+' · '+bytes.length+' byte');if(added%25===0)log('TIP: Hent en ZIP som backup undervejs');if(!stopRequested)await sleep(delay*1000)}catch(e){status('Stoppet ved '+j.role+' '+j.n+': '+e.message+'. Alle gennemførte filer er gemt. Vent ved HTTP 429 og fortsæt senere.');stopRequested=true;break}}
+ lock(false);if(!stopRequested)status('Færdig med '+added+' nye klip. Nu gemt: '+stored.size+'/500. Du kan hente en samlet ZIP.');};
+// Zip skrivefunktion: lagring uden ekstra komprimering, da MP3 allerede er komprimeret.
+const enc=new TextEncoder();function crc32(data){let c=0xffffffff;for(const b of data){c^=b;for(let i=0;i<8;i++)c=(c>>>1)^((c&1)?0xedb88320:0)}return(c^0xffffffff)>>>0}
+function zipFiles(entries){let parts=[],central=[],offset=0;const u16=(d,o,n)=>d.setUint16(o,n,true),u32=(d,o,n)=>d.setUint32(o,n,true);for(const [path,data] of entries){const name=enc.encode(path),crc=crc32(data),local=new Uint8Array(30+name.length);let v=new DataView(local.buffer);u32(v,0,0x04034b50);u16(v,4,20);u16(v,6,0x0800);u16(v,8,0);u32(v,14,crc);u32(v,18,data.length);u32(v,22,data.length);u16(v,26,name.length);local.set(name,30);parts.push(local,data);const c=new Uint8Array(46+name.length);v=new DataView(c.buffer);u32(v,0,0x02014b50);u16(v,4,20);u16(v,6,20);u16(v,8,0x0800);u16(v,10,0);u32(v,16,crc);u32(v,20,data.length);u32(v,24,data.length);u16(v,28,name.length);u32(v,42,offset);c.set(name,46);central.push(c);offset+=local.length+data.length}const centralSize=central.reduce((a,b)=>a+b.length,0),end=new Uint8Array(22),ev=new DataView(end.buffer);u32(ev,0,0x06054b50);u16(ev,8,entries.length);u16(ev,10,entries.length);u32(ev,12,centralSize);u32(ev,16,offset);return new Blob([...parts,...central,end],{type:'application/zip'})}
+$('download').onclick=async()=>{if(running)return;lock(true);try{const keys=await allKeys(),values=await allValues(),entries=keys.map((key,i)=>[key,new Uint8Array(values[i])]).filter(([key])=>EXPECTED.has(key)).sort(([a],[b])=>a.localeCompare(b));const blob=zipFiles(entries);const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='AeselKlog_Alle_Tallyde_'+entries.length+'_af_500.zip';document.body.append(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),120000);status('ZIP med '+entries.length+' MP3-klip hentet. '+(entries.length===500?'ALLE 500 klar.':'Importér flere eller fortsæt med manglende klip.'))}catch(e){status('Fejl ved ZIP-download: '+e.message)}finally{lock(false)}};
+// Import læser ZIP central directory; denne generator og prøveversionen bruger ukomprimerede MP3-filer.
+function readZip(bytes){const dv=new DataView(bytes.buffer,bytes.byteOffset,bytes.byteLength),len=bytes.length;let eocd=-1;for(let p=len-22;p>=Math.max(0,len-65557);p--)if(dv.getUint32(p,true)===0x06054b50){eocd=p;break}if(eocd<0)throw Error('Kun gyldige ZIP-filer kan importeres');const count=dv.getUint16(eocd+10,true);let p=dv.getUint32(eocd+16,true),list=[];for(let i=0;i<count;i++){if(p+46>len||dv.getUint32(p,true)!==0x02014b50)throw Error('ZIP-filen har en beskadiget filfortegnelse');const method=dv.getUint16(p+10,true),crc=dv.getUint32(p+16,true),compressed=dv.getUint32(p+20,true),raw=dv.getUint32(p+24,true),nameLen=dv.getUint16(p+28,true),extraLen=dv.getUint16(p+30,true),commentLen=dv.getUint16(p+32,true),loc=dv.getUint32(p+42,true);const name=new TextDecoder().decode(bytes.subarray(p+46,p+46+nameLen));p+=46+nameLen+extraLen+commentLen;if(!EXPECTED.has(name))continue;if(method!==0||compressed!==raw)throw Error('Filen '+name+' har ZIP-komprimering, som denne import ikke understøtter');if(loc+30>len||dv.getUint32(loc,true)!==0x04034b50)throw Error('Beskadiget ZIP-entry');const start=loc+30+dv.getUint16(loc+26,true)+dv.getUint16(loc+28,true);if(start+compressed>len)throw Error('Ufuldstændig ZIP-fil');const data=bytes.slice(start,start+compressed);if(crc32(data)!==crc)throw Error('Checksumfejl i '+name);if(data.length<500)throw Error('Ugyldig MP3: '+name);list.push([name,data])}return list}
+$('importButton').onclick=async()=>{if(running)return;const files=[...$('import').files];if(!files.length){status('Vælg en eller flere ZIP-filer først.');return}lock(true);let added=0,skipped=0;try{for(const f of files){const content=new Uint8Array(await f.arrayBuffer()),entries=readZip(content);for(const [path,bytes] of entries){if(stored.has(path)){skipped++;continue}await putClip(path,bytes);stored.add(path);added++}log('Importeret '+f.name+': '+entries.length+' lydfiler')}await refresh();status('Import færdig: '+added+' nye MP3-filer, '+skipped+' eksisterende sprunget over. I alt '+stored.size+'/500.')}catch(e){await refresh();status('Import stoppet: '+e.message+'. Allerede importerede filer er bevaret.')}finally{lock(false)}};
+(async()=>{try{db=await openDatabase();await refresh();status('Lokal lagring er klar. '+stored.size+' klip findes allerede. Importér tidligere ZIP eller kontrollér stemmer.');}catch(e){status('Kan ikke åbne lokal lagring: '+e.message+'. Brug normal browsertilstand og tillad webstedsdata.');$('check').disabled=true;$('generate').disabled=true}})();
+if(location.origin!=='https://driftportal-platform.github.io')status('BEMÆRK: Åbn siden fra GitHub Pages – Workeren tillader ikke lokale filer.');
 </script></body></html>
