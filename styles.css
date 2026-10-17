@@ -862,3 +862,6 @@ body.home-active #resumeCard button:active{filter:brightness(.94)}
 .talkort-practice[hidden]{display:none!important}.talkort-practice p{margin:4px 0 12px;color:#526983}
 .talkort-practice #talkortPracticeStatus{margin:10px 0 0}
 @media(max-width:720px){.talkort-mascot{width:28px;height:28px}.talkort-mascot-top{top:10px;right:10px}.talkort-mascot-bottom{bottom:10px;left:10px}.talkort-extra-controls .btn{flex:1}.talkort-practice-buttons .btn{flex:1 1 115px;font-size:.85rem}}
+
+/* v0.9.30: ÆselKlogs rigtige æselkort anvendes som maskot; vis kun selve ansigtet. */
+.talkort-mascot{object-fit:cover;object-position:center 18%;border-radius:50%;border:1px solid #bfaaa3;background:#ffece3;opacity:1;aspect-ratio:1}

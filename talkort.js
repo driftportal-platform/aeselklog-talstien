@@ -44,7 +44,7 @@ $('talkortPractice').hidden=!$('talkortPracticeEnabled').checked;
 $('talkortDelay').addEventListener('change',()=>{try{localStorage.setItem(DELAY_KEY,$('talkortDelay').value)}catch(_){}});
 $('talkortPracticeEnabled').addEventListener('change',()=>{const on=$('talkortPracticeEnabled').checked;$('talkortPractice').hidden=!on;if(!on){stopRecording();clearClip()}try{localStorage.setItem(PRACTICE_KEY,String(on))}catch(_){}});
 $('talkortAuto').addEventListener('click',()=>{if(auto){stopAuto();stopSound();return}stopRecording();clearClip();auto=true;const id=++autoSerial;$('talkortAuto').textContent='⏸ Stop auto';$('talkortAuto').setAttribute('aria-pressed','true');
- void (async()=>{try{if(number===0){number=bounds()[0]}while(auto&&autoSerial===id&&$('talkort').classList.contains('active')){await render(true);if(!auto||autoSerial!==id)break;if(number>=bounds()[1])break;await delay(Number($('talkortDelay').value)*1000);if(!auto||autoSerial!==id)break;number++;clearClip()}}finally{if(autoSerial===id)stopAuto()}})();});
+ void (async()=>{try{stopSound();if(number===0){number=bounds()[0]}while(auto&&autoSerial===id&&$('talkort').classList.contains('active')){stopSound();await render(true);if(!auto||autoSerial!==id)break;if(number>=bounds()[1])break;await delay(Number($('talkortDelay').value)*1000);if(!auto||autoSerial!==id)break;number++;clearClip()}}finally{if(autoSerial===id)stopAuto()}})();});
 function status(t){$('talkortPracticeStatus').textContent=t}
 $('talkortRecord').addEventListener('click',async()=>{
  if(recorder&&recorder.state==='recording'){recorder.stop();return}

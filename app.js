@@ -291,18 +291,20 @@ function say(text,{cpu=false,repeat=false}={}){
 async function speakNumber(number,{repeat=false,cpu=false,preferSelectedVoice=false}={}){
  const n=Number(number);if(!Number.isInteger(n)||n<0||n>100)return Promise.resolve();
  lastSpokenNumber=n;
+ stopCurrentVoice();
+ const numberSpeechId=speechSerial;
  const parts=NUM.parts(n,numberLanguage);
  // Først de faste 500 lydfiler. Gemmes efter behov; ingen ElevenLabs-kreditter.
  if(sound.on&&n>=1&&window.AeselOfflineNumbers){
   const partsForAudio=NUM.parts(n,numberLanguage);
   const role=cpu?'donkey':'narrator';
   const result=await window.AeselOfflineNumbers.play(n,numberLanguage,role);
-  if(result)return;
+  if(numberSpeechId!==speechSerial||result)return;
   // Fallback bruger den eksisterende AI-/telefonstemme, hvis MP3 ikke kan hentes.
  }
  // Same narrator voice for numbers on human and CPU turns; no English guessing by AI.
  // Foreign-language numbers use the device's locale-specific voice, without ElevenLabs credits.
- if(!sound.on)return Promise.resolve();
+ if(numberSpeechId!==speechSerial||!sound.on)return Promise.resolve();
  if(parts.length===1&&parts[0].lang==='da'){
   // Danske 'fem' udtales på enkelte multilingvale AI-stemmer som et engelsk ord.
   // Vælg en faktisk dansk lokal stemme når den findes, ellers behold den valgte AI-stemme.

@@ -5,11 +5,11 @@ const base='./audio/numbers/';
 const langs=new Set(['da','en','de','es']);
 const names=['narrator','donkey','en','de','es'];
 const allPaths=names.flatMap(name=>Array.from({length:100},(_,i)=>`${base}${name}/${String(i+1).padStart(3,'0')}.mp3`));
-let serial=0,active=null,downloading=false,cancelDownload=false;
+let serial=0,active=null,activeResolve=null,downloading=false,cancelDownload=false;
 const ui=id=>document.getElementById(id);
 const pathFor=(number,lang,role)=>`${base}${lang==='da'?(role==='donkey'?'donkey':'narrator'):lang}/${String(number).padStart(3,'0')}.mp3`;
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
-function stop(){serial++;if(active){active.pause();active.removeAttribute('src');active.load();active=null}}
+function stop(){serial++;if(active){active.pause();active.removeAttribute('src');active.load();active=null}if(activeResolve){const done=activeResolve;activeResolve=null;done()}}
 async function play(number,selection,role='narrator'){
  const n=Number(number),parts=window.AeselNumbers?.parts(n,selection)||[];
  if(!Number.isInteger(n)||n<1||n>100||!parts.length)return false;
@@ -22,7 +22,7 @@ async function play(number,selection,role='narrator'){
    if(id!==serial)return true;
    if(i){await wait(650);if(id!==serial)return true}
    const audio=new Audio(paths[i]);active=audio;audio.volume=1;audio.preload='auto';
-   await new Promise((resolve,reject)=>{audio.onended=resolve;audio.onerror=()=>reject(new Error('MP3 mangler eller er beskadiget'));audio.play().catch(reject)});
+   await new Promise((resolve,reject)=>{const finish=()=>{if(activeResolve===finish)activeResolve=null;resolve()};activeResolve=finish;audio.onended=finish;audio.onerror=()=>{if(activeResolve===finish)activeResolve=null;reject(new Error('MP3 mangler eller er beskadiget'))};audio.play().catch(error=>{if(activeResolve===finish)activeResolve=null;reject(error)})});
   }
   return true;
  }catch(err){
