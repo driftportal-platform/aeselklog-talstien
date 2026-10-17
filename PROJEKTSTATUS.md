@@ -1,3 +1,6 @@
+## v0.9.34 – 17. oktober 2026
+Kortspil: kun gemte MP3-tal; tosproget dansk ved vending, fremmedsprog ved placering. CPU trækker lovligt og får ikke strafkort. iPhone-test mangler.
+
 ÆselKlog v0.9.30: korrekt æselkortbillede på Talkort, sekventiel Auto-oplæsning og faste MP3-stemmer i kortspil. MP3-filer genbruges fra v0.9.28 og leveres ikke igen. Test på iPhone/PWA kræves stadig.
 
 ## v0.9.29 – Talkort: udtale, Auto og nulstil (17. oktober 2026)

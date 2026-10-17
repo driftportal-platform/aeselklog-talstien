@@ -11,13 +11,20 @@ const CARD_VOICE_KEY='aeselklog-korttale-v1';
 let cardVoiceOn=true;try{cardVoiceOn=localStorage.getItem(CARD_VOICE_KEY)!=='off'}catch(_){}
 let speechDone=Promise.resolve();
 let lastCardNumber=null,lastCardCpu=false;
-function updateVoiceToggle(){cardVoiceOn=window.AeselAudioSettings?.forMode?.('cards')?.enabled??cardVoiceOn;const b=$('cardsVoiceToggle');if(!b)return;b.textContent=cardVoiceOn?'🔊 Tale til':'🔇 Tale fra';b.setAttribute('aria-pressed',String(cardVoiceOn));}
-function announceCard(message,{cpu=false}={}){
- if(!cardVoiceOn||!window.AeselVoice?.enabled?.())return Promise.resolve();
- const content=String(message||'').slice(0,230).trim();if(!content)return Promise.resolve();
- try{return Promise.resolve(window.AeselVoice.say(content,{cpu})).catch(()=>{})}catch(_){return Promise.resolve()}
+// Kun de gemte MP3-filer – aldrig tale-syntese eller ElevenLabs i kortspillet.
+function cardSelection(){return window.AeselAudioSettings?.forMode?.('cards')?.language||'da'}
+function cardSoundAllowed(){return cardVoiceOn&&(window.AeselAudioSettings?.forMode?.('cards')?.enabled!==false)}
+function savedCardNumber(n,{cpu=false,stage='flip'}={}){
+ if(!cardSoundAllowed()||!Number.isInteger(n))return Promise.resolve(false);
+ const mode=cardSelection(),parts=window.AeselNumbers?.parts?.(n,mode)||[];
+ const selected=parts.length>1?(stage==='flip'?'da':parts[1].lang):(stage==='flip'?mode:null);
+ if(!selected)return Promise.resolve(true);
+ return window.AeselOfflineNumbers?.play?.(n,selected,cpu?'donkey':'narrator')??Promise.resolve(false);
 }
-function stopVoice(){window.AeselVoice?.stop?.();speechDone=Promise.resolve();}
+
+function updateVoiceToggle(){cardVoiceOn=window.AeselAudioSettings?.forMode?.('cards')?.enabled??cardVoiceOn;const b=$('cardsVoiceToggle');if(!b)return;b.textContent=cardVoiceOn?'🔊 Tale til':'🔇 Tale fra';b.setAttribute('aria-pressed',String(cardVoiceOn));}
+function announceCard(){return Promise.resolve()} // Ingen ekstra AI-kommentarer, kun MP3-tal.
+function stopVoice(){window.AeselOfflineNumbers?.stop?.();window.AeselVoice?.stop?.();speechDone=Promise.resolve();}
 
 function navigate(view){if(typeof window.AeselShowView==='function')window.AeselShowView(view)}
 function safeStore(){try{return window.localStorage}catch(_){return null}}
@@ -90,9 +97,12 @@ function act(fn){
   else if(out&&Number.isFinite(out.number))line=`${out.number}.`;
   else if(out?.assigned!==undefined)line='Et æselkort i straf!';
   else if(game.turn!==priorTurn)line='Næste spillers tur!';
-  if(Number.isInteger(out?.number)&&!out?.caught&&game.lastAction==='flip'){lastCardNumber=out.number;lastCardCpu=!!speaker?.isCPU;speechDone=cardVoiceOn&&window.AeselVoice?.enabled?.()?Promise.resolve(window.AeselVoice.number(out.number,{cpu:lastCardCpu,preferSelectedVoice:true})):Promise.resolve();}
-  else if(out?.target&&Number.isFinite(out.number)){speechDone=Promise.resolve();}
-  else speechDone=announceCard(line,{cpu:!!speaker?.isCPU});
+  if(Number.isInteger(out?.number)&&!out?.caught&&game.lastAction==='flip'){
+   lastCardNumber=out.number;lastCardCpu=!!speaker?.isCPU;
+   speechDone=savedCardNumber(out.number,{cpu:lastCardCpu,stage:'flip'});
+  }else if(out?.target&&Number.isInteger(out.number)){
+   speechDone=savedCardNumber(out.number,{cpu:!!speaker?.isCPU,stage:'place'});
+  }else speechDone=Promise.resolve();
   schedule(out);return out;}
  catch(err){$('cardsMessage').textContent=err.message||'Trækket kunne ikke udføres.';renderControls();return null;}
 }
@@ -115,7 +125,7 @@ function render(){if(!game)return;
  $('cardsMessage').textContent=game.message;
  renderStacks();renderControls();
  const sel=Number($('cardPenaltyPlayer').value);$('cardPenaltyPlayer').replaceChildren();
- game.players.forEach((x,i)=>{const opt=document.createElement('option');opt.value=String(i);opt.textContent=x.name+(x.isCPU?' (CPU)':'');$('cardPenaltyPlayer').append(opt)});
+ game.players.forEach((x,i)=>{if(x.isCPU)return;const opt=document.createElement('option');opt.value=String(i);opt.textContent=x.name+(x.isCPU?' (CPU)':'');$('cardPenaltyPlayer').append(opt)});
  const last=game.lastMove;
  $('cardPenaltyPlayer').value=String(last&&last.actor>=0?last.actor:Number.isInteger(sel)&&sel>=0&&sel<game.players.length?sel:game.turn);
  $('cardsChallenge').disabled=!last;
@@ -132,7 +142,7 @@ function punish(){if(!game||!game.lastMove)return;
  const result=act(()=>E.challenge(game));if(result?.caught)donkeySound();
 }
 function manualPenalty(){if(!game||game.finished)return;
- const index=Number($('cardPenaltyPlayer').value);
+ const index=Number($('cardPenaltyPlayer').value);if(game.players[index]?.isCPU)return;
  if(!window.confirm(`Giv ${game.players[index]?.name||'spilleren'} manuel æselstraf? (Fortryder ikke et korttræk, medmindre I bruger æselkort-knappen.)`))return;
  const result=act(()=>E.penalty(game,index));if(result)donkeySound();
 }
@@ -144,14 +154,13 @@ function cpuChoiceTarget(source){
  for(let i=0;i<game.players.length;i++)if(i!==game.turn)candidates.push({kind:'player',index:i});
  if(source==='pending')candidates.push({kind:'self-open'});
  const illegal=candidates.filter(x=>!(good&&x.kind===good.kind&&(x.kind==='new-center'||x.index===good.index))&&!(x.kind==='self-open'&&!good));
- if(illegal.length&&Math.random()<.07)return illegal[Math.floor(Math.random()*illegal.length)];
  return good||{kind:'self-open'};
 }
 function cpuStep(){if(!game||game.finished||!game.players[game.turn].isCPU||document.hidden)return;
  const p=game.players[game.turn];
  if(game.pending!==null){act(()=>E.placeManual(game,'pending',cpuChoiceTarget('pending')));return;}
  const open=E.openPlay(game);
- if(open&&(p.closed.length===0||Math.random()<.5)){act(()=>E.placeManual(game,'open',cpuChoiceTarget('open')));return;}
+ if(open){act(()=>E.placeManual(game,'open',cpuChoiceTarget('open')));return;}
  act(()=>E.flipManual(game));
 }
 function schedule(result){if(!game||game.finished||!$('cardsGame').classList.contains('active')||document.hidden||$('cardRulesDialog').open)return;
@@ -231,7 +240,7 @@ $('cardStart').addEventListener('click',()=>{
 });
 $('cardsContinue').addEventListener('click',()=>{const saved=readSaved();if(!saved){renderResume();return}stopTimers();game=saved;navigate('cardsGame');render();speechDone=announceCard('Vi fortsætter kortspillet!');schedule()});
 $('cardsDeleteSave').addEventListener('click',()=>{if(!window.confirm('Slet det gemte kortspil? Talstien og læringsprofiler berøres ikke.'))return;clear();renderResume()});
-$('cardsRepeatNumber')?.addEventListener('click',()=>{if(lastCardNumber!==null)void window.AeselVoice?.number?.(lastCardNumber,{repeat:true,cpu:lastCardCpu,preferSelectedVoice:true});});
+$('cardsRepeatNumber')?.addEventListener('click',()=>{if(lastCardNumber!==null)void savedCardNumber(lastCardNumber,{cpu:lastCardCpu,stage:'flip'});});
 $('cardsVoiceToggle')?.addEventListener('click',()=>{cardVoiceOn=!(window.AeselAudioSettings?.forMode?.('cards')?.enabled??cardVoiceOn);window.AeselAudioSettings?.update?.('cards',{enabled:cardVoiceOn});try{localStorage.setItem(CARD_VOICE_KEY,cardVoiceOn?'on':'off')}catch(_){};if(!cardVoiceOn)stopVoice();updateVoiceToggle();});
 updateVoiceToggle();
 $('cardsHome').addEventListener('click',()=>{save();menu()});

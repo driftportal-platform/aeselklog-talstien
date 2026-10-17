@@ -167,7 +167,7 @@
   isPlayersTurn(state);
   if(!Number.isInteger(index)||index<0||index>=state.players.length)throw Error('Vælg en spiller.');
   if(state.pending!==null&&!allowPending)throw Error('Læg først det vendte kort.');
-  const p=state.players[index];let assigned=false;
+  const p=state.players[index];if(p.isCPU)throw Error('Æslet kan ikke få æselkort.');let assigned=false;
   if(state.variant==='passing'){
    for(const other of state.players)other.donkeys=0;
    p.donkeys=1;assigned=true;
@@ -255,6 +255,7 @@
   const restored=copy(move.before);restored.lastMove=null;
   // Annullér kun det sidst udførte træk; alle tidligere bunker beholdes.
   Object.keys(state).forEach(k=>delete state[k]);Object.assign(state,restored);
+  if(state.players[actor].isCPU){state.lastMove=null;state.message='Æslets ugyldige træk blev fortrudt uden strafkort.';return {caught:true,actor,number,assigned:false,extras:0};}
   const result=penalty(state,actor,{allowPending:true});state.lastMove=null;
   state.message=`🫏 ${state.players[actor].name} blev opdaget! Trækket med ${number} er fortrudt. ${result.assigned?'Ét æselkort i straf.':'Alle æselkort var allerede uddelt.'}${result.extras?` + ${result.extras} talkort`:''}`;
   return {caught:true,actor,number,...result};
