@@ -1,4 +1,4 @@
-/* ÆselKlog v0.9.32 – MP3-only talkort, udtaletræning og automatisk gennemgang. */
+/* ÆselKlog v0.9.33 – MP3-only talkort, udtaletræning og automatisk gennemgang. */
 (()=>{'use strict';
 const $=id=>document.getElementById(id),NUM=window.AeselNumbers;
 if(!NUM||!$('talkort'))return;
@@ -17,18 +17,18 @@ function stopAll(){stopAuto();readingToken++;comparisonSerial++;stopSound();stop
 // Talkort uses ONLY the five saved MP3 voices. Never call ElevenLabs or device TTS.
 function read(){
  const token=++readingToken;
- if(number<1||!$('talkort').classList.contains('active'))return Promise.resolve();
+ if(number<1||!$('talkort').classList.contains('active'))return Promise.resolve(false);
  const profile=window.AeselAudioSettings?.forMode?.('talkort');
- if(profile?.enabled===false)return Promise.resolve();
+ if(profile?.enabled===false)return Promise.resolve(null);
  const language=NUM.normalize($('talkortLanguage').value);
  const role=$('talkortVoiceRole').value==='donkey'?'donkey':'narrator';
  if(!window.AeselOfflineNumbers?.play){
   $('talkortVoiceInfo').textContent='Gemte lydfiler er ikke indlæst. Prøv at opdatere appen.';
-  return Promise.resolve();
+  return Promise.resolve(false);
  }
  return Promise.resolve(window.AeselOfflineNumbers.play(number,language,role))
- .then(ok=>{if(token===readingToken&&!ok)$('talkortVoiceInfo').textContent='Lydfilen kunne ikke afspilles. Hent talelyde til offlinebrug i Indstillinger.'})
- .catch(()=>{if(token===readingToken)$('talkortVoiceInfo').textContent='Den gemte lydfil er ikke tilgængelig. Ingen anden stemme bruges.'});
+ .then(ok=>{if(token===readingToken&&!ok)$('talkortVoiceInfo').textContent=`Lydfilen til tal ${number} kunne ikke afspilles. Auto er stoppet. Prøv Læs igen eller kontrollér offline-lydene i Indstillinger.`;return Boolean(ok)})
+ .catch(()=>{if(token===readingToken)$('talkortVoiceInfo').textContent=`Lydfilen til tal ${number} er ikke tilgængelig. Auto er stoppet.`;return false});
 }
 function render(announce=true){const [lo,hi]=bounds();number=Math.max(number===0?0:lo,Math.min(hi,number));const z=Math.max(1,Math.ceil(number/20)),ones=number%10,tens=Math.floor(number/10),prime=isPrime(number),label=number%2===0?'Lige':'Ulige',place=`${tens} ${tens===1?'tier':'tiere'} + ${ones} ${ones===1?'ener':'enere'}`;
  $('talkortCard').className=`talkort-card zone-${z}`;$('talkortCard').setAttribute('aria-label',`Talkort ${number}. ${label}. ${place}.${prime?' Primtal.':''}`);
@@ -41,7 +41,7 @@ function render(announce=true){const [lo,hi]=bounds();number=Math.max(number===0
  $('talkortPrev').disabled=number<=lo;$('talkortNext').disabled=number>=hi;
  $('talkortProgress').textContent=number===0?'Nulstillet · klar til start':`Tal ${number} · område ${lo}–${hi}`;
  $('talkortJump').value=String(number);$('talkortVoiceInfo').textContent=voiceRole==='donkey'?'🫏 ÆselKlogs stemme til danske tal · kun gemte MP3-lyde, ingen andre stemmer.':'🎙️ Spillelederens stemme til danske tal · kun gemte MP3-lyde, ingen andre stemmer.';
- if(announce&&number>0)return read();return Promise.resolve();}
+ if(announce&&number>0)return read();return Promise.resolve(null);}
 function fillJump(){const [lo,hi]=bounds(),select=$('talkortJump');select.replaceChildren();const zero=document.createElement('option');zero.value='0';zero.textContent='0 · start';select.append(zero);for(let i=lo;i<=hi;i++){const o=document.createElement('option');o.value=String(i);o.textContent=String(i);select.append(o)}}
 function manual(target){stopAll();clearClip();number=target;return render()}
 $('talkortPrev').addEventListener('click',()=>manual(Math.max(bounds()[0],number-1)));
@@ -58,7 +58,7 @@ $('talkortPractice').hidden=!$('talkortPracticeEnabled').checked;
 $('talkortDelay').addEventListener('change',()=>{try{localStorage.setItem(DELAY_KEY,$('talkortDelay').value)}catch(_){}});
 $('talkortPracticeEnabled').addEventListener('change',()=>{const on=$('talkortPracticeEnabled').checked;$('talkortPractice').hidden=!on;if(!on){stopRecording();clearClip()}try{localStorage.setItem(PRACTICE_KEY,String(on))}catch(_){}});
 $('talkortAuto').addEventListener('click',()=>{if(auto){stopAuto();stopSound();return}stopRecording();clearClip();auto=true;const id=++autoSerial;$('talkortAuto').textContent='⏸ Stop auto';$('talkortAuto').setAttribute('aria-pressed','true');
- void (async()=>{try{stopSound();if(number===0){number=bounds()[0]}while(auto&&autoSerial===id&&$('talkort').classList.contains('active')){stopSound();await render(true);if(!auto||autoSerial!==id)break;if(number>=bounds()[1])break;await delay(Number($('talkortDelay').value)*1000);if(!auto||autoSerial!==id)break;number++;clearClip()}}finally{if(autoSerial===id)stopAuto()}})();});
+ void (async()=>{try{stopSound();if(number===0){number=bounds()[0]}while(auto&&autoSerial===id&&$('talkort').classList.contains('active')){stopSound();const played=await render(true);if(!auto||autoSerial!==id)break;if(played===false){$('talkortVoiceInfo').textContent=`Auto stoppet ved tal ${number}: lydfilen blev ikke afspillet. Tryk Læs igen for at forsøge igen.`;break;}if(number>=bounds()[1])break;await delay(Number($('talkortDelay').value)*1000);if(!auto||autoSerial!==id)break;number++;clearClip()}}finally{if(autoSerial===id)stopAuto()}})();});
 function status(t){$('talkortPracticeStatus').textContent=t}
 $('talkortRecord').addEventListener('click',async()=>{
  if(recorder&&recorder.state==='recording'){recorder.stop();return}
