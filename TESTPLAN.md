@@ -1,3 +1,5 @@
+v0.9.35: Test hurtig vending og placering (dansk + engelsk), CPU-træk 1–20, centrums prioritet, egen åben bunke, gem/fortsæt og iPhone PWA.
+
 ÆselKlog v0.9.30: korrekt æselkortbillede på Talkort, sekventiel Auto-oplæsning og faste MP3-stemmer i kortspil. MP3-filer genbruges fra v0.9.28 og leveres ikke igen. Test på iPhone/PWA kræves stadig.
 
 ## v0.9.29 – Talkort: udtale, Auto og nulstil (17. oktober 2026)

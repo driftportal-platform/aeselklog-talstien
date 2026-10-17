@@ -10,6 +10,16 @@ function donkeySound(){if(!audio)return;try{audio.pause();audio.currentTime=0;vo
 const CARD_VOICE_KEY='aeselklog-korttale-v1';
 let cardVoiceOn=true;try{cardVoiceOn=localStorage.getItem(CARD_VOICE_KEY)!=='off'}catch(_){}
 let speechDone=Promise.resolve();
+let audioGeneration=0;
+// Queue all card number clips, rather than interrupting a flip when its card is placed.
+// A stale queue is cancelled on leaving the game or switching audio off.
+function queueCardNumber(n,options){
+ const generation=audioGeneration;
+ const play=()=>generation===audioGeneration&&$('cardsGame').classList.contains('active')
+  ?savedCardNumber(n,options):false;
+ speechDone=Promise.resolve(speechDone).catch(()=>false).then(play);
+ return speechDone;
+}
 let lastCardNumber=null,lastCardCpu=false;
 // Kun de gemte MP3-filer – aldrig tale-syntese eller ElevenLabs i kortspillet.
 function cardSelection(){return window.AeselAudioSettings?.forMode?.('cards')?.language||'da'}
@@ -24,7 +34,7 @@ function savedCardNumber(n,{cpu=false,stage='flip'}={}){
 
 function updateVoiceToggle(){cardVoiceOn=window.AeselAudioSettings?.forMode?.('cards')?.enabled??cardVoiceOn;const b=$('cardsVoiceToggle');if(!b)return;b.textContent=cardVoiceOn?'🔊 Tale til':'🔇 Tale fra';b.setAttribute('aria-pressed',String(cardVoiceOn));}
 function announceCard(){return Promise.resolve()} // Ingen ekstra AI-kommentarer, kun MP3-tal.
-function stopVoice(){window.AeselOfflineNumbers?.stop?.();window.AeselVoice?.stop?.();speechDone=Promise.resolve();}
+function stopVoice(){audioGeneration++;window.AeselOfflineNumbers?.stop?.();window.AeselVoice?.stop?.();speechDone=Promise.resolve();}
 
 function navigate(view){if(typeof window.AeselShowView==='function')window.AeselShowView(view)}
 function safeStore(){try{return window.localStorage}catch(_){return null}}
@@ -99,10 +109,10 @@ function act(fn){
   else if(game.turn!==priorTurn)line='Næste spillers tur!';
   if(Number.isInteger(out?.number)&&!out?.caught&&game.lastAction==='flip'){
    lastCardNumber=out.number;lastCardCpu=!!speaker?.isCPU;
-   speechDone=savedCardNumber(out.number,{cpu:lastCardCpu,stage:'flip'});
+   queueCardNumber(out.number,{cpu:lastCardCpu,stage:'flip'});
   }else if(out?.target&&Number.isInteger(out.number)){
-   speechDone=savedCardNumber(out.number,{cpu:!!speaker?.isCPU,stage:'place'});
-  }else speechDone=Promise.resolve();
+   queueCardNumber(out.number,{cpu:!!speaker?.isCPU,stage:'place'});
+  }
   schedule(out);return out;}
  catch(err){$('cardsMessage').textContent=err.message||'Trækket kunne ikke udføres.';renderControls();return null;}
 }
@@ -148,13 +158,9 @@ function manualPenalty(){if(!game||game.finished)return;
 }
 function cpuChoiceTarget(source){
  const n=source==='pending'?game.pending:game.players[game.turn].open.at(-1);
- const good=E.preferredTarget(game,n),candidates=[];
- for(let i=0;i<game.centers.length;i++)candidates.push({kind:'center',index:i});
- if(game.centers.length<5)candidates.push({kind:'new-center'});
- for(let i=0;i<game.players.length;i++)if(i!==game.turn)candidates.push({kind:'player',index:i});
- if(source==='pending')candidates.push({kind:'self-open'});
- const illegal=candidates.filter(x=>!(good&&x.kind===good.kind&&(x.kind==='new-center'||x.index===good.index))&&!(x.kind==='self-open'&&!good));
- return good||{kind:'self-open'};
+ const correct=E.preferredTarget(game,n);
+ // Pending card may be discarded only if no playable destination exists.
+ return correct||(source==='pending'?{kind:'self-open'}:null);
 }
 function cpuStep(){if(!game||game.finished||!game.players[game.turn].isCPU||document.hidden)return;
  const p=game.players[game.turn];
@@ -180,7 +186,7 @@ function runTurnTimers(thisRevision){
   cpuTimer=setTimeout(()=>{if(thisRevision!==revision)return;cpuStep();},game.lastMove?.actor===cpuIndex?1700:1100);
  }
 }
-function begin(options){try{stopTimers();game=E.start(options);save();navigate('cardsGame');render();speechDone=announceCard('Velkommen til kortspillet!');schedule();}catch(e){$('cardsSetupError').textContent=e.message}}
+function begin(options){try{stopTimers();stopVoice();game=E.start(options);save();navigate('cardsGame');render();speechDone=announceCard('Velkommen til kortspillet!');schedule();}catch(e){$('cardsSetupError').textContent=e.message}}
 function menu(){stopTimers();stopVoice();chosenSource=null;game=null;renderResume();navigate('cardsSetup')}
 function targetFrom(el){const t=el?.closest('[data-card-target="true"]');if(!t)return null;
  return {kind:t.dataset.targetKind,index:Number(t.dataset.targetIndex)};}
@@ -238,9 +244,9 @@ $('cardStart').addEventListener('click',()=>{
  if(readSaved()&&!window.confirm('Et tidligere kortspil bliver erstattet. Vil I starte et nyt?'))return;
  begin({range:$('cardRange').value,variant:$('cardVariant').value,donkeyCount:Number($('cardDonkeyCount').value),extraPenalty:$('cardExtraPenalty').checked,names,vsCPU:$('cardCpuCheck').checked});
 });
-$('cardsContinue').addEventListener('click',()=>{const saved=readSaved();if(!saved){renderResume();return}stopTimers();game=saved;navigate('cardsGame');render();speechDone=announceCard('Vi fortsætter kortspillet!');schedule()});
+$('cardsContinue').addEventListener('click',()=>{const saved=readSaved();if(!saved){renderResume();return}stopTimers();stopVoice();game=saved;navigate('cardsGame');render();speechDone=announceCard('Vi fortsætter kortspillet!');schedule()});
 $('cardsDeleteSave').addEventListener('click',()=>{if(!window.confirm('Slet det gemte kortspil? Talstien og læringsprofiler berøres ikke.'))return;clear();renderResume()});
-$('cardsRepeatNumber')?.addEventListener('click',()=>{if(lastCardNumber!==null)void savedCardNumber(lastCardNumber,{cpu:lastCardCpu,stage:'flip'});});
+$('cardsRepeatNumber')?.addEventListener('click',()=>{if(lastCardNumber!==null)void queueCardNumber(lastCardNumber,{cpu:lastCardCpu,stage:'flip'});});
 $('cardsVoiceToggle')?.addEventListener('click',()=>{cardVoiceOn=!(window.AeselAudioSettings?.forMode?.('cards')?.enabled??cardVoiceOn);window.AeselAudioSettings?.update?.('cards',{enabled:cardVoiceOn});try{localStorage.setItem(CARD_VOICE_KEY,cardVoiceOn?'on':'off')}catch(_){};if(!cardVoiceOn)stopVoice();updateVoiceToggle();});
 updateVoiceToggle();
 $('cardsHome').addEventListener('click',()=>{save();menu()});

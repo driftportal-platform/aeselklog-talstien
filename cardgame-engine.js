@@ -191,6 +191,8 @@
   isPlayersTurn(state);
   if(state.pending!==null)throw Error('Placér eller læg først det vendte kort i din åbne bunke.');
   const p=state.players[state.turn];
+  // CPU må aldrig vende, hvis det øverste åbne kort kan spilles.
+  if(p.isCPU&&p.open.length&&preferredTarget(state,p.open.at(-1)))throw Error('Æslet skal spille sit åbne kort først.');
   // Hvis spilleren overser et muligt kort fra egen åbne bunke, må vedkommende
   // stadig vende. Fejlen kan bagefter opdages og trukket kort lægges tilbage.
   const skipped=p.open.length&&preferredTarget(state,p.open.at(-1));
@@ -230,6 +232,8 @@
   if(source==='open'&&(state.pending!==null||!p.open.length))throw Error('Placér først det vendte kort.');
   const n=source==='pending'?state.pending:p.open.at(-1);
   const dest=normalizeDestination(state,target,source),expected=preferredTarget(state,n,actor);
+  // Human players may make challengeable mistakes; CPU never may.
+  if(p.isCPU&&!(dest.kind==='self-open'?!expected:sameTarget(dest,expected)))throw Error('Æslet må kun udføre lovlige træk.');
   const valid=dest.kind==='self-open'?!expected:sameTarget(dest,expected);
   const before=snapshot(state);
   if(source==='pending')state.pending=null;else p.open.pop();

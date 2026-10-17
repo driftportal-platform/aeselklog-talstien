@@ -1,3 +1,5 @@
+Status: v0.9.35: kø af kortoplysninger uden overlap, CPU kan ikke gennemføre ugyldige træk. iPhone-test mangler.
+
 ## v0.9.34 – 17. oktober 2026
 Kortspil: kun gemte MP3-tal; tosproget dansk ved vending, fremmedsprog ved placering. CPU trækker lovligt og får ikke strafkort. iPhone-test mangler.
 
