@@ -130,3 +130,14 @@ Ved vending og placering af talkort udtaler stemmen nu kortets tal i stedet for 
 - Udenlandske tal læses op med lokal sprogspecifik telefonstemme uden ElevenLabs-credits. Offline afhænger af installerede systemstemmer.
 - Gentag tallet-knap i begge spil, cache og versionsnummer opdateret.
 - Kræver test af faktisk iPhone og live ElevenLabs; automatiske tests dokumenteres separat.
+
+
+## v0.9.28 – 500 talelyde (17. oktober 2026)
+
+- 500 MP3-talelyde (1–100 i fem faste stemmer) til Talkort, Talstien og Kortspil.
+- MP3-afspilning prioriteres over live ElevenLabs og sparer credits. Ved manglende fil anvendes eksisterende talestemme som reserve.
+- Lydfiler downloades automatisk ved brug og gemmes i separat Service Worker-cache.
+- Indstillinger har knappen **Hent alle 500 talelyde**, stop/fortsæt og tæller for offline-dækning.
+- Dansk + fremmedsprog afspilles i rækkefølge med 650 ms pause.
+- PWA-cachen har selvstændig lydcache, der ikke slettes ved almindelig app-opdatering.
+- Reelle iPhone-tests af offline-cache, tilgængelig lagerplads og hurtigt skift mangler stadig.

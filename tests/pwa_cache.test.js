@@ -8,7 +8,8 @@ const cacheMap=new Map();
 const precached=[];
 const cache={
   addAll: async files=>{precached.push(...files)},
-  put: async()=>{}
+  put: async()=>{},
+  match: async req=> (typeof req==='string'&&req.endsWith('home-fullscreen.webp')?{ok:true,from:'media-cache'}:undefined)
 };
 const caches={
   open:async name=>{cacheMap.set(name,cache);return cache},
@@ -45,7 +46,7 @@ async function dispatch(name,request){
   assert(precached.includes('./profiles.js'),'learning profiles module must be available offline');
   assert(precached.includes('./parentreport.js'),'parent report module must be available offline');
   assert(precached.includes('./actionfx.js'),'action effects must be available offline');
-  assert(worker.includes('aeselklog-talstien-v0925-talkort-stemme'),'PWA must use v0.9.25 cache');
+  assert(worker.includes('aeselklog-talstien-v0928-offline-500'),'PWA must use v0.9.28 cache');
   assert(precached.includes('./cardgame-engine.js'),'new card game rules must work offline');
   assert(precached.includes('./cardgame-ui.js'),'card game UI must work offline');
   assert(precached.includes('./music.js'),'offline music must precache');

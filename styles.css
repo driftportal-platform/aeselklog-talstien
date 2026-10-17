@@ -845,3 +845,6 @@ body.home-active #resumeCard button:active{filter:brightness(.94)}
 .talkort-controls{display:grid;grid-template-columns:1fr 1.15fr 1fr;gap:10px;width:min(100%,540px)}.talkort-controls .btn{white-space:normal;min-height:62px;padding:10px 8px;font-weight:900}.talkort-note{color:#667c92;text-align:center;margin:0}
 @media(max-width:720px){.talkort-options{grid-template-columns:1fr 1fr}.talkort-options .field:last-child{grid-column:1/-1}.talkort-stage{padding:6px 0 15px}.talkort-card{width:min(100%,355px);max-height:56vh;padding:14px 13px}.talkort-info{padding:6px;min-height:46px;font-size:.67rem;gap:4px}.talkort-info b{font-size:.69rem}.talkort-parity-dots,.talkort-blocks{font-size:.7rem}.talkort-number{font-size:clamp(4rem,20vw,8rem)}.talkort-controls{gap:5px}.talkort-controls .btn{font-size:.87rem;min-height:59px}}
 @media(max-width:385px){.talkort-options{grid-template-columns:1fr}.talkort-options .field:last-child{grid-column:auto}}
+
+/* v0.9.28 – offline MP3 downloadstatus */
+.number-audio-download{margin-top:16px;padding:14px;border:1px solid #cbddec;border-radius:16px;background:#f3f9fe}.number-audio-download h3{margin:0 0 6px;color:#173f72}.number-audio-download p{margin:6px 0 10px}.number-audio-actions{display:flex;flex-wrap:wrap;gap:10px}

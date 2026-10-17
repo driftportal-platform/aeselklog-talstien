@@ -4,7 +4,7 @@ const root=path.join(__dirname,'..');
 const sw=fs.readFileSync(path.join(root,'sw.js'),'utf8');
 const mp3=fs.readFileSync(path.join(root,'music','gone-fishin.mp3'));
 const url='https://example.org/aeselklog-talstien/music/gone-fishin.mp3';
-const listeners={},caches={match:async req=>req.url===url?new Response(mp3,{status:200,headers:{'Content-Type':'audio/mpeg','Content-Length':String(mp3.length)}}):undefined};
+const listeners={},caches={open:async()=>({match:async key=>key===url?new Response(mp3,{status:200,headers:{'Content-Type':'audio/mpeg','Content-Length':String(mp3.length)}}):undefined})};
 const self={location:{origin:'https://example.org'},registration:{scope:'https://example.org/aeselklog-talstien/'},addEventListener:(n,cb)=>listeners[n]=cb};
 let networkCalls=0;
 vm.runInNewContext(sw,{self,caches,URL,Response,Headers,Promise,fetch:()=>{networkCalls++;throw Error('offline')}});

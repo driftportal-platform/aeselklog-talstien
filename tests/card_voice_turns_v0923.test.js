@@ -7,7 +7,7 @@ test('Tal siges kun på flip (ikke place) og gentageknap ligger ved bunker',()=>
  assert.ok(html.indexOf('id="cardsRepeatNumber"')<html.indexOf('id="cardsCenter"'));
 });
 test('Pause mellem sprog og dansk fem',()=>{
- assert.match(app,/setTimeout\(resolve,1500\)/);
+ assert.match(app,/setTimeout\(resolve,650\)/);
  assert.match(app,/n!==5/);
  assert.match(app,/\^da\(\?:-\|\$\)/);
 });

@@ -154,6 +154,7 @@ function saveVoice(){
  try{localStorage.setItem(voiceKey,JSON.stringify({selected:sound.selected,rate:sound.rate,pitch:sound.pitch,mode:sound.mode,aiVoice:sound.aiVoice,cpuVoice:sound.cpuVoice}))}catch(e){}
 }
 function stopCurrentVoice(){
+ window.AeselOfflineNumbers?.stop?.();
  speechSerial++;
  // Løs også de afventende Promise'er ved en afbrudt tale, så CPU aldrig fryser.
  if(activeVoiceDone){const done=activeVoiceDone;activeVoiceDone=null;done();}
@@ -291,6 +292,14 @@ async function speakNumber(number,{repeat=false,cpu=false,preferSelectedVoice=fa
  const n=Number(number);if(!Number.isInteger(n)||n<0||n>100)return Promise.resolve();
  lastSpokenNumber=n;
  const parts=NUM.parts(n,numberLanguage);
+ // Først de faste 500 lydfiler. Gemmes efter behov; ingen ElevenLabs-kreditter.
+ if(sound.on&&n>=1&&window.AeselOfflineNumbers){
+  const partsForAudio=NUM.parts(n,numberLanguage);
+  const role=cpu?'donkey':'narrator';
+  const result=await window.AeselOfflineNumbers.play(n,numberLanguage,role);
+  if(result)return;
+  // Fallback bruger den eksisterende AI-/telefonstemme, hvis MP3 ikke kan hentes.
+ }
  // Same narrator voice for numbers on human and CPU turns; no English guessing by AI.
  // Foreign-language numbers use the device's locale-specific voice, without ElevenLabs credits.
  if(!sound.on)return Promise.resolve();

@@ -1,8 +1,9 @@
 /* ÆselKlog v0.9.19 – tre CC0-MP3 gemmes i PWA-cache, ingen Cloudflare/ElevenLabs-cache. */
 const CACHE_PREFIX='aeselklog-talstien-';
-const CACHE='aeselklog-talstien-v0926-talkort-stemme';
+const CACHE='aeselklog-talstien-v0928-offline-500';
+const AUDIO_CACHE='aeselklog-number-audio-v1';
 const CORE=['./','./index.html','./styles.css','./home-ui.js','./home-fullscreen.webp',
- './app.js','./talkort.js','./numbers.js','./cardgame-engine.js','./cardgame-ui.js','./music.js','./engine.js','./board.js','./actions.js','./leaderboard.js',
+ './app.js','./offline-talkort.js','./talkort.js','./numbers.js','./cardgame-engine.js','./cardgame-ui.js','./music.js','./engine.js','./board.js','./actions.js','./leaderboard.js',
  './adaptive.js','./profiles.js','./parentreport.js','./actionfx.js','./savegame.js','./cpuvoice.js','./voicecache.js','./narration.js','./manifest.webmanifest',
  './icon.svg','./aeselklog-card.webp','./donkey-bray.wav',
  './music/gone-fishin.mp3','./music/childrens-march.mp3','./music/beary-fishy.mp3',
@@ -12,7 +13,7 @@ self.addEventListener('install',event=>{
 });
 self.addEventListener('activate',event=>{
  event.waitUntil(caches.keys()
-  .then(names=>Promise.all(names.filter(name=>name.startsWith(CACHE_PREFIX)&&name!==CACHE)
+  .then(names=>Promise.all(names.filter(name=>name.startsWith(CACHE_PREFIX)&&name!==CACHE&&name!==AUDIO_CACHE)
    .map(name=>caches.delete(name))))
   .then(()=>self.clients.claim()));
 });
@@ -25,16 +26,23 @@ self.addEventListener('fetch',event=>{
  if(url.origin!==self.location.origin||!url.pathname.startsWith(scope.pathname))return;
  const media=/\.(?:webp|png|svg|wav|ico|mp3|ogg)$/i.test(url.pathname);
  if(media){
-  // iPhone/Safari beder ofte om byte-intervaller (Range), også mens nettet er slukket.
-  // Besvar dette fra den fulde, forudlagrede MP3, uden at cache en delvis 206-fil.
-  event.respondWith(caches.match(req).then(async hit=>{
+  const isNumberAudio=url.pathname.includes('/audio/numbers/')&&url.pathname.endsWith('.mp3');
+  // Fulde talelyde i separat cache, bevaret på tværs af app-versioner.
+  event.respondWith((async()=>{
+   const store=await caches.open(isNumberAudio?AUDIO_CACHE:CACHE);
+   const key=url.href;
+   const hit=await store.match(key);
    if(hit)return serveRange(req,hit);
-   const response=await fetch(req);
-   if(response.ok&&response.status!==206){
-    const copy=response.clone();event.waitUntil(caches.open(CACHE).then(cache=>cache.put(req,copy)));
+   if(isNumberAudio){
+    // Safari sender ofte Range: bytes=0-. Hent en FULL 200-kopi til cachen.
+    const res=await fetch(key);
+    if(res.ok&&res.status===200){event.waitUntil(store.put(key,res.clone()));return serveRange(req,res)}
+    return res;
    }
+   const response=await fetch(req);
+   if(response.ok&&response.status!==206)event.waitUntil(store.put(key,response.clone()));
    return response;
-  }));
+  })());
  }else{
   // HTML, CSS og JavaScript: hent seneste ved netforbindelse, brug cache offline.
   event.respondWith(fetch(req).then(response=>{

@@ -14,7 +14,7 @@
 <div class="shell">
   <header class="top">
     <div class="brand"><div class="logo" aria-hidden="true">🫏</div><div><h1>Æsel<span class="red">Klog</span> · Talstien</h1><small>Spil, lær og grin sammen</small></div></div>
-    <div class="top-actions"><span class="pill">PRØVEVERSION 0.9.26</span><button id="voiceToggle" class="btn soft small" type="button" aria-pressed="true">🔊 Lyd til</button></div>
+    <div class="top-actions"><span class="pill">PRØVEVERSION 0.9.28 (offline talelyde)</span><button id="voiceToggle" class="btn soft small" type="button" aria-pressed="true">🔊 Lyd til</button></div>
   </header>
 
 
@@ -132,10 +132,16 @@
     </div>
     <section class="music-settings paper" aria-label="Taloplæsning">
       <h2>🌍 Taloplæsning og sprogtræning</h2>
-      <p class="hint">Dansk er standard. Andre sprog læses op med telefonens stemme, mens spillets instruktioner forbliver danske. Fungerer også offline, hvis sprogets stemme er installeret på enheden.</p>
+      <p class="hint">Dansk er standard. De fem faste stemmer bruger MP3-optagelser, som hentes efter behov og gemmes til offlinebrug. Uden en hentet MP3 kan den eksisterende stemme bruges som reserve.</p>
       <div class="field"><label for="numberLanguageChoice">Hvilket sprog skal tallene udtales på?</label>
         <select id="numberLanguageChoice"><option value="da">🇩🇰 Dansk (standard)</option><option value="en">🇬🇧 Engelsk</option><option value="de">🇩🇪 Tysk</option><option value="es">🇪🇸 Spansk</option><option value="da-en">🇩🇰 + 🇬🇧 Dansk og engelsk</option><option value="da-de">🇩🇰 + 🇩🇪 Dansk og tysk</option><option value="da-es">🇩🇰 + 🇪🇸 Dansk og spansk</option></select>
       </div><button id="numberPreview" type="button" class="btn soft">🔊 Prøv tallet 14</button>
+      <div class="number-audio-download" aria-label="Offline talelyde">
+       <h3>📥 Talelyde til offlinebrug</h3>
+       <p class="tiny">Tallyde hentes automatisk, når de bruges. Du kan også hente alle 500 optagelser nu (omkring 10 MB). De gemmes på denne enhed, indtil browseren eventuelt rydder sin cache.</p>
+       <p id="numberAudioStatus" role="status" aria-live="polite">Kontrollerer offline-lydlager…</p>
+       <div class="number-audio-actions"><button type="button" class="btn soft" id="downloadNumberAudio">⬇ Hent alle 500 talelyde</button><button type="button" class="btn soft" id="stopNumberAudio" disabled>Stop download</button></div>
+      </div>
     </section>
     <section class="music-settings paper" aria-label="Baggrundsmusik">
       <h2>🎵 Baggrundsmusik</h2>
@@ -381,5 +387,6 @@
 <script src="./app.js" defer></script>
 <script src="./cardgame-ui.js" defer></script>
 <script src="./home-ui.js" defer></script>
+<script src="./offline-talkort.js" defer></script>
 <script src="./talkort.js" defer></script>
 </body></html>
