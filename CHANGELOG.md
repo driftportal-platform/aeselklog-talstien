@@ -4,6 +4,16 @@ Nyeste øverst. Én kort post pr. version. Detaljer, testresultater og filoversi
 findes i `docs/arkiv/`. Versioner uden post (fx 0.9.8 udover lydcache, 0.9.21, 0.9.26) var ikke
 dokumenteret separat i de gamle noter.
 
+## v0.9.44 – online chat, talelyd og æselkort (19. oktober 2026)
+- CORS tillader `x-player-secret`; lydklip beholder deres MIME-type, og WebSocket-upgrades videresendes intakte.
+- Alle vendte kort vises nu som ventende kort, så tale, frivillig placering og udfordringer følger offlinekortspillet. Et overset åbent kort kan udfordres.
+- Tydelig æselkort-knap, gentag talelyd, eksisterende danske/engelske/tyske/spanske MP3'er, tosproget vend/placér-oplæsning og dæmpning af musik under tale.
+- Begge onlineindgange bruger samme spilflade. Sejrspodie viser navne, placeringer og æselkort. Lokale lydvalg og gemt session bevares.
+- Udfordringer bevarer nyere chat, samtykke og stigende opdateringsnummer. Serveren validerer kortkilde og mål før flytning.
+- Chat opdateres også uden WebSocket. Fejl ved afsendelse bevarer tekst/lyd til nyt forsøg; optagelsestimer afsluttes korrekt.
+- 34/34 Node-tests; Chromium online med to isolerede enheder og simuleret transport/lyd; offlinekortspil i tre skærmstørrelser samt CPU/udfordringer. Wrangler dry-run består. Ingen live-deployment eller fysisk iPhone-test.
+- Windows-linjeskift accepteres i flowtesten; ældre browserfixtures bruger fejl på eksisterende bunker i stedet for en forbudt rækkestart.
+
 ## v0.9.36 – stabilitet, ikoner og dokumentation (18. oktober 2026)
 - Tests: 7 fejlende Node-tests rettet (de fleste testede forældet kode); alle 31 består. Dobbelt `board.test.js` i roden fjernet.
 - Service worker: kode hentes netværk-først med 3 sekunders timeout og falder tilbage til cachen. Cachenavn udledes af `VERSION`. Ny test dækker hængende net.

@@ -1,7 +1,7 @@
 """Offline Chromium smoke test for new digital card game, no ElevenLabs calls."""
 from pathlib import Path
 from playwright.sync_api import sync_playwright, expect
-import re, json
+import re, json, os
 ROOT=Path(__file__).resolve().parents[1]
 ORDER=['engine.js','board.js','actions.js','leaderboard.js','adaptive.js','profiles.js','parentreport.js','savegame.js','cpuvoice.js','voicecache.js','narration.js','actionfx.js','music.js','cardgame-engine.js','app.js','home-ui.js','cardgame-ui.js']
 
@@ -79,7 +79,7 @@ def run(page, dimensions):
     print('PASS card game',dimensions)
 
 with sync_playwright() as p:
-    browser=p.chromium.launch(executable_path='/usr/bin/chromium',headless=True,args=['--no-sandbox','--disable-dev-shm-usage'])
+    browser=p.chromium.launch(executable_path=os.environ.get('CHROMIUM_PATH') or ('/usr/bin/chromium' if Path('/usr/bin/chromium').exists() else None),headless=True,args=['--no-sandbox','--disable-dev-shm-usage'])
     for w,h in [(390,844),(844,390),(1280,800)]:
         page=browser.new_page(viewport={'width':w,'height':h},reduced_motion='reduce')
         try:run(page,f'{w}x{h}')

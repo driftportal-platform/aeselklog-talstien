@@ -63,7 +63,7 @@ const hook=`globalThis.__t={
  get(){return {phase,turn,players:players.map(p=>({name:p.name,pos:p.pos,skipNextTurn:p.skipNextTurn,isCPU:p.isCPU})),pending,extraRollUsed,lines:[...resultLines],challenge}},
  receiveMoveRoll, nextTurn,chooseSuper,processAnswer,resolveLandingAction,scrollToTile
 };`;
-assert(code.endsWith('})();\n')||code.endsWith('})();'));
+assert(/\}\)\(\);\s*$/.test(code)); // Accept Windows CRLF as well as LF.
 code=code.replace(/\}\)\(\);\s*$/,hook+'\n})();');
 vm.runInNewContext(code,context,{filename:'app.js'});
 const T=context.__t;

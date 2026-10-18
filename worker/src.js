@@ -1,4 +1,4 @@
-// ÆselKlog Online v0.9.43 – serverstyret kortspil (2 spillere).
+// ÆselKlog Online v0.9.44 – serverstyret kortspil (2 spillere).
 // Regler matcher det lokale cardgame-engine.js. Ingen CPU. Chat og genopkobling bevaret.
 const QUICK=['🫏 Hov hov!','👏 Godt spil!','😂 Haha!','🎉 Flot klaret!','🥕 Din tur!','❤️ Tak for spillet!'];
 const MAX_VOICE_BASE64=240000,MAX_TEXT=160,CHAT_KEEP_MS=24*60*60*1000;
@@ -6,7 +6,7 @@ const JSON_HEADERS={'content-type':'application/json; charset=utf-8','cache-cont
 function response(data,status=200,headers={}){return new Response(JSON.stringify(data),{status,headers:{...JSON_HEADERS,...headers}})}
 function random(length){const alphabet='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';const bytes=crypto.getRandomValues(new Uint8Array(length));return [...bytes].map(n=>alphabet[n%alphabet.length]).join('')}
 function token(){return [...crypto.getRandomValues(new Uint8Array(24))].map(v=>v.toString(16).padStart(2,'0')).join('')}
-function cors(origin,env){return origin===env.APP_ORIGIN?{'access-control-allow-origin':origin,'vary':'Origin','access-control-allow-methods':'GET,POST,OPTIONS','access-control-allow-headers':'content-type'}:{}}
+function cors(origin,env){return origin===env.APP_ORIGIN?{'access-control-allow-origin':origin,'vary':'Origin','access-control-allow-methods':'GET,POST,OPTIONS','access-control-allow-headers':'content-type, x-player-secret'}:{}}
 function validOrigin(request,env){return request.headers.get('origin')===env.APP_ORIGIN}
 
 function bounds(range){const [a,b]=range.split('-').map(Number);return [a,b]}
@@ -36,7 +36,7 @@ function remaining(state,index){const p=state.players[index];return countCards(p
 export default {
   async fetch(request,env){
     const url=new URL(request.url),origin=request.headers.get('origin');
-    if(request.method==='GET'&&url.pathname==='/health')return response({status:'ready',service:'ÆselKlog Online v0.9.43'});
+    if(request.method==='GET'&&url.pathname==='/health')return response({status:'ready',service:'ÆselKlog Online v0.9.44'});
     if(!validOrigin(request,env))return response({error:'Hjemmesiden er ikke tilladt'},403);
     if(request.method==='OPTIONS')return new Response(null,{status:204,headers:cors(origin,env)});
     if(url.pathname==='/api/create'&&request.method==='POST'){
@@ -48,15 +48,21 @@ export default {
       const donkeyCount=variant==='passing'?1:([1,4,6,8].includes(Number(input.donkeyCount))?Number(input.donkeyCount):8);
       const code=random(8),secret=token();const id=env.GAME_ROOM.idFromName(code);const stub=env.GAME_ROOM.get(id);
       const roomResponse=await stub.fetch('https://room/init',{method:'POST',body:JSON.stringify({name,range,secret,code,variant,extraPenalty,donkeyCount})});
-      return new Response(roomResponse.body,{status:roomResponse.status,headers:{...JSON_HEADERS,...cors(origin,env)}});
+      if(roomResponse.status===101)return roomResponse;
+    const headers=new Headers(roomResponse.headers);
+    for(const [key,value] of Object.entries(cors(origin,env)))headers.set(key,value);
+    return new Response(roomResponse.body,{status:roomResponse.status,headers});
     }
     const match=url.pathname.match(/^\/api\/room\/([A-Z0-9]{8})(\/.*)?$/);
-    if(!match)return response({error:'Ukendt sti'},404);
+    if(!match)return response({error:'Ukendt sti'},404,cors(origin,env));
     const code=match[1],id=env.GAME_ROOM.idFromName(code);const stub=env.GAME_ROOM.get(id);
     const roomUrl=new URL(request.url);roomUrl.pathname=match[2]||'/';// Bevar query-parametre til WebSocket og lydklip.
     const roomRequest=new Request(roomUrl,request);
     const roomResponse=await stub.fetch(roomRequest);
-    return new Response(roomResponse.body,{status:roomResponse.status,headers:{...JSON_HEADERS,...cors(origin,env)}});
+    if(roomResponse.status===101)return roomResponse;
+    const headers=new Headers(roomResponse.headers);
+    for(const [key,value] of Object.entries(cors(origin,env)))headers.set(key,value);
+    return new Response(roomResponse.body,{status:roomResponse.status,headers});
   }
 };
 
@@ -157,7 +163,7 @@ export class GameRoom {
         item={...item,kind:'text',text:value};
       }else if(b.kind==='voice'){
         if(!(g.chatPrefs||[]).every(Boolean))return response({error:'Begge spillere skal slå lydchat til'},403);
-        if(!['audio/webm','audio/mp4','audio/ogg'].includes(b.mime)||typeof b.audio!=='string'||b.audio.length>MAX_VOICE_BASE64||!/^[A-Za-z0-9+/]*={0,2}$/.test(b.audio)||Number(b.duration)>10.2||Number(b.duration)<0.1)return response({error:'Lydklip skal være højst 10 sekunder'},400);
+        if(!['audio/webm','audio/mp4','audio/ogg'].includes(b.mime)||typeof b.audio!=='string'||b.audio.length>MAX_VOICE_BASE64||!/^[A-Za-z0-9+/]*={0,2}$/.test(b.audio)||!Number.isFinite(Number(b.duration))||Number(b.duration)>10.2||Number(b.duration)<0.1)return response({error:'Lydklip skal være højst 10 sekunder'},400);
         item={...item,kind:'voice',mime:b.mime,audio:b.audio,duration:Math.round(Number(b.duration)*10)/10};
       }else return response({error:'Ukendt beskedtype'},400);
       g.chat=[...full.filter(m=>now-m.at<CHAT_KEEP_MS),item].slice(-30);
@@ -169,28 +175,35 @@ export class GameRoom {
   doFlip(g,seat){
     if(g.pending!==null)throw Error('Læg først det vendte kort.');
     const p=g.players[seat];
+    const skipped=p.open.length&&preferredTarget(g,p.open.at(-1),seat);
+    const before=skipped?snapshot(g):null,number=p.open.at(-1);
     if(!p.closed.length){
       if(!p.open.length)throw Error('Ingen talkort tilbage.');
       p.closed=p.open.slice().reverse();p.open=[];
     }
-    const n=p.closed.pop();
-    const target=preferredTarget(g,n,seat);
-    if(!target){
-      p.open.push(n);
-      this.finishOrNext(g);
-      g.message=`${p.name} vendte ${n}. Det passer ikke endnu.`;
-    }else{
-      g.pending=n;
-      g.message=`${p.name} vendte ${n}. Det kan lægges på ${target.caption}.`;
-    }
-    g.lastMove=null;
+    g.pending=p.closed.pop();
+    g.lastMove=skipped?{actor:seat,valid:false,number,type:'flip',before}:null;
+    g.message=`${p.name} vendte ${g.pending}. Vælg en bunke.`;
   }
   doPlace(g,seat,b){
-    const source=b.source==='open'?'open':'pending';
+    if(!['open','pending'].includes(b.source))throw Error('Vælg et kort.');
+    const source=b.source;
+    if(source==='open'&&g.pending!==null)throw Error('Læg først det vendte kort.');
     const p=g.players[seat];
     const n=source==='pending'?g.pending:p.open.at(-1);
     if(n==null)throw Error('Intet kort at lægge');
     const dest={kind:b.kind,index:Number(b.index)};
+    if(dest.kind==='new-center'){
+      if(n!==bounds(g.range)[0]||g.centers.length>=5)throw Error(`En ny række skal starte med ${bounds(g.range)[0]}, og der må højst være fem.`);
+      dest.index=g.centers.length;
+    }else if(dest.kind==='center'){
+      if(!Number.isInteger(dest.index)||!g.centers[dest.index])throw Error('Ukendt række.');
+    }else if(dest.kind==='player'){
+      if(!Number.isInteger(dest.index)||!g.players[dest.index]||dest.index===seat)throw Error('Vælg modstanderens bunke.');
+    }else if(dest.kind==='self-open'){
+      if(source!=='pending')throw Error('Vælg et vendt kort.');
+      dest.index=seat;
+    }else throw Error('Ukendt mål.');
     const expected=preferredTarget(g,n,seat);
     const valid=dest.kind==='self-open'?!expected:sameTarget(dest,expected);
     const before=snapshot(g);
@@ -215,6 +228,8 @@ export class GameRoom {
     if(g.lastMove.valid){g.message='Trækket var korrekt. Ingen æselstraf.';g.lastMove=null;return}
     const actor=g.lastMove.actor,number=g.lastMove.number;
     const restored=JSON.parse(JSON.stringify(g.lastMove.before));
+    // Undo cards only; preserve newer chat, consent and the monotonic revision.
+    Object.assign(restored,{chat:g.chat,chatPrefs:g.chatPrefs,move:g.move});
     Object.keys(g).forEach(k=>delete g[k]);Object.assign(g,restored);
     this.givePenalty(g,actor);
     g.lastMove=null;
