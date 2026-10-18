@@ -1,28 +1,27 @@
-# ÆselKlog Online v0.9.38 – chatpilot
+# ÆselKlog – Online-knap og forbindelsesrettelse
 
-Dette er en selvstændig pilot til **online-kortspillet**, baseret på v0.9.37. Den ændrer ikke eksisterende Kortspil, Talstien, Talkort eller de 500 MP3-filer.
+Denne pakke retter den forkerte Worker-adresse i `/site/online-config.js` og flytter knappen fra forsideillustrationen til menuen **Spil**. Ændringerne er målrettede, så nyere kode ikke erstattes af gamle filer.
 
-## Indhold
-- `site/online.html`, `site/online.js`, `site/chat.js`, `site/online-config.js`: hjemmeside til online-kortspillet
-- `worker/src.js`, `worker/wrangler.jsonc`: Cloudflare Worker og Durable Object
-- `test-chat.mjs`: lokal adgangs-/chat-smoketest
+## Installation (Windows)
 
-## Første opsætning
-1. Cloudflare: opret Worker **aeselklog-online-pilot** via Wrangler fra `worker/`. Durable Objects kræver egnet konto/plan. For en ny Worker skal `new_sqlite_classes` migrationen bevares.
-2. Tilføj miljøvariabel `APP_ORIGIN` med nøjagtig `https://driftportal-platform.github.io` (ingen slut-skråstreg).
-3. Kør fra worker-mappen: `npx wrangler deploy`. Dette opretter/opdaterer både Worker og bindingen GAME_ROOM.
-4. Find den offentlige Workers-URL, eksempelvis `https://aeselklog-online-pilot.<subdomain>.workers.dev`. Indsæt **den faktiske URL** i `site/online-config.js` som `window.AESEL_ONLINE_URL = 'https://...';`.
-5. Upload `site/online.html`, `site/online.js`, `site/chat.js`, `site/online-config.js` til roden af GitHub Pages-repositoriet **uden** at slette eksisterende filer.
-6. Besøg `https://driftportal-platform.github.io/aeselklog-talstien/online.html` på to enheder. Spiller 1 opretter, spiller 2 deltager med rumkode.
-7. Test hurtigbeskeder; aktivér derefter chat på begge enheder for at afprøve tekst og korte optagelser.
+1. Hent seneste komplette repository med **Code → Download ZIP** fra https://github.com/driftportal-platform/aeselklog-talstien, og pak det ud.
+2. Pak DENNE ZIP ud et andet sted.
+3. Åbn Terminal/PowerShell i **roden af ÆselKlog-repositoriet**, samme mappe som `index.html` og `app.js`.
+4. Kør med Node (det er allerede installeret):
 
-## Chat og sikkerhed
-- Kun spillere med deres individuelle, tilfældige hemmelige sessionstoken kan hente chat/lyd. Invitér kun personer, I kender.
-- Hurtigbeskeder kan sendes uden opt-in, men kun efter begge spillere er tilsluttet. Fri tekst og lyd kræver opt-in fra **begge** spillere og er fra som standard.
-- Tekst højst 160 tegn; lydoptagelse automatisk højst 10 sekunder (derudover en størrelsesgrænse). Server kontrollerer metadata og maksimal filstørrelse; den foretager **ikke** indholdsmoderation eller verificerer lydvarighed fra codec.
-- De 30 seneste chatbeskeder (inklusive lydklip) opbevares i rumlagringen, højst cirka 24 timer, og ryddes når rummet næste gang tilgås efter udløbet. Dette er **ikke** en garanteret aktiv automatisk sletning på præcis 24-timersgrænsen.
-- Ingen lyd sendes til ElevenLabs. Mikrofonen kræver HTTPS og tilladelse i browseren. Test i Safari og installeret iPhone-PWA.
-- Del ikke personlige eller følsomme oplysninger i chatten. Pilot beregnet til familie/venner. Fravælg fri chat til mindre børn.
+   `node "C:\STI\TIL\aeselklog_menu_fix\anvend-opdatering.cjs"`
 
-## Status
-Node-syntaks kontrolleret og chat-serverens adgangskontrol smoke-test bestået. Ingen live-test på Cloudflare eller to telefoner udført. Onlinespillets øvrige kendte pilotbegrænsninger gælder stadig (bl.a. udfordringer, æselkort og CPU er ikke færdiggjort).
+   Erstat stien med den faktiske sti til den udpakkede opdateringsmappe. Tip: I Stifinder kan du kopiere filens sti med højreklik → Kopiér som sti.
+5. Upload disse TRE filer til samme placering på GitHub, **uden at slette andre filer**:
+   - `index.html` i repository-roden
+   - `online-menu.js` i repository-roden
+   - `site/online-config.js` i `site`-mappen
+6. Åbn ÆselKlog og genindlæs. Klik Spil → Online spil. Test kun med voksne.
+
+Skriptet gemmer `.bak`-filer lokalt, hvis du vil fortryde ændringerne.
+
+## Afgrænsning
+
+Den hidtidige online-Worker (`aeselklog-online`) ændres IKKE. V0.9.39-klienten ser ud til at forvente nye serverfunktioner (fx `discard` og `challenge`), som ikke findes i den tidligere uploadede v0.9.38-worker. Derfor skal den nye Worker-kode gennemgås og deployes, før vi kan kalde det fuldt spillbart. At knappen og API-adressen virker, er kun forbindelsestest.
+
+Forældrelåsen i `/site/parent-gate.js` er lokalt baseret med standardkode 1234 og er IKKE sikker serverbeskyttelse. Online skal fortsat være voksenstyret test.
