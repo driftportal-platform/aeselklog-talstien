@@ -1,47 +1,8 @@
 <!doctype html>
-<html lang="da">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>ÆselKlog Online · Kortspil</title>
-<link rel="stylesheet" href="../styles.css">
+<html lang="da"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>ÆselKlog Online v0.9.41</title><link rel="stylesheet" href="../styles.css">
 <style>
-body{background:#f6f9fd;font-family:system-ui}
-.hidden{display:none}
-.card{width:70px;height:100px;border-radius:12px;border:2px solid #124075;display:grid;place-items:center;background:#fff;font-weight:900;font-size:1.4rem;margin:4px}
-.card.back{background:#124075;color:#fff}
-.players,.centers{display:flex;gap:12px;flex-wrap:wrap;margin:12px 0}
-.player{border:2px solid #dae5ef;border-radius:14px;padding:10px;min-width:140px}
-.player.turn{border-color:#1976d2;background:#e8f3ff}
-button{min-height:44px}
-</style>
-</head>
-<body>
-<div class="shell" style="max-width:900px;margin:auto;padding:16px">
-  <p><a id="onlineBack" href="../index.html" style="display:inline-flex;align-items:center;min-height:44px;padding:9px 15px;border:1px solid #b8d0e9;border-radius:12px;text-decoration:none;color:#124075;font-weight:700;background:#fff">← Tilbage til spilmenu</a></p>
-  <h1>ÆselKlog Online <small style="color:#62758a">v0.9.39</small></h1>
-  <section id="setup">
-    <p>Opret et rum eller deltag med kode.</p>
-    <input id="name" placeholder="Dit navn" maxlength="25">
-    <select id="range"><option>1-20</option><option>21-40</option><option>41-60</option><option>61-80</option><option>81-100</option></select>
-    <button id="create">Opret rum</button>
-    <hr>
-    <input id="joinCode" placeholder="Rumkode" maxlength="8">
-    <button id="join">Deltag</button>
-    <p id="setupError" style="color:#c0392b"></p>
-  </section>
-  <section id="game" class="hidden">
-    <p>Rum: <strong id="code"></strong> · <span id="message"></span></p>
-    <div id="players" class="players"></div>
-    <div id="centers" class="centers"></div>
-    <div id="current"></div>
-    <div id="actions"></div>
-    <p id="actionError" style="color:#c0392b"></p>
-    <button id="challenge" class="hidden">Udfordr sidste træk 🫏</button>
-  </section>
-</div>
-<script src="./parent-gate.js"></script>
-<script src="./online-config.js"></script>
-<script src="./online.js"></script>
-</body>
-</html>
+body{margin:0;background:#f5f8fd;color:#153e70;font-family:system-ui,sans-serif}*{box-sizing:border-box}.shell{max-width:970px;margin:auto;padding:18px}.hidden{display:none!important}.panel{background:white;border:1px solid #d4e3f2;border-radius:18px;padding:18px;margin:15px 0}button,input,select{font:inherit;padding:11px;border:1px solid #b7d1ea;border-radius:11px;min-height:44px}button{font-weight:700;background:#e6f2ff;color:#153e70;cursor:pointer}button:disabled{opacity:.5}button.primary{background:#174578;color:white}.flex{display:flex;flex-wrap:wrap;gap:10px;align-items:center}.players,.centers{display:grid;grid-template-columns:repeat(auto-fit,minmax(225px,1fr));gap:12px}.player,.target{border:2px solid #d7e5f1;border-radius:15px;padding:12px}.turn{border-color:#1976d2;background:#edf7ff}.target{border-style:dashed;background:#f6fbff;min-height:90px}.target.active{border-color:#dba12a;cursor:pointer}.card{width:82px;height:116px;border:2px solid #a8bfd5;border-radius:12px;background:#fff1f1;display:grid;place-items:center;font-weight:900;font-size:2.5rem;color:#d10d35;user-select:none;touch-action:pan-y;margin:8px 0}.card.back{background:#174578;color:#fff;font-size:1.7rem}.card.selectable{cursor:pointer}.card.selected{outline:4px solid #f0b64e}.muted{color:#59738d}.error{color:#b51d31;white-space:pre-wrap}.status{background:#edf5ff;border-radius:11px;padding:12px}.targets{display:grid;grid-template-columns:repeat(auto-fit,minmax(155px,1fr));gap:10px}.target h3{margin:0 0 8px}.target button{width:100%}#pendingCard{margin:12px 0}a{color:#153e70;font-weight:700}@media(max-width:600px){.shell{padding:10px}.panel{padding:12px}.card{width:70px;height:105px}}
+</style></head><body><main class="shell"><p><a href="../index.html">← Tilbage til spilmenu</a></p><h1>🫏 ÆselKlog Online <small>v0.9.41</small></h1><p class="muted">To spillere på hver sin enhed · voksenstyret pilot</p>
+<section id="setup" class="panel"><h2>Opret rum eller deltag</h2><p><label>Dit navn <input id="name" maxlength="25" placeholder="Dit navn"></label></p><p><label>Talområde <select id="range"><option value="1-20">1–20</option><option value="21-40">21–40</option><option value="41-60">41–60</option><option value="61-80">61–80</option><option value="81-100">81–100</option></select></label></p><button id="create" class="primary">Opret rum</button><hr><div class="flex"><input id="joinCode" maxlength="8" placeholder="Rumkode"><button id="join">Deltag</button></div><p id="setupError" class="error" role="alert"></p></section>
+<section id="game" class="hidden"><div class="panel"><h2>Rum: <span id="code"></span></h2><div id="message" class="status" aria-live="polite"></div><div class="flex" style="margin-top:12px"><button id="copyCode">📋 Kopiér rumkode</button><button id="reconnect">🔄 Opdater</button><button id="leave">Forlad på denne enhed</button></div><p id="connectionStatus" class="muted"></p></div><div class="panel"><h2>Spillernes bunker</h2><div id="players" class="players"></div></div><div class="panel"><h2>🌹 Rækker i midten</h2><div id="centers" class="centers"></div></div><div class="panel"><h2>Dit træk</h2><p id="current"></p><div id="pendingArea"></div><div id="actions" class="flex"></div><p id="actionError" class="error" role="alert"></p></div><div class="panel"><button id="challenge" class="hidden">🫏 Udfordr modstanderens sidste træk</button><p class="muted">Vælg et kort, og tryk på den ønskede bunke. Du kan også trække og slippe kort på PC.</p></div></section>
+</main><script src="./parent-gate.js"></script><script src="./online-config.js"></script><script src="./online.js"></script></body></html>
