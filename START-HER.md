@@ -1,20 +1,59 @@
-# ÆselKlog – lydgenerator til alle 500 MP3-filer
+# ÆselKlog Online – første tekniske pilot
 
-1. Upload **lydproeve.html** til roden af GitHub-repository `driftportal-platform/aeselklog-talstien` (overskriv den gamle prøvefil). ÆselKlog v0.9.27 skal ikke uploades for at bruge generatoren.
-2. Åbn `https://driftportal-platform.github.io/aeselklog-talstien/lydproeve.html` i en normal browser (ikke privat).
-3. **Importér** først `AeselKlog_Lydproever_15_klip.zip` og evt. andre tidligere ZIP-filer. De 15 klip tæller så med og optages ikke igen.
-4. Klik **Kontrollér stemmer**; vælg alle fem og tal 1–100.
-5. Pause 8 sekunder anbefales ved dine normale Cloudflare-grænser på 12 forespørgsler/minut. Hvis du midlertidigt øger grænserne, kan 3–5 sekunder bruges, men ElevenLabs har egne grænser.
-6. Klik **Generér manglende klip** og bekræft kreditforbruget. Hvert færdigt klip gemmes i browserens IndexedDB. Bliver du afbrudt, kan du genåbne samme adresse i samme browserprofil og fortsætte.
-7. Hent periodisk **samlet ZIP** som backup. Når indikatoren viser 500/500, hent den endelige ZIP.
-8. Sæt eventuelt forhøjede Cloudflare-grænser tilbage til `CLIENT_LIMIT=12/60s` og `GLOBAL_LIMIT=24/60s`.
-9. Upload den samlede ZIP til ChatGPT for kvalitetstjek og indbygning i ÆselKlogs PWA. Dette værktøj ændrer **ikke** selve spillet.
+Dette er **en selvstændig prototype**, ikke en færdig multiplayer-integration i det eksisterende kortspil. Den kræver en Cloudflare Worker med Durable Objects og to nye filer i GitHub Pages. De 500 MP3-lyde skal ikke gen-uploades.
 
-Stemmer: dansk fortæller `4RklGmuxoAskAbGXplXN`, dansk æsel `F6ZuXSkDhi5i4KLiT7Id`, engelsk `aHCytOTnUOgfGPn5n89j`, tysk `yVKATr0ZJETwd3tQtpNG`, spansk `x5IDPSl4ZUbhosMmVFTk`. Kun offentlig Voice ID; aldrig API-secret i GitHub.
+## 1. Deploy serveren (Cloudflare)
 
-## Bemærk
-- Gemte browserdata kan blive slettet af browseren, brug derfor løbende ZIP-backups.
-- Den eksisterende Worker anvender rate limits og må ikke erstattes af en usikker batch-endpoint.
-- Eksisterende lydklip importeres uændret; de normaliseres først efter godkendt lydkontrol.
-- Et gennemført API-kald, hvor svaret går tabt inden lokal lagring, kan i sjældne tilfælde have brugt credits uden at levere filen.
-- ZIP-import kræver MP3-filer i ZIP som ukomprimerede entries (formatet fra den gamle prøve-generator).
+På din egen computer med Node.js installeret:
+
+```bash
+cd worker
+npm install -g wrangler
+npx wrangler login
+npx wrangler deploy
+```
+
+`worker/wrangler.jsonc` bruger en SQLite-backed Durable Object `GameRoom` til hvert spil. Afhængig af Cloudflare-plan og kontokonfiguration kan Durable Objects kræve Workers Paid eller konfigurationsændringer; gennemgå Cloudflares aktuelle prisside. Workeren oprettes som **aeselklog-online-pilot**, separat fra ElevenLabs-workeren.
+
+**Efter deploy** i Cloudflare Workers → aeselklog-online-pilot → Settings → Variables and Secrets: tilføj almindelig variabel:
+
+- `APP_ORIGIN` = `https://driftportal-platform.github.io`
+
+Deploy ændringen. Indstillingen begrænser kald til din GitHub Pages-side. Det er ikke en brugergodkendelse; deltagelseskoden og personlige adgangstokens giver spilleradgang. Tokens gemmes i browserens sessionStorage og tilgås ikke af andre deltagere.
+
+## 2. Opsæt GitHub Pages
+
+I `site/online-config.js` erstatter du:
+
+`https://DIN-WORKER.workers.dev`
+
+med den præcise Cloudflare Worker URL, du fik efter deploy (ingen skråstreg til sidst).
+
+Upload **kun** disse filer fra `site/` til roden af dit eksisterende repo:
+
+- `online.html`
+- `online.js`
+- `online-config.js`
+
+Slet ingen eksisterende filer. Åbn `https://driftportal-platform.github.io/aeselklog-talstien/online.html` i to forskellige browsere eller på to telefoner. Opret et rum på den ene; kopiér linket og åbn på den anden. Linket indeholder rumkode, ikke personligt adgangstoken.
+
+## 3. Begrænsninger i piloten
+
+- To spillere, fem talområder, fem kort af hvert tal. Regler kontrolleres på serveren.
+- Enkle, lovlige træk: læg et åbent kort, vend, placer vendt kort; hvis ingen placering findes, ryger det vendte kort automatisk i den åbne bunke.
+- **Ikke implementeret:** klassiske æselkortstraffe, udfordringsknap, variant med ét æselkort, CPU, gemte spilleres score, fuld lydstyring, online Talstien.
+- Hold invitationskoder private. Ingen konti, ingen matchmaking, ingen moderation. Undgå personlige oplysninger i kaldenavne.
+- Spilrum bliver i Durable Object-lager, indtil de ryddes. Der er endnu ikke indbygget automatisk oprydning eller sletning – derfor kun en privat pilot, ikke offentlig lancering.
+- Connection reconnect kræver, at browserens sessionStorage stadig har spillerens token. En tabt session kan ikke genskabes uden videre.
+- Begge spillere kan have siden åben samtidig. Serveren sender kun antal lukkede kort, ikke modstanderens skjulte værdier.
+- Browseren modtager ikke de 500 MP3-optagelser direkte i denne pilot.
+
+## 4. Test først
+
+- Opret 1–20-spil, deltag fra anden telefon, observer to navne.
+- Prøv at vende et kort og se, at begge enheder opdaterer skærmen.
+- Prøv at lægge tallet 1 i ny midterrække, derefter 2 i samme række.
+- Kontroller, at den anden telefon ikke kan handle på den forkerte tur.
+- Genindlæs en telefon, og kontrollér, at den får korrekt spiltilstand igen.
+
+**Note:** Prototypen er syntakskontrolleret, men ikke live-deployet på din Cloudflare-konto. Den skal afprøves og gennemgås med yderligere sikkerhedstest før bred anvendelse.
