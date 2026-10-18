@@ -219,6 +219,11 @@
     if(i!==index&&state.players[i].closed.length){p.closed.push(state.players[i].closed.pop());extras++}
    }
   }
+  // Ekstra talkort genaktiverer en tidligere færdig spiller.
+  // Fjern derfor spillerens tidligere placering, når der igen er kort.
+  if(extras && Array.isArray(state.finishOrder) && countOf(p)>0){
+   state.finishOrder=state.finishOrder.filter(i=>i!==index);
+  }
   state.lastAction='penalty';
   state.message=`🫏 ${p.name} fik ${assigned?'et æselkort':'ikke et nyt æselkort (alle er uddelt)'}${extras?` og ${extras} ekstra talkort`:''}.`;
   return {assigned,extras};
