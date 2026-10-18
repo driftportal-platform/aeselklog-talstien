@@ -632,12 +632,11 @@ $('deleteParentProfile').addEventListener('click',()=>{
  }else $('parentReportContent').textContent='Profilen kunne ikke slettes på denne enhed.';
 });
 $('homePlay').addEventListener('click',()=>show('setup'));
+ $('openOnlineGame')?.addEventListener('click',()=>{location.href='./site/online.html'});
 $('homeSettings').addEventListener('click',()=>show('settings'));
 $('homeTopscore').addEventListener('click',openTopscore);
 
-document.getElementById('homeOnline')?.addEventListener('click', () => {
-  location.href = './site/online.html';
-});
+
 
 // Musikken er slukket som udgangspunkt. Samme indstilling bruges i begge spiltyper.
 const bgMusic=window.AeselMusic;

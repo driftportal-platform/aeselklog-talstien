@@ -15,14 +15,16 @@
  }
  const countOf=(p)=>p.closed.length+p.open.length;
  const copy=(state)=>JSON.parse(JSON.stringify(state));
- function shuffledDeck(range,rng=Math.random){
+ function shuffledDeck(range,rng=Math.random,deckSets=5){
   const [first,last]=bounds(range),cards=[];
-  for(let n=first;n<=last;n++)for(let i=0;i<5;i++)cards.push(n);
+  for(let n=first;n<=last;n++)for(let i=0;i<deckSets;i++)cards.push(n);
   for(let i=cards.length-1;i>0;i--){const v=Number(rng());const j=Math.max(0,Math.min(i,Math.floor((Number.isFinite(v)?v:0.5)*(i+1))));[cards[i],cards[j]]=[cards[j],cards[i]];}
   return cards;
  }
- function start({range='1-20',variant='collect',extraPenalty=false,donkeyCount=8,names=['Spiller 1','Spiller 2'],vsCPU=false}={},rng=Math.random){
+ function start({range='1-20',variant='collect',extraPenalty=false,donkeyCount=8,names=['Spiller 1','Spiller 2'],vsCPU=false,deckSets=5,cpuErrorPercent=0}={},rng=Math.random){
   bounds(range);
+  if(!Number.isInteger(deckSets)||deckSets<1||deckSets>5)throw Error('Vælg 1–5 kortsæt.');
+  if(!Number.isInteger(cpuErrorPercent)||cpuErrorPercent<0||cpuErrorPercent>100)throw Error('Ugyldig fejlprocent.');
   if(!['collect','passing'].includes(variant))throw Error('Ugyldig kortvariant.');
   if(!Array.isArray(names)||names.length<(vsCPU?1:2)||names.length>6)throw Error(vsCPU?'Kortspil mod æslet kræver 1–6 personer.':'Kortspillet kræver 2–6 personer.');
   const clean=names.map((s,i)=>String(s||'').trim().slice(0,25)||`Spiller ${i+1}`);
@@ -31,8 +33,8 @@
   if(![1,4,6,8].includes(total))throw Error('Ugyldigt antal æselkort.');
   const players=clean.map(name=>({name,closed:[],open:[],donkeys:0,isCPU:false}));
   if(vsCPU){if(clean.some(name=>name.toLocaleLowerCase('da-DK')==='æslet'))throw Error('Vælg et andet spillernavn end Æslet.');players.push({name:'Æslet',closed:[],open:[],donkeys:0,isCPU:true});}
-  shuffledDeck(range,rng).forEach((n,i)=>players[i%players.length].closed.push(n));
-  const state={version:VERSION,range,variant,extraPenalty:!!extraPenalty,donkeyCount:total,players,centers:[],turn:0,pending:null,finished:false,winner:null,turnCount:1,message:'Spillet er klar! Første spiller må vende et kort.',lastAction:'start',lastMove:null};
+  shuffledDeck(range,rng,deckSets).forEach((n,i)=>players[i%players.length].closed.push(n));
+  const state={version:VERSION,range,deckSets,cpuErrorPercent,variant,extraPenalty:!!extraPenalty,donkeyCount:total,players,centers:[],turn:0,pending:null,finished:false,winner:null,turnCount:1,message:'Spillet er klar! Første spiller må vende et kort.',lastAction:'start',lastMove:null};
   if(!validate(state))throw Error('Kunne ikke starte kortspillet.');
   return state;
  }
@@ -41,6 +43,9 @@
   if(!state||typeof state!=='object'||state.version!==VERSION||!RANGES.includes(state.range)||!['collect','passing'].includes(state.variant))return false;
   if(typeof state.extraPenalty!=='boolean'||!Number.isInteger(state.donkeyCount)||![1,4,6,8].includes(state.donkeyCount))return false;
   if(state.variant==='passing'&&state.donkeyCount!==1)return false;
+  // Ældre gemte spil brugte altid fem kopier og ingen CPU-fejl.
+  if(state.deckSets!==undefined&&(!Number.isInteger(state.deckSets)||state.deckSets<1||state.deckSets>5))return false;
+  if(state.cpuErrorPercent!==undefined&&(!Number.isInteger(state.cpuErrorPercent)||state.cpuErrorPercent<0||state.cpuErrorPercent>100))return false;
   if(!Array.isArray(state.players)||state.players.length<2||state.players.length>7)return false;
   if(!Array.isArray(state.centers)||state.centers.length>5)return false;
   if(!Number.isInteger(state.turn)||state.turn<0||state.turn>=state.players.length)return false;
@@ -65,7 +70,7 @@
    if(pile.some(n=>!push(n)))return false;
   }
   if(state.pending!==null&&(!push(state.pending)||state.finished))return false;
-  if([...counted.values()].some(v=>v!==5))return false;
+  if([...counted.values()].some(v=>v!==(state.deckSets??5)))return false;
   if(state.finished&&countOf(state.players[state.winner])!==0)return false;
   if(!Number.isSafeInteger(state.turnCount)||state.turnCount<1||state.turnCount>200000)return false;
   if(typeof state.message!=='string'||state.message.length>400)return false;
@@ -167,7 +172,7 @@
   isPlayersTurn(state);
   if(!Number.isInteger(index)||index<0||index>=state.players.length)throw Error('Vælg en spiller.');
   if(state.pending!==null&&!allowPending)throw Error('Læg først det vendte kort.');
-  const p=state.players[index];if(p.isCPU)throw Error('Æslet kan ikke få æselkort.');let assigned=false;
+  const p=state.players[index];let assigned=false;
   if(state.variant==='passing'){
    for(const other of state.players)other.donkeys=0;
    p.donkeys=1;assigned=true;
@@ -232,8 +237,7 @@
   if(source==='open'&&(state.pending!==null||!p.open.length))throw Error('Placér først det vendte kort.');
   const n=source==='pending'?state.pending:p.open.at(-1);
   const dest=normalizeDestination(state,target,source),expected=preferredTarget(state,n,actor);
-  // Human players may make challengeable mistakes; CPU never may.
-  if(p.isCPU&&!(dest.kind==='self-open'?!expected:sameTarget(dest,expected)))throw Error('Æslet må kun udføre lovlige træk.');
+  // CPU-fejl styres kun af den valgte procent i UI; alle træk kan udfordres.
   const valid=dest.kind==='self-open'?!expected:sameTarget(dest,expected);
   const before=snapshot(state);
   if(source==='pending')state.pending=null;else p.open.pop();
@@ -259,7 +263,6 @@
   const restored=copy(move.before);restored.lastMove=null;
   // Annullér kun det sidst udførte træk; alle tidligere bunker beholdes.
   Object.keys(state).forEach(k=>delete state[k]);Object.assign(state,restored);
-  if(state.players[actor].isCPU){state.lastMove=null;state.message='Æslets ugyldige træk blev fortrudt uden strafkort.';return {caught:true,actor,number,assigned:false,extras:0};}
   const result=penalty(state,actor,{allowPending:true});state.lastMove=null;
   state.message=`🫏 ${state.players[actor].name} blev opdaget! Trækket med ${number} er fortrudt. ${result.assigned?'Ét æselkort i straf.':'Alle æselkort var allerede uddelt.'}${result.extras?` + ${result.extras} talkort`:''}`;
   return {caught:true,actor,number,...result};

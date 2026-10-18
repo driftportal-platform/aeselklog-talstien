@@ -56,6 +56,7 @@ function renderNameInputs(count){
 }
 function syncCpuSetting(){
  const isCpu=$('cardCpuCheck').checked;
+ const cpuSettings=$('cardCpuErrorSettings');if(cpuSettings)cpuSettings.hidden=!isCpu;
  const one=$('cardPlayerCount').querySelector('option[value="1"]');if(one)one.disabled=!isCpu;
  if(!isCpu&&Number($('cardPlayerCount').value)<2)$('cardPlayerCount').value='2';
  renderNameInputs(Number($('cardPlayerCount').value));
@@ -135,7 +136,7 @@ function render(){if(!game)return;
  $('cardsMessage').textContent=game.message;
  renderStacks();renderControls();
  const sel=Number($('cardPenaltyPlayer').value);$('cardPenaltyPlayer').replaceChildren();
- game.players.forEach((x,i)=>{if(x.isCPU)return;const opt=document.createElement('option');opt.value=String(i);opt.textContent=x.name+(x.isCPU?' (CPU)':'');$('cardPenaltyPlayer').append(opt)});
+ game.players.forEach((x,i)=>{const opt=document.createElement('option');opt.value=String(i);opt.textContent=x.name+(x.isCPU?' (CPU)':'');$('cardPenaltyPlayer').append(opt)});
  const last=game.lastMove;
  $('cardPenaltyPlayer').value=String(last&&last.actor>=0?last.actor:Number.isInteger(sel)&&sel>=0&&sel<game.players.length?sel:game.turn);
  $('cardsChallenge').disabled=!last;
@@ -143,7 +144,7 @@ function render(){if(!game)return;
  $('cardChallengeHint').textContent=last?`Udfordr ${game.players[last.actor].name}s seneste træk med kort ${last.number}. Er det forkert, bliver det fortrudt og giver straf.`:'Tryk på æselkortet, når I opdager et forkert træk. Appen retter ikke kort automatisk.';
  $('cardPenalties').hidden=false;
  $('cardPenaltyDesc').textContent=game.variant==='passing'?`Ét æselkort i spil · ${game.players.find(x=>x.donkeys)?.name||'i puljen'}`:`${E.stock(game)} af ${game.donkeyCount} æselkort tilbage i strafpuljen`;
- $('cardsPlayInfo').textContent=`${game.players.filter(x=>!x.isCPU).length} personer${game.players.some(x=>x.isCPU)?' + Æslet':''} · ${game.extraPenalty?'Ekstra kortstraf tilvalgt':'Kun æselkort ved fejl'} · ${game.turnCount}. tur`;
+ $('cardsPlayInfo').textContent=`${game.deckSets??5} sæt · ${game.players.filter(x=>!x.isCPU).length} personer${game.players.some(x=>x.isCPU)?' + Æslet':''} · ${game.extraPenalty?'Ekstra kortstraf tilvalgt':'Kun æselkort ved fejl'} · ${game.turnCount}. tur`;
  $('cardInteractionHint').textContent=chosenSource?'Tryk på en bunke for at lægge kortet – også hvis placeringen er forkert.':'Træk et kort, eller tryk først på kortet og derefter på den ønskede bunke.';
 }
 function punish(){if(!game||!game.lastMove)return;
@@ -152,7 +153,7 @@ function punish(){if(!game||!game.lastMove)return;
  const result=act(()=>E.challenge(game));if(result?.caught)donkeySound();
 }
 function manualPenalty(){if(!game||game.finished)return;
- const index=Number($('cardPenaltyPlayer').value);if(game.players[index]?.isCPU)return;
+ const index=Number($('cardPenaltyPlayer').value);
  if(!window.confirm(`Giv ${game.players[index]?.name||'spilleren'} manuel æselstraf? (Fortryder ikke et korttræk, medmindre I bruger æselkort-knappen.)`))return;
  const result=act(()=>E.penalty(game,index));if(result)donkeySound();
 }
@@ -160,6 +161,10 @@ function cpuChoiceTarget(source){
  const n=source==='pending'?game.pending:game.players[game.turn].open.at(-1);
  const correct=E.preferredTarget(game,n);
  // Pending card may be discarded only if no playable destination exists.
+ const rate=Number(game.cpuErrorPercent||0);
+ // Bevidst CPU-fejl: overser et gyldigt træk og lægger vendt kort i egen åbne bunke.
+ // Det skifter tur, så mennesket kan udfordre uden at CPU'en fortsætter straks.
+ if(source==='pending'&&correct&&rate>0&&Math.random()*100<rate)return {kind:'self-open'};
  return correct||(source==='pending'?{kind:'self-open'}:null);
 }
 function cpuStep(){if(!game||game.finished||!game.players[game.turn].isCPU||document.hidden)return;
@@ -183,6 +188,8 @@ function runTurnTimers(thisRevision){
   },1100);
  }
  if(game.players[game.turn]?.isCPU){
+  // Vent på menneskets udfordring efter Æslets fejl.
+  if(game.lastMove?.actor===cpuIndex&&!game.lastMove.valid)return;
   cpuTimer=setTimeout(()=>{if(thisRevision!==revision)return;cpuStep();},game.lastMove?.actor===cpuIndex?1700:1100);
  }
 }
@@ -236,13 +243,14 @@ playRoot.addEventListener('pointerdown',dragStart);document.addEventListener('po
 document.addEventListener('pointercancel',dragCleanup);
 $('cardVariant').addEventListener('change',syncVariant);
 $('cardCpuCheck').addEventListener('change',syncCpuSetting);
+ $('cardCpuMistakes')?.addEventListener('change',()=>{$('cardCpuErrorPercent').disabled=!$('cardCpuMistakes').checked});
 $('cardPlayerCount').addEventListener('change',()=>renderNameInputs(Number($('cardPlayerCount').value)));
 $('openCardSetup').addEventListener('click',()=>{renderResume();navigate('cardsSetup')});
 $('cardsSetupBack').addEventListener('click',()=>navigate('setup'));
 $('cardStart').addEventListener('click',()=>{
  $('cardsSetupError').textContent='';const names=[...$('cardPlayerNames').querySelectorAll('input')].map(input=>input.value.trim());
  if(readSaved()&&!window.confirm('Et tidligere kortspil bliver erstattet. Vil I starte et nyt?'))return;
- begin({range:$('cardRange').value,variant:$('cardVariant').value,donkeyCount:Number($('cardDonkeyCount').value),extraPenalty:$('cardExtraPenalty').checked,names,vsCPU:$('cardCpuCheck').checked});
+ begin({range:$('cardRange').value,variant:$('cardVariant').value,donkeyCount:Number($('cardDonkeyCount').value),extraPenalty:$('cardExtraPenalty').checked,names,vsCPU:$('cardCpuCheck').checked,deckSets:Number($('cardDeckSets').value),cpuErrorPercent:$('cardCpuCheck').checked&&$('cardCpuMistakes').checked?Number($('cardCpuErrorPercent').value):0});
 });
 $('cardsContinue').addEventListener('click',()=>{const saved=readSaved();if(!saved){renderResume();return}stopTimers();stopVoice();game=saved;navigate('cardsGame');render();speechDone=announceCard('Vi fortsætter kortspillet!');schedule()});
 $('cardsDeleteSave').addEventListener('click',()=>{if(!window.confirm('Slet det gemte kortspil? Talstien og læringsprofiler berøres ikke.'))return;clear();renderResume()});

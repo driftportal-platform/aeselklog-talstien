@@ -18,7 +18,7 @@
 <div class="shell">
   <header class="top">
     <div class="brand"><div class="logo" aria-hidden="true">🫏</div><div><h1>Æsel<span class="red">Klog</span> · Talstien</h1><small>Spil, lær og grin sammen</small></div></div>
-    <div class="top-actions"><span class="pill">PRØVEVERSION 0.9.36 (stabilitet og ikoner)</span><button id="voiceToggle" class="btn soft small" type="button" aria-pressed="true">🔊 Lyd til</button></div>
+    <div class="top-actions"><span class="pill">PRØVEVERSION 0.9.40 (stabilitet og ikoner)</span><button id="voiceToggle" class="btn soft small" type="button" aria-pressed="true">🔊 Lyd til</button></div>
   </header>
 
 
@@ -31,11 +31,6 @@
         <button type="button" id="homePlay" class="home-hit home-hit-play" aria-label="Spil – klar til et nyt eventyr"><span class="visually-hidden">Spil</span></button>
         <button type="button" id="homeSettings" class="home-hit home-hit-settings" aria-label="Indstillinger – gør spillet til jeres eget"><span class="visually-hidden">Indstillinger</span></button>
         <button type="button" id="homeTopscore" class="home-hit home-hit-scores" aria-label="Topscore – se de dygtigste"><span class="visually-hidden">Topscore</span></button>
-        <button type="button" id="homeOnline" class="home-button" style="background:linear-gradient(100deg,#ffd6a5,#ffb86c);border-color:#f4a261;margin-top:8px">
-          <span class="home-icon">🌐</span>
-          <span><strong>ONLINE SPIL</strong><small>Spil kort med en anden enhed (forældrelås)</small></span>
-          <span class="home-arrow">➜</span>
-        </button>
         <button type="button" id="homeAbout" class="home-hit home-hit-about" aria-label="Om spillet – sådan spiller I"><span class="visually-hidden">Om spillet</span></button>
         <!-- Kun synlig ved lokalt gemt spil. Ligger i samme koordinatsystem som forsideillustrationen. -->
         <section id="resumeCard" class="resume-card resume-compact" aria-label="Fortsæt gemt spil" hidden>
@@ -179,6 +174,7 @@
         <span class="game-mode-check" aria-hidden="true">✓</span>
       </button>
       <button type="button" id="openTalkort" class="game-mode-card game-mode-talkort" aria-pressed="false"><span class="game-mode-icon" aria-hidden="true">🔢</span><span class="game-mode-copy"><strong>Talkort</strong><small>Se og hør tallene fra 1 til 100</small></span><span class="game-mode-check" aria-hidden="true">✓</span></button>
+      <button type="button" id="openOnlineGame" class="game-mode-card game-mode-online" aria-label="Online kortspil – voksenstyret pilot"><span class="game-mode-icon" aria-hidden="true">🌐</span><span class="game-mode-copy"><strong>Online spil 🔒</strong><small>Spil kort på hver sin enhed · voksenstyret pilot</small></span><span class="game-mode-check" aria-hidden="true">➜</span></button>
     </div>
     <div class="settings-glance" id="settingsSummary" aria-live="polite"><span>⚙️ Spillet er klar med dine indstillinger.</span><button type="button" id="setupEditSettings" class="btn soft small">Skift indstillinger</button></div>
     <div class="paper"><div class="row between"><div><h2>👨‍👩‍👧 Spillere</h2></div><button type="button" id="addPlayer" class="btn soft small">+ Tilføj spiller</button></div><p class="tiny setup-player-limit" id="boardPlayerLimitNote">Op til 6 spillere samt eventuelt CPU-æslet.</p><div id="playerInputs"></div>
@@ -246,12 +242,14 @@
         <h3>🫏 Æselkort og straf</h3>
         <label class="field" for="cardVariant"><span>Hvilket kortspil?</span><select id="cardVariant"><option value="collect">Klassisk ÆselKlog – behold æselkortene</option><option value="passing">Send æslet videre – kun ét æselkort</option></select></label>
         <p class="tiny" id="cardVariantInfo"></p>
+        <label class="field" for="cardDeckSets"><span>Antal kortsæt</span><select id="cardDeckSets"><option value="1">1 sæt · 20 kort</option><option value="2">2 sæt · 40 kort</option><option value="3">3 sæt · 60 kort</option><option value="4">4 sæt · 80 kort</option><option value="5" selected>5 sæt · 100 kort</option></select></label>
         <label class="field" id="cardDonkeySetting" for="cardDonkeyCount"><span>Antal æselkort i strafpuljen</span><select id="cardDonkeyCount"><option value="4">4 æselkort</option><option value="6">6 æselkort</option><option value="8" selected>8 æselkort</option></select></label>
         <label class="option card-extra-rule"><input type="checkbox" id="cardExtraPenalty"><span><strong>Ekstra kortstraf</strong><small>Ved fejl giver hver af de andre spillere ét kort fra sin lukkede bunke, hvis de har et.</small></span></label>
       </div>
       <div class="paper"><h3>👨‍👩‍👧‍👦 Spillere</h3>
         <label class="field" for="cardPlayerCount"><span>Antal personer</span><select id="cardPlayerCount"><option value="1" disabled>1 person (kun mod æslet)</option><option value="2">2 personer</option><option value="3">3 personer</option><option value="4">4 personer</option><option value="5">5 personer</option><option value="6">6 personer</option></select></label>
         <label class="option card-cpu-toggle"><input type="checkbox" id="cardCpuCheck"><span><strong>🫏 Spil mod Æslet</strong><small>Én person kan spille alene. Æslet vender og lægger kort automatisk.</small></span></label>
+        <div id="cardCpuErrorSettings" class="field" hidden><label class="option"><input type="checkbox" id="cardCpuMistakes"><span><strong>🫏 Æslet kan lave fejl</strong><small>En opdaget fejl kan give Æslet strafkort.</small></span></label><label for="cardCpuErrorPercent">Fejl ved mulige korttræk</label><select id="cardCpuErrorPercent" disabled><option value="5">5 %</option><option value="10" selected>10 %</option><option value="15">15 %</option><option value="20">20 %</option><option value="25">25 %</option><option value="35">35 %</option><option value="50">50 %</option><option value="75">75 %</option><option value="100">100 %</option></select></div>
         <div id="cardPlayerNames" class="card-name-grid"></div>
         <p class="tiny" id="cardCpuHint">I spiller på samme enhed og holder selv øje med hinandens træk.</p>
         <button type="button" id="cardPhysicalRules" class="btn soft block">🃏 Se regler til de fysiske kort</button>
@@ -265,11 +263,12 @@
     <div class="card-game-top"><div><h2 id="cardsPlayTitle">🃏 ÆselKlog – Kortspil</h2><p id="cardsPlayInfo" class="tiny"></p></div><div class="row"><button class="btn soft small" id="cardsMusicToggle" type="button" aria-pressed="false">🎵 Musik fra</button><button class="btn soft small" id="cardsVoiceToggle" type="button" aria-pressed="true">🔊 Tale til</button><button class="btn soft small" id="cardsRules" type="button">📖 Regler</button><button class="btn soft small" id="cardsSaveHome" type="button">💾 Gem og tilbage</button><button class="btn danger small" id="cardsFinish" type="button">✕ Afslut</button></div></div>
     <div class="card-game-status" role="status" aria-live="polite"><h3 id="cardsTurnHeading">Næste tur</h3><p id="cardsMessage"></p></div>
     <div class="card-table">
-      <section class="paper card-game-players" aria-label="Spillernes bunker"><div class="card-section-heading"><h3>🃏 Spillernes bunker</h3><p id="cardInteractionHint" class="card-table-hint" role="status" aria-live="polite">Tryk på bunken for at vende. Træk kortet til en anden bunke.</p></div><div id="cardsPlayers" class="card-players-grid"></div><div class="card-number-repeat"><button class="btn soft" id="cardsRepeatNumber" type="button">🔊 Hør tallet igen</button></div></section>
+      <section class="paper card-game-players" aria-label="Spillernes bunker"><div class="card-section-heading"><h3>🃏 Spillernes bunker</h3><p id="cardInteractionHint" class="card-table-hint" role="status" aria-live="polite">Tryk på bunken for at vende. Træk kortet til en anden bunke.</p></div><div id="cardsPlayers" class="card-players-grid"></div><section class="paper card-challenge" aria-label="Opdagede fejl"><button id="cardsChallenge" type="button" class="card-challenge-button" disabled><img src="./aeselklog-card.webp" alt=""><span><strong>🫏 Opdaget fejl!</strong><small>Tryk på æselkortet for at udfordre det seneste træk</small></span></button><p id="cardChallengeHint" class="tiny">Kortet går tilbage, hvis trækket var forkert. Straf gives derefter.</p></section>
+      <div class="card-number-repeat"><button class="btn soft" id="cardsRepeatNumber" type="button">🔊 Hør tallet igen</button></div></section>
       <section class="paper card-game-center" aria-label="Kortbunker midt på bordet"><div class="card-section-heading"><h3>🌹 Rækker i midten</h3><small>Træk eller tryk et kort hertil</small></div><div id="cardsCenter" class="card-center-piles"></div></section>
     </div>
     <div class="card-quick-actions" id="cardMoveButtons" aria-label="Alternative kortkommandoer"></div>
-    <section class="paper card-challenge" aria-label="Opdagede fejl"><button id="cardsChallenge" type="button" class="card-challenge-button" disabled><img src="./aeselklog-card.webp" alt=""><span><strong>🫏 Opdaget fejl!</strong><small>Tryk på æselkortet for at udfordre det seneste træk</small></span></button><p id="cardChallengeHint" class="tiny">Kortet går tilbage, hvis trækket var forkert. Straf gives derefter.</p></section>
+    
     <details class="paper card-penalty" id="cardPenalties"><summary>⚙️ Manuel straf (ekstra mulighed)</summary><p class="tiny" id="cardPenaltyDesc"></p><div class="row"><label for="cardPenaltyPlayer">Hvem lavede fejlen?</label><select id="cardPenaltyPlayer"></select><button type="button" id="cardsGivePenalty" class="btn danger">🫏 Giv strafkort</button></div><p class="tiny">Ved en fejl i det seneste træk: brug æselkortet ovenfor for at fortryde og give straf. Denne ekstra mulighed giver kun en manuelt aftalt straf.</p></details>
     <button id="cardsHome" type="button" class="btn soft">← Til kortspil-menuen</button>
   </section>

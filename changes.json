@@ -1,0 +1,78 @@
+{
+  "cardgame-engine.js": [
+    {
+      "old": " function shuffledDeck(range,rng=Math.random){\n",
+      "new": " function shuffledDeck(range,rng=Math.random,deckSets=5){\n"
+    },
+    {
+      "old": "  for(let n=first;n<=last;n++)for(let i=0;i<5;i++)cards.push(n);\n",
+      "new": "  for(let n=first;n<=last;n++)for(let i=0;i<deckSets;i++)cards.push(n);\n"
+    },
+    {
+      "old": " function start({range='1-20',variant='collect',extraPenalty=false,donkeyCount=8,names=['Spiller 1','Spiller 2'],vsCPU=false}={},rng=Math.random){\n",
+      "new": " function start({range='1-20',variant='collect',extraPenalty=false,donkeyCount=8,names=['Spiller 1','Spiller 2'],vsCPU=false,deckSets=5,cpuErrorPercent=0}={},rng=Math.random){\n"
+    },
+    {
+      "old": "  bounds(range);\n",
+      "new": "  bounds(range);\n  if(!Number.isInteger(deckSets)||deckSets<1||deckSets>5)throw Error('Vælg 1–5 kortsæt.');\n  if(!Number.isInteger(cpuErrorPercent)||cpuErrorPercent<0||cpuErrorPercent>100)throw Error('Ugyldig fejlprocent.');\n"
+    },
+    {
+      "old": "  shuffledDeck(range,rng).forEach((n,i)=>players[i%players.length].closed.push(n));\n  const state={version:VERSION,range,variant,extraPenalty:!!extraPenalty,donkeyCount:total,players,centers:[],turn:0,pending:null,finished:false,winner:null,turnCount:1,message:'Spillet er klar! Første spiller må vende et kort.',lastAction:'start',lastMove:null};\n",
+      "new": "  shuffledDeck(range,rng,deckSets).forEach((n,i)=>players[i%players.length].closed.push(n));\n  const state={version:VERSION,range,deckSets,cpuErrorPercent,variant,extraPenalty:!!extraPenalty,donkeyCount:total,players,centers:[],turn:0,pending:null,finished:false,winner:null,turnCount:1,message:'Spillet er klar! Første spiller må vende et kort.',lastAction:'start',lastMove:null};\n"
+    },
+    {
+      "old": "  if(state.variant==='passing'&&state.donkeyCount!==1)return false;\n",
+      "new": "  if(state.variant==='passing'&&state.donkeyCount!==1)return false;\n  // Ældre gemte spil brugte altid fem kopier og ingen CPU-fejl.\n  if(state.deckSets!==undefined&&(!Number.isInteger(state.deckSets)||state.deckSets<1||state.deckSets>5))return false;\n  if(state.cpuErrorPercent!==undefined&&(!Number.isInteger(state.cpuErrorPercent)||state.cpuErrorPercent<0||state.cpuErrorPercent>100))return false;\n"
+    },
+    {
+      "old": "  if([...counted.values()].some(v=>v!==5))return false;\n",
+      "new": "  if([...counted.values()].some(v=>v!==(state.deckSets??5)))return false;\n"
+    },
+    {
+      "old": "  const p=state.players[index];if(p.isCPU)throw Error('Æslet kan ikke få æselkort.');let assigned=false;\n",
+      "new": "  const p=state.players[index];let assigned=false;\n"
+    },
+    {
+      "old": "  // Human players may make challengeable mistakes; CPU never may.\n  if(p.isCPU&&!(dest.kind==='self-open'?!expected:sameTarget(dest,expected)))throw Error('Æslet må kun udføre lovlige træk.');\n",
+      "new": "  // CPU-fejl styres kun af den valgte procent i UI; alle træk kan udfordres.\n"
+    },
+    {
+      "old": "  if(state.players[actor].isCPU){state.lastMove=null;state.message='Æslets ugyldige træk blev fortrudt uden strafkort.';return {caught:true,actor,number,assigned:false,extras:0};}\n",
+      "new": ""
+    }
+  ],
+  "cardgame-ui.js": [
+    {
+      "old": " const isCpu=$('cardCpuCheck').checked;\n",
+      "new": " const isCpu=$('cardCpuCheck').checked;\n const cpuSettings=$('cardCpuErrorSettings');if(cpuSettings)cpuSettings.hidden=!isCpu;\n"
+    },
+    {
+      "old": " game.players.forEach((x,i)=>{if(x.isCPU)return;const opt=document.createElement('option');opt.value=String(i);opt.textContent=x.name+(x.isCPU?' (CPU)':'');$('cardPenaltyPlayer').append(opt)});\n",
+      "new": " game.players.forEach((x,i)=>{const opt=document.createElement('option');opt.value=String(i);opt.textContent=x.name+(x.isCPU?' (CPU)':'');$('cardPenaltyPlayer').append(opt)});\n"
+    },
+    {
+      "old": " $('cardsPlayInfo').textContent=`${game.players.filter(x=>!x.isCPU).length} personer${game.players.some(x=>x.isCPU)?' + Æslet':''} · ${game.extraPenalty?'Ekstra kortstraf tilvalgt':'Kun æselkort ved fejl'} · ${game.turnCount}. tur`;\n",
+      "new": " $('cardsPlayInfo').textContent=`${game.deckSets??5} sæt · ${game.players.filter(x=>!x.isCPU).length} personer${game.players.some(x=>x.isCPU)?' + Æslet':''} · ${game.extraPenalty?'Ekstra kortstraf tilvalgt':'Kun æselkort ved fejl'} · ${game.turnCount}. tur`;\n"
+    },
+    {
+      "old": " const index=Number($('cardPenaltyPlayer').value);if(game.players[index]?.isCPU)return;\n",
+      "new": " const index=Number($('cardPenaltyPlayer').value);\n"
+    },
+    {
+      "old": " // Pending card may be discarded only if no playable destination exists.\n",
+      "new": " // Pending card may be discarded only if no playable destination exists.\n const rate=Number(game.cpuErrorPercent||0);\n // Bevidst CPU-fejl: overser et gyldigt træk og lægger vendt kort i egen åbne bunke.\n // Det skifter tur, så mennesket kan udfordre uden at CPU'en fortsætter straks.\n if(source==='pending'&&correct&&rate>0&&Math.random()*100<rate)return {kind:'self-open'};\n"
+    },
+    {
+      "old": " if(game.players[game.turn]?.isCPU){\n",
+      "new": " if(game.players[game.turn]?.isCPU){\n  // Vent på menneskets udfordring efter Æslets fejl.\n  if(game.lastMove?.actor===cpuIndex&&!game.lastMove.valid)return;\n"
+    },
+    {
+      "old": "$('cardCpuCheck').addEventListener('change',syncCpuSetting);\n",
+      "new": "$('cardCpuCheck').addEventListener('change',syncCpuSetting);\n $('cardCpuMistakes')?.addEventListener('change',()=>{$('cardCpuErrorPercent').disabled=!$('cardCpuMistakes').checked});\n"
+    },
+    {
+      "old": " begin({range:$('cardRange').value,variant:$('cardVariant').value,donkeyCount:Number($('cardDonkeyCount').value),extraPenalty:$('cardExtraPenalty').checked,names,vsCPU:$('cardCpuCheck').checked});\n",
+      "new": " begin({range:$('cardRange').value,variant:$('cardVariant').value,donkeyCount:Number($('cardDonkeyCount').value),extraPenalty:$('cardExtraPenalty').checked,names,vsCPU:$('cardCpuCheck').checked,deckSets:Number($('cardDeckSets').value),cpuErrorPercent:$('cardCpuCheck').checked&&$('cardCpuMistakes').checked?Number($('cardCpuErrorPercent').value):0});\n"
+    }
+  ]
+}

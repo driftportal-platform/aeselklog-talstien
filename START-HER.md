@@ -1,27 +1,42 @@
-# ÆselKlog – Online-knap og forbindelsesrettelse
+# ÆselKlog – kortspil, æselfejl, menu og tilbageknap
 
-Denne pakke retter den forkerte Worker-adresse i `/site/online-config.js` og flytter knappen fra forsideillustrationen til menuen **Spil**. Ændringerne er målrettede, så nyere kode ikke erstattes af gamle filer.
+Dette er en **målrettet kildekodeopdatering** – ikke en komplet app. Den indeholder ingen MP3-filer, ændrer ingen Cloudflare Worker og sender intet til GitHub automatisk.
 
-## Installation (Windows)
+## Installation på Windows
+1. Hent **den seneste kode** fra GitHub `driftportal-platform/aeselklog-talstien` via **Code → Download ZIP**, og pak den ud i en ny mappe. Brug ikke en gammel v0.9.36 ZIP: dit GitHub indeholder nyere onlinefiler.
+2. Pak denne opdaterings-ZIP ud. Behold mappen `aeselklog-opdatering` samlet (den indeholder `anvend-opdatering.cjs` og `changes.json`).
+3. Kopiér hele `aeselklog-opdatering`-mappen ind i hovedmappen af den nyligt udpakkede GitHub-kode, ved siden af `index.html`.
+4. Åbn hovedmappen i Stifinder. Skriv `powershell` i adresselinjen. Kør:
 
-1. Hent seneste komplette repository med **Code → Download ZIP** fra https://github.com/driftportal-platform/aeselklog-talstien, og pak det ud.
-2. Pak DENNE ZIP ud et andet sted.
-3. Åbn Terminal/PowerShell i **roden af ÆselKlog-repositoriet**, samme mappe som `index.html` og `app.js`.
-4. Kør med Node (det er allerede installeret):
+   `node .\aeselklog-opdatering\anvend-opdatering.cjs`
 
-   `node "C:\STI\TIL\aeselklog_menu_fix\anvend-opdatering.cjs"`
+5. Hvis den viser `KLAR`, upload disse opdaterede filer til de **samme placeringer** i GitHub: `index.html`, `app.js`, `styles.css`, `sw.js`, `cardgame-engine.js`, `cardgame-ui.js`, `site/online.html`. Brug GitHub's Upload files i rodmappen (for `site/online.html` skal du åbne `site` i repo først).
+6. Test på mobil efter GitHub Pages er opdateret.
 
-   Erstat stien med den faktiske sti til den udpakkede opdateringsmappe. Tip: I Stifinder kan du kopiere filens sti med højreklik → Kopiér som sti.
-5. Upload disse TRE filer til samme placering på GitHub, **uden at slette andre filer**:
-   - `index.html` i repository-roden
-   - `online-menu.js` i repository-roden
-   - `site/online-config.js` i `site`-mappen
-6. Åbn ÆselKlog og genindlæs. Klik Spil → Online spil. Test kun med voksne.
+Ved fejl stopper programmet uden at gemme nye filer. For filer, det ændrer, laves en `.before-aeselklog-update.bak`-kopi. **Upload ikke** backupfilerne eller `aeselklog-opdatering` til GitHub.
 
-Skriptet gemmer `.bak`-filer lokalt, hvis du vil fortryde ændringerne.
+## Hvad der ændres
+- Online spil flyttes fra forside til Spil-menu; links fortsat til `/site/online.html`.
+- Online får en tydelig `← Tilbage til spilmenu`-knap.
+- Kortspil: 1–5 kopier af hvert tal i valgt område (20–100 talkort).
+- CPU-fejl valgfri, fra som standard; fejlprocent bruges kun ved mulige korttræk, hvor Æslet kan overse at placere det vendte kort.
+- Æslet kan nu få strafkort ved en gyldig udfordring på samme vilkår som mennesker. CPU-straf vises i bunkeoversigten, og manuel straf kan målrettes CPU.
+- Den store knap `Opdaget fejl!` er flyttet op over `Hør tallet igen`.
+- Ny PWA-cache-version til kode, uden sletning af den separate MP3-lydcache.
 
 ## Afgrænsning
+- **Dette ændrer det lokale Kortspil**, ikke antal kort i Cloudflare-online-versionen. Online kræver en særskilt serverændring for variable kortsæt.
+- Den valgte CPU-fejlprocent angiver sandsynlighed *pr. relevant, vendt kort med et muligt placeringstræk*, ikke af alle ture.
+- Æslet laver fejl ved at lægge et ellers spilbart kort i sin åbne bunke. Spilleren skal opdage og udfordre fejlen, før senere træk overskriver den seneste hændelse.
+- Den nuværende forældrelås til online er stadig kun en voksenstyret pilot, ikke en stærk serverbeskyttelse.
+- Børnenes iPhone/PWA-afprøvning og live-synkronisering er ikke automatisk testet.
 
-Den hidtidige online-Worker (`aeselklog-online`) ændres IKKE. V0.9.39-klienten ser ud til at forvente nye serverfunktioner (fx `discard` og `challenge`), som ikke findes i den tidligere uploadede v0.9.38-worker. Derfor skal den nye Worker-kode gennemgås og deployes, før vi kan kalde det fuldt spillbart. At knappen og API-adressen virker, er kun forbindelsestest.
+## Forslag til prøver
+1. Start kortspil i 1–20 med 1, 2, 3, 4 og 5 sæt: kontroller 20, 40, 60, 80, 100 kort.
+2. Start mod Æslet med fejl slået fra. Test et almindeligt spil.
+3. Vælg CPU-fejl 100 %, vend til et træk hvor kortet ellers kunne placeres. Tryk på Æselkortets `Opdaget fejl!` før næste træk. Æslet skal nu modtage strafkort, og kortet tilbageføres.
+4. Kontroller både Spil-menu og online Tilbage-knap på iPhone.
+5. Test et gemt kortspil fra før opdateringen.
 
-Forældrelåsen i `/site/parent-gate.js` er lokalt baseret med standardkode 1234 og er IKKE sikker serverbeskyttelse. Online skal fortsat være voksenstyret test.
+## Kendte begrænsninger
+Der er gennemført JavaScript-syntakskontrol samt de tre eksisterende kortspilstests og en særskilt test for 1–5 kortsæt og CPU-straf. Det er **ikke** en live-test på brugerens seneste GitHub-version eller iPhone. Opdateringsprogrammet stopper, hvis afgørende kodeafsnit ikke findes, i stedet for at gætte.

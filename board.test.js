@@ -1,6 +1,6 @@
 // Kør med: node tests/board.test.js
 const assert = require('node:assert/strict');
-const B = require('../board.js');
+const B = require('./board.js');
 assert.equal(B.WIDTH,1700);
 assert.equal(B.HEIGHT,1210);
 assert(B.validate(),'Banens geometriske rækkefølge skal være gyldig');
