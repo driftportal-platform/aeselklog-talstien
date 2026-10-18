@@ -634,6 +634,11 @@ $('deleteParentProfile').addEventListener('click',()=>{
 $('homePlay').addEventListener('click',()=>show('setup'));
 $('homeSettings').addEventListener('click',()=>show('settings'));
 $('homeTopscore').addEventListener('click',openTopscore);
+
+document.getElementById('homeOnline')?.addEventListener('click', () => {
+  location.href = './site/online.html';
+});
+
 // Musikken er slukket som udgangspunkt. Samme indstilling bruges i begge spiltyper.
 const bgMusic=window.AeselMusic;
 function syncMusicButtons(){if(!bgMusic)return;const p=bgMusic.get();
