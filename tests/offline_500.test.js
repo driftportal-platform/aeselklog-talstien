@@ -10,5 +10,5 @@ test('offline audio cache is preserved during upgrades; no precache of 500',()=>
 });
 test('talkort and common voice playback prefer the recorded numbers',()=>{
  const app=fs.readFileSync(path.join(root,'app.js'),'utf8'),ui=fs.readFileSync(path.join(root,'talkort.js'),'utf8'),html=fs.readFileSync(path.join(root,'index.html'),'utf8');
- assert.match(app,/AeselOfflineNumbers\.play\(n,numberLanguage,role\)/);assert.match(ui,/AeselVoice\.number\(number/);assert.match(html,/id="downloadNumberAudio"/);assert.match(html,/id="stopNumberAudio"/);
+ assert.match(app,/AeselOfflineNumbers\.play\(n,numberLanguage,role\)/);assert.match(ui,/AeselOfflineNumbers\.play\(number,language,role\)/);assert.doesNotMatch(ui,/AeselVoice\.number\(/,'Talkort must not fall back to TTS');assert.match(html,/id="downloadNumberAudio"/);assert.match(html,/id="stopNumberAudio"/);
 });

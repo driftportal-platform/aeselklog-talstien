@@ -18,8 +18,8 @@ const caches={
   match:async req=>typeof req==='string'&&req==='./index.html' ? {ok:true,from:'index-offline'} : req.mode==='navigate' ? undefined : (req.url||'').endsWith('home-fullscreen.webp') ? {ok:true,from:'media-cache'} : {ok:true,from:'asset-offline'}
 };
 let fetches=0;
-let networkOffline=true;
-async function fetchMock(req){fetches++;if(networkOffline)throw Error('offline');return {ok:true,clone(){return this},from:'network'}}
+let networkOffline=true,networkHangs=false;
+async function fetchMock(req){fetches++;if(networkHangs)return new Promise(()=>{});if(networkOffline)throw Error('offline');return {ok:true,clone(){return this},from:'network'}}
 const scope='https://example.org/aeselklog-talstien/';
 const self={
   addEventListener:(name,cb)=>{listeners[name]=cb},
@@ -28,7 +28,9 @@ const self={
   location:{origin:'https://example.org'},
   registration:{scope}
 };
-vm.runInNewContext(worker,{self,caches,fetch:fetchMock,URL,Promise,console});
+// Kort timeout i testen i stedet for de rigtige 3 sekunder.
+const fastTimeout=fn=>setTimeout(fn,5);
+vm.runInNewContext(worker,{self,caches,fetch:fetchMock,URL,Promise,console,setTimeout:fastTimeout,clearTimeout});
 async function dispatch(name,request){
   let result;
   let lifetime=[];
@@ -46,12 +48,20 @@ async function dispatch(name,request){
   assert(precached.includes('./profiles.js'),'learning profiles module must be available offline');
   assert(precached.includes('./parentreport.js'),'parent report module must be available offline');
   assert(precached.includes('./actionfx.js'),'action effects must be available offline');
-  assert(worker.includes('aeselklog-talstien-v0930-practice-auto'),'PWA must use v0.9.30 cache');
+  assert([...cacheMap.keys()].some(name=>/^aeselklog-talstien-v\d+$/.test(name)),'PWA must use a cache name derived from VERSION');
   assert(precached.includes('./cardgame-engine.js'),'new card game rules must work offline');
   assert(precached.includes('./cardgame-ui.js'),'card game UI must work offline');
   assert(precached.includes('./music.js'),'offline music must precache');
   assert(precached.includes('./numbers.js'),'number speech must work offline');
   assert(precached.includes('./talkort.js'),'talkort viewer must work offline');
+  const manifest=JSON.parse(fs.readFileSync(path.join(root,'manifest.webmanifest'),'utf8'));
+  for(const icon of manifest.icons){const rel=icon.src.replace(/^\.\//,'');assert(fs.existsSync(path.join(root,rel)),'manifest icon missing '+icon.src);assert(precached.includes(icon.src),'manifest icon must be precached '+icon.src)}
+  assert(manifest.icons.some(i=>i.type==='image/png'&&i.sizes==='512x512'&&i.purpose==='maskable'),'maskable PNG icon required');
+  const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
+  assert(html.includes('rel="apple-touch-icon"'),'iOS needs apple-touch-icon');
+  assert(precached.includes('./apple-touch-icon.png'),'apple-touch-icon must be precached');
+  const swVersion=/const VERSION='([0-9.]+)'/.exec(worker)?.[1],pageVersion=/PRØVEVERSION ([0-9.]+)/.exec(html)?.[1];
+  assert.equal(swVersion,pageVersion,'sw.js VERSION must match the version shown in index.html');
   for(const name of ['gone-fishin.mp3','childrens-march.mp3','beary-fishy.mp3'])assert(precached.includes('./music/'+name),'PWA must precache '+name);
   for(const asset of precached){
     const relative=asset.replace(/^\.\//,'');
@@ -73,5 +83,10 @@ async function dispatch(name,request){
   networkOffline=false;
   const jsFresh=await dispatch('fetch',{method:'GET',url:scope+'app.js',mode:'same-origin'});
   assert.equal(jsFresh.from,'network','JS must use fresh version online');
-  console.log('PASS: CSS precache, app-only cache cleanup, 3 MP3 media assets, fresh JS online');
+  networkHangs=true;
+  const slow=await dispatch('fetch',{method:'GET',url:scope+'app.js',mode:'same-origin'});
+  assert.equal(slow.from,'asset-offline','hanging network must fall back to cache after the timeout');
+  const slowNav=await dispatch('fetch',{method:'GET',url:scope,mode:'navigate'});
+  assert.equal(slowNav.from,'index-offline','hanging network must serve precached index for navigation');
+  console.log('PASS: CSS precache, app-only cache cleanup, 3 MP3 media assets, fresh JS online, network timeout fallback');
 })().catch(error=>{console.error(error);process.exit(1)});

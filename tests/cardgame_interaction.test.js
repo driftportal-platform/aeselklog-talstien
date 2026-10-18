@@ -67,7 +67,7 @@ function toTop(p,n){let i=p.closed.indexOf(n);if(i<0)throw Error('testkort finde
  const s=E.start({range:'61-80',names:['Aya'],vsCPU:true},(()=>{let n=0;return ()=>((n= (Math.imul(n,1664525)+1013904223)>>>0)/2**32)})());
  for(let step=0;step<1000&&!s.finished;step++){
   if(s.pending!==null){const target=E.preferredTarget(s,s.pending);E.placeManual(s,'pending',target||{kind:'self-open'});}
-  else{const target=E.openPlay(s);if(target&&step%4===0)E.placeManual(s,'open',target);else E.flipManual(s);}
+  else{const target=E.openPlay(s);if(target&&(step%4===0||s.players[s.turn].isCPU))E.placeManual(s,'open',target);else E.flipManual(s);}
   assert(E.validate(s),'manual turn '+step);if(step%100===0)assert(E.restore(JSON.stringify(s)));
  }
 }

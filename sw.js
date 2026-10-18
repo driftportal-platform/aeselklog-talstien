@@ -1,11 +1,15 @@
-/* ÆselKlog v0.9.19 – tre CC0-MP3 gemmes i PWA-cache, ingen Cloudflare/ElevenLabs-cache. */
+/* ÆselKlog PWA-service worker.
+   Hæv KUN VERSION ved en release; cachenavnet udledes derfra. Kode hentes netværk-først med
+   timeout, så appen ikke hænger på dårlig wifi, men falder tilbage til cachen. */
+const VERSION='0.9.36';
 const CACHE_PREFIX='aeselklog-talstien-';
-const CACHE='aeselklog-talstien-v0935-card-voice-queue';
+const CACHE=CACHE_PREFIX+'v'+VERSION.replace(/\./g,'');
+const NETWORK_TIMEOUT_MS=3000;
 const AUDIO_CACHE='aeselklog-number-audio-v1';
 const CORE=['./','./index.html','./styles.css','./home-ui.js','./home-fullscreen.webp',
  './app.js','./audio-settings.js','./offline-talkort.js','./talkort.js','./numbers.js','./cardgame-engine.js','./cardgame-ui.js','./music.js','./engine.js','./board.js','./actions.js','./leaderboard.js',
  './adaptive.js','./profiles.js','./parentreport.js','./actionfx.js','./savegame.js','./cpuvoice.js','./voicecache.js','./narration.js','./manifest.webmanifest',
- './icon.svg','./aeselklog-card.webp','./donkey-bray.wav',
+ './icon.svg','./icon-192.png','./icon-512.png','./icon-maskable-512.png','./apple-touch-icon.png','./aeselklog-card.webp','./donkey-bray.wav',
  './music/gone-fishin.mp3','./music/childrens-march.mp3','./music/beary-fishy.mp3',
  './home-illustration.webp','./home-hero-mobile.webp','./home-hero-wide.webp','./home-mascot.webp'];
 self.addEventListener('install',event=>{
@@ -44,13 +48,30 @@ self.addEventListener('fetch',event=>{
    return response;
   })());
  }else{
-  // HTML, CSS og JavaScript: hent seneste ved netforbindelse, brug cache offline.
-  event.respondWith(fetch(req).then(response=>{
-   if(response.ok){const copy=response.clone();event.waitUntil(caches.open(CACHE).then(cache=>cache.put(req,copy)));}
-   return response;
-  }).catch(async()=> (await caches.match(req)) || (req.mode==='navigate' ? caches.match('./index.html') : undefined)));
+  // HTML, CSS og JavaScript: netværk først, men giv op efter NETWORK_TIMEOUT_MS og brug cachen.
+  event.respondWith(networkFirst(event,req));
  }
 });
+
+async function networkFirst(event,req){
+ const cached=async()=>(await caches.match(req))||(req.mode==='navigate'?caches.match('./index.html'):undefined);
+ const network=fetch(req).then(response=>{
+  if(response.ok){const copy=response.clone();event.waitUntil(caches.open(CACHE).then(cache=>cache.put(req,copy)));}
+  return response;
+ });
+ let timer;
+ const timeout=new Promise(resolve=>{timer=setTimeout(()=>resolve(null),NETWORK_TIMEOUT_MS)});
+ try{
+  const first=await Promise.race([network,timeout]);
+  if(first)return first;
+  // Langsomt net: server cachen med det samme; hentningen kører videre og opdaterer cachen.
+  const hit=await cached();
+  if(hit){network.catch(()=>{});return hit}
+  return await network;
+ }catch(_){
+  return (await cached())||Response.error();
+ }finally{clearTimeout(timer)}
+}
 
 // Kun én bytes-range pr. forespørgsel; uændrede svar til billeder og uden Range.
 async function serveRange(req,response){
