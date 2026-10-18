@@ -1,59 +1,28 @@
-# ÆselKlog Online – første tekniske pilot
+# ÆselKlog Online v0.9.38 – chatpilot
 
-Dette er **en selvstændig prototype**, ikke en færdig multiplayer-integration i det eksisterende kortspil. Den kræver en Cloudflare Worker med Durable Objects og to nye filer i GitHub Pages. De 500 MP3-lyde skal ikke gen-uploades.
+Dette er en selvstændig pilot til **online-kortspillet**, baseret på v0.9.37. Den ændrer ikke eksisterende Kortspil, Talstien, Talkort eller de 500 MP3-filer.
 
-## 1. Deploy serveren (Cloudflare)
+## Indhold
+- `site/online.html`, `site/online.js`, `site/chat.js`, `site/online-config.js`: hjemmeside til online-kortspillet
+- `worker/src.js`, `worker/wrangler.jsonc`: Cloudflare Worker og Durable Object
+- `test-chat.mjs`: lokal adgangs-/chat-smoketest
 
-På din egen computer med Node.js installeret:
+## Første opsætning
+1. Cloudflare: opret Worker **aeselklog-online-pilot** via Wrangler fra `worker/`. Durable Objects kræver egnet konto/plan. For en ny Worker skal `new_sqlite_classes` migrationen bevares.
+2. Tilføj miljøvariabel `APP_ORIGIN` med nøjagtig `https://driftportal-platform.github.io` (ingen slut-skråstreg).
+3. Kør fra worker-mappen: `npx wrangler deploy`. Dette opretter/opdaterer både Worker og bindingen GAME_ROOM.
+4. Find den offentlige Workers-URL, eksempelvis `https://aeselklog-online-pilot.<subdomain>.workers.dev`. Indsæt **den faktiske URL** i `site/online-config.js` som `window.AESEL_ONLINE_URL = 'https://...';`.
+5. Upload `site/online.html`, `site/online.js`, `site/chat.js`, `site/online-config.js` til roden af GitHub Pages-repositoriet **uden** at slette eksisterende filer.
+6. Besøg `https://driftportal-platform.github.io/aeselklog-talstien/online.html` på to enheder. Spiller 1 opretter, spiller 2 deltager med rumkode.
+7. Test hurtigbeskeder; aktivér derefter chat på begge enheder for at afprøve tekst og korte optagelser.
 
-```bash
-cd worker
-npm install -g wrangler
-npx wrangler login
-npx wrangler deploy
-```
+## Chat og sikkerhed
+- Kun spillere med deres individuelle, tilfældige hemmelige sessionstoken kan hente chat/lyd. Invitér kun personer, I kender.
+- Hurtigbeskeder kan sendes uden opt-in, men kun efter begge spillere er tilsluttet. Fri tekst og lyd kræver opt-in fra **begge** spillere og er fra som standard.
+- Tekst højst 160 tegn; lydoptagelse automatisk højst 10 sekunder (derudover en størrelsesgrænse). Server kontrollerer metadata og maksimal filstørrelse; den foretager **ikke** indholdsmoderation eller verificerer lydvarighed fra codec.
+- De 30 seneste chatbeskeder (inklusive lydklip) opbevares i rumlagringen, højst cirka 24 timer, og ryddes når rummet næste gang tilgås efter udløbet. Dette er **ikke** en garanteret aktiv automatisk sletning på præcis 24-timersgrænsen.
+- Ingen lyd sendes til ElevenLabs. Mikrofonen kræver HTTPS og tilladelse i browseren. Test i Safari og installeret iPhone-PWA.
+- Del ikke personlige eller følsomme oplysninger i chatten. Pilot beregnet til familie/venner. Fravælg fri chat til mindre børn.
 
-`worker/wrangler.jsonc` bruger en SQLite-backed Durable Object `GameRoom` til hvert spil. Afhængig af Cloudflare-plan og kontokonfiguration kan Durable Objects kræve Workers Paid eller konfigurationsændringer; gennemgå Cloudflares aktuelle prisside. Workeren oprettes som **aeselklog-online-pilot**, separat fra ElevenLabs-workeren.
-
-**Efter deploy** i Cloudflare Workers → aeselklog-online-pilot → Settings → Variables and Secrets: tilføj almindelig variabel:
-
-- `APP_ORIGIN` = `https://driftportal-platform.github.io`
-
-Deploy ændringen. Indstillingen begrænser kald til din GitHub Pages-side. Det er ikke en brugergodkendelse; deltagelseskoden og personlige adgangstokens giver spilleradgang. Tokens gemmes i browserens sessionStorage og tilgås ikke af andre deltagere.
-
-## 2. Opsæt GitHub Pages
-
-I `site/online-config.js` erstatter du:
-
-`https://DIN-WORKER.workers.dev`
-
-med den præcise Cloudflare Worker URL, du fik efter deploy (ingen skråstreg til sidst).
-
-Upload **kun** disse filer fra `site/` til roden af dit eksisterende repo:
-
-- `online.html`
-- `online.js`
-- `online-config.js`
-
-Slet ingen eksisterende filer. Åbn `https://driftportal-platform.github.io/aeselklog-talstien/online.html` i to forskellige browsere eller på to telefoner. Opret et rum på den ene; kopiér linket og åbn på den anden. Linket indeholder rumkode, ikke personligt adgangstoken.
-
-## 3. Begrænsninger i piloten
-
-- To spillere, fem talområder, fem kort af hvert tal. Regler kontrolleres på serveren.
-- Enkle, lovlige træk: læg et åbent kort, vend, placer vendt kort; hvis ingen placering findes, ryger det vendte kort automatisk i den åbne bunke.
-- **Ikke implementeret:** klassiske æselkortstraffe, udfordringsknap, variant med ét æselkort, CPU, gemte spilleres score, fuld lydstyring, online Talstien.
-- Hold invitationskoder private. Ingen konti, ingen matchmaking, ingen moderation. Undgå personlige oplysninger i kaldenavne.
-- Spilrum bliver i Durable Object-lager, indtil de ryddes. Der er endnu ikke indbygget automatisk oprydning eller sletning – derfor kun en privat pilot, ikke offentlig lancering.
-- Connection reconnect kræver, at browserens sessionStorage stadig har spillerens token. En tabt session kan ikke genskabes uden videre.
-- Begge spillere kan have siden åben samtidig. Serveren sender kun antal lukkede kort, ikke modstanderens skjulte værdier.
-- Browseren modtager ikke de 500 MP3-optagelser direkte i denne pilot.
-
-## 4. Test først
-
-- Opret 1–20-spil, deltag fra anden telefon, observer to navne.
-- Prøv at vende et kort og se, at begge enheder opdaterer skærmen.
-- Prøv at lægge tallet 1 i ny midterrække, derefter 2 i samme række.
-- Kontroller, at den anden telefon ikke kan handle på den forkerte tur.
-- Genindlæs en telefon, og kontrollér, at den får korrekt spiltilstand igen.
-
-**Note:** Prototypen er syntakskontrolleret, men ikke live-deployet på din Cloudflare-konto. Den skal afprøves og gennemgås med yderligere sikkerhedstest før bred anvendelse.
+## Status
+Node-syntaks kontrolleret og chat-serverens adgangskontrol smoke-test bestået. Ingen live-test på Cloudflare eller to telefoner udført. Onlinespillets øvrige kendte pilotbegrænsninger gælder stadig (bl.a. udfordringer, æselkort og CPU er ikke færdiggjort).
