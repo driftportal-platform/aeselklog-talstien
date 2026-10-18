@@ -1,4 +1,4 @@
-// ÆselKlog Online v0.9.39 – serverstyret kortspil (2 spillere).
+// ÆselKlog Online v0.9.43 – serverstyret kortspil (2 spillere).
 // Regler matcher det lokale cardgame-engine.js. Ingen CPU. Chat og genopkobling bevaret.
 const QUICK=['🫏 Hov hov!','👏 Godt spil!','😂 Haha!','🎉 Flot klaret!','🥕 Din tur!','❤️ Tak for spillet!'];
 const MAX_VOICE_BASE64=240000,MAX_TEXT=160,CHAT_KEEP_MS=24*60*60*1000;
@@ -36,15 +36,18 @@ function remaining(state,index){const p=state.players[index];return countCards(p
 export default {
   async fetch(request,env){
     const url=new URL(request.url),origin=request.headers.get('origin');
-    if(request.method==='GET'&&url.pathname==='/health')return response({status:'ready',service:'ÆselKlog Online v0.9.39'});
+    if(request.method==='GET'&&url.pathname==='/health')return response({status:'ready',service:'ÆselKlog Online v0.9.43'});
     if(!validOrigin(request,env))return response({error:'Hjemmesiden er ikke tilladt'},403);
     if(request.method==='OPTIONS')return new Response(null,{status:204,headers:cors(origin,env)});
     if(url.pathname==='/api/create'&&request.method==='POST'){
       let input;try{input=await request.json()}catch{return response({error:'Ugyldigt JSON'},400,cors(origin,env))}
       const name=String(input.name||'').trim().slice(0,25);if(!name)return response({error:'Skriv et spillernavn'},400,cors(origin,env));
       const range=['1-20','21-40','41-60','61-80','81-100'].includes(input.range)?input.range:'1-20';
+      const variant=input.variant==='passing'?'passing':'collect';
+      const extraPenalty=input.extraPenalty===true;
+      const donkeyCount=variant==='passing'?1:([1,4,6,8].includes(Number(input.donkeyCount))?Number(input.donkeyCount):8);
       const code=random(8),secret=token();const id=env.GAME_ROOM.idFromName(code);const stub=env.GAME_ROOM.get(id);
-      const roomResponse=await stub.fetch('https://room/init',{method:'POST',body:JSON.stringify({name,range,secret,code})});
+      const roomResponse=await stub.fetch('https://room/init',{method:'POST',body:JSON.stringify({name,range,secret,code,variant,extraPenalty,donkeyCount})});
       return new Response(roomResponse.body,{status:roomResponse.status,headers:{...JSON_HEADERS,...cors(origin,env)}});
     }
     const match=url.pathname.match(/^\/api\/room\/([A-Z0-9]{8})(\/.*)?$/);
@@ -65,7 +68,7 @@ export class GameRoom {
     if(route==='/init'&&request.method==='POST'){
       if(g)return response({error:'Rummet findes allerede'},409);
       const b=await request.json();
-      g={code:b.code,range:b.range,phase:'waiting',turn:0,pending:null,centers:[],players:[{name:b.name,secret:b.secret,closed:[],open:[],donkeys:0}],chat:[],chatPrefs:[false,false],created:Date.now(),move:0,lastMove:null,message:'Venter på spiller 2…'};
+      g={code:b.code,range:b.range,variant:b.variant==='passing'?'passing':'collect',extraPenalty:b.extraPenalty===true,donkeyCount:b.variant==='passing'?1:Number(b.donkeyCount)||8,phase:'waiting',turn:0,pending:null,centers:[],players:[{name:b.name,secret:b.secret,closed:[],open:[],donkeys:0}],chat:[],chatPrefs:[false,false],created:Date.now(),move:0,lastMove:null,message:'Venter på spiller 2…'};
       await this.state.storage.put('game',g);return response({code:b.code,secret:b.secret});
     }
     if(!g)return response({error:'Rummet findes ikke'},404);
@@ -209,13 +212,35 @@ export class GameRoom {
   doChallenge(g,seat){
     if(!g.lastMove)throw Error('Der er ikke et træk at udfordre.');
     if(g.lastMove.actor===seat)throw Error('Du kan ikke udfordre dit eget træk.');
-    if(g.lastMove.valid){g.message='Trækket var korrekt. Ingen æselstraf.';return}
+    if(g.lastMove.valid){g.message='Trækket var korrekt. Ingen æselstraf.';g.lastMove=null;return}
     const actor=g.lastMove.actor,number=g.lastMove.number;
     const restored=JSON.parse(JSON.stringify(g.lastMove.before));
     Object.keys(g).forEach(k=>delete g[k]);Object.assign(g,restored);
-    g.players[actor].donkeys=(g.players[actor].donkeys||0)+1;
+    this.givePenalty(g,actor);
     g.lastMove=null;
-    g.message=`🫏 ${g.players[actor].name} blev opdaget! Trækket med ${number} er fortrudt. Æselkort i straf.`;
+    g.message=`🫏 ${g.players[actor].name} blev opdaget! Trækket med ${number} blev fortrudt. ${g.penaltyMessage}`;
+    delete g.penaltyMessage;
+  }
+  givePenalty(g,actor){
+    const p=g.players[actor];let assigned=false;
+    if((g.variant||'collect')==='passing'){
+      for(const other of g.players)other.donkeys=0;
+      p.donkeys=1;assigned=true;
+    }else if(g.players.reduce((v,item)=>v+(item.donkeys||0),0)<(g.donkeyCount||8)){
+      p.donkeys=(p.donkeys||0)+1;assigned=true;
+    }
+    let extras=0;
+    if(g.extraPenalty===true){
+      for(let i=0;i<g.players.length;i++){
+        if(i!==actor&&g.players[i].closed.length){p.closed.push(g.players[i].closed.pop());extras++}
+      }
+    }
+    if(extras && Array.isArray(g.finishOrder))g.finishOrder=g.finishOrder.filter(i=>i!==actor);
+    if(extras && g.phase==='finished'){
+      g.phase='playing';g.winner=null;g.placements=null;
+    }
+    g.penaltyMessage=`${assigned?'Æselkort givet':'Ingen ledige æselkort'}${extras?` og ${extras} ekstra talkort`:''}.`;
+    return {assigned,extras};
   }
   finishWinner(g,finisher){
     const opponent=1-finisher;
@@ -234,7 +259,7 @@ export class GameRoom {
     return {
       phase:g.phase,turn:g.turn,pending:g.turn===seat?g.pending:null,centers:g.centers.map(c=>({top:c.at(-1),length:c.length})),
       players:g.players.map((p,i)=>({name:p.name,closed:p.closed.length,open:i===seat||true?p.open.at(-1):null,openCount:p.open.length,donkeys:p.donkeys})),
-      you:seat,message:g.message,move:g.move,canChallenge:!!g.lastMove&&g.lastMove.actor!==seat,winner:g.winner,placements:g.placements||null
+      you:seat,variant:g.variant||'collect',extraPenalty:g.extraPenalty===true,donkeyCount:g.donkeyCount||8,message:g.message,move:g.move,canChallenge:!!g.lastMove&&g.lastMove.actor!==seat,winner:g.winner,placements:g.placements||null
     };
   }
   broadcast(g){
