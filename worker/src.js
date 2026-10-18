@@ -202,7 +202,7 @@ export class GameRoom {
       this.finishOrNext(g);
       g.message=`${p.name} lagde ${n} i sin åbne bunke.`;
     }else if(remaining(g,seat)===0){
-      g.phase='finished';g.winner=seat;g.message=`${p.name} vandt!`;
+      this.finishWinner(g,seat);
     }else g.message=`${p.name} lagde ${n}.`;
   }
   doDiscard(g,seat){return this.doPlace(g,seat,{source:'pending',kind:'self-open'})}
@@ -217,9 +217,15 @@ export class GameRoom {
     g.lastMove=null;
     g.message=`🫏 ${g.players[actor].name} blev opdaget! Trækket med ${number} er fortrudt. Æselkort i straf.`;
   }
+  finishWinner(g,finisher){
+    const opponent=1-finisher;
+    const winner=g.players[finisher].donkeys>g.players[opponent].donkeys?opponent:finisher;
+    g.phase='finished';g.winner=winner;g.placements=[winner,1-winner];
+    g.message=`🏆 ${g.players[winner].name} vandt! 🥇 ${g.players[winner].name} · 🥈 ${g.players[1-winner].name}`;
+  }
   finishOrNext(g){
     if(remaining(g,g.turn)===0&&g.pending===null){
-      g.phase='finished';g.winner=g.turn;g.message=`${g.players[g.turn].name} vandt!`;return;
+      this.finishWinner(g,g.turn);return;
     }
     g.turn=1-g.turn;
     g.message=`${g.players[g.turn].name}s tur.`;
@@ -228,7 +234,7 @@ export class GameRoom {
     return {
       phase:g.phase,turn:g.turn,pending:g.turn===seat?g.pending:null,centers:g.centers.map(c=>({top:c.at(-1),length:c.length})),
       players:g.players.map((p,i)=>({name:p.name,closed:p.closed.length,open:i===seat||true?p.open.at(-1):null,openCount:p.open.length,donkeys:p.donkeys})),
-      you:seat,message:g.message,move:g.move,canChallenge:!!g.lastMove&&g.lastMove.actor!==seat,winner:g.winner
+      you:seat,message:g.message,move:g.move,canChallenge:!!g.lastMove&&g.lastMove.actor!==seat,winner:g.winner,placements:g.placements||null
     };
   }
   broadcast(g){

@@ -123,7 +123,7 @@ function discard(){if(!userTurn())return;act(()=>E.discardManual(game));}
 function renderControls(){
  const holder=$('cardMoveButtons');if(!holder)return;holder.replaceChildren();
  if(!game)return;
- if(game.finished){holder.innerHTML=`<p class="card-win-text">🏆 ${escape(game.players[game.winner].name)} kom af med sine talkort!</p>`;return;}
+ if(game.finished){const ranks=game.placements||E.placements(game);holder.innerHTML=`<div class="card-win-text" role="status"><h2>🏆 ${escape(game.players[game.winner].name)} har vundet!</h2><h3>🏆 Sejrspodie</h3>${ranks.slice(0,3).map((i,k)=>`<p>${['🥇 1.','🥈 2.','🥉 3.'][k]} plads: ${escape(game.players[i].name)} · 🫏 ${game.players[i].donkeys} æselkort</p>`).join('')}</div>`;return;}
  const p=game.players[game.turn];if(p.isCPU)return;
  const button=(label,id,act)=>{const b=document.createElement('button');b.type='button';b.id=id;b.className='btn soft small';b.textContent=label;b.addEventListener('click',act);holder.append(b)};
  if(game.pending!==null){button('↪ Læg i egen åbne bunke','cardDiscard',discard);}

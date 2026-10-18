@@ -71,7 +71,8 @@
   }
   if(state.pending!==null&&(!push(state.pending)||state.finished))return false;
   if([...counted.values()].some(v=>v!==(state.deckSets??5)))return false;
-  if(state.finished&&countOf(state.players[state.winner])!==0)return false;
+  if(state.finishOrder!==undefined&&(!Array.isArray(state.finishOrder)||new Set(state.finishOrder).size!==state.finishOrder.length||state.finishOrder.some(i=>!Number.isInteger(i)||i<0||i>=state.players.length||countOf(state.players[i])!==0)))return false;
+  if(state.finished&&state.players.length>2&&countOf(state.players[state.winner])!==0)return false;
   if(!Number.isSafeInteger(state.turnCount)||state.turnCount<1||state.turnCount>200000)return false;
   if(typeof state.message!=='string'||state.message.length>400)return false;
   if(state.lastMove!==undefined&&state.lastMove!==null){
@@ -107,15 +108,48 @@
   return null;
  }
  function isPlayersTurn(state){if(!validate(state)||state.finished)throw Error('Kortspillet er afsluttet.');}
- function finishOrNext(state){
-  if(countOf(state.players[state.turn])===0&&state.pending===null){
-   state.winner=state.turn;state.finished=true;
-   state.message=`🏆 ${state.players[state.turn].name} kom af med alle talkortene!`;
-   return;
+ function completed(state,index){
+  if(countOf(state.players[index])!==0||state.pending!==null)return false;
+  if(!Array.isArray(state.finishOrder))state.finishOrder=[];
+  if(!state.finishOrder.includes(index))state.finishOrder.push(index);
+  return true;
+ }
+ function placements(state){
+  const done=state.finishOrder||[];
+  // Færrest æselkort blandt færdige; lige mange afgøres af tidspunktet.
+  const ranks=done.slice().sort((a,b)=>state.players[a].donkeys-state.players[b].donkeys||done.indexOf(a)-done.indexOf(b));
+  return ranks.concat(state.players.map((_,i)=>i).filter(i=>!done.includes(i)).sort((a,b)=>state.players[a].donkeys-state.players[b].donkeys));
+ }
+ function podiumMessage(state){
+  const labels=['🥇','🥈','🥉'];
+  return placements(state).slice(0,3).map((i,k)=>`${labels[k]} ${state.players[i].name}`).join(' · ');
+ }
+ function handleCompletion(state,index){
+  if(!completed(state,index))return false;
+  const done=state.finishOrder;
+  if(state.players.length===2){
+   const other=1-index;
+   const winner=state.players[index].donkeys>state.players[other].donkeys?other:index;
+   state.winner=winner;state.finished=true;
+   state.placements=[winner,1-winner];
+  }else if(done.length>=state.players.length-1){
+   state.placements=placements(state);state.winner=state.placements[0];state.finished=true;
   }
-  state.turn=(state.turn+1)%state.players.length;
+  if(state.finished)state.message=`🏆 ${state.players[state.winner].name} har vundet! ${podiumMessage(state)}`;
+  else state.message=`${state.players[index].name} er færdig med talkortene, men placeringerne er endnu ikke afgjort.`;
+  return true;
+ }
+ function advance(state){
+  for(let i=0;i<state.players.length;i++){
+   state.turn=(state.turn+1)%state.players.length;
+   if(countOf(state.players[state.turn])>0)break;
+  }
   state.turnCount++;
-  state.message=`${state.players[state.turn].name}s tur – vend et kort eller brug et åbent kort.`;
+  if(!state.finished)state.message=`${state.players[state.turn].name}s tur – vend et kort eller brug et åbent kort.`;
+ }
+ function finishOrNext(state){
+  handleCompletion(state,state.turn);
+  if(!state.finished)advance(state);
  }
  function flip(state){
   isPlayersTurn(state);
@@ -164,7 +198,7 @@
   addToTarget(state,n,target);
   state.lastAction='play';state.message=`${p.name} lagde ${n} på ${target.caption}.`;
   const won=!countOf(p)&&state.pending===null;
-  if(won){state.winner=state.turn;state.finished=true;state.message+=` 🏆 ${p.name} vandt!`}
+  if(won){handleCompletion(state,state.turn);if(!state.finished)advance(state);}
   return {number:n,target,won};
  }
  function openPlay(state){if(!state||state.finished||state.pending!==null)return null;const p=state.players[state.turn];const n=p.open[p.open.length-1];return n===undefined?null:preferredTarget(state,n);}
@@ -248,7 +282,7 @@
    finishOrNext(state);
    state.message=`${p.name} lagde ${n} i sin åbne bunke. ${state.players[state.turn].name} er nu på tur.`;
   }else if(!countOf(p)&&state.pending===null){
-   state.winner=actor;state.finished=true;state.message+=` 🏆 ${p.name} vandt!`;
+   handleCompletion(state,actor);if(!state.finished)advance(state);
   }
   state.lastMove={actor,valid,number:n,type:dest.kind==='self-open'?'discard':'place',before};
   return {actor,number:n,target:dest,legal:valid,won:state.finished};
@@ -269,5 +303,5 @@
  }
  function stock(state){return state.donkeyCount-state.players.reduce((sum,p)=>sum+p.donkeys,0);}
  function remaining(state,index){const p=state.players[index];return countOf(p)+(state.turn===index&&state.pending!==null?1:0);}
- return Object.freeze({VERSION,RANGES,SAVE_KEY,bounds,start,restore,validate,shuffledDeck,preferredTarget,openPlay,flip,play,penalty,stock,remaining,flipManual,placeManual,discardManual,challenge});
+ return Object.freeze({VERSION,RANGES,SAVE_KEY,bounds,start,restore,validate,shuffledDeck,preferredTarget,openPlay,flip,play,penalty,stock,remaining,placements,flipManual,placeManual,discardManual,challenge});
 });
