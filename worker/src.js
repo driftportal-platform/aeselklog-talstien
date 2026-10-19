@@ -1,4 +1,4 @@
-// ÆselKlog Online v0.9.52 – serverstyret kortspil (2–6 spillere).
+// ÆselKlog Online v0.9.53 – serverstyret kortspil (2–6 spillere).
 // Regler matcher det lokale cardgame-engine.js. Ingen CPU. Chat og genopkobling bevaret.
 const QUICK=['🫏 Hov hov!','👏 Godt spil!','😂 Haha!','🎉 Flot klaret!','🥕 Din tur!','❤️ Tak for spillet!'];
 const MAX_VOICE_BASE64=1400000,MAX_TEXT=10000,CHAT_KEEP_MS=24*60*60*1000;
@@ -36,7 +36,7 @@ function remaining(state,index){const p=state.players[index];return countCards(p
 export default {
   async fetch(request,env){
     const url=new URL(request.url),origin=request.headers.get('origin');
-    if(request.method==='GET'&&url.pathname==='/health')return response({status:'ready',service:'ÆselKlog Online v0.9.52'});
+    if(request.method==='GET'&&url.pathname==='/health')return response({status:'ready',service:'ÆselKlog Online v0.9.53'});
     if(!validOrigin(request,env))return response({error:'Hjemmesiden er ikke tilladt'},403);
     if(request.method==='OPTIONS')return new Response(null,{status:204,headers:cors(origin,env)});
     if(url.pathname==='/api/create'&&request.method==='POST'){
@@ -135,7 +135,8 @@ export class GameRoom {
           if(g.phase!=='playing'||g.turn!==seat)throw Error('Det er ikke din tur');
           if(b.type==='flip-open')this.doFlipOpen(g,seat);
           else if(b.type==='end-turn')this.doEndTurn(g,seat);
-          else if(b.type==='flip')this.doFlip(g,seat);
+          else if(b.type==='recycle')this.doRecycle(g,seat);
+          else if(b.type==='flip'){if(b.manualRecycle===true&&!g.players[seat].closed.length)throw Error('Vend først din åbne bunke.');this.doFlip(g,seat);}
           else if(b.type==='place')this.doPlace(g,seat,b);
           else if(b.type==='discard')this.doDiscard(g,seat);
           else throw Error('Ukendt handling');
@@ -240,6 +241,15 @@ export class GameRoom {
     this.finishOrNext(g);
     g.lastMove={actor:seat,valid,number:n??0,type:'end-turn',before};
     if(g.phase!=='finished')g.message=`${g.players[seat].name} afsluttede turen. ${g.players[g.turn].name}s tur.`;
+  }
+  doRecycle(g,seat){
+    if(g.pending!==null)throw Error('Læg først det vendte kort.');
+    const p=g.players[seat];if(p.closed.length)throw Error('Din lukkede bunke er ikke tom.');
+    if(!p.open.length)throw Error('Ingen åben bunke at vende.');
+    const number=p.open.at(-1),skipped=preferredTarget(g,number,seat),before=skipped?snapshot(g):null;
+    p.closed=p.open.slice().reverse();p.open=[];
+    g.lastMove=skipped?{actor:seat,valid:false,number,type:'flip',before}:g.lastMove;
+    g.message=`${p.name} vendte sin åbne bunke. Tryk på den lukkede bunke for at vende et kort.`;
   }
   doFlip(g,seat){
     if(g.pending!==null)throw Error('Læg først det vendte kort.');

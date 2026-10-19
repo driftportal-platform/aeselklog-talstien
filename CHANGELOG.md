@@ -4,6 +4,12 @@ Nyeste øverst. Én kort post pr. version. Detaljer, testresultater og filoversi
 findes i `docs/arkiv/`. Versioner uden post (fx 0.9.8 udover lydcache, 0.9.21, 0.9.26) var ikke
 dokumenteret separat i de gamle noter.
 
+## v0.9.53 – sidste kort og tydelig vending af bunke (19. oktober 2026)
+- Sidste vendte kort bliver liggende på egen lukkede plads, indtil det flyttes. Ingen automatisk vending af åben bunke. Tom lukket bunke vises nu som Tom eller en tydelig Vend åben bunke-knap.
+- Vend åben bunke er et separat tryk: hele den eksisterende åbne bunke vendes i samme rækkefølge til lukket, uden at et kort tages. Næste tryk vender første kort. Serveren afviser vending, mens et kort afventer placering.
+- Uændrede statusopdateringer genopbygger ikke spillebordet. Det beskytter et igangværende fingertræk mod at miste det kort, man holder på.
+- 43/43 Node-tests og relevante online-browserkontroller består; Worker dry-run består. Rettelser fra v0.9.52 er inkluderet. Nye server-/browserkontroller dækker sidste kort, ventetid, langsomt touchtræk hen over polling, separat bunkevending og bevaret rækkefølge. Ingen nye kort eller blanding.
+
 ## v0.9.52 – større chat, musikpause og prik til spiller (19. oktober 2026)
 - Musik holder pause fra mikrofonen anmodes, til optagelsen er stoppet og mikrofonen frigivet. Fortsætter med samme indstilling; også ved afvist tilladelse. Periodisk opdatering kan ikke starte musik under optagelsen.
 - Nyeste beskeder øverst. Et større chatvindue giver plads til historikken, hurtigbeskeder er foldet sammen. Uændret historik genopbygges ikke ved polling, så man kan læse ældre beskeder uden at blive flyttet.

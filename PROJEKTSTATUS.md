@@ -1,6 +1,6 @@
 # ÆselKlog – hvor er vi nu
 
-**Version:** 0.9.52 (lokalt valideret opdateringspakke, 19. oktober 2026; ikke publiceret). Opdateres ved hver release sammen med `CHANGELOG.md`.
+**Version:** 0.9.53 (lokalt valideret opdateringspakke, 19. oktober 2026; ikke publiceret). Opdateres ved hver release sammen med `CHANGELOG.md`.
 
 ## Hvad er det?
 Børnevenligt talspil som PWA (GitHub Pages, repo `driftportal-platform/aeselklog-talstien`) med tre selvstændige dele og frivillig matematik:
@@ -10,10 +10,12 @@ Børnevenligt talspil som PWA (GitHub Pages, repo `driftportal-platform/aeselklo
 Lyd: 500 gemte MP3-tal (fem stemmer), valgfri baggrundsmusik, ElevenLabs kun via Cloudflare Worker. Alt gemmes lokalt, ingen konti.
 
 ## Status
+- v0.9.53: tom lukket bunke viser en eksplicit Vend åben bunke-handling. Denne vender kun bunken; et nyt tryk vender et kort. Pending skal placeres først. Kortorden bevares; ingen nye kort eller blanding. Nye klienter kræver manuel vending, gamle klienters flip-API er bevaret for kompatibilitet.
+- Uændrede statusopdateringer genopbygger ikke kortenes DOM, så ventetid og fingertræk over polling bevarer kortet. v0.9.52 er inkluderet i pakken, da GitHub main stadig er `36cac3bf335a777c11ad462b7717a4221ec40f46` (v0.9.51). Ikke publiceret herfra.
 - v0.9.52: større chat med nyeste beskeder øverst og sammenfoldelige hurtigbeskeder. Polling bevarer læsepositionen ved uændret historik.
 - Musik pause under mikrofonanmodning/optagelse, også ved periodiske opdateringer. Genoptages med samme valg efter mikrofonfrigivelse. Rigtig iPhone-lydrouting er ikke afprøvet.
 - Prik ved tryk på modspillers navn; deres eget felt markeres på deres enhed med afsenderbesked. Auth/gyldige mål/tresekunders mellemrum kontrolleres af Worker. Kort, tur og udfordringsgrundlag ændres ikke; prik bevares ved udfordring.
-- Udgangspunkt v0.9.52: GitHub main `36cac3bf335a777c11ad462b7717a4221ec40f46`. Ikke deployet herfra. 42/42 Node-tests og simulerede browserkontroller består.
+- Udgangspunkt v0.9.52: GitHub main `36cac3bf335a777c11ad462b7717a4221ec40f46`. Ikke deployet herfra. 43/43 Node-tests og simulerede browserkontroller består.
 - v0.9.51: kompakte spillerkort med midterbunker direkte nedenunder; vandret rulning ved mange spillere. Tandhjul åbner indstillinger, invitationer, lyd og afslutning. Chat som rundt ikon med ulæste beskeder og et vindue, der kan lukkes igen.
 - Fri tekst, optagelser og lydfiler uden samtykkekrav, beskedventetid eller 10-sekundersgrænse. Teknisk lydfilgrænse 1 MiB. Klip opbevares separat, hentes med spilleradgang og ryddes ved udløb/afslutning.
 - Æsellyd via Web Audio ved faktisk straf, én gang pr. deltager; prøveknap og manuel aktivering ved browserblokering. Automatisk kontrol simulerer afspilning på tre enheder; fysisk iPhone/iPad mangler.
@@ -33,7 +35,7 @@ Lyd: 500 gemte MP3-tal (fem stemmer), valgfri baggrundsmusik, ElevenLabs kun via
 - Invitationer: native deling, mailkladde og kopiering. Offentligt rumlink udfylder kode uden at dele spillerens secret. Gæster får en enkel deltag-side; et gammelt gemt rum overtager ikke en ny invitation.
 - Chat navngiver afsenderen; fri tekst/lyd er altid tilgængelig fra v0.9.51. Samtidige tilmeldinger er testet.
 - Onlinefejl rettet: CORS/chat, MIME-type på lydklip, WebSocket-videresendelse, oplæsning af alle vendte kort, synligt æselkort, gentag tal, udfordringer uden tab af nyere chat eller opdateringsnummer. Begge onlineindgange er opdateret.
-- **Automatisk:** 42/42 Node-tests består. Ny servertest dækker begge deltagere, CORS, hurtigtekst/fri tekst/lyddata, adgang, udfordringer, begge varianter, ekstra kortstraf og vinderregler.
+- **Automatisk:** 43/43 Node-tests består. Ny servertest dækker begge deltagere, CORS, hurtigtekst/fri tekst/lyddata, adgang, udfordringer, begge varianter, ekstra kortstraf og vinderregler.
 - **Chromium/simuleret:** online med to og seks isolerede browserprofiler, størrelser 320×740, 390×844, 768×1024, 1024×768, 844×390 og 1280×800. Worker-logik via simuleret transport, simuleret mikrofon/afspilning/deling, mail-link, kopiering/reservefelt, invitationslink, genindlæsning, lokale sprogvalg, straf og podium. Offlinekortspil ved 390×844, 844×390 og 1280×800; træk, tryk, udfordringer og CPU består.
 - **Cloudflare:** lokal Wrangler dry-run består med GAME_ROOM og eksplicit APP_ORIGIN. Eksisterende bindinger og migrationsfil er uændrede. Konfigurationens navn er `aeselklog-online-pilot`, mens den oplyste liveadresse bruger `aeselklog-online`; følg installationsvejledningens eksplicitte `--name`.
 - **Ikke bekræftet:** faktisk deployment på Cloudflare, live WebSocket på flere fysiske enheder, rigtig deling til Beskeder/Messenger, mailapp, rigtig mikrofon/lydafspilning på iPhone, installeret iPhone-PWA eller live ElevenLabs.
