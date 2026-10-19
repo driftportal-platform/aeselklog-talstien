@@ -1,6 +1,6 @@
 # ÆselKlog – hvor er vi nu
 
-**Version:** 0.9.58 (lokalt valideret opdateringspakke, 19. oktober 2026; ikke publiceret). Opdateres ved hver release sammen med `CHANGELOG.md`.
+**Version:** 0.9.59 (lokalt valideret opdateringspakke, 19. oktober 2026; ikke publiceret). Opdateres ved hver release sammen med `CHANGELOG.md`.
 
 ## Hvad er det?
 Børnevenligt talspil som PWA (GitHub Pages, repo `driftportal-platform/aeselklog-talstien`) med tre selvstændige dele og frivillig matematik:
@@ -10,6 +10,9 @@ Børnevenligt talspil som PWA (GitHub Pages, repo `driftportal-platform/aeselklo
 Lyd: 500 gemte MP3-tal (fem stemmer), valgfri baggrundsmusik, ElevenLabs kun via Cloudflare Worker. Alt gemmes lokalt, ingen konti.
 
 ## Status
+- v0.9.59: Dansk – æselstemme er tilføjet i onlinefeltet Sprog og stemme. De eksisterende 100 tal i audio/numbers/donkey bruges uden nye lydfiler eller netværks-TTS.
+- Valg, kortvending, gentagelse, lokal lagring/genindlæsning og uafhængigt engelsk valg på anden enhed er kontrolleret i begge onlineindgange. 46/46 Node-tests består. Afspilning er simuleret; rigtig iPhone ikke prøvet.
+- Udgangspunkt er main `247b8cab25f9b87c2f6e4220b150f726a49e7c56` (v0.9.58). Denne pakke ændrer kun hjemmesiden; ingen ny Worker-deployment nødvendig. Ikke publiceret herfra.
 - v0.9.58: 3 sekunder i midten og 2 sekunder ved modspiller. Dette erstatter den tidligere 5-sekunders midterpause. Fejlplacering, manuel udfordring, overset midterfejls retur og kortregnskab er bevaret.
 - 46/46 tests samt server- og browserkontrol af begge frister består. Worker dry-run består. Ingen fysisk iPhone/iPad-test eller publicering herfra. Pakken indeholder tidligere rettelser siden main `54bee3832bc7a330294979f4f92c174a316c8b3a`.
 - v0.9.57: pausen ved kort til modstander er 2 sekunder; i midten stadig 5 sekunder. Serverfrister, nedtælling, æselknap, kortregnskab og automatisk retur af overset midterfejl er bevaret.

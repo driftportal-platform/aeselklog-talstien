@@ -4,6 +4,11 @@ Nyeste øverst. Én kort post pr. version. Detaljer, testresultater og filoversi
 findes i `docs/arkiv/`. Versioner uden post (fx 0.9.8 udover lydcache, 0.9.21, 0.9.26) var ikke
 dokumenteret separat i de gamle noter.
 
+## v0.9.59 – æselstemme i online-taloplæsning (19. oktober 2026)
+- Sprog og stemme indeholder nu Dansk – æselstemme på begge onlineindgange. Bruger de eksisterende 100 MP3-tal i audio/numbers/donkey. Ingen nye lydfiler eller eksterne talekald.
+- Valget virker ved kortvending og Hør tallet igen, gemmes på enheden og er uafhængigt af andre spilleres sprogvalg. De øvrige sprog og kombinationer er bevaret. Æsellyden ved straf har stadig sit eget til/fra-valg.
+- 46/46 Node-tests; browserkontrol af begge indgange, æseloplæsning, gentagelse, genindlæsning og skift tilbage til engelsk består med simuleret afspilning. Alle 100 filer findes. Fysisk iPhone ikke prøvet. Kun hjemmesiden ændres; Worker kræver ingen opdatering for denne rettelse.
+
 ## v0.9.58 – kortere pause i midten (19. oktober 2026)
 - Midterbunkernes pause er efter brugerens ønske nu 3 sekunder. Modspillerens pause er fortsat 2 sekunder. Fejl kan opdages med æselknappen; overset fejl i midten returneres stadig uden straf.
 - 46/46 Node-tests. Serverkontrol af 2.999/3.000 ms og fortsat 1.999/2.000 ms ved modstander. Browserkontroller dækker begge pauser, opdaget fejl og automatisk retur uden straf. Worker dry-run består. Ikke publiceret.
