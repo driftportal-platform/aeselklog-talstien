@@ -1,4 +1,4 @@
-// ÆselKlog Online v0.9.47 – serverstyret kortspil (2–6 spillere).
+// ÆselKlog Online v0.9.49 – serverstyret kortspil (2–6 spillere).
 // Regler matcher det lokale cardgame-engine.js. Ingen CPU. Chat og genopkobling bevaret.
 const QUICK=['🫏 Hov hov!','👏 Godt spil!','😂 Haha!','🎉 Flot klaret!','🥕 Din tur!','❤️ Tak for spillet!'];
 const MAX_VOICE_BASE64=240000,MAX_TEXT=160,CHAT_KEEP_MS=24*60*60*1000;
@@ -36,7 +36,7 @@ function remaining(state,index){const p=state.players[index];return countCards(p
 export default {
   async fetch(request,env){
     const url=new URL(request.url),origin=request.headers.get('origin');
-    if(request.method==='GET'&&url.pathname==='/health')return response({status:'ready',service:'ÆselKlog Online v0.9.47'});
+    if(request.method==='GET'&&url.pathname==='/health')return response({status:'ready',service:'ÆselKlog Online v0.9.49'});
     if(!validOrigin(request,env))return response({error:'Hjemmesiden er ikke tilladt'},403);
     if(request.method==='OPTIONS')return new Response(null,{status:204,headers:cors(origin,env)});
     if(url.pathname==='/api/create'&&request.method==='POST'){
@@ -119,7 +119,9 @@ export class GameRoom {
         }else if(b.type==='challenge'){this.doChallenge(g,seat)}
         else{
           if(g.phase!=='playing'||g.turn!==seat)throw Error('Det er ikke din tur');
-          if(b.type==='flip')this.doFlip(g,seat);
+          if(b.type==='flip-open')this.doFlipOpen(g,seat);
+          else if(b.type==='end-turn')this.doEndTurn(g,seat);
+          else if(b.type==='flip')this.doFlip(g,seat);
           else if(b.type==='place')this.doPlace(g,seat,b);
           else if(b.type==='discard')this.doDiscard(g,seat);
           else throw Error('Ukendt handling');
@@ -202,6 +204,27 @@ export class GameRoom {
   }
   chatPrefs(g){return Array.from({length:g.playerCount??2},(_,i)=>g.chatPrefs?.[i]===true)}
   seat(secret,g){return g.players.findIndex(p=>p.secret===secret)}
+  doFlipOpen(g,seat){
+    if(g.pending!==null)throw Error('Læg først det allerede vendte kort.');
+    const p=g.players[seat],skipped=p.open.length&&preferredTarget(g,p.open.at(-1),seat);
+    const before=skipped?snapshot(g):null,number=p.open.at(-1);
+    if(!p.closed.length){
+      if(!p.open.length)throw Error('Ingen talkort tilbage.');
+      p.closed=p.open.slice().reverse();p.open=[];
+    }
+    const n=p.closed.pop();p.open.push(n);
+    g.lastMove=skipped?{actor:seat,valid:false,number,type:'flip',before}:null;
+    g.message=`${p.name} vendte ${n} til sin åbne bunke. Flyt kortet, eller afslut turen.`;
+  }
+  doEndTurn(g,seat){
+    // Allow an older pending card to finish normally after reconnecting/updating.
+    if(g.pending!==null)return this.doDiscard(g,seat);
+    const n=g.players[seat].open.at(-1),before=snapshot(g);
+    const valid=n==null||!preferredTarget(g,n,seat);
+    this.finishOrNext(g);
+    g.lastMove={actor:seat,valid,number:n??0,type:'end-turn',before};
+    if(g.phase!=='finished')g.message=`${g.players[seat].name} afsluttede turen. ${g.players[g.turn].name}s tur.`;
+  }
   doFlip(g,seat){
     if(g.pending!==null)throw Error('Læg først det vendte kort.');
     const p=g.players[seat];
@@ -261,9 +284,10 @@ export class GameRoom {
     const actor=g.lastMove.actor,number=g.lastMove.number;
     const restored=JSON.parse(JSON.stringify(g.lastMove.before));
     // Undo cards only; preserve newer chat, consent and the monotonic revision.
-    Object.assign(restored,{chat:g.chat,chatPrefs:g.chatPrefs,move:g.move});
+    Object.assign(restored,{chat:g.chat,chatPrefs:g.chatPrefs,move:g.move,penaltySoundId:g.penaltySoundId||0});
     Object.keys(g).forEach(k=>delete g[k]);Object.assign(g,restored);
-    this.givePenalty(g,actor);
+    const penalty=this.givePenalty(g,actor);
+    if(penalty.assigned)g.penaltySoundId=g.move+1;
     this.finishWinner(g,actor);
     if(g.phase!=='finished'&&remaining(g,g.turn)===0)this.advanceTurn(g);
     g.lastMove=null;
@@ -324,7 +348,7 @@ export class GameRoom {
   }
   publicState(g,seat){
     return {
-      phase:g.phase,startWaitMs:g.phase==='waiting'?this.earlyStartWait(g):0,turn:g.turn,pending:g.turn===seat?g.pending:null,centers:g.centers.map(c=>({top:c.at(-1),length:c.length})),
+      phase:g.phase,penaltySoundId:g.penaltySoundId||0,startWaitMs:g.phase==='waiting'?this.earlyStartWait(g):0,turn:g.turn,pending:g.turn===seat?g.pending:null,centers:g.centers.map(c=>({top:c.at(-1),length:c.length})),
       players:g.players.map((p,i)=>({name:p.name,closed:p.closed.length,open:i===seat||true?p.open.at(-1):null,openCount:p.open.length,donkeys:p.donkeys})),
       you:seat,playerCount:g.playerCount??2,deckSets:g.deckSets??5,variant:g.variant||'collect',extraPenalty:g.extraPenalty===true,donkeyCount:g.donkeyCount||8,message:g.message,move:g.move,canChallenge:!!g.lastMove&&g.lastMove.actor!==seat,winner:g.winner,placements:g.placements||null
     };

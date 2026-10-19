@@ -37,41 +37,41 @@ const {chromium}=require('playwright');
   const p=pages[i];if(i===5){await p.evaluate(()=>localStorage.setItem('aeselklog-online-session-v0941',JSON.stringify({code:'ZZZZZZZZ',secret:'a'.repeat(48),at:Date.now()})));await p.goto(origin+'/aeselklog-talstien/site/online.html?room='+code+'&secret=do-not-share');assert.equal(await p.locator('#joinCode').inputValue(),code);assert(await p.locator('#invitedNotice').isVisible())}await p.locator('#name').fill('Spiller '+(i+1));await p.locator('#joinCode').fill(code);await p.locator('#join').click();await p.locator('#parentPin').fill('1234');await p.locator('#parentOk').click();await p.locator('#game').waitFor({state:'visible'});
   if(i<5){assert.equal(db.get('game').phase,'waiting');assert.equal(await p.getByRole('button',{name:'🃏 Vend kort',exact:true}).count(),0)}
  }
- for(const p of pages){await p.locator('#reconnect').click();await p.waitForFunction(()=>document.querySelectorAll('#players .player').length===6)}
+ for(const p of pages){await p.locator('#roomMenu').evaluate(e=>e.open=true);await p.locator('#reconnect').click();await p.waitForFunction(()=>document.querySelectorAll('#players .player').length===6)}
  assert.deepEqual(db.get('game').players.map(p=>p.closed.length),[4,4,3,3,3,3]);
  for(const p of pages){const dimensions=await p.evaluate(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth,overflow:[...document.querySelectorAll('body *')].filter(e=>e.getBoundingClientRect().right>innerWidth+1).map(e=>({tag:e.tagName,id:e.id,cls:e.className,right:e.getBoundingClientRect().right})).slice(0,12)}));assert(dimensions.scroll<=dimensions.width,JSON.stringify(dimensions));}
  await a.screenshot({path:path.join(root,'preview_online_table_mobile.png'),fullPage:true});await pages[1].screenshot({path:path.join(root,'preview_online_table_ipad.png'),fullPage:true});
 
  // Native device sharing, email compose and copy all use the same public invitation.
- await a.locator('#shareInvite').click();const shared=await a.evaluate(()=>window.__shared[0]);assert.equal(new URL(shared.url).searchParams.get('room'),code);assert(!shared.url.includes('secret'));
+ await a.locator('#roomMenu').evaluate(e=>e.open=true);await a.locator('#shareInvite').click();const shared=await a.evaluate(()=>window.__shared[0]);assert.equal(new URL(shared.url).searchParams.get('room'),code);assert(!shared.url.includes('secret'));
  await a.locator('#copyInvite').click();assert((await a.evaluate(()=>window.__copied[0])).includes(shared.url));
  const mail=await pages[5].locator('#inviteEmail').getAttribute('href');assert(mail.startsWith('mailto:?'));assert(decodeURIComponent(mail).includes('?room='+code));assert(!mail.includes('do-not-share'));
- await a.evaluate(()=>Object.defineProperty(navigator,'share',{configurable:true,value:undefined}));await a.locator('#shareInvite').click();assert.equal(await a.evaluate(()=>window.__copied.length),2);
+ await a.evaluate(()=>Object.defineProperty(navigator,'share',{configurable:true,value:undefined}));await a.locator('#roomMenu').evaluate(e=>e.open=true);await a.locator('#shareInvite').click();assert.equal(await a.evaluate(()=>window.__copied.length),2);
  await a.evaluate(()=>Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async()=>{throw Error('unavailable')}}}));await a.locator('#copyInvite').click();assert(await a.locator('#inviteText').isVisible());assert((await a.locator('#inviteText').inputValue()).includes(code));
 
  for(let i=0;i<6;i++){
-  const p=pages[i];await p.locator('#chatConsent').check();
+  const p=pages[i];await p.locator('#chatPanel').evaluate(e=>e.open=true);await p.locator('#chatConsent').check();
   if(i<5)assert(await p.locator('#chatFree').isHidden());
  }
- for(const p of pages){await p.locator('#reconnect').click();await p.locator('#chatText').waitFor({state:'visible'})}
+ for(const p of pages){await p.locator('#roomMenu').evaluate(e=>e.open=true);await p.locator('#reconnect').click();await p.locator('#chatText').waitFor({state:'visible'})}
  await pages[5].locator('#chatText').fill('Hej fra spiller seks');await pages[5].locator('#chatSendText').click();await pages[5].waitForFunction(()=>document.querySelector('#chatStatus').textContent==='Sendt');
- await a.locator('#reconnect').click();await a.waitForFunction(()=>document.querySelector('#chatMessages').textContent.includes('Hej fra spiller seks'));
+ await a.locator('#roomMenu').evaluate(e=>e.open=true);await a.locator('#reconnect').click();await a.waitForFunction(()=>document.querySelector('#chatMessages').textContent.includes('Hej fra spiller seks'));
  assert((await a.locator('#chatMessages').textContent()).includes('Spiller 6'));
  // Every seat can act. Exercise a complete round through the rendered buttons.
  let g=db.get('game');g.players.forEach(p=>{p.closed=[10,10];p.open=[]});g.centers=[];g.turn=0;g.pending=null;g.move++;db.set('game',g);
  for(let i=0;i<6;i++){
-  const p=pages[i];await p.locator('#reconnect').click();await p.getByRole('button',{name:'🃏 Vend kort',exact:true}).click();await p.getByRole('button',{name:'Læg i egen åbne bunke',exact:true}).click();await p.waitForFunction(()=>!document.querySelector('#current').textContent.includes('Vælg det vendte kort'));
+  const p=pages[i];await p.locator('#roomMenu').evaluate(e=>e.open=true);await p.locator('#reconnect').click();await p.getByRole('button',{name:'🃏 Vend kort',exact:true}).click();await p.getByRole('button',{name:'Læg i egen åbne bunke',exact:true}).click();await p.waitForFunction(name=>document.querySelector('#current').textContent.includes(name),'Spiller '+((i+1)%6+1));
   assert.equal(db.get('game').turn,(i+1)%6);
  }
  // Sixth participant catches a missed center placement. All five donors contribute.
- g=db.get('game');g.pending=1;g.turn=0;g.extraPenalty=true;g.move++;db.set('game',g);await a.locator('#reconnect').click();
+ g=db.get('game');g.pending=1;g.turn=0;g.extraPenalty=true;g.move++;db.set('game',g);await a.locator('#roomMenu').evaluate(e=>e.open=true);await a.locator('#reconnect').click();
  await a.getByRole('button',{name:'Læg i egen åbne bunke',exact:true}).click();await pages[5].locator('#reconnect').click();await pages[5].locator('#challenge').click();await pages[5].waitForFunction(()=>document.querySelector('#message').textContent.includes('blev opdaget'));
  assert.equal(db.get('game').players[0].donkeys,1);assert.equal(db.get('game').players[0].closed.length,6);
  await pages[4].reload();await pages[4].locator('#game').waitFor({state:'visible'});assert.equal(await pages[4].locator('#code').textContent(),code);assert((await pages[4].locator('#roomDeckSets').textContent()).includes('6/6 spillere'));
  // Reach completion through a real move: three medalists rendered on all seats.
  g=db.get('game');g.players.forEach((p,i)=>{p.closed=i===5?[9]:[];p.open=[]});g.pending=5;g.turn=4;g.centers=[[1,2,3,4]];g.finishOrder=[0,1,2,3];g.move++;db.set('game',g);
- const finisher=pages[4];await finisher.locator('#reconnect').click();await finisher.locator('#pendingArea .card').click();await finisher.locator('#centers .target').first().getByRole('button').click();await finisher.waitForFunction(()=>document.querySelector('#podium').textContent.includes('3. plads'));
- for(const p of pages){await p.locator('#reconnect').click();await p.waitForFunction(()=>document.querySelector('#podium').textContent.includes('3. plads'));assert.equal(await p.locator('#podium p').count(),3)}
+ const finisher=pages[4];await finisher.locator('#roomMenu').evaluate(e=>e.open=true);await finisher.locator('#reconnect').click();await finisher.locator('#players [data-source]').click();await finisher.locator('#centers .target').first().getByRole('button').click();await finisher.waitForFunction(()=>document.querySelector('#podium').textContent.includes('3. plads'));
+ for(const p of pages){await p.locator('#roomMenu').evaluate(e=>e.open=true);await p.locator('#reconnect').click();await p.waitForFunction(()=>document.querySelector('#podium').textContent.includes('3. plads'));assert.equal(await p.locator('#podium p').count(),3)}
  await a.screenshot({path:path.join(root,'preview_online_six_mobile.png'),fullPage:true});await pages[5].screenshot({path:path.join(root,'preview_online_six_desktop.png'),fullPage:true});
  assert.deepEqual(errors,[]);console.log('PASS six-player Chromium: lobby, balanced deal, six identities, unanimous chat, named sender, round-robin, challenge, five-card penalty, seat 5 reload, invitations/share/mail/copy and three-place podium');
  }finally{for(const c of contexts)await c.close();await browser.close()}

@@ -30,15 +30,15 @@ const {chromium}=require('playwright');
  const [a,b]=pages;
  await a.locator('#playerCount').selectOption('6');await a.locator('#name').fill('Alma');await a.locator('#create').click();await a.locator('#parentPin').fill('1234');await a.locator('#parentOk').click();await a.waitForFunction(()=>document.querySelector('#code').textContent.length===8);
  const code=await a.locator('#code').textContent();await b.locator('#name').fill('Bo');await b.locator('#joinCode').fill(code);await b.locator('#join').click();await b.locator('#parentPin').fill('1234');await b.locator('#parentOk').click();await b.locator('#game').waitFor({state:'visible'});
- await a.locator('#reconnect').click();assert.equal(db.get('game').phase,'waiting');assert(await a.locator('#startEarly').isHidden());assert(await b.locator('#startEarly').isHidden());
+ await a.locator('#roomMenu').evaluate(e=>e.open=true);await a.locator('#reconnect').click();assert.equal(db.get('game').phase,'waiting');assert(await a.locator('#startEarly').isHidden());assert(await b.locator('#startEarly').isHidden());
  // Age the server fixture; the final short countdown uses real browser timers.
  const g=db.get('game');g.created=Date.now()-58000;db.set('game',g);
  await a.reload();await a.locator('#earlyStartPanel').waitFor({state:'visible'});await a.locator('#startEarly').waitFor({state:'visible',timeout:7000});assert(await a.locator('#startEarly').isEnabled());assert.equal(db.get('game').phase,'waiting');
- await b.locator('#reconnect').click();assert(await b.locator('#startEarly').isHidden());
+ await b.locator('#roomMenu').evaluate(e=>e.open=true);await b.locator('#reconnect').click();assert(await b.locator('#startEarly').isHidden());
  await a.screenshot({path:path.join(root,'preview_online_start_early.png'),fullPage:true});
  await a.locator('#startEarly').click();await a.waitForFunction(()=>document.querySelector('#message').textContent.includes('startet med 2'));
  assert.equal(db.get('game').playerCount,2);assert.deepEqual(db.get('game').players.map(p=>p.closed.length),[50,50]);assert(await a.locator('#earlyStartPanel').isHidden());
- await b.locator('#reconnect').click();await b.waitForFunction(()=>document.querySelector('#roomDeckSets').textContent.includes('2/2 spillere'));
+ await b.locator('#roomMenu').evaluate(e=>e.open=true);await b.locator('#reconnect').click();await b.waitForFunction(()=>document.querySelector('#roomDeckSets').textContent.includes('2/2 spillere'));
  await a.reload();await a.waitForFunction(()=>document.querySelector('#roomDeckSets').textContent.includes('2/2 spillere'));assert(await a.locator('#startEarly').isHidden());
  assert.deepEqual(errors,[]);console.log('PASS early-start Chromium: host countdown, persisted deadline, guest cannot start, optional click, two-player deal, broadcast fallback and reload');
  }finally{for(const c of contexts)await c.close();await browser.close()}

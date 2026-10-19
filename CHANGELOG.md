@@ -4,6 +4,21 @@ Nyeste øverst. Én kort post pr. version. Detaljer, testresultater og filoversi
 findes i `docs/arkiv/`. Versioner uden post (fx 0.9.8 udover lydcache, 0.9.21, 0.9.26) var ikke
 dokumenteret separat i de gamle noter.
 
+## v0.9.49 – vend på lukket bunke og æsellyd (19. oktober 2026)
+- Rettet efter præcisering: kortet vendes oven på egen lukkede bunke og bliver dér, indtil spilleren flytter det. Den åbne bunke ændres først ved eget valg.
+- Flytning til egen åbne bunke afslutter turen automatisk. Flytning til modspiller/midte lader spilleren fortsætte. Ingen Afslut tur-knap i onlinevisningen.
+- Eksisterende sammenfoldelige paneler, æselknap ved spillerkortene og træk/tryk er bevaret.
+- Den eksisterende donkey-bray.wav afspilles ved faktisk tildelt æselstraf, også Send æslet videre. Korrekte udfordringer eller en tom æselkortpulje giver ingen lyd. Nyt hændelsesnummer hindrer gentagelser ved polling/F5. Æsellyd kan slås til/fra pr. enhed, uafhængigt af talestemmen.
+- 39/39 Node-tests; Chromium tester touch fra vendt kort på lukket bunke til midte, musetræk til modspiller, tur ved egen åben bunke, lydhændelse én gang pr. enhed, lokal mute og ingen gentaget lyd efter F5. Online med to/seks spillere, 60-sekundersstart, offline/CPU og Worker dry-run består. Afspilning er simuleret; rigtig iPhone/iPad skal prøves efter upload.
+
+## v0.9.48 – kompakt spillebord og kort direkte i åben bunke (19. oktober 2026)
+- Rum/invitationer, lyd og chat kan foldes ud/sammen. Under spil starter de sammenfoldet; rumoplysninger er åbne i ventelobbyen. Turbesked og 60-sekundersstart forbliver synlige. Åbne/lukkede paneler bevares under løbende statusopdateringer.
+- Æselknap og gentag tal sidder lige under spillerkortene, før midterrækkerne. Spillets overskrift fylder mindre.
+- Et tryk på egen lukkede bunke vender nu kortet direkte til egen åbne bunke. Turen fortsætter, mens kort flyttes til midten eller andre spillere. “Afslut tur” sender turen videre.
+- Oversete placeringer ved næste vending eller afsluttet tur kan udfordres. Serveren fortryder kun den seneste handling og giver valgt straf. Tidligere pending-kort og ældre klienthandlinger kan fortsat læses.
+- Pointer Events giver træk med finger, mus og pen, inklusive rulning nær skærmkanten. Tryk på kort og derefter mål samt tastatur er bevaret. Chat viser antal beskeder, også sammenfoldet.
+- 38/38 Node-tests; Chromium med to og seks profiler, rigtig simuleret touch-input og musetræk, foldning, invitationer, lyd, podium og 60-sekundersstart. Offline-/CPU-browsertests og Worker dry-run består. Ingen fysisk iPhone-test eller deployment udført herfra.
+
 ## v0.9.47 – start uden de sidste inviterede (19. oktober 2026)
 - Efter 60 sekunder fra rummets oprettelse kan opretteren starte med de tilmeldte, hvis mindst to er med. Ingen automatisk start ved tidsgrænsen; I kan fortsætte med at vente.
 - Nedtælling vises i rummet og bevares efter genindlæsning. Serveren kontrollerer tid, opretterens adgang og minimumsantal.
