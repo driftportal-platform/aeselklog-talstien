@@ -1,4 +1,4 @@
-// ÆselKlog Online v0.9.51 – serverstyret kortspil (2–6 spillere).
+// ÆselKlog Online v0.9.52 – serverstyret kortspil (2–6 spillere).
 // Regler matcher det lokale cardgame-engine.js. Ingen CPU. Chat og genopkobling bevaret.
 const QUICK=['🫏 Hov hov!','👏 Godt spil!','😂 Haha!','🎉 Flot klaret!','🥕 Din tur!','❤️ Tak for spillet!'];
 const MAX_VOICE_BASE64=1400000,MAX_TEXT=10000,CHAT_KEEP_MS=24*60*60*1000;
@@ -36,7 +36,7 @@ function remaining(state,index){const p=state.players[index];return countCards(p
 export default {
   async fetch(request,env){
     const url=new URL(request.url),origin=request.headers.get('origin');
-    if(request.method==='GET'&&url.pathname==='/health')return response({status:'ready',service:'ÆselKlog Online v0.9.51'});
+    if(request.method==='GET'&&url.pathname==='/health')return response({status:'ready',service:'ÆselKlog Online v0.9.52'});
     if(!validOrigin(request,env))return response({error:'Hjemmesiden er ikke tilladt'},403);
     if(request.method==='OPTIONS')return new Response(null,{status:204,headers:cors(origin,env)});
     if(url.pathname==='/api/create'&&request.method==='POST'){
@@ -106,6 +106,14 @@ export class GameRoom {
     if(route==='/state'&&request.method==='GET'){
       const seat=this.seat(url.searchParams.get('secret')||'',g);if(seat<0)return response({error:'Ugyldig adgang'},401);
       return response(this.publicState(g,seat));
+    }
+    if(route==='/attention'&&request.method==='POST'){
+      let b;try{b=await request.json()}catch{return response({error:'Ugyldigt JSON'},400)}
+      const seat=this.seat(b.secret||'',g);if(seat<0)return response({error:'Ugyldig adgang'},401);
+      if(!Number.isInteger(b.target)||b.target<0||b.target>=g.players.length||b.target===seat)return response({error:'Vælg en anden spiller'},400);
+      const now=Date.now();if(now-(g.nudgeTimes?.[seat]||0)<3000)return response({error:'Vent et øjeblik før næste prik'},429);
+      g.nudgeTimes={...g.nudgeTimes,[seat]:now};g.attention={...g.attention,[b.target]:{id:token(),at:now,from:seat}};
+      await this.state.storage.put('game',g);this.broadcast(g);return response({ok:true});
     }
     if(route==='/action'&&request.method==='POST'){
       let b;try{b=await request.json()}catch{return response({error:'Ugyldigt JSON'},400)}
@@ -292,7 +300,7 @@ export class GameRoom {
     const actor=g.lastMove.actor,number=g.lastMove.number;
     const restored=JSON.parse(JSON.stringify(g.lastMove.before));
     // Undo cards only; preserve newer chat, consent and the monotonic revision.
-    Object.assign(restored,{chat:g.chat,chatPrefs:g.chatPrefs,move:g.move,penaltySoundId:g.penaltySoundId||0});
+    Object.assign(restored,{attention:g.attention,nudgeTimes:g.nudgeTimes,chat:g.chat,chatPrefs:g.chatPrefs,move:g.move,penaltySoundId:g.penaltySoundId||0});
     Object.keys(g).forEach(k=>delete g[k]);Object.assign(g,restored);
     const penalty=this.givePenalty(g,actor);
     if(penalty.assigned)g.penaltySoundId=g.move+1;
@@ -356,7 +364,7 @@ export class GameRoom {
   }
   publicState(g,seat){
     return {
-      phase:g.phase,penaltySoundId:g.penaltySoundId||0,startWaitMs:g.phase==='waiting'?this.earlyStartWait(g):0,turn:g.turn,pending:g.turn===seat?g.pending:null,centers:g.centers.map(c=>({top:c.at(-1),length:c.length})),
+      attention:g.phase!=='closed'?(g.attention?.[seat]||null):null,phase:g.phase,penaltySoundId:g.penaltySoundId||0,startWaitMs:g.phase==='waiting'?this.earlyStartWait(g):0,turn:g.turn,pending:g.turn===seat?g.pending:null,centers:g.centers.map(c=>({top:c.at(-1),length:c.length})),
       players:g.players.map((p,i)=>({name:p.name,closed:p.closed.length,open:i===seat||true?p.open.at(-1):null,openCount:p.open.length,donkeys:p.donkeys})),
       you:seat,playerCount:g.playerCount??2,deckSets:g.deckSets??5,variant:g.variant||'collect',extraPenalty:g.extraPenalty===true,donkeyCount:g.donkeyCount||8,message:g.message,move:g.move,canChallenge:!!g.lastMove&&g.lastMove.actor!==seat,winner:g.winner,placements:g.placements||null
     };

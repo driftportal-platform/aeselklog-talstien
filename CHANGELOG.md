@@ -4,6 +4,12 @@ Nyeste øverst. Én kort post pr. version. Detaljer, testresultater og filoversi
 findes i `docs/arkiv/`. Versioner uden post (fx 0.9.8 udover lydcache, 0.9.21, 0.9.26) var ikke
 dokumenteret separat i de gamle noter.
 
+## v0.9.52 – større chat, musikpause og prik til spiller (19. oktober 2026)
+- Musik holder pause fra mikrofonen anmodes, til optagelsen er stoppet og mikrofonen frigivet. Fortsætter med samme indstilling; også ved afvist tilladelse. Periodisk opdatering kan ikke starte musik under optagelsen.
+- Nyeste beskeder øverst. Et større chatvindue giver plads til historikken, hurtigbeskeder er foldet sammen. Uændret historik genopbygges ikke ved polling, så man kan læse ældre beskeder uden at blive flyttet.
+- Tryk på en anden spillers navn med 👋 for at prikke. Kun modtagerens egen enhed markerer deres felt og viser afsenderen. Kort, tur og udfordringer ændres ikke. Tre sekunder mellem prik fra samme afsender.
+- 42/42 Node-tests; browserkontrol af musikpause/genoptagelse, afvist mikrofon, beskedrækkefølge, større historik og målrettet prik. Øvrige online-browserkontroller og Worker dry-run består. Mikrofon/lyd er simuleret; fysisk iPhone skal prøves efter upload.
+
 ## v0.9.51 – kompakt spillebord, flydende chat og æsellyd (19. oktober 2026)
 - Spillerkort i en kompakt vandret række med midterbunkerne direkte nedenunder. Flere spillere kan ses ved at stryge sidelæns.
 - Indstillinger, invitationer, lydvalg og afslutning er samlet bag tandhjulet øverst. Runde knapper til æseludfordring, gentag tal og chat.
