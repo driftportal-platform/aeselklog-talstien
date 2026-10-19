@@ -8,3 +8,5 @@
 .setup-panel.has-invite .create-room{display:none}.setup-panel.has-invite .setup-columns{grid-template-columns:1fr}.setup-panel.has-invite .join-room{max-width:none}.setup-panel.has-invite .join-illustration{font-size:2rem;margin-bottom:7px}
 @media(max-width:360px){.player .card,.player .empty-pile{width:46px;height:68px}.player .flex{gap:4px}.player h3{font-size:.7rem}.player .muted{font-size:.57rem}.pile-target{padding:2px}.welcome-art{width:70px}.welcome h1{font-size:1.65rem}.feature-chip{font-size:.56rem}.room-heading h2{font-size:1.15rem}}
 .welcome-art:before{inset:20px 0 0;transform:none}
+
+.early-start{margin-top:14px;padding:12px 15px;background:#fff3d7;border:1px solid #e1ca8d;border-radius:14px}.early-start p{margin:0 0 10px}.early-start button{min-height:48px}@media(max-width:520px){.early-start button{width:100%}}

@@ -4,6 +4,13 @@ Nyeste øverst. Én kort post pr. version. Detaljer, testresultater og filoversi
 findes i `docs/arkiv/`. Versioner uden post (fx 0.9.8 udover lydcache, 0.9.21, 0.9.26) var ikke
 dokumenteret separat i de gamle noter.
 
+## v0.9.47 – start uden de sidste inviterede (19. oktober 2026)
+- Efter 60 sekunder fra rummets oprettelse kan opretteren starte med de tilmeldte, hvis mindst to er med. Ingen automatisk start ved tidsgrænsen; I kan fortsætte med at vente.
+- Nedtælling vises i rummet og bevares efter genindlæsning. Serveren kontrollerer tid, opretterens adgang og minimumsantal.
+- Når opretteren starter, lukkes de ledige pladser, kortene fordeles blandt deltagerne, og chatgodkendelser tilpasses dem, der er med. Sene invitationer kan ikke ændre et startet spil.
+- Normal start, når alle valgte deltagere er med, er bevaret. Samtidig sidste tilmelding/startknap kan ikke uddele kort to gange.
+- 37/37 Node-tests, Chromium med to/seks profiler, ny nedtællings-/starttest og eksisterende offline/CPU-browsertests består; Worker dry-run består. Ingen deployment udført herfra.
+
 ## v0.9.46 – flere spillere, hyggeligt spillebord og invitationer (19. oktober 2026)
 - Online understøtter 2–6 spillere. Rumopretteren vælger antal; alle tilmelder sig med samme rumkode. Kortene uddeles, når rummet er fuldt, så lige som muligt.
 - Turrækkefølge, nærmeste spiller til venstre, begge æselkortvarianter, ekstra kortstraf, færdige/tilbagevendende spillere og podium virker med flere deltagere. Gamle rum fortsætter som tospillerspil.
