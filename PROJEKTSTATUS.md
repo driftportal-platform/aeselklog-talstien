@@ -1,6 +1,6 @@
 # ÆselKlog – hvor er vi nu
 
-**Version:** 0.9.45 (lokalt valideret opdateringspakke, 19. oktober 2026; ikke publiceret). Opdateres ved hver release sammen med `CHANGELOG.md`.
+**Version:** 0.9.46 (lokalt valideret opdateringspakke, 19. oktober 2026; ikke publiceret). Opdateres ved hver release sammen med `CHANGELOG.md`.
 
 ## Hvad er det?
 Børnevenligt talspil som PWA (GitHub Pages, repo `driftportal-platform/aeselklog-talstien`) med tre selvstændige dele og frivillig matematik:
@@ -10,13 +10,16 @@ Børnevenligt talspil som PWA (GitHub Pages, repo `driftportal-platform/aeselklo
 Lyd: 500 gemte MP3-tal (fem stemmer), valgfri baggrundsmusik, ElevenLabs kun via Cloudflare Worker. Alt gemmes lokalt, ingen konti.
 
 ## Status
-- Udgangspunkt for v0.9.45: GitHub main `437a9ddac7032e380ffbc3601da436b56605cae3`.
-- Nyt: 1–5 kortsæt vælges af rumopretteren og gemmes på serveren. 20–100 talkort i alt; lige fordeling; begge spillere ser valget. Gamle rum fortsætter med deres eksisterende kort. Test dækker alle talområder og sætantal samt gamle rum.
+- Udgangspunkt for v0.9.46: GitHub main `1ffebc1ab0c8779d175dddaef2f375637176a60c`.
+- Nyt: 2–6 online-spillere, 1–5 kortsæt, ventelobby indtil alle er med, så lige uddeling som muligt, turrækkefølge, færdige/tilbagevendende spillere og podium med tre medaljepladser.
+- Nyt design til online opsætning og spillebord med eksisterende æselgrafik og appens farver. Åbne bunker kan modtage kort direkte. Den almindelige appforside er uændret bortset fra versionsmærket.
+- Invitationer: native deling, mailkladde og kopiering. Offentligt rumlink udfylder kode uden at dele spillerens secret. Gæster får en enkel deltag-side; et gammelt gemt rum overtager ikke en ny invitation.
+- Chat navngiver afsenderen; alle deltagere godkender fri tekst/lyd. Samtidige tilmeldinger er testet.
 - Onlinefejl rettet: CORS/chat, MIME-type på lydklip, WebSocket-videresendelse, oplæsning af alle vendte kort, synligt æselkort, gentag tal, udfordringer uden tab af nyere chat eller opdateringsnummer. Begge onlineindgange er opdateret.
-- **Automatisk:** 35/35 Node-tests består. Ny servertest dækker begge deltagere, CORS, hurtigtekst/fri tekst/lyddata, adgang, udfordringer, begge varianter, ekstra kortstraf og vinderregler.
-- **Chromium/simuleret:** online mobil 390×844 og desktop 1280×800 i separate browserprofiler, Worker-logik via simuleret transport, simuleret mikrofon/afspilning, genindlæsning, lokale sprogvalg, straf og sejrspodie. Offlinekortspil ved 390×844, 844×390 og 1280×800; træk, tryk, udfordringer og CPU består.
+- **Automatisk:** 36/36 Node-tests består. Ny servertest dækker begge deltagere, CORS, hurtigtekst/fri tekst/lyddata, adgang, udfordringer, begge varianter, ekstra kortstraf og vinderregler.
+- **Chromium/simuleret:** online med to og seks isolerede browserprofiler, størrelser 320×740, 390×844, 768×1024, 1024×768, 844×390 og 1280×800. Worker-logik via simuleret transport, simuleret mikrofon/afspilning/deling, mail-link, kopiering/reservefelt, invitationslink, genindlæsning, lokale sprogvalg, straf og podium. Offlinekortspil ved 390×844, 844×390 og 1280×800; træk, tryk, udfordringer og CPU består.
 - **Cloudflare:** lokal Wrangler dry-run består med GAME_ROOM og eksplicit APP_ORIGIN. Eksisterende bindinger og migrationsfil er uændrede. Konfigurationens navn er `aeselklog-online-pilot`, mens den oplyste liveadresse bruger `aeselklog-online`; følg installationsvejledningens eksplicitte `--name`.
-- **Ikke bekræftet:** faktisk deployment på Cloudflare, live WebSocket på to fysiske enheder, rigtig mikrofon/lydafspilning på iPhone, installeret iPhone-PWA eller live ElevenLabs.
+- **Ikke bekræftet:** faktisk deployment på Cloudflare, live WebSocket på flere fysiske enheder, rigtig deling til Beskeder/Messenger, mailapp, rigtig mikrofon/lydafspilning på iPhone, installeret iPhone-PWA eller live ElevenLabs.
 - Ingen lydfiler genoprettet eller ændret; ingen konto-/nøglefiler i pakken.
 
 ## Åbent før v1.0
@@ -27,7 +30,7 @@ Lyd: 500 gemte MP3-tal (fem stemmer), valgfri baggrundsmusik, ElevenLabs kun via
 5. Ryd op: `OPDATERING-v0.9.31.md` er forældet og kan slettes.
 
 ## Næste skridt
-1. Installér filerne fra v0.9.45-pakken efter INSTALLATION-v0.9.45.md; Commit og Push origin via GitHub Desktop.
+1. Installér filerne fra v0.9.46-pakken efter INSTALLATION-v0.9.46.md; Commit og Push origin via GitHub Desktop.
 2. Deploy Worker særskilt efter aftale til den eksisterende Worker, og kontrollér GAME_ROOM og APP_ORIGIN først.
 3. Gennemfør tjeklisten med to fysiske enheder: chat, rigtig mikrofon/afspilning, sprog, udfordringer, musik og F5. Notér resultater her.
 4. Fortsæt iPhone- og familietest fra TESTPLAN.md.

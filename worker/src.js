@@ -1,4 +1,4 @@
-// ÆselKlog Online v0.9.45 – serverstyret kortspil (2 spillere).
+// ÆselKlog Online v0.9.46 – serverstyret kortspil (2–6 spillere).
 // Regler matcher det lokale cardgame-engine.js. Ingen CPU. Chat og genopkobling bevaret.
 const QUICK=['🫏 Hov hov!','👏 Godt spil!','😂 Haha!','🎉 Flot klaret!','🥕 Din tur!','❤️ Tak for spillet!'];
 const MAX_VOICE_BASE64=240000,MAX_TEXT=160,CHAT_KEEP_MS=24*60*60*1000;
@@ -36,7 +36,7 @@ function remaining(state,index){const p=state.players[index];return countCards(p
 export default {
   async fetch(request,env){
     const url=new URL(request.url),origin=request.headers.get('origin');
-    if(request.method==='GET'&&url.pathname==='/health')return response({status:'ready',service:'ÆselKlog Online v0.9.45'});
+    if(request.method==='GET'&&url.pathname==='/health')return response({status:'ready',service:'ÆselKlog Online v0.9.46'});
     if(!validOrigin(request,env))return response({error:'Hjemmesiden er ikke tilladt'},403);
     if(request.method==='OPTIONS')return new Response(null,{status:204,headers:cors(origin,env)});
     if(url.pathname==='/api/create'&&request.method==='POST'){
@@ -45,11 +45,13 @@ export default {
       const range=['1-20','21-40','41-60','61-80','81-100'].includes(input.range)?input.range:'1-20';
       const deckSets=input.deckSets===undefined?5:input.deckSets;
       if(!Number.isInteger(deckSets)||deckSets<1||deckSets>5)return response({error:'Vælg 1–5 kortsæt'},400,cors(origin,env));
+      const playerCount=input.playerCount===undefined?2:input.playerCount;
+      if(!Number.isInteger(playerCount)||playerCount<2||playerCount>6)return response({error:'Vælg 2–6 spillere'},400,cors(origin,env));
       const variant=input.variant==='passing'?'passing':'collect';
       const extraPenalty=input.extraPenalty===true;
       const donkeyCount=variant==='passing'?1:([1,4,6,8].includes(Number(input.donkeyCount))?Number(input.donkeyCount):8);
       const code=random(8),secret=token();const id=env.GAME_ROOM.idFromName(code);const stub=env.GAME_ROOM.get(id);
-      const roomResponse=await stub.fetch('https://room/init',{method:'POST',body:JSON.stringify({name,range,secret,code,variant,extraPenalty,donkeyCount,deckSets})});
+      const roomResponse=await stub.fetch('https://room/init',{method:'POST',body:JSON.stringify({name,range,secret,code,variant,extraPenalty,donkeyCount,deckSets,playerCount})});
       if(roomResponse.status===101)return roomResponse;
     const headers=new Headers(roomResponse.headers);
     for(const [key,value] of Object.entries(cors(origin,env)))headers.set(key,value);
@@ -69,8 +71,13 @@ export default {
 };
 
 export class GameRoom {
-  constructor(state,env){this.state=state;this.env=env;this.clients=new Map()}
-  async fetch(request){
+  constructor(state,env){this.state=state;this.env=env;this.clients=new Map();this.queue=Promise.resolve()}
+  fetch(request){
+    // Serialize room reads/writes, including simultaneous joins and challenges.
+    const result=this.queue.then(()=>this.handleFetch(request));
+    this.queue=result.catch(()=>{});return result;
+  }
+  async handleFetch(request){
     const url=new URL(request.url),route=url.pathname;
     let g=await this.state.storage.get('game')||null;
     if(route==='/init'&&request.method==='POST'){
@@ -78,7 +85,9 @@ export class GameRoom {
       const b=await request.json();
       const deckSets=b.deckSets===undefined?5:b.deckSets;
       if(!Number.isInteger(deckSets)||deckSets<1||deckSets>5)return response({error:'Vælg 1–5 kortsæt'},400);
-      g={code:b.code,range:b.range,deckSets,variant:b.variant==='passing'?'passing':'collect',extraPenalty:b.extraPenalty===true,donkeyCount:b.variant==='passing'?1:Number(b.donkeyCount)||8,phase:'waiting',turn:0,pending:null,centers:[],players:[{name:b.name,secret:b.secret,closed:[],open:[],donkeys:0}],chat:[],chatPrefs:[false,false],created:Date.now(),move:0,lastMove:null,message:'Venter på spiller 2…'};
+      const playerCount=b.playerCount===undefined?2:b.playerCount;
+      if(!Number.isInteger(playerCount)||playerCount<2||playerCount>6)return response({error:'Vælg 2–6 spillere'},400);
+      g={code:b.code,range:b.range,deckSets,playerCount,variant:b.variant==='passing'?'passing':'collect',extraPenalty:b.extraPenalty===true,donkeyCount:b.variant==='passing'?1:Number(b.donkeyCount)||8,phase:'waiting',turn:0,pending:null,centers:[],players:[{name:b.name,secret:b.secret,closed:[],open:[],donkeys:0}],chat:[],chatPrefs:Array(playerCount).fill(false),created:Date.now(),move:0,lastMove:null,message:`Venter på spillere: 1 af ${playerCount} er tilmeldt.`};
       await this.state.storage.put('game',g);return response({code:b.code,secret:b.secret});
     }
     if(!g)return response({error:'Rummet findes ikke'},404);
@@ -113,15 +122,18 @@ export class GameRoom {
       g.move++;await this.state.storage.put('game',g);this.broadcast(g);return response(this.publicState(g,seat));
     }
     if(route==='/join'&&request.method==='POST'){
-      if(g.players.length!==1||g.phase!=='waiting')return response({error:'Rummet er allerede fuldt'},409);
+      if(g.players.length>=(g.playerCount??2)||g.phase!=='waiting')return response({error:'Rummet er allerede fuldt'},409);
       const b=await request.json(),name=String(b.name||'').trim().slice(0,25);
-      if(!name||name.toLowerCase()===g.players[0].name.toLowerCase())return response({error:'Vælg et andet navn'},400);
+      if(!name||g.players.some(p=>p.name.toLocaleLowerCase('da-DK')===name.toLocaleLowerCase('da-DK')))return response({error:'Vælg et andet navn'},400);
       const secret=token();g.players.push({name,secret,closed:[],open:[],donkeys:0});
+      if(g.players.length===(g.playerCount??2)){
       const [lo,hi]=bounds(g.range);const deck=[];
       for(let n=lo;n<=hi;n++)for(let i=0;i<(g.deckSets??5);i++)deck.push(n);
       for(let i=deck.length-1;i>0;i--){const v=crypto.getRandomValues(new Uint32Array(1))[0]%(i+1);[deck[i],deck[v]]=[deck[v],deck[i]]}
-      deck.forEach((n,i)=>g.players[i%2].closed.push(n));
-      g.phase='playing';g.message='Spillet er startet. Spiller 1 begynder.';g.move++;
+      deck.forEach((n,i)=>g.players[i%g.players.length].closed.push(n));
+      g.phase='playing';g.message='Spillet er startet. Spiller 1 begynder.';
+      }else g.message=`Venter på spillere: ${g.players.length} af ${g.playerCount} er tilmeldt.`;
+      g.move++;
       await this.state.storage.put('game',g);this.broadcast(g);return response({secret});
     }
     // Chat: kun deltagere i rummet; hurtigbeskeder eller frivillig tekst/lyd.
@@ -130,7 +142,7 @@ export class GameRoom {
     if(route==='/chat'&&request.method==='GET'){
       const seat=this.seat(request.headers.get('x-player-secret')||'',g);
       if(seat<0)return response({error:'Ingen adgang'},401);
-      return response({messages:(g.chat||[]).map(({audio,...rest})=>rest),prefs:g.chatPrefs||[false,false]});
+      return response({messages:(g.chat||[]).map(({audio,...rest})=>rest),prefs:this.chatPrefs(g),players:g.players.map(p=>p.name)});
     }
     if(route==='/clip'&&request.method==='GET'){
       const seat=this.seat(request.headers.get('x-player-secret')||'',g);
@@ -143,7 +155,7 @@ export class GameRoom {
     if(route==='/chat-settings'&&request.method==='POST'){
       const b=await request.json(),seat=this.seat(b.secret||'',g);
       if(seat<0)return response({error:'Ingen adgang'},401);
-      if(!Array.isArray(g.chatPrefs))g.chatPrefs=[false,false];
+      g.chatPrefs=this.chatPrefs(g);
       g.chatPrefs[seat]=b.enabled===true;
       await this.state.storage.put('game',g);this.broadcast(g);notifyChat();
       return response({prefs:g.chatPrefs});
@@ -161,12 +173,12 @@ export class GameRoom {
         if(!QUICK.includes(b.text))return response({error:'Ukendt hurtigbesked'},400);
         item={...item,kind:'quick',text:b.text};
       }else if(b.kind==='text'){
-        if(!(g.chatPrefs||[]).every(Boolean))return response({error:'Begge spillere skal slå fri chat til'},403);
+        if(!this.chatPrefs(g).every(Boolean))return response({error:'Alle spillere skal slå fri chat til'},403);
         const value=String(b.text||'').trim();
         if(!value||value.length>MAX_TEXT||/[<>\x00-\x08]/.test(value))return response({error:'Teksten skal være 1–160 tegn'},400);
         item={...item,kind:'text',text:value};
       }else if(b.kind==='voice'){
-        if(!(g.chatPrefs||[]).every(Boolean))return response({error:'Begge spillere skal slå lydchat til'},403);
+        if(!this.chatPrefs(g).every(Boolean))return response({error:'Alle spillere skal slå lydchat til'},403);
         if(!['audio/webm','audio/mp4','audio/ogg'].includes(b.mime)||typeof b.audio!=='string'||b.audio.length>MAX_VOICE_BASE64||!/^[A-Za-z0-9+/]*={0,2}$/.test(b.audio)||!Number.isFinite(Number(b.duration))||Number(b.duration)>10.2||Number(b.duration)<0.1)return response({error:'Lydklip skal være højst 10 sekunder'},400);
         item={...item,kind:'voice',mime:b.mime,audio:b.audio,duration:Math.round(Number(b.duration)*10)/10};
       }else return response({error:'Ukendt beskedtype'},400);
@@ -175,6 +187,7 @@ export class GameRoom {
     }
     return response({error:'Ukendt sti'},404);
   }
+  chatPrefs(g){return Array.from({length:g.playerCount??2},(_,i)=>g.chatPrefs?.[i]===true)}
   seat(secret,g){return g.players.findIndex(p=>p.secret===secret)}
   doFlip(g,seat){
     if(g.pending!==null)throw Error('Læg først det vendte kort.');
@@ -217,12 +230,14 @@ export class GameRoom {
     else if(dest.kind==='center')g.centers[dest.index].push(n);
     else if(dest.kind==='player')g.players[dest.index].open.push(n);
     else throw Error('Ukendt mål');
+    if(Array.isArray(g.finishOrder))g.finishOrder=g.finishOrder.filter(i=>remaining(g,i)===0);
     g.lastMove={actor:seat,valid,number:n,type:dest.kind==='self-open'?'discard':'place',before};
     if(dest.kind==='self-open'){
       this.finishOrNext(g);
       g.message=`${p.name} lagde ${n} i sin åbne bunke.`;
     }else if(remaining(g,seat)===0){
       this.finishWinner(g,seat);
+      if(g.phase!=='finished')this.advanceTurn(g);
     }else g.message=`${p.name} lagde ${n}.`;
   }
   doDiscard(g,seat){return this.doPlace(g,seat,{source:'pending',kind:'self-open'})}
@@ -236,6 +251,8 @@ export class GameRoom {
     Object.assign(restored,{chat:g.chat,chatPrefs:g.chatPrefs,move:g.move});
     Object.keys(g).forEach(k=>delete g[k]);Object.assign(g,restored);
     this.givePenalty(g,actor);
+    this.finishWinner(g,actor);
+    if(g.phase!=='finished'&&remaining(g,g.turn)===0)this.advanceTurn(g);
     g.lastMove=null;
     g.message=`🫏 ${g.players[actor].name} blev opdaget! Trækket med ${number} blev fortrudt. ${g.penaltyMessage}`;
     delete g.penaltyMessage;
@@ -262,23 +279,41 @@ export class GameRoom {
     return {assigned,extras};
   }
   finishWinner(g,finisher){
-    const opponent=1-finisher;
-    const winner=g.players[finisher].donkeys>g.players[opponent].donkeys?opponent:finisher;
-    g.phase='finished';g.winner=winner;g.placements=[winner,1-winner];
-    g.message=`🏆 ${g.players[winner].name} vandt! 🥇 ${g.players[winner].name} · 🥈 ${g.players[1-winner].name}`;
+    // Same ranking as offline: completed players by donkeys, then finish time.
+    const done=(g.finishOrder||[]).filter(i=>remaining(g,i)===0);
+    for(let i=0;i<g.players.length;i++)if(remaining(g,i)===0&&!done.includes(i))done.push(i);
+    g.finishOrder=done;
+    if(!done.length)return;
+    if(g.players.length===2){
+      if(!done.includes(finisher))finisher=done[0];
+      const other=1-finisher;
+      const winner=g.players[finisher].donkeys>g.players[other].donkeys?other:finisher;
+      g.placements=[winner,1-winner];
+    }else{
+      if(done.length<g.players.length-1)return;
+      g.placements=done.slice().sort((a,b)=>g.players[a].donkeys-g.players[b].donkeys||done.indexOf(a)-done.indexOf(b));
+      g.placements.push(...g.players.map((_,i)=>i).filter(i=>!done.includes(i)));
+    }
+    g.phase='finished';g.winner=g.placements[0];
+    g.message=`🏆 ${g.players[g.winner].name} vandt! `+g.placements.slice(0,3).map((i,k)=>`${['🥇','🥈','🥉'][k]} ${g.players[i].name}`).join(' · ');
+  }
+  advanceTurn(g){
+    for(let step=0;step<g.players.length;step++){
+      g.turn=(g.turn+1)%g.players.length;
+      if(remaining(g,g.turn)>0)break;
+    }
   }
   finishOrNext(g){
-    if(remaining(g,g.turn)===0&&g.pending===null){
-      this.finishWinner(g,g.turn);return;
-    }
-    g.turn=1-g.turn;
+    this.finishWinner(g,g.turn);
+    if(g.phase==='finished')return;
+    this.advanceTurn(g);
     g.message=`${g.players[g.turn].name}s tur.`;
   }
   publicState(g,seat){
     return {
       phase:g.phase,turn:g.turn,pending:g.turn===seat?g.pending:null,centers:g.centers.map(c=>({top:c.at(-1),length:c.length})),
       players:g.players.map((p,i)=>({name:p.name,closed:p.closed.length,open:i===seat||true?p.open.at(-1):null,openCount:p.open.length,donkeys:p.donkeys})),
-      you:seat,deckSets:g.deckSets??5,variant:g.variant||'collect',extraPenalty:g.extraPenalty===true,donkeyCount:g.donkeyCount||8,message:g.message,move:g.move,canChallenge:!!g.lastMove&&g.lastMove.actor!==seat,winner:g.winner,placements:g.placements||null
+      you:seat,playerCount:g.playerCount??2,deckSets:g.deckSets??5,variant:g.variant||'collect',extraPenalty:g.extraPenalty===true,donkeyCount:g.donkeyCount||8,message:g.message,move:g.move,canChallenge:!!g.lastMove&&g.lastMove.actor!==seat,winner:g.winner,placements:g.placements||null
     };
   }
   broadcast(g){

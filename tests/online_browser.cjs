@@ -29,7 +29,7 @@ const {chromium}=require('playwright');
  }
  const [a,b]=pages;
  assert.equal(await a.locator('#deckSets').inputValue(),'5');assert.equal(await a.locator('#deckSets option').count(),5);await a.locator('#deckSets').selectOption('2');await a.screenshot({path:path.join(root,'preview_online_decksets_mobile.png'),fullPage:true});await a.locator('#name').fill('Alma');await a.locator('#create').click();await a.locator('#parentPin').fill('1234');await a.locator('#parentOk').click();await a.locator('#game').waitFor({state:'visible'});
- const code=await a.locator('#code').textContent();
+ await a.waitForFunction(()=>document.querySelector('#code').textContent.length===8);const code=await a.locator('#code').textContent();
  await b.locator('#name').fill('Bo');await b.locator('#joinCode').fill(code);await b.locator('#join').click();await b.locator('#parentPin').fill('1234');await b.locator('#parentOk').click();await b.locator('#game').waitFor({state:'visible'});
  await a.locator('#reconnect').click();await a.waitForFunction(()=>document.querySelectorAll('#players .player').length===2);
  assert.equal(db.get('game').deckSets,2);assert.deepEqual(db.get('game').players.map(p=>p.closed.length),[20,20]);assert((await a.locator('#roomDeckSets').textContent()).includes('40 talkort'));assert((await b.locator('#roomDeckSets').textContent()).includes('40 talkort'));assert(await a.locator('#challenge').isVisible());assert(await a.locator('#challenge').isDisabled());

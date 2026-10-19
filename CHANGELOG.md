@@ -4,6 +4,15 @@ Nyeste øverst. Én kort post pr. version. Detaljer, testresultater og filoversi
 findes i `docs/arkiv/`. Versioner uden post (fx 0.9.8 udover lydcache, 0.9.21, 0.9.26) var ikke
 dokumenteret separat i de gamle noter.
 
+## v0.9.46 – flere spillere, hyggeligt spillebord og invitationer (19. oktober 2026)
+- Online understøtter 2–6 spillere. Rumopretteren vælger antal; alle tilmelder sig med samme rumkode. Kortene uddeles, når rummet er fuldt, så lige som muligt.
+- Turrækkefølge, nærmeste spiller til venstre, begge æselkortvarianter, ekstra kortstraf, færdige/tilbagevendende spillere og podium virker med flere deltagere. Gamle rum fortsætter som tospillerspil.
+- Samtidige tilmeldinger og øvrige rumhandlinger behandles i rækkefølge, så pladser og kort ikke overskrives.
+- Opret-siden og spillebordet har appens æselkort, varme farver, store knapper, farvede spillerfelter og et layout til mobil, iPad og pc. Åbne bunker er direkte mål for tryk og træk. Forsiden i den almindelige app er bevaret.
+- Del invitation åbner enhedens delingsmenu, hvor tilgængelige apps vælges. Mail-knap åbner en mailkladde; invitationen kan også kopieres. Linket udfylder rumkoden og indeholder ingen spillerhemmelighed. Deling/afsendelse vælges af brugeren.
+- Chat viser afsenderens navn og kræver samtykke fra alle til fri tekst/lyd.
+- 36/36 Node-tests, online Chromium med to og seks isolerede profiler, størrelser fra 320 til 1280 px, simuleret deling/lyd, samt eksisterende offline-/CPU-browsertests består. Worker dry-run består. Ingen deployment eller test på fysiske enheder udført herfra.
+
 ## v0.9.45 – vælg 1–5 kortsæt online (19. oktober 2026)
 - Rumopretteren vælger 1–5 kortsæt: 20–100 talkort i alt, 10–50 til hver spiller. Standard er fortsat fem sæt.
 - Serveren validerer valget, gemmer det i rummet og bruger det ved kortuddeling. Begge spillere ser rummets antal sæt og kort.
