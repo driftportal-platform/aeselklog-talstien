@@ -4,6 +4,35 @@ Nyeste øverst. Én kort post pr. version. Detaljer, testresultater og filoversi
 findes i `docs/arkiv/`. Versioner uden post (fx 0.9.8 udover lydcache, 0.9.21, 0.9.26) var ikke
 dokumenteret separat i de gamle noter.
 
+## v0.9.58 – kortere pause i midten (19. oktober 2026)
+- Midterbunkernes pause er efter brugerens ønske nu 3 sekunder. Modspillerens pause er fortsat 2 sekunder. Fejl kan opdages med æselknappen; overset fejl i midten returneres stadig uden straf.
+- 46/46 Node-tests. Serverkontrol af 2.999/3.000 ms og fortsat 1.999/2.000 ms ved modstander. Browserkontroller dækker begge pauser, opdaget fejl og automatisk retur uden straf. Worker dry-run består. Ikke publiceret.
+
+## v0.9.57 – to sekunder ved modstander (19. oktober 2026)
+- Efter brugerens ønske er pausen ved kort til en modspillers åbne bunke nu 2 sekunder. Midterbunker har fortsat 5 sekunder. Begge pauser styres af serveren, viser nedtælling og giver mulighed for æseludfordring.
+- Reserveopdatering uden liveforbindelse tjekker nu status hurtigere, så andre enheder kan se den korte pause. Under en pause opdateres også hyppigere. Midterfejl, der overses, går stadig tilbage uden straf.
+- 46/46 Node-tests. Serverkontrol bekræfter 2.000 ms ved modstander, udfordring ved 1.999 ms og fortsættelse ved udløb; midten er stadig 5.000 ms. Browserkontrol med to profiler uden liveforbindelse ser pausen hos modtageren uden manuelt tryk på opdatering, udfordrer en fejl og lader et korrekt kort blive. Midterpause og touch/mus består også. Worker dry-run består. Ikke publiceret.
+
+## v0.9.56 – fem sekunder til at opdage fejl (19. oktober 2026)
+- Fejlplacering i online-midten er igen mulig, efter brugerens præcisering. Dette erstatter den stramme afvisning fra v0.9.55. Den rigtige rækkefølge er stadig første tal, næste tal osv. til områdets sidste tal.
+- Et kort til modstander eller midte starter en fem sekunders serverstyret pause. Nye korttræk og placeringer afvises under pausen; andre kan trykke på æslet. Alle ser nedtælling, og æselknappen fremhæves for mulige udfordrere. Chat og prik kan stadig bruges.
+- Opdaget fejl fortrydes med sædvanlig æselstraf og eventuel ekstra kortstraf. Udfordres et korrekt træk, gives ingen straf. Uopdaget forkert placering i midten rulles tilbage ved pauseudløb uden straf; kortet kommer tilbage til samme kilde, og turen gendannes. Korrekte kort bliver liggende. Uopdagede modstandertræk følger de eksisterende regler.
+- Pausen gemmes på serveren og overlever genindlæsning/genopstart. Cloudflare-alarm eller næste forespørgsel afslutter den; gentaget alarm giver ikke dobbelt rollback/straf. Sejr vises først efter pausen. Afslut spil rydder pausen.
+- 46/46 Node-tests; nye serverkontroller dækker tidsgrænse, straf, overset fejl, åben/vendt kilde, ny midterrække, korrekt træk, modstander, slutkort/sejr, chatbevarelse og gentagen alarm. Browserkontrol med to enheder viser pause, nedtælling, æselknap, overset og opdaget fejl. Øvrige online-browserkontroller og Worker dry-run består. Fysisk iPhone/iPad og live deployment ikke prøvet herfra.
+
+## v0.9.55 – midterbunker kræver fortløbende tal (19. oktober 2026)
+- Efter brugerens præcisering håndhæves talrækken i online-midten: start ved områdets første tal, fortsæt kun med næste tal, stop ved sidste tal. I 61–80 accepteres 61, 62, …, 80. Forkerte forsøg flytter ingen kort og viser det nødvendige næste tal.
+- Højst én midterrække pr. kortsæt. Korrekt placering på enhver passende række er gyldig, også når flere rækker venter på samme tal. Udfordring giver ikke straf for korrekt valg af anden række.
+- Tidligere fejlplacerede midterbunker ombygges ikke. Fortsat placering på en ugyldig gammel række afvises med besked om nyt spil. Opret et nyt rum efter opdatering. Øvrigt kortflow og manuel æseludfordring bevares.
+- Kortregnskabet fra v0.9.54 følger med. 45/45 Node-tests; alle fem talområder, hvert trin, gentagelser/spring/baglæns, fulde bunker, gammel ugyldig række, forkert åbent kort og maksimum rækker er kontrolleret. Browserkontrol dækker forkert tryk og korrekt træk. Worker dry-run består. Ikke publiceret herfra.
+
+## v0.9.54 – synligt kortregnskab og indhold i midterbunker (19. oktober 2026)
+- Vendte kort tælles særskilt i Lukkede: X + 1 vendt og i spillerens I alt. Gæster ser også, at et kort er vendt, uden at tallet på det skjulte kort afsløres.
+- Samlet regnskab viser talkort hos spillerne, i midten og faktisk/forventet antal (20 × kortsæt). Hver midterbunke viser sit rigtige antal og en Se-knap til alle tal i læggerækkefølge.
+- Øverste tal beskriver ikke nødvendigvis en komplet talrække: fejltræk er fortsat tilladt og udfordres manuelt med æslet. Ingen automatisk rettelse, udfyldning eller nye kort.
+- Serveren sammenligner alle talkorts værdier og antal før/efter en handling. En handling, som mister, ændrer eller skaber kort, gemmes ikke. Første uddeling er undtaget.
+- 44/44 Node-tests. Ny test gennemspiller faste tilfældige handlinger på flere talområder, kortsæt og varianter samt en billedlignende position, hvor alle 40 kort er bevaret trods misvisende topkort. Browserkontrol dækker kortregnskab, vendt kort, bunkeindhold og eksisterende træk. Worker dry-run består. Det konkrete live-rums indhold er ikke tilgængeligt herfra; billedet alene beviser ikke korttab.
+
 ## v0.9.53 – sidste kort og tydelig vending af bunke (19. oktober 2026)
 - Sidste vendte kort bliver liggende på egen lukkede plads, indtil det flyttes. Ingen automatisk vending af åben bunke. Tom lukket bunke vises nu som Tom eller en tydelig Vend åben bunke-knap.
 - Vend åben bunke er et separat tryk: hele den eksisterende åbne bunke vendes i samme rækkefølge til lukket, uden at et kort tages. Næste tryk vender første kort. Serveren afviser vending, mens et kort afventer placering.

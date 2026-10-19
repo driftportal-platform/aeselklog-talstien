@@ -1,6 +1,6 @@
 # ÆselKlog – hvor er vi nu
 
-**Version:** 0.9.53 (lokalt valideret opdateringspakke, 19. oktober 2026; ikke publiceret). Opdateres ved hver release sammen med `CHANGELOG.md`.
+**Version:** 0.9.58 (lokalt valideret opdateringspakke, 19. oktober 2026; ikke publiceret). Opdateres ved hver release sammen med `CHANGELOG.md`.
 
 ## Hvad er det?
 Børnevenligt talspil som PWA (GitHub Pages, repo `driftportal-platform/aeselklog-talstien`) med tre selvstændige dele og frivillig matematik:
@@ -10,12 +10,27 @@ Børnevenligt talspil som PWA (GitHub Pages, repo `driftportal-platform/aeselklo
 Lyd: 500 gemte MP3-tal (fem stemmer), valgfri baggrundsmusik, ElevenLabs kun via Cloudflare Worker. Alt gemmes lokalt, ingen konti.
 
 ## Status
+- v0.9.58: 3 sekunder i midten og 2 sekunder ved modspiller. Dette erstatter den tidligere 5-sekunders midterpause. Fejlplacering, manuel udfordring, overset midterfejls retur og kortregnskab er bevaret.
+- 46/46 tests samt server- og browserkontrol af begge frister består. Worker dry-run består. Ingen fysisk iPhone/iPad-test eller publicering herfra. Pakken indeholder tidligere rettelser siden main `54bee3832bc7a330294979f4f92c174a316c8b3a`.
+- v0.9.57: pausen ved kort til modstander er 2 sekunder; i midten stadig 5 sekunder. Serverfrister, nedtælling, æselknap, kortregnskab og automatisk retur af overset midterfejl er bevaret.
+- Reserveopdatering uden liveforbindelse og under pause kører hurtigere. Ny browserkontrol uden liveforbindelse ser modtagerens pause automatisk og kan udfordre. Serverkontrol af 1.999/2.000 ms og fortsat 5.000 ms i midten. 46/46 tests består samt relevante browserkontroller og Worker dry-run.
+- Pakken bygger fortsat på main `54bee3832bc7a330294979f4f92c174a316c8b3a` og indeholder alle efterfølgende rettelser. Ikke publiceret herfra. Fysisk iPhone/iPad er ikke prøvet.
+- v0.9.56 erstatter v0.9.55: fejl i midten skal kunne opdages manuelt. Fem sekunders pause efter placering hos modstander eller i midten. Nye spilhandlinger er blokeret servermæssigt; udfordring og afslutning er tilladt. Nedtælling/æselknap vises hos klienterne.
+- Ved opdaget fejl: eksisterende rollback og æsel-/ekstrastraf. Ved overset fejl i midten: automatisk rollback til den oprindelige kilde/tur uden straf. Korrekte kort bliver, og uopdagede modstanderfejl accepteres som før. Ingen nye talkort eller blanding.
+- Pausen gemmes i rumstatus og afsluttes via Durable Object-alarm eller næste forespørgsel. Seriel behandling, idempotent udløb, genopstart, sen udfordring, slutkort og afsluttet rum er kontrolleret. Sejr udsættes til pauseudløb.
+- 46/46 Node-tests og relevante online-browserkontroller består; simuleret Worker-transport/lyd/touch, ikke fysiske telefoner. Worker dry-run består. Udgangspunkt fortsat main `54bee3832bc7a330294979f4f92c174a316c8b3a` (v0.9.53), så kortregnskab og øvrige efterfølgende rettelser er inkluderet. Ikke deployet.
+- v0.9.55 ændrer online-reglen efter brugerens præcisering: midterbunker accepterer kun fortløbende kort fra talområdets første til sidste tal, højst én række pr. kortsæt. Forkerte forsøg bevarer kort/kilde. Dette erstatter tidligere fri placering i online-midten; øvrige mål er uændrede.
+- Korrekt kort på enhver passende række er gyldigt. Gammel ugyldig række kan ikke udvides; nyt rum anbefales efter opdateringen, ingen automatisk omfordeling. Kortregnskab og beskyttelse fra v0.9.54 følger med.
+- Udgangspunkt GitHub main er fortsat `54bee3832bc7a330294979f4f92c174a316c8b3a` (v0.9.53). Pakken indeholder derfor også v0.9.54. 46/46 tests og relevante browserkontroller; Worker dry-run. Ikke publiceret herfra.
+- v0.9.54: tydelig opdeling mellem lukkede, vendt og åbne kort; I alt pr. spiller og samlet kortregnskab. Midterbunker har faktisk antal og Se-knap med alle allerede åbne kort. Ingen automatisk fejlretning.
+- Serveren afviser at gemme handlinger, som ændrer talkortenes samlede multiset. Der skabes ikke erstatningskort. Regnskabstests og en billedlignende position dokumenterer, at topkort 79/63 ikke beviser rækkeindhold. Konkrete brugerdata kan ikke læses fra et billede; ingen bekræftet årsag til det rapporterede live-forløb.
+- Udgangspunkt v0.9.54: GitHub main `54bee3832bc7a330294979f4f92c174a316c8b3a` (v0.9.53). 46/46 Node-tests; simuleret browserkontrol og Worker dry-run. Ikke publiceret herfra.
 - v0.9.53: tom lukket bunke viser en eksplicit Vend åben bunke-handling. Denne vender kun bunken; et nyt tryk vender et kort. Pending skal placeres først. Kortorden bevares; ingen nye kort eller blanding. Nye klienter kræver manuel vending, gamle klienters flip-API er bevaret for kompatibilitet.
 - Uændrede statusopdateringer genopbygger ikke kortenes DOM, så ventetid og fingertræk over polling bevarer kortet. v0.9.52 er inkluderet i pakken, da GitHub main stadig er `36cac3bf335a777c11ad462b7717a4221ec40f46` (v0.9.51). Ikke publiceret herfra.
 - v0.9.52: større chat med nyeste beskeder øverst og sammenfoldelige hurtigbeskeder. Polling bevarer læsepositionen ved uændret historik.
 - Musik pause under mikrofonanmodning/optagelse, også ved periodiske opdateringer. Genoptages med samme valg efter mikrofonfrigivelse. Rigtig iPhone-lydrouting er ikke afprøvet.
 - Prik ved tryk på modspillers navn; deres eget felt markeres på deres enhed med afsenderbesked. Auth/gyldige mål/tresekunders mellemrum kontrolleres af Worker. Kort, tur og udfordringsgrundlag ændres ikke; prik bevares ved udfordring.
-- Udgangspunkt v0.9.52: GitHub main `36cac3bf335a777c11ad462b7717a4221ec40f46`. Ikke deployet herfra. 43/43 Node-tests og simulerede browserkontroller består.
+- Udgangspunkt v0.9.52: GitHub main `36cac3bf335a777c11ad462b7717a4221ec40f46`. Ikke deployet herfra. 46/46 Node-tests og simulerede browserkontroller består.
 - v0.9.51: kompakte spillerkort med midterbunker direkte nedenunder; vandret rulning ved mange spillere. Tandhjul åbner indstillinger, invitationer, lyd og afslutning. Chat som rundt ikon med ulæste beskeder og et vindue, der kan lukkes igen.
 - Fri tekst, optagelser og lydfiler uden samtykkekrav, beskedventetid eller 10-sekundersgrænse. Teknisk lydfilgrænse 1 MiB. Klip opbevares separat, hentes med spilleradgang og ryddes ved udløb/afslutning.
 - Æsellyd via Web Audio ved faktisk straf, én gang pr. deltager; prøveknap og manuel aktivering ved browserblokering. Automatisk kontrol simulerer afspilning på tre enheder; fysisk iPhone/iPad mangler.
@@ -35,7 +50,7 @@ Lyd: 500 gemte MP3-tal (fem stemmer), valgfri baggrundsmusik, ElevenLabs kun via
 - Invitationer: native deling, mailkladde og kopiering. Offentligt rumlink udfylder kode uden at dele spillerens secret. Gæster får en enkel deltag-side; et gammelt gemt rum overtager ikke en ny invitation.
 - Chat navngiver afsenderen; fri tekst/lyd er altid tilgængelig fra v0.9.51. Samtidige tilmeldinger er testet.
 - Onlinefejl rettet: CORS/chat, MIME-type på lydklip, WebSocket-videresendelse, oplæsning af alle vendte kort, synligt æselkort, gentag tal, udfordringer uden tab af nyere chat eller opdateringsnummer. Begge onlineindgange er opdateret.
-- **Automatisk:** 43/43 Node-tests består. Ny servertest dækker begge deltagere, CORS, hurtigtekst/fri tekst/lyddata, adgang, udfordringer, begge varianter, ekstra kortstraf og vinderregler.
+- **Automatisk:** 46/46 Node-tests består. Ny servertest dækker begge deltagere, CORS, hurtigtekst/fri tekst/lyddata, adgang, udfordringer, begge varianter, ekstra kortstraf og vinderregler.
 - **Chromium/simuleret:** online med to og seks isolerede browserprofiler, størrelser 320×740, 390×844, 768×1024, 1024×768, 844×390 og 1280×800. Worker-logik via simuleret transport, simuleret mikrofon/afspilning/deling, mail-link, kopiering/reservefelt, invitationslink, genindlæsning, lokale sprogvalg, straf og podium. Offlinekortspil ved 390×844, 844×390 og 1280×800; træk, tryk, udfordringer og CPU består.
 - **Cloudflare:** lokal Wrangler dry-run består med GAME_ROOM og eksplicit APP_ORIGIN. Eksisterende bindinger og migrationsfil er uændrede. Konfigurationens navn er `aeselklog-online-pilot`, mens den oplyste liveadresse bruger `aeselklog-online`; følg installationsvejledningens eksplicitte `--name`.
 - **Ikke bekræftet:** faktisk deployment på Cloudflare, live WebSocket på flere fysiske enheder, rigtig deling til Beskeder/Messenger, mailapp, rigtig mikrofon/lydafspilning på iPhone, installeret iPhone-PWA eller live ElevenLabs.

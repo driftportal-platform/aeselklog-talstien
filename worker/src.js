@@ -1,6 +1,7 @@
-// ÆselKlog Online v0.9.53 – serverstyret kortspil (2–6 spillere).
+// ÆselKlog Online v0.9.58 – serverstyret kortspil (2–6 spillere).
 // Regler matcher det lokale cardgame-engine.js. Ingen CPU. Chat og genopkobling bevaret.
 const QUICK=['🫏 Hov hov!','👏 Godt spil!','😂 Haha!','🎉 Flot klaret!','🥕 Din tur!','❤️ Tak for spillet!'];
+const CENTER_REVIEW_MS=3000,PLAYER_REVIEW_MS=2000;
 const MAX_VOICE_BASE64=1400000,MAX_TEXT=10000,CHAT_KEEP_MS=24*60*60*1000;
 const JSON_HEADERS={'content-type':'application/json; charset=utf-8','cache-control':'no-store'};
 function response(data,status=200,headers={}){return new Response(JSON.stringify(data),{status,headers:{...JSON_HEADERS,...headers}})}
@@ -16,7 +17,7 @@ function centerTarget(state,n){
     const row=state.centers[i];
     if(row.length&&row[row.length-1]+1===n)return {kind:'center',index:i,caption:`Række ${i+1}`};
   }
-  if(n===first&&state.centers.length<5)return {kind:'new-center',index:state.centers.length,caption:'Ny række'};
+  if(n===first&&state.centers.length<(state.deckSets??5))return {kind:'new-center',index:state.centers.length,caption:'Ny række'};
   return null;
 }
 function preferredTarget(state,n,fromPlayer=state.turn){
@@ -31,12 +32,14 @@ function preferredTarget(state,n,fromPlayer=state.turn){
 function sameTarget(a,b){return !!a&&!!b&&a.kind===b.kind&&a.index===b.index}
 function snapshot(state){const s=JSON.parse(JSON.stringify(state));s.lastMove=null;return s}
 function countCards(p){return (p.closed?.length||0)+(p.open?.length||0)}
+function allCards(g){return [...g.players.flatMap(p=>[...p.closed,...p.open]),...g.centers.flat(),...(g.pending!=null?[g.pending]:[])]}
+function fingerprint(g){return allCards(g).sort((a,b)=>a-b).join(',')}
 function remaining(state,index){const p=state.players[index];return countCards(p)+(state.turn===index&&state.pending!==null?1:0)}
 
 export default {
   async fetch(request,env){
     const url=new URL(request.url),origin=request.headers.get('origin');
-    if(request.method==='GET'&&url.pathname==='/health')return response({status:'ready',service:'ÆselKlog Online v0.9.53'});
+    if(request.method==='GET'&&url.pathname==='/health')return response({status:'ready',service:'ÆselKlog Online v0.9.58'});
     if(!validOrigin(request,env))return response({error:'Hjemmesiden er ikke tilladt'},403);
     if(request.method==='OPTIONS')return new Response(null,{status:204,headers:cors(origin,env)});
     if(url.pathname==='/api/create'&&request.method==='POST'){
@@ -91,6 +94,7 @@ export class GameRoom {
       await this.state.storage.put('game',g);return response({code:b.code,secret:b.secret});
     }
     if(!g)return response({error:'Rummet findes ikke'},404);
+    await this.settleReview(g);
     if(g.phase==='closed'&&route!=='/state'&&route!=='/action')return response({error:'Spillet er afsluttet. Opret et nyt rum.'},410);
     if(route==='/ws'){
       const pair=new WebSocketPair();const [client,server]=Object.values(pair);
@@ -119,11 +123,13 @@ export class GameRoom {
       let b;try{b=await request.json()}catch{return response({error:'Ugyldigt JSON'},400)}
       const seat=this.seat(b.secret||'',g);if(seat<0)return response({error:'Ugyldig adgang'},401);
       if(g.phase==='closed'&&b.type!=='end-game')return response({error:'Spillet er afsluttet. Opret et nyt rum.'},409);
+      const cardsBefore=fingerprint(g);
       try{
+        if(g.review&&!['challenge','end-game'].includes(b.type))throw Error('Vent et øjeblik, så de andre kan nå at trykke på æslet.');
         if(b.type==='end-game'){
           if(seat!==0)throw Error('Kun rumopretteren kan afslutte spillet for alle.');
           if(g.phase==='closed')return response(this.publicState(g,seat));
-          for(const m of g.chat||[])await this.state.storage.delete?.('clip:'+m.id);g.phase='closed';g.closedAt=Date.now();g.lastMove=null;g.chat=[];g.chatPrefs=Array(g.players.length).fill(false);g.message=`${g.players[0].name} afsluttede spillet.`;
+          for(const m of g.chat||[])await this.state.storage.delete?.('clip:'+m.id);g.phase='closed';g.closedAt=Date.now();g.review=null;g.lastMove=null;g.chat=[];g.chatPrefs=Array(g.players.length).fill(false);g.message=`${g.players[0].name} afsluttede spillet.`;
         }else if(b.type==='start-early'){
           if(seat!==0)throw Error('Kun rumopretteren kan starte spillet.');
           if(g.phase!=='waiting')throw Error('Spillet er allerede startet.');
@@ -142,7 +148,9 @@ export class GameRoom {
           else throw Error('Ukendt handling');
         }
       }catch(e){return response({error:e.message},400)}
-      g.move++;await this.state.storage.put('game',g);this.broadcast(g);
+      if(b.type==='place'&&['player','center','new-center'].includes(b.kind)){g.review={until:Date.now()+(b.kind==='player'?PLAYER_REVIEW_MS:CENTER_REVIEW_MS),actor:seat,kind:b.kind,invalid:!g.lastMove.valid};if(g.phase==='finished'){g.phase='playing';g.winner=null;g.placements=null;g.message=`${g.players[seat].name} lagde ${g.lastMove.number}.`}}
+      if(b.type!=='start-early'&&fingerprint(g)!==cardsBefore)return response({error:'Trækket kunne ikke gemmes, fordi kortantallet ændrede sig. Prøv at opdatere spillet.'},409);
+      g.move++;await this.state.storage.put('game',g);if(g.review)await this.state.storage.setAlarm?.(g.review.until);else await this.state.storage.deleteAlarm?.();this.broadcast(g);
       if(g.phase==='closed'){for(const [ws] of this.clients){try{ws.close(1000,'Spillet er afsluttet')}catch{}}this.clients.clear()}
       return response(this.publicState(g,seat));
     }
@@ -219,6 +227,20 @@ export class GameRoom {
     deck.forEach((n,i)=>g.players[i%g.players.length].closed.push(n));
     g.phase='playing';g.message=`Spillet er startet med ${g.players.length} spillere. Spiller 1 begynder.`;
   }
+  alarm(){const result=this.queue.then(async()=>{const g=await this.state.storage.get('game');if(!g)return;if(!await this.settleReview(g)&&g.review)await this.state.storage.setAlarm?.(g.review.until)});this.queue=result.catch(()=>{});return result}
+  async settleReview(g){
+    const review=g.review;if(!review||review.until>Date.now())return false;
+    const beforeCards=fingerprint(g);
+    if(review.invalid&&['center','new-center'].includes(review.kind)&&g.lastMove?.before){
+      const restored=structuredClone(g.lastMove.before);
+      Object.assign(restored,{attention:g.attention,nudgeTimes:g.nudgeTimes,chat:g.chat,chatPrefs:g.chatPrefs,move:g.move,penaltySoundId:g.penaltySoundId||0});
+      Object.keys(g).forEach(k=>delete g[k]);Object.assign(g,restored);
+      g.message=`Kortet gik tilbage til ${g.players[review.actor].name}, fordi talrækken ikke passede. Ingen æselstraf blev givet.`;
+    }else{g.review=null;g.lastMove=null;this.finishWinner(g,review.actor)}
+    g.review=null;g.lastMove=null;
+    if(fingerprint(g)!==beforeCards)throw Error('Kortregnskabet ændrede sig ved pauseafslutning');
+    g.move++;await this.state.storage.put('game',g);await this.state.storage.deleteAlarm?.();this.broadcast(g);return true;
+  }
   chatPrefs(g){return Array.from({length:g.playerCount??2},(_,i)=>g.chatPrefs?.[i]===true)}
   seat(secret,g){return g.players.findIndex(p=>p.secret===secret)}
   doFlipOpen(g,seat){
@@ -273,7 +295,7 @@ export class GameRoom {
     if(n==null)throw Error('Intet kort at lægge');
     const dest={kind:b.kind,index:Number(b.index)};
     if(dest.kind==='new-center'){
-      if(n!==bounds(g.range)[0]||g.centers.length>=5)throw Error(`En ny række skal starte med ${bounds(g.range)[0]}, og der må højst være fem.`);
+      if(g.centers.length>=(g.deckSets??5))throw Error(`Der må højst være ${g.deckSets??5} midterrækker.`);
       dest.index=g.centers.length;
     }else if(dest.kind==='center'){
       if(!Number.isInteger(dest.index)||!g.centers[dest.index])throw Error('Ukendt række.');
@@ -284,7 +306,8 @@ export class GameRoom {
       dest.index=seat;
     }else throw Error('Ukendt mål.');
     const expected=preferredTarget(g,n,seat);
-    const valid=dest.kind==='self-open'?!expected:sameTarget(dest,expected);
+    const [first,last]=bounds(g.range);const row=dest.kind==='center'?g.centers[dest.index]:null;
+    const valid=dest.kind==='new-center'?n===first:row?row.length>0&&row.every((v,i)=>v===first+i)&&row.at(-1)<last&&n===row.at(-1)+1:dest.kind==='self-open'?!expected:sameTarget(dest,expected);
     const before=snapshot(g);
     if(source==='pending')g.pending=null;else p.open.pop();
     if(dest.kind==='self-open')p.open.push(n);
@@ -373,9 +396,12 @@ export class GameRoom {
     g.message=`${g.players[g.turn].name}s tur.`;
   }
   publicState(g,seat){
+    const playerCards=g.players.reduce((sum,p)=>sum+countCards(p),0)+(g.pending!=null?1:0),centerCards=g.centers.reduce((sum,c)=>sum+c.length,0);
     return {
-      attention:g.phase!=='closed'?(g.attention?.[seat]||null):null,phase:g.phase,penaltySoundId:g.penaltySoundId||0,startWaitMs:g.phase==='waiting'?this.earlyStartWait(g):0,turn:g.turn,pending:g.turn===seat?g.pending:null,centers:g.centers.map(c=>({top:c.at(-1),length:c.length})),
-      players:g.players.map((p,i)=>({name:p.name,closed:p.closed.length,open:i===seat||true?p.open.at(-1):null,openCount:p.open.length,donkeys:p.donkeys})),
+      reviewUntil:g.review?.until||0,reviewRemainingMs:Math.max(0,(g.review?.until||0)-Date.now()),
+      cardCount:{players:playerCards,centers:centerCards,total:playerCards+centerCards,expected:(g.deckSets??5)*20},
+      attention:g.phase!=='closed'?(g.attention?.[seat]||null):null,phase:g.phase,penaltySoundId:g.penaltySoundId||0,startWaitMs:g.phase==='waiting'?this.earlyStartWait(g):0,turn:g.turn,pending:g.turn===seat?g.pending:null,centers:g.centers.map(c=>({top:c.at(-1),length:c.length,cards:[...c]})),
+      players:g.players.map((p,i)=>({name:p.name,closed:p.closed.length,turned:i===g.turn&&g.pending!=null?1:0,total:remaining(g,i),open:i===seat||true?p.open.at(-1):null,openCount:p.open.length,donkeys:p.donkeys})),
       you:seat,playerCount:g.playerCount??2,deckSets:g.deckSets??5,variant:g.variant||'collect',extraPenalty:g.extraPenalty===true,donkeyCount:g.donkeyCount||8,message:g.message,move:g.move,canChallenge:!!g.lastMove&&g.lastMove.actor!==seat,winner:g.winner,placements:g.placements||null
     };
   }

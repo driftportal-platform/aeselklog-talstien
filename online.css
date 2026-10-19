@@ -27,3 +27,7 @@
 @media(max-height:540px){.chat-dialog{bottom:8px;height:calc(100dvh - 16px);max-height:calc(100dvh - 16px)}.chat-dialog #chatPanel{overflow-y:auto}.chat-dialog #chatMessages{flex:none;min-height:110px;max-height:40dvh}.chat-dialog .dialog-heading{margin-bottom:4px}}
 
 .recycle-pile{font-size:.65rem!important;text-align:center;padding:3px;background:#fff1c9;color:#153c65;font-weight:700;border-color:#d9a748;cursor:pointer}
+
+.card-tally{font-size:.67rem;color:var(--muted);margin:0 0 7px}.centers>.target .inspect-pile{border:0;box-shadow:none;background:transparent;min-height:32px;padding:3px;font-size:.62rem;color:var(--ink)}.pile-history{display:flex;flex-wrap:wrap;gap:8px}.pile-history-number{display:grid;place-items:center;min-width:43px;height:55px;border:1px solid #ddbdb7;border-radius:8px;background:#fff0e8;color:#b92140;font-weight:800;font-size:1.2rem}
+
+.challenge-review{outline:4px solid #eab73a;outline-offset:3px;box-shadow:0 0 15px #ebbd56aa}

@@ -52,7 +52,7 @@ const assert=require('node:assert/strict');
  // Extra-card penalties bring a previously completed participant back into turn order.
  {const g=game(4);g.players[0].closed=[];g.players.slice(1).forEach(p=>p.closed.push(9));g.finishOrder=[0];g.extraPenalty=true;engine.givePenalty(g,0);assert.equal(g.players[0].closed.length,3);assert(!g.finishOrder.includes(0));g.turn=3;engine.finishOrNext(g);assert.equal(g.turn,0);}
  // A wrong final placement can still be challenged and the podium rolled back.
- {const g=game(3);g.players[0].closed=[];g.finishOrder=[0];g.turn=1;g.pending=8;g.players[1].closed=[];g.centers=[[1]];engine.doPlace(g,1,{source:'pending',kind:'center',index:0});assert.equal(g.phase,'finished');engine.doChallenge(g,2);assert.equal(g.phase,'playing');assert.equal(g.pending,8);assert.deepEqual(g.finishOrder,[0]);assert.deepEqual(g.centers,[[1]]);}
+ {const g=game(3);g.players[0].closed=[];g.finishOrder=[0];g.turn=1;g.pending=8;g.players[1].closed=[];g.centers=[[1]];engine.doPlace(g,1,{source:'pending',kind:'player',index:2});assert.equal(g.phase,'finished');engine.doChallenge(g,2);assert.equal(g.phase,'playing');assert.equal(g.pending,8);assert.deepEqual(g.finishOrder,[0]);assert.deepEqual(g.centers,[[1]]);}
  // All donors contribute only a closed card; passing keeps exactly one donkey.
  {const g=game(6);g.variant='passing';g.extraPenalty=true;g.players[5].donkeys=1;g.players[0].donkeys=0;engine.givePenalty(g,2);assert.equal(g.players[2].closed.length,6);assert.equal(g.players.reduce((s,p)=>s+p.donkeys,0),1);assert.equal(g.players[2].donkeys,1);}
  // Nearest left player wins over another legal receiver, and center has priority.

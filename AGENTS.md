@@ -17,7 +17,8 @@ Gælder både mennesker og AI-assistenter. Hold denne fil kort og kun med regler
 
 ## Kortspil
 - Fem talområder, fem kort af hvert tal. En ny midterrække kan kun starte med områdets laveste tal.
-- Fri placering: forkerte træk forhindres ikke på forhånd. Et tryk på æselkortet udfordrer, fortryder kun det seneste træk og giver straf. Et korrekt træk straffes ikke.
+- Online fra v0.9.56: fejlplaceringer skal være mulige. Fra v0.9.58 holdes serverstyret pause til æseludfordring: 3 sekunder i midten og 2 sekunder hos modstander. Uopdaget fejl i midten rulles tilbage uden æselstraf ved pauseudløb. Korrekt midterrække er fra områdets første til sidste tal, ét trin ad gangen; højst én række pr. kortsæt. Dette erstatter v0.9.55 efter brugerens præcisering.
+- Øvrig fri placering: forkerte træk forhindres ikke på forhånd. Et tryk på æselkortet udfordrer, fortryder kun det seneste træk og giver straf. Et korrekt træk straffes ikke.
 - CPU-æslet bruger kun lokal regelkode (ingen AI-kald): skal spille sit åbne kort før det vender, opdager andres fejl med ca. 72 %, begår selv fejl i ca. 7 % af valg med mulige ugyldige mål. Justér først efter familietest.
 
 ## Gemte data og privatliv
