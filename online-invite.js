@@ -5,10 +5,11 @@
  let activeCode='',invite=null;
  const status=text=>{$('inviteStatus').textContent=text};
  if(room){$('setup').classList.add('has-invite');$('joinCode').value=room;$('invitedNotice').hidden=false;$('name').placeholder='Dit navn – så er du klar';}
- function setRoom(code){
-  if(code===activeCode)return;
-  activeCode=code;const url=new URL(location.href);url.search='';url.hash='';url.searchParams.set('room',code);
-  const text=`Vil du være med til ÆselKlog? 🫏\nÅbn linket, skriv dit navn, og deltag i vores kortspil.\nRumkode: ${code}\n${url.href}`;
+ let activeGame='';
+ function setRoom(code,game=window.AeselOnlineGameType||'cards'){
+  if(code===activeCode&&game===activeGame)return;activeGame=game;
+  activeCode=code;const url=new URL(location.href);url.search='';url.hash='';url.searchParams.set('room',code);if(game==='board')url.searchParams.set('game','board');
+  const text=`Vil du være med til ÆselKlog? 🫏\nÅbn linket, skriv dit navn, og deltag i vores ${game==='board'?'Talstien-brætspil':'kortspil'}.\nRumkode: ${code}\n${url.href}`;
   invite={title:'Kom og spil ÆselKlog',text,url:url.href};
   $('inviteLink').value=url.href;$('inviteText').value=text;
   $('inviteEmail').href=`mailto:?subject=${encodeURIComponent('Kom og spil ÆselKlog 🫏')}&body=${encodeURIComponent(text)}`;

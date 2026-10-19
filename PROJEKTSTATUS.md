@@ -1,6 +1,6 @@
 # ÆselKlog – hvor er vi nu
 
-**Version:** 0.9.60 (lokalt valideret opdateringspakke, 19. oktober 2026; ikke publiceret). Opdateres ved hver release sammen med `CHANGELOG.md`.
+**Version:** 0.9.61 (lokalt valideret opdateringspakke, 19. oktober 2026; ikke publiceret). Opdateres ved hver release sammen med `CHANGELOG.md`.
 
 ## Hvad er det?
 Børnevenligt talspil som PWA (GitHub Pages, repo `driftportal-platform/aeselklog-talstien`) med tre selvstændige dele og frivillig matematik:
@@ -10,6 +10,9 @@ Børnevenligt talspil som PWA (GitHub Pages, repo `driftportal-platform/aeselklo
 Lyd: 500 gemte MP3-tal (fem stemmer), valgfri baggrundsmusik, ElevenLabs kun via Cloudflare Worker. Alt gemmes lokalt, ingen konti.
 
 ## Status
+- v0.9.61: online-menu med Kortspil og Talstien. Talstien er serverstyret for 2–6 mennesker med den eksisterende bondegårds-SVG, alle talområder, tilfældig digital/faste A3-specialfelter, digital/egen terning og samme centrale bevægelses-/opgaveregler som offline. Fælles moduler: actions, engine, adaptive. Ingen ændring i offline-spillet eller forsidens design.
+- Brætspillet bruger samme invitationer, chat, prik, æsellyd, genopkobling, tidlig start og afslutning som kortspillet. Barn/alder og voksen/sværhed vælges ved tilslutning. Opgaveprogression gælder rummet; ingen import/synkronisering af offlineprofiler. CPU og lokal forældreoversigt findes fortsat kun offline.
+- Udgangspunkt main `7f442f12825bfe2322d559766cea6e5bbe7c4456` (v0.9.60). 49/49 Node-tests, nye browserforløb på tre/seks profiler og eksisterende kortspils-/offlinekontroller består. Worker dry-run består. Transport og lyd simuleret i Chromium; ingen fysisk iPhone/iPad eller live Worker-test. Begge onlineindgange opdateret; GitHub Pages OG Cloudflare Worker skal opdateres. Ikke publiceret herfra.
 - v0.9.60 ændrer online-regler efter brugerens seneste instruktion: ingen pauser og ingen tidsstyret midterkorrektion. Seneste placering vises og kan udfordres frem til næste placering; almindelig kortvending bevarer den. Fejl kan fortrydes efter en mellemliggende vending, mens chat, prik og kortregnskab bevares.
 - Rangering: æselkort, talkort, færdigrækkefølge. Det ene æselkort giver sidstepladsen, selv om indehaveren er færdig. Offline-regler er ikke ændret.
 - Kompakte felter, højst tre spillere pr. række, 4–6 under første række. Antal i alt og æselkort vises; bunkenavne er kun adgangsnavne. Sidste åbne kort kan beholdes, mens turen gives videre, og får normal bunkevending igen efter modtagelse af flere kort.

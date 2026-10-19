@@ -1,6 +1,6 @@
 const fs=require('node:fs'),path=require('node:path');
 const {chromium}=require('playwright');
-module.exports=async function fixture({count=3,joined=count,sets=1}={}){
+module.exports=async function fixture({count=3,joined=count,sets=1,gameType='cards',boardConfig={}}={}){
  const {default:worker,GameRoom}=await import('../worker/src.js');const root=path.resolve(__dirname,'..'),origin='https://driftportal-platform.github.io',db=new Map(),rooms=new Map();
  const env={APP_ORIGIN:origin,GAME_ROOM:{idFromName:x=>x,get:id=>{if(!rooms.has(id)){const records=rooms.size===0?db:new Map();rooms.set(id,new GameRoom({storage:{get:async k=>structuredClone(records.get(k)),put:async(k,v)=>records.set(k,structuredClone(v)),delete:async k=>records.delete(k)}},{}))}return {fetch:(r,i)=>rooms.get(id).fetch(r instanceof Request?r:new Request(r,i))}}}};
  const browser=await chromium.launch({headless:true}),contexts=[],pages=[],errors=[];
@@ -25,8 +25,8 @@ module.exports=async function fixture({count=3,joined=count,sets=1}={}){
  async function refresh(p){await settings(p);await p.locator('#reconnect').click();await p.waitForTimeout(50);await closeSettings(p)}
  async function chat(p){if(!await p.locator('#chatDialog').evaluate(e=>e.open))await p.locator('#chatLauncher').click()}
  async function closeChat(p){if(await p.locator('#chatDialog').evaluate(e=>e.open))await p.locator('#closeChat').click()}
- const a=pages[0];await a.locator('#playerCount').selectOption(String(count));await a.locator('#deckSets').selectOption(String(sets));await a.locator('#name').fill('Spiller 1');await gate(a,'create');await a.waitForFunction(()=>document.querySelector('#code').textContent.length===8);const code=await a.locator('#code').textContent();
- for(let i=1;i<joined;i++){const p=pages[i];await p.goto(p.url()+'?room='+code+'&secret=must-not-leak');await p.locator('#name').fill('Spiller '+(i+1));await p.locator('#joinCode').fill(code);await gate(p,'join');await p.waitForFunction(()=>document.querySelector('#code').textContent.length===8)}
+ const a=pages[0];await a.locator(gameType==='board'?'#chooseOnlineBoard':'#chooseOnlineCards').click();if(gameType==='board'){for(const [key,id] of Object.entries({range:'boardRange',learning:'boardLearning',tables:'boardTables',boardMode:'boardMode',moveDice:'boardMoveDice',learnDice:'boardLearnDice'})){if(boardConfig[key]!==undefined){const e=a.locator('#'+id);if(!await e.isVisible())await a.locator('#boardSetup details summary').click();await e.selectOption(String(boardConfig[key]))}}}await a.locator('#playerCount').selectOption(String(count));if(gameType==='cards')await a.locator('#deckSets').selectOption(String(sets));await a.locator('#name').fill('Spiller 1');await gate(a,'create');await a.waitForFunction(()=>document.querySelector('#code').textContent.length===8);const code=await a.locator('#code').textContent();
+ for(let i=1;i<joined;i++){const p=pages[i];await p.goto(p.url()+'?room='+code+'&secret=must-not-leak'+(gameType==='board'?'&game=board':''));await p.locator('#name').fill('Spiller '+(i+1));await p.locator('#joinCode').fill(code);await gate(p,'join');await p.waitForFunction(()=>document.querySelector('#code').textContent.length===8)}
  for(const p of pages)await refresh(p);
  return {root,origin,db,rooms,browser,contexts,pages,errors,code,gate,settings,closeSettings,refresh,chat,closeChat,async close(){for(const c of contexts)await c.close();await browser.close()}};
 };

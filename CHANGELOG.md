@@ -4,6 +4,12 @@ Nyeste øverst. Én kort post pr. version. Detaljer, testresultater og filoversi
 findes i `docs/arkiv/`. Versioner uden post (fx 0.9.8 udover lydcache, 0.9.21, 0.9.26) var ikke
 dokumenteret separat i de gamle noter.
 
+## v0.9.61 – Talstien som online-brætspil (19. oktober 2026)
+- Online-menuen vælger nu mellem Kortspil og Talstien. Talstien bruger den eksisterende bondegårdsbane, 2–6 menneskelige spillere, invitationer, chat, prik, indstillinger og afslutning fra online-delen. Den godkendte offlineforside og offline-spilregler er bevaret.
+- Serverstyret brætspil genbruger actions.js, engine.js og adaptive.js: alle talområder, samme specialfelter, fast A3 eller tilfældig digital plade, højst ét gulerodsekstrakast, ingen kædereaktioner, frivillig superopgave, byt og vandpyt. Digital terning afgøres på serveren; egen terning kan indtastes. Banen og turen bevares ved genindlæsning.
+- Leg, Lær, Udfordring og Tabeller; egne valg for barn/alder eller voksen/sværhedsgrad. Voksenuret afgøres på serveren og kan pauses ved skjult side. Svar kan kun afgives af spilleren på tur. Offline-læreprofiler og offline-gemninger importeres ikke; online har ikke CPU-spiller eller lokal forældreoversigt.
+- 49/49 Node-tests. Simulerede Chromium-kontroller af tre/seks enheder, begge onlineadresser, 320 px/mobil/tablet, terninger, genindlæsning, opgaver, urpause, chat, æsellyd og afslutning. Eksisterende kortspil og offlineforside/spilvalg kontrolleret. Worker dry-run består. Ingen rigtig iPhone/iPad, rigtig lyd eller live Worker-test. Ikke publiceret herfra.
+
 ## v0.9.60 – frie træk, tydeligt seneste kort og æselkort først (19. oktober 2026)
 - Online-rangering vægter færrest æselkort blandt alle, derefter færrest talkort og færdigrækkefølge. I enkeltæsel-varianten ender indehaveren af æselkortet sidst. Det ændrer ikke offlinekortspillet.
 - Alle pauser er 0 sekunder. Seneste udspil vises med spiller, tal og mål og kan udfordres, også efter næste kortvending, indtil et nyt kort placeres. Midterfejl bliver liggende til udfordring; dette erstatter automatisk tidsstyret retur. Forkerte udfordringer på korrekte kort giver ikke straf. Et forældet kort-ID kan ikke straffe det næste udspil.

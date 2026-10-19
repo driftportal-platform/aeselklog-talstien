@@ -1,4 +1,10 @@
-// ÆselKlog Online v0.9.60 – serverstyret kortspil (2–6 spillere).
+import '../actions.js';
+import '../engine.js';
+import '../adaptive.js';
+import '../boardgame-engine.js';
+const BoardGame=globalThis.AeselBoardGame;
+const boardRandom=()=>crypto.getRandomValues(new Uint32Array(1))[0]/4294967296;
+// ÆselKlog Online v0.9.61 – serverstyret kortspil og Talstien (2–6 spillere).
 // Regler matcher det lokale cardgame-engine.js. Ingen CPU. Chat og genopkobling bevaret.
 const QUICK=['🫏 Hov hov!','👏 Godt spil!','😂 Haha!','🎉 Flot klaret!','🥕 Din tur!','❤️ Tak for spillet!'];
 
@@ -39,11 +45,13 @@ function remaining(state,index){const p=state.players[index];return countCards(p
 export default {
   async fetch(request,env){
     const url=new URL(request.url),origin=request.headers.get('origin');
-    if(request.method==='GET'&&url.pathname==='/health')return response({status:'ready',service:'ÆselKlog Online v0.9.60'});
+    if(request.method==='GET'&&url.pathname==='/health')return response({status:'ready',service:'ÆselKlog Online v0.9.61'});
     if(!validOrigin(request,env))return response({error:'Hjemmesiden er ikke tilladt'},403);
     if(request.method==='OPTIONS')return new Response(null,{status:204,headers:cors(origin,env)});
     if(url.pathname==='/api/create'&&request.method==='POST'){
       let input;try{input=await request.json()}catch{return response({error:'Ugyldigt JSON'},400,cors(origin,env))}
+      const gameType=input.gameType??'cards';if(!['cards','board'].includes(gameType))return response({error:'Vælg kortspil eller Talstien'},400,cors(origin,env));
+      let boardConfig,boardProfile;try{if(gameType==='board'){boardConfig=BoardGame.config(input.boardConfig);boardProfile=BoardGame.profile(input.boardProfile)}}catch(e){return response({error:e.message},400,cors(origin,env))}
       const name=String(input.name||'').trim().slice(0,25);if(!name)return response({error:'Skriv et spillernavn'},400,cors(origin,env));
       const range=['1-20','21-40','41-60','61-80','81-100'].includes(input.range)?input.range:'1-20';
       const deckSets=input.deckSets===undefined?5:input.deckSets;
@@ -54,7 +62,7 @@ export default {
       const extraPenalty=input.extraPenalty===true;
       const donkeyCount=variant==='passing'?1:([1,4,6,8].includes(Number(input.donkeyCount))?Number(input.donkeyCount):8);
       const code=random(8),secret=token();const id=env.GAME_ROOM.idFromName(code);const stub=env.GAME_ROOM.get(id);
-      const roomResponse=await stub.fetch('https://room/init',{method:'POST',body:JSON.stringify({name,range,secret,code,variant,extraPenalty,donkeyCount,deckSets,playerCount})});
+      const roomResponse=await stub.fetch('https://room/init',{method:'POST',body:JSON.stringify({name,range,secret,code,variant,extraPenalty,donkeyCount,deckSets,playerCount,gameType,boardConfig,boardProfile})});
       if(roomResponse.status===101)return roomResponse;
     const headers=new Headers(roomResponse.headers);
     for(const [key,value] of Object.entries(cors(origin,env)))headers.set(key,value);
@@ -91,10 +99,12 @@ export class GameRoom {
       const playerCount=b.playerCount===undefined?2:b.playerCount;
       if(!Number.isInteger(playerCount)||playerCount<2||playerCount>6)return response({error:'Vælg 2–6 spillere'},400);
       g={code:b.code,range:b.range,deckSets,playerCount,variant:b.variant==='passing'?'passing':'collect',extraPenalty:b.extraPenalty===true,donkeyCount:b.variant==='passing'?1:Number(b.donkeyCount)||8,phase:'waiting',turn:0,pending:null,centers:[],players:[{name:b.name,secret:b.secret,closed:[],open:[],donkeys:0}],chat:[],chatPrefs:Array(playerCount).fill(false),created:Date.now(),move:0,lastMove:null,message:`Venter på spillere: 1 af ${playerCount} er tilmeldt.`};
+      g.gameType=b.gameType==='board'?'board':'cards';if(g.gameType==='board'){try{g.boardConfig=BoardGame.config(b.boardConfig);g.players[0].boardProfile=BoardGame.profile(b.boardProfile)}catch(e){return response({error:e.message},400)}}
       await this.state.storage.put('game',g);return response({code:b.code,secret:b.secret});
     }
     if(!g)return response({error:'Rummet findes ikke'},404);
     await this.settleReview(g);
+    const oldBoardEffects=g.board?.effectSeq||0;if(g.board&&g.phase==='playing'&&BoardGame.tick(g.board,Date.now(),boardRandom)){g.donkeySoundId=(g.donkeySoundId||0)+g.board.effectSeq-oldBoardEffects;this.syncBoard(g);g.move++;await this.state.storage.put('game',g);this.broadcast(g)}
     if(g.phase==='closed'&&route!=='/state'&&route!=='/action')return response({error:'Spillet er afsluttet. Opret et nyt rum.'},410);
     if(route==='/ws'){
       const pair=new WebSocketPair();const [client,server]=Object.values(pair);
@@ -123,6 +133,14 @@ export class GameRoom {
       let b;try{b=await request.json()}catch{return response({error:'Ugyldigt JSON'},400)}
       const seat=this.seat(b.secret||'',g);if(seat<0)return response({error:'Ugyldig adgang'},401);
       if(g.phase==='closed'&&b.type!=='end-game')return response({error:'Spillet er afsluttet. Opret et nyt rum.'},409);
+      if(g.gameType==='board'&&!['end-game','start-early','challenge'].includes(b.type)){
+        if(g.phase!=='playing'||!g.board)return response({error:'Brætspillet er ikke startet'},400);
+        if(b.expectedMove!==undefined&&b.expectedMove!==g.move)return response({error:'Spillet er opdateret. Prøv igen.'},409);
+        const effects=g.board.effectSeq;
+        try{BoardGame.action(g.board,seat,b,boardRandom,Date.now())}catch(e){return response({error:e.message},400)}
+        g.donkeySoundId=(g.donkeySoundId||0)+g.board.effectSeq-effects;this.syncBoard(g);g.move++;
+        await this.state.storage.put('game',g);if(g.board.question?.deadline)await this.state.storage.setAlarm?.(g.board.question.deadline);else await this.state.storage.deleteAlarm?.();this.broadcast(g);return response(this.publicState(g,seat));
+      }
       const cardsBefore=fingerprint(g);
       try{
 
@@ -163,7 +181,8 @@ export class GameRoom {
       if(g.players.length>=(g.playerCount??2)||g.phase!=='waiting')return response({error:'Rummet er allerede fuldt'},409);
       const b=await request.json(),name=String(b.name||'').trim().slice(0,25);
       if(!name||g.players.some(p=>p.name.toLocaleLowerCase('da-DK')===name.toLocaleLowerCase('da-DK')))return response({error:'Vælg et andet navn'},400);
-      const secret=token();g.players.push({name,secret,closed:[],open:[],donkeys:0});
+      let boardProfile;if(g.gameType==='board'){try{boardProfile=BoardGame.profile(b.boardProfile)}catch(e){return response({error:e.message},400)}}
+      const secret=token();g.players.push({name,secret,closed:[],open:[],donkeys:0,...(boardProfile?{boardProfile}:{})});
       if(g.players.length===(g.playerCount??2))this.startGame(g);
       else g.message=`Venter på spillere: ${g.players.length} af ${g.playerCount} er tilmeldt.`;
       g.move++;
@@ -226,13 +245,14 @@ export class GameRoom {
     // Close vacant seats before dealing, so late invitations cannot change this game.
     g.playerCount=g.players.length;
     g.chatPrefs=this.chatPrefs(g);
+    if(g.gameType==='board'){g.board=BoardGame.start(g.boardConfig,g.players,boardRandom);this.syncBoard(g);return}
     const [lo,hi]=bounds(g.range),deck=[];
     for(let n=lo;n<=hi;n++)for(let i=0;i<(g.deckSets??5);i++)deck.push(n);
     for(let i=deck.length-1;i>0;i--){const v=crypto.getRandomValues(new Uint32Array(1))[0]%(i+1);[deck[i],deck[v]]=[deck[v],deck[i]]}
     deck.forEach((n,i)=>g.players[i%g.players.length].closed.push(n));
     g.phase='playing';g.message=`Spillet er startet med ${g.players.length} spillere. Spiller 1 begynder.`;
   }
-  alarm(){const result=this.queue.then(async()=>{const g=await this.state.storage.get('game');if(!g)return;if(!await this.settleReview(g)&&g.review)await this.state.storage.setAlarm?.(g.review.until)});this.queue=result.catch(()=>{});return result}
+  alarm(){const result=this.queue.then(async()=>{const g=await this.state.storage.get('game');if(!g)return;if(g.board&&g.phase==='playing'){const effects=g.board.effectSeq;if(BoardGame.tick(g.board,Date.now(),boardRandom)){g.donkeySoundId=(g.donkeySoundId||0)+g.board.effectSeq-effects;this.syncBoard(g);g.move++;await this.state.storage.put('game',g);this.broadcast(g)}if(g.board.question?.deadline)await this.state.storage.setAlarm?.(g.board.question.deadline);return}if(!await this.settleReview(g)&&g.review)await this.state.storage.setAlarm?.(g.review.until)});this.queue=result.catch(()=>{});return result}
   async settleReview(g){
     if(!g.review)return false;
     // Migrate an older in-progress pause without silently moving its card.
@@ -390,9 +410,11 @@ export class GameRoom {
     this.advanceTurn(g);
     g.message=`${g.players[g.turn].name}s tur.`;
   }
+  syncBoard(g){g.turn=g.board.turn;g.phase=g.board.phase==='win'?'finished':'playing';g.winner=g.board.winner;g.message=g.board.message}
   publicState(g,seat){
     const playerCards=g.players.reduce((sum,p)=>sum+countCards(p),0)+(g.pending!=null?1:0),centerCards=g.centers.reduce((sum,c)=>sum+c.length,0);
     return {
+      gameType:g.gameType||'cards',board:g.board?BoardGame.view(g.board,seat):null,boardConfig:g.boardConfig||null,
       reviewUntil:0,reviewRemainingMs:0,lastPlayed:g.lastPlayed||null,donkeySoundId:g.donkeySoundId||0,
       cardCount:{players:playerCards,centers:centerCards,total:playerCards+centerCards,expected:(g.deckSets??5)*20},
       attention:g.phase!=='closed'?(g.attention?.[seat]||null):null,phase:g.phase,penaltySoundId:g.penaltySoundId||0,startWaitMs:g.phase==='waiting'?this.earlyStartWait(g):0,turn:g.turn,pending:g.turn===seat?g.pending:null,centers:g.centers.map(c=>({top:c.at(-1),length:c.length,cards:[...c]})),

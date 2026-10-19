@@ -1,12 +1,12 @@
 /* ÆselKlog PWA-service worker.
    Hæv KUN VERSION ved en release; cachenavnet udledes derfra. Kode hentes netværk-først med
    timeout, så appen ikke hænger på dårlig wifi, men falder tilbage til cachen. */
-const VERSION='0.9.60';
+const VERSION='0.9.61';
 const CACHE_PREFIX='aeselklog-talstien-';
 const CACHE=CACHE_PREFIX+'v'+VERSION.replace(/\./g,'');
 const NETWORK_TIMEOUT_MS=3000;
 const AUDIO_CACHE='aeselklog-number-audio-v1';
-const CORE=['./online-shell.js','./online-sound.js','./online.css','./online-invite.js','./','./index.html','./styles.css','./home-ui.js','./home-fullscreen.webp',
+const CORE=['./online-menu.js','./online-board.js','./online-shell.js','./online-sound.js','./online.css','./online-invite.js','./','./index.html','./styles.css','./home-ui.js','./home-fullscreen.webp',
  './app.js','./audio-settings.js','./offline-talkort.js','./talkort.js','./numbers.js','./cardgame-engine.js','./cardgame-ui.js','./music.js','./engine.js','./board.js','./actions.js','./leaderboard.js',
  './adaptive.js','./profiles.js','./parentreport.js','./actionfx.js','./savegame.js','./cpuvoice.js','./voicecache.js','./narration.js','./manifest.webmanifest',
  './icon.svg','./icon-192.png','./icon-512.png','./icon-maskable-512.png','./apple-touch-icon.png','./aeselklog-card.webp','./donkey-bray.wav',
