@@ -4,6 +4,13 @@ Nyeste øverst. Én kort post pr. version. Detaljer, testresultater og filoversi
 findes i `docs/arkiv/`. Versioner uden post (fx 0.9.8 udover lydcache, 0.9.21, 0.9.26) var ikke
 dokumenteret separat i de gamle noter.
 
+## v0.9.50 – afslut online-spillet og opret et nyt (19. oktober 2026)
+- Rumopretteren kan vælge Afslut spil for alle i rum-menuen og bekræfte. Virker i ventelobby, under spillet og efter sejr.
+- Serveren gemmer rummet som afsluttet, sender slutstatus til alle og lukker WebSocket-forbindelserne. Gamle invitationer, træk og chat kan ikke genåbne rummet. Rumchat/lydbeskeder ryddes ved afslutning.
+- Alle får en afslutningsside med Opret nyt spil. Gemte sessioner fjernes, genopkobling/polling stoppes, og tale/musik afbrydes. Et nyt spil får en ny rumkode. Lokale lydindstillinger bevares.
+- Forsinkede svar fra det gamle spil kan ikke genåbne det efter afslutning eller overtage et nyt rum. Forlad på denne enhed er stadig kun lokal.
+- 40/40 Node-tests; ny Chromium-test dækker annullér/bekræft, afslutning hos begge spillere, glemt gammel session, ny rumkode og F5. Øvrige online-, offline-/CPU-browsertests og Worker dry-run består. Ikke deployet herfra.
+
 ## v0.9.49 – vend på lukket bunke og æsellyd (19. oktober 2026)
 - Rettet efter præcisering: kortet vendes oven på egen lukkede bunke og bliver dér, indtil spilleren flytter det. Den åbne bunke ændres først ved eget valg.
 - Flytning til egen åbne bunke afslutter turen automatisk. Flytning til modspiller/midte lader spilleren fortsætte. Ingen Afslut tur-knap i onlinevisningen.

@@ -1,4 +1,4 @@
-// ÆselKlog Online v0.9.49 – serverstyret kortspil (2–6 spillere).
+// ÆselKlog Online v0.9.50 – serverstyret kortspil (2–6 spillere).
 // Regler matcher det lokale cardgame-engine.js. Ingen CPU. Chat og genopkobling bevaret.
 const QUICK=['🫏 Hov hov!','👏 Godt spil!','😂 Haha!','🎉 Flot klaret!','🥕 Din tur!','❤️ Tak for spillet!'];
 const MAX_VOICE_BASE64=240000,MAX_TEXT=160,CHAT_KEEP_MS=24*60*60*1000;
@@ -36,7 +36,7 @@ function remaining(state,index){const p=state.players[index];return countCards(p
 export default {
   async fetch(request,env){
     const url=new URL(request.url),origin=request.headers.get('origin');
-    if(request.method==='GET'&&url.pathname==='/health')return response({status:'ready',service:'ÆselKlog Online v0.9.49'});
+    if(request.method==='GET'&&url.pathname==='/health')return response({status:'ready',service:'ÆselKlog Online v0.9.50'});
     if(!validOrigin(request,env))return response({error:'Hjemmesiden er ikke tilladt'},403);
     if(request.method==='OPTIONS')return new Response(null,{status:204,headers:cors(origin,env)});
     if(url.pathname==='/api/create'&&request.method==='POST'){
@@ -91,6 +91,7 @@ export class GameRoom {
       await this.state.storage.put('game',g);return response({code:b.code,secret:b.secret});
     }
     if(!g)return response({error:'Rummet findes ikke'},404);
+    if(g.phase==='closed'&&route!=='/state'&&route!=='/action')return response({error:'Spillet er afsluttet. Opret et nyt rum.'},410);
     if(route==='/ws'){
       const pair=new WebSocketPair();const [client,server]=Object.values(pair);
       const seat=this.seat(url.searchParams.get('secret')||'',g);
@@ -109,8 +110,13 @@ export class GameRoom {
     if(route==='/action'&&request.method==='POST'){
       let b;try{b=await request.json()}catch{return response({error:'Ugyldigt JSON'},400)}
       const seat=this.seat(b.secret||'',g);if(seat<0)return response({error:'Ugyldig adgang'},401);
+      if(g.phase==='closed'&&b.type!=='end-game')return response({error:'Spillet er afsluttet. Opret et nyt rum.'},409);
       try{
-        if(b.type==='start-early'){
+        if(b.type==='end-game'){
+          if(seat!==0)throw Error('Kun rumopretteren kan afslutte spillet for alle.');
+          if(g.phase==='closed')return response(this.publicState(g,seat));
+          g.phase='closed';g.closedAt=Date.now();g.lastMove=null;g.chat=[];g.chatPrefs=Array(g.players.length).fill(false);g.message=`${g.players[0].name} afsluttede spillet.`;
+        }else if(b.type==='start-early'){
           if(seat!==0)throw Error('Kun rumopretteren kan starte spillet.');
           if(g.phase!=='waiting')throw Error('Spillet er allerede startet.');
           if(g.players.length<2)throw Error('Der skal være mindst to spillere.');
@@ -127,7 +133,9 @@ export class GameRoom {
           else throw Error('Ukendt handling');
         }
       }catch(e){return response({error:e.message},400)}
-      g.move++;await this.state.storage.put('game',g);this.broadcast(g);return response(this.publicState(g,seat));
+      g.move++;await this.state.storage.put('game',g);this.broadcast(g);
+      if(g.phase==='closed'){for(const [ws] of this.clients){try{ws.close(1000,'Spillet er afsluttet')}catch{}}this.clients.clear()}
+      return response(this.publicState(g,seat));
     }
     if(route==='/join'&&request.method==='POST'){
       if(g.players.length>=(g.playerCount??2)||g.phase!=='waiting')return response({error:'Rummet er allerede fuldt'},409);
