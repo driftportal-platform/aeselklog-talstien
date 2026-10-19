@@ -44,7 +44,7 @@ const assert=require('node:assert/strict');
    assert.equal(g.turn,i);engine.doFlip(g,i);engine.doPlace(g,i,{source:'pending',kind:i===0?'new-center':'center',index:0});
    assert.equal(g.phase,i===n-2?'finished':'playing');
   }
-  assert.equal(g.winner,1);assert.equal(g.placements.length,n);assert.equal(g.placements[0],1);assert.equal(g.placements.at(-1),n-1);
+  assert.equal(g.winner,1);assert.equal(g.placements.length,n);assert.equal(g.placements[0],1);assert.equal(g.placements.at(-1),0);
  }
  // Skip a player who finished; receiving a card restores their participation.
  {const g=game(4);g.players[0].closed=[];g.finishOrder=[0];g.turn=3;engine.finishOrNext(g);assert.equal(g.turn,1);

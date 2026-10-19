@@ -1,6 +1,6 @@
 # ÆselKlog – hvor er vi nu
 
-**Version:** 0.9.59 (lokalt valideret opdateringspakke, 19. oktober 2026; ikke publiceret). Opdateres ved hver release sammen med `CHANGELOG.md`.
+**Version:** 0.9.60 (lokalt valideret opdateringspakke, 19. oktober 2026; ikke publiceret). Opdateres ved hver release sammen med `CHANGELOG.md`.
 
 ## Hvad er det?
 Børnevenligt talspil som PWA (GitHub Pages, repo `driftportal-platform/aeselklog-talstien`) med tre selvstændige dele og frivillig matematik:
@@ -10,6 +10,11 @@ Børnevenligt talspil som PWA (GitHub Pages, repo `driftportal-platform/aeselklo
 Lyd: 500 gemte MP3-tal (fem stemmer), valgfri baggrundsmusik, ElevenLabs kun via Cloudflare Worker. Alt gemmes lokalt, ingen konti.
 
 ## Status
+- v0.9.60 ændrer online-regler efter brugerens seneste instruktion: ingen pauser og ingen tidsstyret midterkorrektion. Seneste placering vises og kan udfordres frem til næste placering; almindelig kortvending bevarer den. Fejl kan fortrydes efter en mellemliggende vending, mens chat, prik og kortregnskab bevares.
+- Rangering: æselkort, talkort, færdigrækkefølge. Det ene æselkort giver sidstepladsen, selv om indehaveren er færdig. Offline-regler er ikke ændret.
+- Kompakte felter, højst tre spillere pr. række, 4–6 under første række. Antal i alt og æselkort vises; bunkenavne er kun adgangsnavne. Sidste åbne kort kan beholdes, mens turen gives videre, og får normal bunkevending igen efter modtagelse af flere kort.
+- Æselknappen kan altid bruges i rummet. Hvert autentificeret tryk giver separat lydsignal til alle og udfordrer kun et aktuelt udspil fra en anden. Forsinket/stale kort-ID giver ikke straf på et andet udspil. Lokal lyd fra bevares. Rigtig iPhone-afspilning mangler.
+- Udgangspunkt main `2a248872750f2114e66d79220499c63aef773335` (v0.9.59). 47/47 Node-tests; relevante browserkontroller og Worker dry-run består. Begge onlineindgange opdateret; ny Worker-deployment kræves. Ikke publiceret herfra.
 - v0.9.59: Dansk – æselstemme er tilføjet i onlinefeltet Sprog og stemme. De eksisterende 100 tal i audio/numbers/donkey bruges uden nye lydfiler eller netværks-TTS.
 - Valg, kortvending, gentagelse, lokal lagring/genindlæsning og uafhængigt engelsk valg på anden enhed er kontrolleret i begge onlineindgange. 46/46 Node-tests består. Afspilning er simuleret; rigtig iPhone ikke prøvet.
 - Udgangspunkt er main `247b8cab25f9b87c2f6e4220b150f726a49e7c56` (v0.9.58). Denne pakke ændrer kun hjemmesiden; ingen ny Worker-deployment nødvendig. Ikke publiceret herfra.

@@ -8,8 +8,8 @@ module.exports=async function fixture({count=3,joined=count,sets=1}={}){
   const viewport=[{width:390,height:844},{width:768,height:1024},{width:1280,height:800},{width:320,height:740},{width:844,height:390},{width:1024,height:768}][i];
   const context=await browser.newContext({viewport,hasTouch:i!==2});contexts.push(context);
   await context.addInitScript(()=>{
-   window.__audios=[];window.__brays=0;window.__played=[];window.__shared=[];window.__copied=[];window.__blockSound=false;
-   window.AudioContext=class{constructor(){this.state='suspended';this.destination={}}resume(){if(window.__blockSound)return Promise.reject(Error('blocked'));this.state='running';return Promise.resolve()}createGain(){return {gain:{value:1},connect(){}}}decodeAudioData(){return Promise.resolve({duration:3})}createBufferSource(){return {connect(){},start(){window.__brays++;setTimeout(()=>this.onended?.(),10)},stop(){this.onended?.()}}}};
+   window.__soundContexts=[];window.__audios=[];window.__brays=0;window.__played=[];window.__shared=[];window.__copied=[];window.__blockSound=false;
+   window.AudioContext=class{constructor(){this.state='suspended';this.destination={};window.__soundContexts.push(this)}resume(){if(window.__blockSound)return Promise.reject(Error('blocked'));this.state='running';return Promise.resolve()}createGain(){return {gain:{value:1},connect(){}}}decodeAudioData(){return Promise.resolve({duration:3})}createBufferSource(){return {connect(){},start(){window.__brays++;setTimeout(()=>this.onended?.(),10)},stop(){this.onended?.()}}}};
    window.Audio=class{constructor(src=''){this.src=src;this.paused=true;window.__audios.push(this)}getAttribute(){return this.src}removeAttribute(){this.src=''}pause(){this.paused=true}play(){this.paused=false;window.__played.push(this.src);this.onplay?.();if(!this.loop)setTimeout(()=>{this.paused=true;this.onended?.()},10);return Promise.resolve()}};
    Object.defineProperty(navigator,'share',{configurable:true,value:async data=>window.__shared.push(data)});Object.defineProperty(navigator,'clipboard',{configurable:true,value:{writeText:async data=>window.__copied.push(data)}});
   });

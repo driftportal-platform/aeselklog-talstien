@@ -1,7 +1,7 @@
-// ÆselKlog Online v0.9.58 – serverstyret kortspil (2–6 spillere).
+// ÆselKlog Online v0.9.60 – serverstyret kortspil (2–6 spillere).
 // Regler matcher det lokale cardgame-engine.js. Ingen CPU. Chat og genopkobling bevaret.
 const QUICK=['🫏 Hov hov!','👏 Godt spil!','😂 Haha!','🎉 Flot klaret!','🥕 Din tur!','❤️ Tak for spillet!'];
-const CENTER_REVIEW_MS=3000,PLAYER_REVIEW_MS=2000;
+
 const MAX_VOICE_BASE64=1400000,MAX_TEXT=10000,CHAT_KEEP_MS=24*60*60*1000;
 const JSON_HEADERS={'content-type':'application/json; charset=utf-8','cache-control':'no-store'};
 function response(data,status=200,headers={}){return new Response(JSON.stringify(data),{status,headers:{...JSON_HEADERS,...headers}})}
@@ -39,7 +39,7 @@ function remaining(state,index){const p=state.players[index];return countCards(p
 export default {
   async fetch(request,env){
     const url=new URL(request.url),origin=request.headers.get('origin');
-    if(request.method==='GET'&&url.pathname==='/health')return response({status:'ready',service:'ÆselKlog Online v0.9.58'});
+    if(request.method==='GET'&&url.pathname==='/health')return response({status:'ready',service:'ÆselKlog Online v0.9.60'});
     if(!validOrigin(request,env))return response({error:'Hjemmesiden er ikke tilladt'},403);
     if(request.method==='OPTIONS')return new Response(null,{status:204,headers:cors(origin,env)});
     if(url.pathname==='/api/create'&&request.method==='POST'){
@@ -125,7 +125,7 @@ export class GameRoom {
       if(g.phase==='closed'&&b.type!=='end-game')return response({error:'Spillet er afsluttet. Opret et nyt rum.'},409);
       const cardsBefore=fingerprint(g);
       try{
-        if(g.review&&!['challenge','end-game'].includes(b.type))throw Error('Vent et øjeblik, så de andre kan nå at trykke på æslet.');
+
         if(b.type==='end-game'){
           if(seat!==0)throw Error('Kun rumopretteren kan afslutte spillet for alle.');
           if(g.phase==='closed')return response(this.publicState(g,seat));
@@ -136,11 +136,17 @@ export class GameRoom {
           if(g.players.length<2)throw Error('Der skal være mindst to spillere.');
           if(this.earlyStartWait(g)>0)throw Error('Vent 60 sekunder fra rummet blev oprettet.');
           this.startGame(g);
-        }else if(b.type==='challenge'){this.doChallenge(g,seat)}
+        }else if(b.type==='challenge'){
+          g.donkeySoundId=(g.donkeySoundId||0)+1;
+          if(b.moveId!==undefined&&b.moveId!==g.lastPlayed?.id)g.message='Der er lagt et nyt kort. Se det seneste udspil før du udfordrer.';
+          else if(g.lastMove&&g.lastMove.actor!==seat)this.doChallenge(g,seat);
+          else g.message='🫏 Hov hov!';
+        }
         else{
           if(g.phase!=='playing'||g.turn!==seat)throw Error('Det er ikke din tur');
           if(b.type==='flip-open')this.doFlipOpen(g,seat);
           else if(b.type==='end-turn')this.doEndTurn(g,seat);
+          else if(b.type==='keep-single')this.doKeepSingle(g,seat);
           else if(b.type==='recycle')this.doRecycle(g,seat);
           else if(b.type==='flip'){if(b.manualRecycle===true&&!g.players[seat].closed.length)throw Error('Vend først din åbne bunke.');this.doFlip(g,seat);}
           else if(b.type==='place')this.doPlace(g,seat,b);
@@ -148,7 +154,6 @@ export class GameRoom {
           else throw Error('Ukendt handling');
         }
       }catch(e){return response({error:e.message},400)}
-      if(b.type==='place'&&['player','center','new-center'].includes(b.kind)){g.review={until:Date.now()+(b.kind==='player'?PLAYER_REVIEW_MS:CENTER_REVIEW_MS),actor:seat,kind:b.kind,invalid:!g.lastMove.valid};if(g.phase==='finished'){g.phase='playing';g.winner=null;g.placements=null;g.message=`${g.players[seat].name} lagde ${g.lastMove.number}.`}}
       if(b.type!=='start-early'&&fingerprint(g)!==cardsBefore)return response({error:'Trækket kunne ikke gemmes, fordi kortantallet ændrede sig. Prøv at opdatere spillet.'},409);
       g.move++;await this.state.storage.put('game',g);if(g.review)await this.state.storage.setAlarm?.(g.review.until);else await this.state.storage.deleteAlarm?.();this.broadcast(g);
       if(g.phase==='closed'){for(const [ws] of this.clients){try{ws.close(1000,'Spillet er afsluttet')}catch{}}this.clients.clear()}
@@ -229,17 +234,9 @@ export class GameRoom {
   }
   alarm(){const result=this.queue.then(async()=>{const g=await this.state.storage.get('game');if(!g)return;if(!await this.settleReview(g)&&g.review)await this.state.storage.setAlarm?.(g.review.until)});this.queue=result.catch(()=>{});return result}
   async settleReview(g){
-    const review=g.review;if(!review||review.until>Date.now())return false;
-    const beforeCards=fingerprint(g);
-    if(review.invalid&&['center','new-center'].includes(review.kind)&&g.lastMove?.before){
-      const restored=structuredClone(g.lastMove.before);
-      Object.assign(restored,{attention:g.attention,nudgeTimes:g.nudgeTimes,chat:g.chat,chatPrefs:g.chatPrefs,move:g.move,penaltySoundId:g.penaltySoundId||0});
-      Object.keys(g).forEach(k=>delete g[k]);Object.assign(g,restored);
-      g.message=`Kortet gik tilbage til ${g.players[review.actor].name}, fordi talrækken ikke passede. Ingen æselstraf blev givet.`;
-    }else{g.review=null;g.lastMove=null;this.finishWinner(g,review.actor)}
-    g.review=null;g.lastMove=null;
-    if(fingerprint(g)!==beforeCards)throw Error('Kortregnskabet ændrede sig ved pauseafslutning');
-    g.move++;await this.state.storage.put('game',g);await this.state.storage.deleteAlarm?.();this.broadcast(g);return true;
+    if(!g.review)return false;
+    // Migrate an older in-progress pause without silently moving its card.
+    g.review=null;g.move++;await this.state.storage.put('game',g);await this.state.storage.deleteAlarm?.();this.broadcast(g);return true;
   }
   chatPrefs(g){return Array.from({length:g.playerCount??2},(_,i)=>g.chatPrefs?.[i]===true)}
   seat(secret,g){return g.players.findIndex(p=>p.secret===secret)}
@@ -264,26 +261,28 @@ export class GameRoom {
     g.lastMove={actor:seat,valid,number:n??0,type:'end-turn',before};
     if(g.phase!=='finished')g.message=`${g.players[seat].name} afsluttede turen. ${g.players[g.turn].name}s tur.`;
   }
+  doKeepSingle(g,seat){
+    const p=g.players[seat];if(remaining(g,seat)!==1||!p.open.length||g.pending!==null)throw Error('Du skal have ét åbent kort tilbage.');
+    this.finishOrNext(g);if(g.phase!=='finished')g.message=`${p.name} beholder sit sidste åbne kort. ${g.players[g.turn].name}s tur.`;
+  }
   doRecycle(g,seat){
     if(g.pending!==null)throw Error('Læg først det vendte kort.');
-    const p=g.players[seat];if(p.closed.length)throw Error('Din lukkede bunke er ikke tom.');
+    const p=g.players[seat];if(!p.closed.length&&p.open.length===1)return this.doKeepSingle(g,seat);if(p.closed.length)throw Error('Din lukkede bunke er ikke tom.');
     if(!p.open.length)throw Error('Ingen åben bunke at vende.');
-    const number=p.open.at(-1),skipped=preferredTarget(g,number,seat),before=skipped?snapshot(g):null;
     p.closed=p.open.slice().reverse();p.open=[];
-    g.lastMove=skipped?{actor:seat,valid:false,number,type:'flip',before}:g.lastMove;
+
     g.message=`${p.name} vendte sin åbne bunke. Tryk på den lukkede bunke for at vende et kort.`;
   }
   doFlip(g,seat){
     if(g.pending!==null)throw Error('Læg først det vendte kort.');
     const p=g.players[seat];
-    const skipped=p.open.length&&preferredTarget(g,p.open.at(-1),seat);
-    const before=skipped?snapshot(g):null,number=p.open.at(-1);
+    if(!p.closed.length&&p.open.length===1)return this.doKeepSingle(g,seat);
     if(!p.closed.length){
       if(!p.open.length)throw Error('Ingen talkort tilbage.');
       p.closed=p.open.slice().reverse();p.open=[];
     }
     g.pending=p.closed.pop();
-    g.lastMove=skipped?{actor:seat,valid:false,number,type:'flip',before}:null;
+
     g.message=`${p.name} vendte ${g.pending}. Vælg en bunke.`;
   }
   doPlace(g,seat,b){
@@ -317,6 +316,7 @@ export class GameRoom {
     else throw Error('Ukendt mål');
     if(Array.isArray(g.finishOrder))g.finishOrder=g.finishOrder.filter(i=>remaining(g,i)===0);
     g.lastMove={actor:seat,valid,number:n,type:dest.kind==='self-open'?'discard':'place',before};
+    g.lastPlayed={id:(g.move||0)+1,actor:seat,number:n,kind:dest.kind,index:dest.index};
     if(dest.kind==='self-open'){
       this.finishOrNext(g);
       g.message=`${p.name} lagde ${n} i sin åbne bunke.`;
@@ -330,16 +330,16 @@ export class GameRoom {
     if(!g.lastMove)throw Error('Der er ikke et træk at udfordre.');
     if(g.lastMove.actor===seat)throw Error('Du kan ikke udfordre dit eget træk.');
     if(g.lastMove.valid){g.message='Trækket var korrekt. Ingen æselstraf.';g.lastMove=null;return}
-    const actor=g.lastMove.actor,number=g.lastMove.number;
+    const actor=g.lastMove.actor,number=g.lastMove.number,played=g.lastPlayed;
     const restored=JSON.parse(JSON.stringify(g.lastMove.before));
     // Undo cards only; preserve newer chat, consent and the monotonic revision.
-    Object.assign(restored,{attention:g.attention,nudgeTimes:g.nudgeTimes,chat:g.chat,chatPrefs:g.chatPrefs,move:g.move,penaltySoundId:g.penaltySoundId||0});
+    Object.assign(restored,{attention:g.attention,nudgeTimes:g.nudgeTimes,chat:g.chat,chatPrefs:g.chatPrefs,move:g.move,penaltySoundId:g.penaltySoundId||0,donkeySoundId:g.donkeySoundId||0});
     Object.keys(g).forEach(k=>delete g[k]);Object.assign(g,restored);
     const penalty=this.givePenalty(g,actor);
     if(penalty.assigned)g.penaltySoundId=g.move+1;
     this.finishWinner(g,actor);
     if(g.phase!=='finished'&&remaining(g,g.turn)===0)this.advanceTurn(g);
-    g.lastMove=null;
+    g.lastMove=null;if(played)g.lastPlayed={...played,challenged:true};
     g.message=`🫏 ${g.players[actor].name} blev opdaget! Trækket med ${number} blev fortrudt. ${g.penaltyMessage}`;
     delete g.penaltyMessage;
   }
@@ -365,21 +365,16 @@ export class GameRoom {
     return {assigned,extras};
   }
   finishWinner(g,finisher){
-    // Same ranking as offline: completed players by donkeys, then finish time.
+    // Online: donkey cards first, then remaining cards and finishing order.
     const done=(g.finishOrder||[]).filter(i=>remaining(g,i)===0);
     for(let i=0;i<g.players.length;i++)if(remaining(g,i)===0&&!done.includes(i))done.push(i);
     g.finishOrder=done;
     if(!done.length)return;
-    if(g.players.length===2){
-      if(!done.includes(finisher))finisher=done[0];
-      const other=1-finisher;
-      const winner=g.players[finisher].donkeys>g.players[other].donkeys?other:finisher;
-      g.placements=[winner,1-winner];
-    }else{
-      if(done.length<g.players.length-1)return;
-      g.placements=done.slice().sort((a,b)=>g.players[a].donkeys-g.players[b].donkeys||done.indexOf(a)-done.indexOf(b));
-      g.placements.push(...g.players.map((_,i)=>i).filter(i=>!done.includes(i)));
-    }
+    if(g.players.length>2&&done.length<g.players.length-1)return;
+    g.placements=g.players.map((_,i)=>i).sort((a,b)=>
+      (g.players[a].donkeys||0)-(g.players[b].donkeys||0)||
+      remaining(g,a)-remaining(g,b)||
+      (done.indexOf(a)<0?Infinity:done.indexOf(a))-(done.indexOf(b)<0?Infinity:done.indexOf(b))||a-b);
     g.phase='finished';g.winner=g.placements[0];
     g.message=`🏆 ${g.players[g.winner].name} vandt! `+g.placements.slice(0,3).map((i,k)=>`${['🥇','🥈','🥉'][k]} ${g.players[i].name}`).join(' · ');
   }
@@ -398,7 +393,7 @@ export class GameRoom {
   publicState(g,seat){
     const playerCards=g.players.reduce((sum,p)=>sum+countCards(p),0)+(g.pending!=null?1:0),centerCards=g.centers.reduce((sum,c)=>sum+c.length,0);
     return {
-      reviewUntil:g.review?.until||0,reviewRemainingMs:Math.max(0,(g.review?.until||0)-Date.now()),
+      reviewUntil:0,reviewRemainingMs:0,lastPlayed:g.lastPlayed||null,donkeySoundId:g.donkeySoundId||0,
       cardCount:{players:playerCards,centers:centerCards,total:playerCards+centerCards,expected:(g.deckSets??5)*20},
       attention:g.phase!=='closed'?(g.attention?.[seat]||null):null,phase:g.phase,penaltySoundId:g.penaltySoundId||0,startWaitMs:g.phase==='waiting'?this.earlyStartWait(g):0,turn:g.turn,pending:g.turn===seat?g.pending:null,centers:g.centers.map(c=>({top:c.at(-1),length:c.length,cards:[...c]})),
       players:g.players.map((p,i)=>({name:p.name,closed:p.closed.length,turned:i===g.turn&&g.pending!=null?1:0,total:remaining(g,i),open:i===seat||true?p.open.at(-1):null,openCount:p.open.length,donkeys:p.donkeys})),

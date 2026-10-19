@@ -4,6 +4,14 @@ Nyeste øverst. Én kort post pr. version. Detaljer, testresultater og filoversi
 findes i `docs/arkiv/`. Versioner uden post (fx 0.9.8 udover lydcache, 0.9.21, 0.9.26) var ikke
 dokumenteret separat i de gamle noter.
 
+## v0.9.60 – frie træk, tydeligt seneste kort og æselkort først (19. oktober 2026)
+- Online-rangering vægter færrest æselkort blandt alle, derefter færrest talkort og færdigrækkefølge. I enkeltæsel-varianten ender indehaveren af æselkortet sidst. Det ændrer ikke offlinekortspillet.
+- Alle pauser er 0 sekunder. Seneste udspil vises med spiller, tal og mål og kan udfordres, også efter næste kortvending, indtil et nyt kort placeres. Midterfejl bliver liggende til udfordring; dette erstatter automatisk tidsstyret retur. Forkerte udfordringer på korrekte kort giver ikke straf. Et forældet kort-ID kan ikke straffe det næste udspil.
+- Lavere spillerfelter viser kun talkort i alt og æselkort. Bunkeoverskrifter fjernet fra skærmen, adgangsnavne bevaret. Spillerne står tre pr. række, med spiller 4–6 på anden række; alle inden for bredden. Midterbunker er tættere på kortene og tilpasses samme bredde.
+- Sidste åbne talkort bliver liggende. Behold kortet · næste spiller sender turen videre uden genvending. Modtages endnu et kort, bliver almindelig bunkevending igen mulig.
+- Hvert æseltryk sender et separat lydsignal til alle, inklusive afsenderen, også når ingen straf gives. Én straf pr. udspil og ingen lydgentagelse ved genindlæsning. AudioContext genoptages før afspilning; lokal lyd fra/manuel aktivering understøttes stadig. Ingen nye lydfiler.
+- 47/47 Node-tests, nye og opdaterede browserkontroller for tre/seks spillere, 320/390 px, midterbunker, énkort-flow, sen udfordring, alle-enheders lyd, ingen genindlæsningslyd, podium, chat, talestemme og træk. Afspilning/transport er simuleret; rigtig iPhone/iPad og live Worker ikke prøvet herfra. Worker dry-run består. Ikke publiceret.
+
 ## v0.9.59 – æselstemme i online-taloplæsning (19. oktober 2026)
 - Sprog og stemme indeholder nu Dansk – æselstemme på begge onlineindgange. Bruger de eksisterende 100 MP3-tal i audio/numbers/donkey. Ingen nye lydfiler eller eksterne talekald.
 - Valget virker ved kortvending og Hør tallet igen, gemmes på enheden og er uafhængigt af andre spilleres sprogvalg. De øvrige sprog og kombinationer er bevaret. Æsellyden ved straf har stadig sit eget til/fra-valg.

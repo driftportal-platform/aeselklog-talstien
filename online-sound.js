@@ -6,7 +6,7 @@ function unlock(){
  if(!ctx&&!fallback){fallback=new Audio(path);fallback.preload='auto';fallback.volume=.75}
 }
 function stop(){if(source){try{source.stop()}catch{}source=null}fallback?.pause();signal(false)}
-async function play(){unlock();if(ctx){const buffer=await loaded;if(ctx.state!=='running')throw Error('Tryk for at aktivere lyd');stop();source=ctx.createBufferSource();source.buffer=buffer;source.connect(gain);const current=source;source.onended=()=>{if(source===current){source=null;signal(false)}};source.start();signal(true);return}if(!fallback)throw Error('Lyd understøttes ikke');fallback.currentTime=0;fallback.onended=()=>signal(false);fallback.onplay=()=>signal(true);await fallback.play()}
+async function play(){unlock();if(ctx){const buffer=await loaded;if(ctx.state!=='running')await ctx.resume();if(ctx.state!=='running')throw Error('Tryk for at aktivere lyd');stop();source=ctx.createBufferSource();source.buffer=buffer;source.connect(gain);const current=source;source.onended=()=>{if(source===current){source=null;signal(false)}};source.start();signal(true);return}if(!fallback)throw Error('Lyd understøttes ikke');fallback.currentTime=0;fallback.onended=()=>signal(false);fallback.onplay=()=>signal(true);await fallback.play()}
 for(const event of ['pointerdown','keydown'])document.addEventListener(event,unlock,{capture:true});
 window.AeselSound={unlock,play,stop,isPlaying:()=>playing};
 })();

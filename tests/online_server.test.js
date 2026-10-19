@@ -34,7 +34,7 @@ const fs=require('node:fs');
   if(variant==='passing')assert.equal(s.players[1].donkeys,0);
  }
  {const s=fresh();room.doPlace(s,0,{source:'pending',kind:'center',index:0});room.doChallenge(s,1);assert.equal(s.players[0].donkeys,0);assert.deepEqual(s.centers,[[1,2]]);}
- {const s=fresh();s.pending=null;s.players[0].open=[2];room.doFlip(s,0);assert.equal(s.pending,7);assert.equal(s.lastMove.type,'flip');room.doChallenge(s,1);assert.equal(s.pending,null);assert.deepEqual(s.players[0].closed,[7]);}
+ {const s=fresh();s.pending=null;s.players[0].open=[2];room.doFlip(s,0);assert.equal(s.pending,7);assert.equal(s.lastMove,null);assert.equal(s.pending,7);assert.deepEqual(s.players[0].open,[2]);}
  for(const dons of [[0,0],[2,0],[0,2]]){const s=fresh();s.players.forEach((p,i)=>p.donkeys=dons[i]);s.players[0].closed=[];room.doPlace(s,0,{source:'pending',kind:'center',index:0});assert.equal(s.winner,dons[0]>dons[1]?1:0);assert.equal(s.placements[0],s.winner);room.doChallenge(s,1);assert.equal(s.phase,'finished');}
  {const s=fresh();const before=structuredClone(s);assert.throws(()=>room.doPlace(s,0,{source:'pending',kind:'center',index:9}));assert.deepEqual(s,before);}
  {const s=fresh();s.pending=null;s.players[0].open=[];room.doFlip(s,0);assert.equal(s.pending,7);assert.equal(s.turn,0);}

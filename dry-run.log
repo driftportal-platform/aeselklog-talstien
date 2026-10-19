@@ -1,0 +1,92 @@
+
+--- 2026-10-19T20:34:42.936Z debug
+🪵  Writing logs to "C:\Users\mrbro\.codex\.chatgpt-projects\g-p-6ad543d9d4a08191bd69bc6c49246a9a\aeselklog-v0960\dry-run.log"
+---
+
+--- 2026-10-19T20:34:42.936Z debug
+.env file not found at "C:\Users\mrbro\.codex\.chatgpt-projects\g-p-6ad543d9d4a08191bd69bc6c49246a9a\aeselklog-v0960\.env". Continuing... For more details, refer to https://developers.cloudflare.com/workers/wrangler/system-environment-variables/
+---
+
+--- 2026-10-19T20:34:42.941Z debug
+.env file not found at "C:\Users\mrbro\.codex\.chatgpt-projects\g-p-6ad543d9d4a08191bd69bc6c49246a9a\aeselklog-v0960\.env.local". Continuing... For more details, refer to https://developers.cloudflare.com/workers/wrangler/system-environment-variables/
+---
+
+--- 2026-10-19T20:34:43.054Z log
+
+ ⛅️ wrangler 4.151.1
+────────────────────
+---
+
+--- 2026-10-19T20:34:43.085Z log
+
+Cloudflare collects anonymous telemetry about your usage of Wrangler. Learn more at https://github.com/cloudflare/workers-sdk/tree/main/packages/wrangler/telemetry.md
+---
+
+--- 2026-10-19T20:34:43.096Z debug
+Error sending metrics event Error: EPERM: operation not permitted, open 'C:\Users\mrbro\AppData\Roaming\xdg.config\.wrangler\metrics.json'
+    at Object.writeFileSync (node:fs:2483:20)
+    at writeMetricsConfig (C:\Users\mrbro\.codex\.chatgpt-projects\g-p-6ad543d9d4a08191bd69bc6c49246a9a\aeselklog-v0944\node_modules\wrangler\wrangler-dist\cli.js:162459:8)
+    at printMetricsBanner (C:\Users\mrbro\.codex\.chatgpt-projects\g-p-6ad543d9d4a08191bd69bc6c49246a9a\aeselklog-v0944\node_modules\wrangler\wrangler-dist\cli.js:162689:7)
+    at Object.sendCommandEvent (C:\Users\mrbro\.codex\.chatgpt-projects\g-p-6ad543d9d4a08191bd69bc6c49246a9a\aeselklog-v0944\node_modules\wrangler\wrangler-dist\cli.js:162595:11)
+    at C:\Users\mrbro\.codex\.chatgpt-projects\g-p-6ad543d9d4a08191bd69bc6c49246a9a\aeselklog-v0944\node_modules\wrangler\wrangler-dist\cli.js:236865:20
+    at AsyncLocalStorage.run (node:internal/async_local_storage/async_context_frame:65:14)
+    at run (C:\Users\mrbro\.codex\.chatgpt-projects\g-p-6ad543d9d4a08191bd69bc6c49246a9a\aeselklog-v0944\node_modules\wrangler\wrangler-dist\cli.js:189558:61)
+    at Object.handler (C:\Users\mrbro\.codex\.chatgpt-projects\g-p-6ad543d9d4a08191bd69bc6c49246a9a\aeselklog-v0944\node_modules\wrangler\wrangler-dist\cli.js:236820:13) {
+  errno: -4048,
+  code: 'EPERM',
+  syscall: 'open',
+  path: 'C:\\Users\\mrbro\\AppData\\Roaming\\xdg.config\\.wrangler\\metrics.json'
+}
+---
+
+--- 2026-10-19T20:34:43.443Z log
+Total Upload: 30.86 KiB / gzip: 8.20 KiB
+---
+
+--- 2026-10-19T20:34:43.446Z log
+Your Worker has access to the following bindings:
+---
+
+--- 2026-10-19T20:34:43.446Z log
+Binding                          Resource                  
+---
+
+--- 2026-10-19T20:34:43.447Z log
+env.GAME_ROOM (GameRoom)         Durable Object            
+---
+
+--- 2026-10-19T20:34:43.447Z log
+env.APP_ORIGIN ("(hidden)")      Environment Variable      
+---
+
+--- 2026-10-19T20:34:43.447Z log
+
+---
+
+--- 2026-10-19T20:34:43.447Z log
+--dry-run: exiting now.
+---
+
+--- 2026-10-19T20:34:43.459Z log
+
+Cloudflare collects anonymous telemetry about your usage of Wrangler. Learn more at https://github.com/cloudflare/workers-sdk/tree/main/packages/wrangler/telemetry.md
+---
+
+--- 2026-10-19T20:34:43.461Z debug
+Error sending metrics event Error: EPERM: operation not permitted, open 'C:\Users\mrbro\AppData\Roaming\xdg.config\.wrangler\metrics.json'
+    at Object.writeFileSync (node:fs:2483:20)
+    at writeMetricsConfig (C:\Users\mrbro\.codex\.chatgpt-projects\g-p-6ad543d9d4a08191bd69bc6c49246a9a\aeselklog-v0944\node_modules\wrangler\wrangler-dist\cli.js:162459:8)
+    at printMetricsBanner (C:\Users\mrbro\.codex\.chatgpt-projects\g-p-6ad543d9d4a08191bd69bc6c49246a9a\aeselklog-v0944\node_modules\wrangler\wrangler-dist\cli.js:162689:7)
+    at Object.sendCommandEvent (C:\Users\mrbro\.codex\.chatgpt-projects\g-p-6ad543d9d4a08191bd69bc6c49246a9a\aeselklog-v0944\node_modules\wrangler\wrangler-dist\cli.js:162595:11)
+    at C:\Users\mrbro\.codex\.chatgpt-projects\g-p-6ad543d9d4a08191bd69bc6c49246a9a\aeselklog-v0944\node_modules\wrangler\wrangler-dist\cli.js:236899:22
+    at async Object.handler (C:\Users\mrbro\.codex\.chatgpt-projects\g-p-6ad543d9d4a08191bd69bc6c49246a9a\aeselklog-v0944\node_modules\wrangler\wrangler-dist\cli.js:236820:7) {
+  errno: -4048,
+  code: 'EPERM',
+  syscall: 'open',
+  path: 'C:\\Users\\mrbro\\AppData\\Roaming\\xdg.config\\.wrangler\\metrics.json'
+}
+---
+
+--- 2026-10-19T20:34:44.154Z debug
+Metrics dispatcher: Posting data {"deviceId":"a4fad864-85e7-4362-ab9f-ff7ee4d4ed82","event":"deploy worker script","timestamp":1792442084154,"properties":{"amplitude_session_id":1792442083447,"amplitude_event_id":0,"wranglerVersion":"4.151.1","wranglerMajorVersion":4,"wranglerMinorVersion":151,"wranglerPatchVersion":1,"osPlatform":"Windows","osVersion":"Windows 11 Pro","nodeVersion":24,"isFirstUsage":false,"configFileType":"none","isCI":false,"isPagesCI":false,"isWorkersCI":false,"isInteractive":false,"hasAssets":false,"agent":"codex","category":"Workers","os":"win32:x64","usesTypeScript":false,"durationMs":238,"currentAgentSkillsInstalled":false}}
+---
