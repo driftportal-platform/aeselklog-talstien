@@ -32,10 +32,10 @@ const assert=require('node:assert/strict');
  // Everyone must consent, including seats 2–5. Messages identify the actual sender.
  {const {call,host,db}=await lobby(6);const secrets=[host];for(let i=1;i<6;i++)secrets.push((await (await call('join',{name:'P'+i})).json()).secret);
  for(let i=0;i<5;i++)await call('chat-settings',{secret:secrets[i],enabled:true});
- assert.equal((await call('chat',{secret:host,kind:'text',text:'Hej'})).status,403);
+ assert.equal((await call('chat',{secret:host,kind:'text',text:'Hej'})).status,200);
  await call('chat-settings',{secret:secrets[5],enabled:true});assert.equal((await call('chat',{secret:secrets[5],kind:'text',text:'Hej fra seks'})).status,200);
  const history=await (await call('chat',null,host)).json();assert.equal(history.prefs.length,6);assert.equal(history.messages.at(-1).seat,5);assert.equal(history.players[5],'P5');
- await call('chat-settings',{secret:secrets[2],enabled:false});assert.equal((await call('chat',{secret:host,kind:'voice',mime:'audio/mp4',audio:'AA==',duration:1})).status,403);
+ await call('chat-settings',{secret:secrets[2],enabled:false});assert.equal((await call('chat',{secret:host,kind:'voice',mime:'audio/mp4',audio:'AA==',duration:1})).status,200);
  }
  const engine=new GameRoom({storage:{}},{});
  const game=n=>({range:'1-20',phase:'playing',playerCount:n,turn:0,pending:null,variant:'collect',extraPenalty:false,donkeyCount:8,centers:[],players:Array.from({length:n},(_,i)=>({name:'P'+i,closed:[i+1],open:[],donkeys:i===0?1:0})),chat:[],chatPrefs:Array(n).fill(false),move:0,lastMove:null});

@@ -14,14 +14,14 @@ const fs=require('node:fs');
  r=await call(base+'join','POST',{name:'Bo'});const other=(await r.json()).secret;assert(other);
  r=await call(base+'chat','GET',null,'bad');assert.equal(r.status,401);assert.equal(r.headers.get('access-control-allow-origin'),origin);
  r=await call(base+'chat','POST',{secret:initSecret,kind:'quick',text:'👏 Godt spil!'});assert.equal(r.status,200);
- r=await call(base+'chat','POST',{secret:other,kind:'text',text:'Hej'});assert.equal(r.status,403);
+ r=await call(base+'chat','POST',{secret:other,kind:'text',text:'Hej'});assert.equal(r.status,200);
  for(const secret of [initSecret,other])assert.equal((await call(base+'chat-settings','POST',{secret,enabled:true})).status,200);
  r=await call(base+'chat','POST',{secret:other,kind:'text',text:'Hej'});assert.equal(r.status,200);
  let g=records.get('game');g.chat.forEach(m=>m.at-=2000);records.set('game',g);
  const bytes=Buffer.from([0,1,2,3,255]);
  r=await call(base+'chat','POST',{secret:initSecret,kind:'voice',mime:'audio/mp4',audio:bytes.toString('base64'),duration:1});assert.equal(r.status,200);const id=(await r.json()).id;
  r=await call(base+'clip?id='+id,'GET',null,other);assert.equal(r.headers.get('content-type'),'audio/mp4');assert.deepEqual(Buffer.from(await r.arrayBuffer()),bytes);
- r=await call(base+'chat','GET',null,other);const history=await r.json();assert.equal(history.messages.length,3);assert(!history.messages.some(m=>'audio'in m));
+ r=await call(base+'chat','GET',null,other);const history=await r.json();assert.equal(history.messages.length,4);assert(!history.messages.some(m=>'audio'in m));
  // WebSocket upgrades must be returned intact (Node's Response disallows real 101).
  const upgrade={status:101,webSocket:{}};
  const upgraded=await worker.fetch(new Request('https://worker'+base+'ws?secret='+other,{headers:{origin}}),{...env,GAME_ROOM:{idFromName:c=>c,get:()=>({fetch:async()=>upgrade})}});assert.equal(upgraded,upgrade);

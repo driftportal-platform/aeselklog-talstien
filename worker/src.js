@@ -1,7 +1,7 @@
-// ÆselKlog Online v0.9.50 – serverstyret kortspil (2–6 spillere).
+// ÆselKlog Online v0.9.51 – serverstyret kortspil (2–6 spillere).
 // Regler matcher det lokale cardgame-engine.js. Ingen CPU. Chat og genopkobling bevaret.
 const QUICK=['🫏 Hov hov!','👏 Godt spil!','😂 Haha!','🎉 Flot klaret!','🥕 Din tur!','❤️ Tak for spillet!'];
-const MAX_VOICE_BASE64=240000,MAX_TEXT=160,CHAT_KEEP_MS=24*60*60*1000;
+const MAX_VOICE_BASE64=1400000,MAX_TEXT=10000,CHAT_KEEP_MS=24*60*60*1000;
 const JSON_HEADERS={'content-type':'application/json; charset=utf-8','cache-control':'no-store'};
 function response(data,status=200,headers={}){return new Response(JSON.stringify(data),{status,headers:{...JSON_HEADERS,...headers}})}
 function random(length){const alphabet='ABCDEFGHJKLMNPQRSTUVWXYZ23456789';const bytes=crypto.getRandomValues(new Uint8Array(length));return [...bytes].map(n=>alphabet[n%alphabet.length]).join('')}
@@ -36,7 +36,7 @@ function remaining(state,index){const p=state.players[index];return countCards(p
 export default {
   async fetch(request,env){
     const url=new URL(request.url),origin=request.headers.get('origin');
-    if(request.method==='GET'&&url.pathname==='/health')return response({status:'ready',service:'ÆselKlog Online v0.9.50'});
+    if(request.method==='GET'&&url.pathname==='/health')return response({status:'ready',service:'ÆselKlog Online v0.9.51'});
     if(!validOrigin(request,env))return response({error:'Hjemmesiden er ikke tilladt'},403);
     if(request.method==='OPTIONS')return new Response(null,{status:204,headers:cors(origin,env)});
     if(url.pathname==='/api/create'&&request.method==='POST'){
@@ -115,7 +115,7 @@ export class GameRoom {
         if(b.type==='end-game'){
           if(seat!==0)throw Error('Kun rumopretteren kan afslutte spillet for alle.');
           if(g.phase==='closed')return response(this.publicState(g,seat));
-          g.phase='closed';g.closedAt=Date.now();g.lastMove=null;g.chat=[];g.chatPrefs=Array(g.players.length).fill(false);g.message=`${g.players[0].name} afsluttede spillet.`;
+          for(const m of g.chat||[])await this.state.storage.delete?.('clip:'+m.id);g.phase='closed';g.closedAt=Date.now();g.lastMove=null;g.chat=[];g.chatPrefs=Array(g.players.length).fill(false);g.message=`${g.players[0].name} afsluttede spillet.`;
         }else if(b.type==='start-early'){
           if(seat!==0)throw Error('Kun rumopretteren kan starte spillet.');
           if(g.phase!=='waiting')throw Error('Spillet er allerede startet.');
@@ -149,7 +149,7 @@ export class GameRoom {
     }
     // Chat: kun deltagere i rummet; hurtigbeskeder eller frivillig tekst/lyd.
     const notifyChat=()=>{for(const [ws] of this.clients){try{ws.send(JSON.stringify({type:'chat-update'}))}catch{}}};
-    if(g.created&&Date.now()-g.created>CHAT_KEEP_MS&&g.chat?.length){g.chat=[];await this.state.storage.put('game',g)}
+    const expired=(g.chat||[]).filter(m=>Date.now()-m.at>=CHAT_KEEP_MS);if(expired.length){for(const m of expired)await this.state.storage.delete?.('clip:'+m.id);g.chat=g.chat.filter(m=>!expired.includes(m));await this.state.storage.put('game',g)}
     if(route==='/chat'&&request.method==='GET'){
       const seat=this.seat(request.headers.get('x-player-secret')||'',g);
       if(seat<0)return response({error:'Ingen adgang'},401);
@@ -160,7 +160,8 @@ export class GameRoom {
       if(seat<0)return response({error:'Ingen adgang'},401);
       const item=(g.chat||[]).find(m=>m.id===url.searchParams.get('id')&&m.kind==='voice');
       if(!item)return response({error:'Lyd er udløbet'},404);
-      const binary=Uint8Array.from(atob(item.audio),c=>c.charCodeAt(0));
+      const clip=item.audio?item:await this.state.storage.get('clip:'+item.id);if(!clip)return response({error:'Lyd er udløbet'},404);
+      const binary=Uint8Array.from(atob(clip.audio),c=>c.charCodeAt(0));
       return new Response(binary,{headers:{'content-type':item.mime,'cache-control':'no-store','x-content-type-options':'nosniff'}});
     }
     if(route==='/chat-settings'&&request.method==='POST'){
@@ -172,28 +173,27 @@ export class GameRoom {
       return response({prefs:g.chatPrefs});
     }
     if(route==='/chat'&&request.method==='POST'){
-      if(Number(request.headers.get('content-length')||0)>260000)return response({error:'Beskeden er for stor'},413);
+      if(Number(request.headers.get('content-length')||0)>1500000)return response({error:'Beskeden er for stor'},413);
       let b;try{b=await request.json()}catch{return response({error:'Ugyldig besked'},400)}
       const seat=this.seat(b.secret||'',g);
       if(seat<0)return response({error:'Ingen adgang'},401);
-      if(g.players.length<2)return response({error:'Vent på spiller 2'},409);
       const now=Date.now(),full=g.chat||[];
-      if(full.some(m=>m.seat===seat&&now-m.at<1800))return response({error:'Vent lidt mellem beskeder'},429);
       let item={id:token().slice(0,16),seat,at:now};
       if(b.kind==='quick'){
         if(!QUICK.includes(b.text))return response({error:'Ukendt hurtigbesked'},400);
         item={...item,kind:'quick',text:b.text};
       }else if(b.kind==='text'){
-        if(!this.chatPrefs(g).every(Boolean))return response({error:'Alle spillere skal slå fri chat til'},403);
         const value=String(b.text||'').trim();
-        if(!value||value.length>MAX_TEXT||/[<>\x00-\x08]/.test(value))return response({error:'Teksten skal være 1–160 tegn'},400);
+        if(!value||value.length>MAX_TEXT||/[\x00-\x08]/.test(value))return response({error:'Teksten skal være 1–10.000 tegn'},400);
         item={...item,kind:'text',text:value};
       }else if(b.kind==='voice'){
-        if(!this.chatPrefs(g).every(Boolean))return response({error:'Alle spillere skal slå lydchat til'},403);
-        if(!['audio/webm','audio/mp4','audio/ogg'].includes(b.mime)||typeof b.audio!=='string'||b.audio.length>MAX_VOICE_BASE64||!/^[A-Za-z0-9+/]*={0,2}$/.test(b.audio)||!Number.isFinite(Number(b.duration))||Number(b.duration)>10.2||Number(b.duration)<0.1)return response({error:'Lydklip skal være højst 10 sekunder'},400);
-        item={...item,kind:'voice',mime:b.mime,audio:b.audio,duration:Math.round(Number(b.duration)*10)/10};
+        if(!['audio/webm','audio/mp4','audio/ogg','audio/mpeg','audio/wav','audio/x-wav','audio/aac','audio/flac','audio/x-m4a'].includes(b.mime)||typeof b.audio!=='string'||!b.audio.length||b.audio.length%4!==0||b.audio.length>MAX_VOICE_BASE64||!/^[A-Za-z0-9+/]*={0,2}$/.test(b.audio)||!Number.isFinite(Number(b.duration))||Number(b.duration)<0)return response({error:'Lydfilen skal være en understøttet lydtype og højst 1 MB'},400);
+        let binary;try{binary=atob(b.audio)}catch{return response({error:'Ugyldig lydfil'},400)}if(binary.length>1048576)return response({error:'Lydfilen må højst være 1 MB'},413);
+        await this.state.storage.put('clip:'+item.id,{audio:b.audio,mime:b.mime});
+        item={...item,kind:'voice',mime:b.mime,duration:Math.round(Number(b.duration)*10)/10};
       }else return response({error:'Ukendt beskedtype'},400);
       g.chat=[...full.filter(m=>now-m.at<CHAT_KEEP_MS),item].slice(-30);
+      for(const m of full)if(!g.chat.some(kept=>kept.id===m.id))await this.state.storage.delete?.('clip:'+m.id);
       await this.state.storage.put('game',g);notifyChat();return response({ok:true,id:item.id});
     }
     return response({error:'Ukendt sti'},404);

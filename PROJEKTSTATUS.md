@@ -1,6 +1,6 @@
 # ÆselKlog – hvor er vi nu
 
-**Version:** 0.9.50 (lokalt valideret opdateringspakke, 19. oktober 2026; ikke publiceret). Opdateres ved hver release sammen med `CHANGELOG.md`.
+**Version:** 0.9.51 (lokalt valideret opdateringspakke, 19. oktober 2026; ikke publiceret). Opdateres ved hver release sammen med `CHANGELOG.md`.
 
 ## Hvad er det?
 Børnevenligt talspil som PWA (GitHub Pages, repo `driftportal-platform/aeselklog-talstien`) med tre selvstændige dele og frivillig matematik:
@@ -10,11 +10,15 @@ Børnevenligt talspil som PWA (GitHub Pages, repo `driftportal-platform/aeselklo
 Lyd: 500 gemte MP3-tal (fem stemmer), valgfri baggrundsmusik, ElevenLabs kun via Cloudflare Worker. Alt gemmes lokalt, ingen konti.
 
 ## Status
+- v0.9.51: kompakte spillerkort med midterbunker direkte nedenunder; vandret rulning ved mange spillere. Tandhjul åbner indstillinger, invitationer, lyd og afslutning. Chat som rundt ikon med ulæste beskeder og et vindue, der kan lukkes igen.
+- Fri tekst, optagelser og lydfiler uden samtykkekrav, beskedventetid eller 10-sekundersgrænse. Teknisk lydfilgrænse 1 MiB. Klip opbevares separat, hentes med spilleradgang og ryddes ved udløb/afslutning.
+- Æsellyd via Web Audio ved faktisk straf, én gang pr. deltager; prøveknap og manuel aktivering ved browserblokering. Automatisk kontrol simulerer afspilning på tre enheder; fysisk iPhone/iPad mangler.
+- Udgangspunkt for v0.9.51: GitHub main `78176e2cd8f6f115f3bdd943b9f5e04bbbd439e7`. Begge onlineindgange opdateret. Ingen deployment udført.
 - v0.9.50: opretteren kan afslutte rummet for alle med bekræftelse. Afsluttet status gemmes på serveren; sockets lukkes, sessioner glemmes, polling/genopkobling og lyd stoppes. Chat/lydbeskeder i rummet ryddes. Alle kan vælge Opret nyt spil og får en ny rumkode.
 - Adgang, afslutning i ventende/aktivt/færdigt spil, gentagne anmodninger, sene tilmeldinger og forbindelseslukning er testet. Ny browserkontrol dækker ny oprettelse og F5 uden tilbagevenden til det afsluttede rum.
 - Udgangspunkt for v0.9.50: GitHub main `cb0bb4a92fffc1bb5856f19cf22360ae90b56726`.
 - v0.9.49: vend på egen lukkede bunke, flyt selv til egen/modspillers åbne bunke eller midten. Egen åbne bunke sender turen videre; modspiller/midte lader spilleren fortsætte. Afslut tur-knappen er fjernet. Dette erstatter kortflowet fra v0.9.48.
-- Sammenfoldelige paneler og æselknap direkte under spillerkortene er bevaret.
+- Fra v0.9.51 ligger indstillinger bag et tandhjul; æselknappen er rund og sidder ved spillerkortene.
 - Æsellyd bruger den eksisterende donkey-bray.wav ved faktisk tildelt æselkort. Lokal Æsellyd til/fra findes under Lyd og musik. Hændelsesnummer sikrer én afspilning pr. ny straf, uden gentagelse ved polling eller F5. Browserkontrol simulerer lydafspilning; fysisk iPhone/iPad mangler.
 - Udgangspunkt for denne pakke: GitHub main `265c1444cb5c9201d4d2e1bc838d199a573e5c83`.
 - v0.9.47 tilføjer valgfri start efter 60 sekunder med mindst to tilmeldte. Kun opretteren kan starte; tiden regnes på serveren fra oprettelse og nulstilles ikke ved F5. Ledige pladser lukkes ved start; kort og chattilsagn følger de faktiske deltagere. Ingen automatisk start ved tidsgrænsen.
@@ -23,9 +27,9 @@ Lyd: 500 gemte MP3-tal (fem stemmer), valgfri baggrundsmusik, ElevenLabs kun via
 - Nyt: 2–6 online-spillere, 1–5 kortsæt, ventelobby indtil alle er med, så lige uddeling som muligt, turrækkefølge, færdige/tilbagevendende spillere og podium med tre medaljepladser.
 - Nyt design til online opsætning og spillebord med eksisterende æselgrafik og appens farver. Åbne bunker kan modtage kort direkte. Den almindelige appforside er uændret bortset fra versionsmærket.
 - Invitationer: native deling, mailkladde og kopiering. Offentligt rumlink udfylder kode uden at dele spillerens secret. Gæster får en enkel deltag-side; et gammelt gemt rum overtager ikke en ny invitation.
-- Chat navngiver afsenderen; alle deltagere godkender fri tekst/lyd. Samtidige tilmeldinger er testet.
+- Chat navngiver afsenderen; fri tekst/lyd er altid tilgængelig fra v0.9.51. Samtidige tilmeldinger er testet.
 - Onlinefejl rettet: CORS/chat, MIME-type på lydklip, WebSocket-videresendelse, oplæsning af alle vendte kort, synligt æselkort, gentag tal, udfordringer uden tab af nyere chat eller opdateringsnummer. Begge onlineindgange er opdateret.
-- **Automatisk:** 40/40 Node-tests består. Ny servertest dækker begge deltagere, CORS, hurtigtekst/fri tekst/lyddata, adgang, udfordringer, begge varianter, ekstra kortstraf og vinderregler.
+- **Automatisk:** 41/41 Node-tests består. Ny servertest dækker begge deltagere, CORS, hurtigtekst/fri tekst/lyddata, adgang, udfordringer, begge varianter, ekstra kortstraf og vinderregler.
 - **Chromium/simuleret:** online med to og seks isolerede browserprofiler, størrelser 320×740, 390×844, 768×1024, 1024×768, 844×390 og 1280×800. Worker-logik via simuleret transport, simuleret mikrofon/afspilning/deling, mail-link, kopiering/reservefelt, invitationslink, genindlæsning, lokale sprogvalg, straf og podium. Offlinekortspil ved 390×844, 844×390 og 1280×800; træk, tryk, udfordringer og CPU består.
 - **Cloudflare:** lokal Wrangler dry-run består med GAME_ROOM og eksplicit APP_ORIGIN. Eksisterende bindinger og migrationsfil er uændrede. Konfigurationens navn er `aeselklog-online-pilot`, mens den oplyste liveadresse bruger `aeselklog-online`; følg installationsvejledningens eksplicitte `--name`.
 - **Ikke bekræftet:** faktisk deployment på Cloudflare, live WebSocket på flere fysiske enheder, rigtig deling til Beskeder/Messenger, mailapp, rigtig mikrofon/lydafspilning på iPhone, installeret iPhone-PWA eller live ElevenLabs.

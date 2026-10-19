@@ -4,6 +4,13 @@ Nyeste øverst. Én kort post pr. version. Detaljer, testresultater og filoversi
 findes i `docs/arkiv/`. Versioner uden post (fx 0.9.8 udover lydcache, 0.9.21, 0.9.26) var ikke
 dokumenteret separat i de gamle noter.
 
+## v0.9.51 – kompakt spillebord, flydende chat og æsellyd (19. oktober 2026)
+- Spillerkort i en kompakt vandret række med midterbunkerne direkte nedenunder. Flere spillere kan ses ved at stryge sidelæns.
+- Indstillinger, invitationer, lydvalg og afslutning er samlet bag tandhjulet øverst. Runde knapper til æseludfordring, gentag tal og chat.
+- Chat åbnes/lukkes som et vindue. Nye beskeder fra andre markeres med antal og en pulserende chatknap. Tekst, optagelser og valgte lydfiler kræver ikke længere fælles godkendelse. Ventetid og 10-sekundersgrænse fjernet; lydfiler har en teknisk grænse på 1 MiB.
+- Æsellyd bruger Web Audio, aktiveret ved spillerens første tryk. Straf afspilles én gang på hver enhed; indstillinger har en prøveknap, og blokeret lyd kan aktiveres manuelt. Lydklip gemmes separat fra spilstatus og slettes med chatten.
+- 41/41 Node-tests, seks online-browserkontroller og Worker dry-run består. Simuleret lyd og mikrofon; fysisk iPhone/iPad og live deployment er ikke kontrolleret herfra.
+
 ## v0.9.50 – afslut online-spillet og opret et nyt (19. oktober 2026)
 - Rumopretteren kan vælge Afslut spil for alle i rum-menuen og bekræfte. Virker i ventelobby, under spillet og efter sejr.
 - Serveren gemmer rummet som afsluttet, sender slutstatus til alle og lukker WebSocket-forbindelserne. Gamle invitationer, træk og chat kan ikke genåbne rummet. Rumchat/lydbeskeder ryddes ved afslutning.
