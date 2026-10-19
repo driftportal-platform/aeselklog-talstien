@@ -1,4 +1,4 @@
-// ÆselKlog Online v0.9.44 – serverstyret kortspil (2 spillere).
+// ÆselKlog Online v0.9.45 – serverstyret kortspil (2 spillere).
 // Regler matcher det lokale cardgame-engine.js. Ingen CPU. Chat og genopkobling bevaret.
 const QUICK=['🫏 Hov hov!','👏 Godt spil!','😂 Haha!','🎉 Flot klaret!','🥕 Din tur!','❤️ Tak for spillet!'];
 const MAX_VOICE_BASE64=240000,MAX_TEXT=160,CHAT_KEEP_MS=24*60*60*1000;
@@ -36,18 +36,20 @@ function remaining(state,index){const p=state.players[index];return countCards(p
 export default {
   async fetch(request,env){
     const url=new URL(request.url),origin=request.headers.get('origin');
-    if(request.method==='GET'&&url.pathname==='/health')return response({status:'ready',service:'ÆselKlog Online v0.9.44'});
+    if(request.method==='GET'&&url.pathname==='/health')return response({status:'ready',service:'ÆselKlog Online v0.9.45'});
     if(!validOrigin(request,env))return response({error:'Hjemmesiden er ikke tilladt'},403);
     if(request.method==='OPTIONS')return new Response(null,{status:204,headers:cors(origin,env)});
     if(url.pathname==='/api/create'&&request.method==='POST'){
       let input;try{input=await request.json()}catch{return response({error:'Ugyldigt JSON'},400,cors(origin,env))}
       const name=String(input.name||'').trim().slice(0,25);if(!name)return response({error:'Skriv et spillernavn'},400,cors(origin,env));
       const range=['1-20','21-40','41-60','61-80','81-100'].includes(input.range)?input.range:'1-20';
+      const deckSets=input.deckSets===undefined?5:input.deckSets;
+      if(!Number.isInteger(deckSets)||deckSets<1||deckSets>5)return response({error:'Vælg 1–5 kortsæt'},400,cors(origin,env));
       const variant=input.variant==='passing'?'passing':'collect';
       const extraPenalty=input.extraPenalty===true;
       const donkeyCount=variant==='passing'?1:([1,4,6,8].includes(Number(input.donkeyCount))?Number(input.donkeyCount):8);
       const code=random(8),secret=token();const id=env.GAME_ROOM.idFromName(code);const stub=env.GAME_ROOM.get(id);
-      const roomResponse=await stub.fetch('https://room/init',{method:'POST',body:JSON.stringify({name,range,secret,code,variant,extraPenalty,donkeyCount})});
+      const roomResponse=await stub.fetch('https://room/init',{method:'POST',body:JSON.stringify({name,range,secret,code,variant,extraPenalty,donkeyCount,deckSets})});
       if(roomResponse.status===101)return roomResponse;
     const headers=new Headers(roomResponse.headers);
     for(const [key,value] of Object.entries(cors(origin,env)))headers.set(key,value);
@@ -74,7 +76,9 @@ export class GameRoom {
     if(route==='/init'&&request.method==='POST'){
       if(g)return response({error:'Rummet findes allerede'},409);
       const b=await request.json();
-      g={code:b.code,range:b.range,variant:b.variant==='passing'?'passing':'collect',extraPenalty:b.extraPenalty===true,donkeyCount:b.variant==='passing'?1:Number(b.donkeyCount)||8,phase:'waiting',turn:0,pending:null,centers:[],players:[{name:b.name,secret:b.secret,closed:[],open:[],donkeys:0}],chat:[],chatPrefs:[false,false],created:Date.now(),move:0,lastMove:null,message:'Venter på spiller 2…'};
+      const deckSets=b.deckSets===undefined?5:b.deckSets;
+      if(!Number.isInteger(deckSets)||deckSets<1||deckSets>5)return response({error:'Vælg 1–5 kortsæt'},400);
+      g={code:b.code,range:b.range,deckSets,variant:b.variant==='passing'?'passing':'collect',extraPenalty:b.extraPenalty===true,donkeyCount:b.variant==='passing'?1:Number(b.donkeyCount)||8,phase:'waiting',turn:0,pending:null,centers:[],players:[{name:b.name,secret:b.secret,closed:[],open:[],donkeys:0}],chat:[],chatPrefs:[false,false],created:Date.now(),move:0,lastMove:null,message:'Venter på spiller 2…'};
       await this.state.storage.put('game',g);return response({code:b.code,secret:b.secret});
     }
     if(!g)return response({error:'Rummet findes ikke'},404);
@@ -114,7 +118,7 @@ export class GameRoom {
       if(!name||name.toLowerCase()===g.players[0].name.toLowerCase())return response({error:'Vælg et andet navn'},400);
       const secret=token();g.players.push({name,secret,closed:[],open:[],donkeys:0});
       const [lo,hi]=bounds(g.range);const deck=[];
-      for(let n=lo;n<=hi;n++)for(let i=0;i<5;i++)deck.push(n);
+      for(let n=lo;n<=hi;n++)for(let i=0;i<(g.deckSets??5);i++)deck.push(n);
       for(let i=deck.length-1;i>0;i--){const v=crypto.getRandomValues(new Uint32Array(1))[0]%(i+1);[deck[i],deck[v]]=[deck[v],deck[i]]}
       deck.forEach((n,i)=>g.players[i%2].closed.push(n));
       g.phase='playing';g.message='Spillet er startet. Spiller 1 begynder.';g.move++;
@@ -274,7 +278,7 @@ export class GameRoom {
     return {
       phase:g.phase,turn:g.turn,pending:g.turn===seat?g.pending:null,centers:g.centers.map(c=>({top:c.at(-1),length:c.length})),
       players:g.players.map((p,i)=>({name:p.name,closed:p.closed.length,open:i===seat||true?p.open.at(-1):null,openCount:p.open.length,donkeys:p.donkeys})),
-      you:seat,variant:g.variant||'collect',extraPenalty:g.extraPenalty===true,donkeyCount:g.donkeyCount||8,message:g.message,move:g.move,canChallenge:!!g.lastMove&&g.lastMove.actor!==seat,winner:g.winner,placements:g.placements||null
+      you:seat,deckSets:g.deckSets??5,variant:g.variant||'collect',extraPenalty:g.extraPenalty===true,donkeyCount:g.donkeyCount||8,message:g.message,move:g.move,canChallenge:!!g.lastMove&&g.lastMove.actor!==seat,winner:g.winner,placements:g.placements||null
     };
   }
   broadcast(g){

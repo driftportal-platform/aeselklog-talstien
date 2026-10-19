@@ -1,6 +1,6 @@
 # ÆselKlog – hvor er vi nu
 
-**Version:** 0.9.44 (lokalt valideret opdateringspakke, 19. oktober 2026; ikke publiceret). Opdateres ved hver release sammen med `CHANGELOG.md`.
+**Version:** 0.9.45 (lokalt valideret opdateringspakke, 19. oktober 2026; ikke publiceret). Opdateres ved hver release sammen med `CHANGELOG.md`.
 
 ## Hvad er det?
 Børnevenligt talspil som PWA (GitHub Pages, repo `driftportal-platform/aeselklog-talstien`) med tre selvstændige dele og frivillig matematik:
@@ -10,9 +10,10 @@ Børnevenligt talspil som PWA (GitHub Pages, repo `driftportal-platform/aeselklo
 Lyd: 500 gemte MP3-tal (fem stemmer), valgfri baggrundsmusik, ElevenLabs kun via Cloudflare Worker. Alt gemmes lokalt, ingen konti.
 
 ## Status
-- Udgangspunkt: GitHub main `2e0abe6b1c30eabcf79e738e49cb79d299e050cf`.
+- Udgangspunkt for v0.9.45: GitHub main `437a9ddac7032e380ffbc3601da436b56605cae3`.
+- Nyt: 1–5 kortsæt vælges af rumopretteren og gemmes på serveren. 20–100 talkort i alt; lige fordeling; begge spillere ser valget. Gamle rum fortsætter med deres eksisterende kort. Test dækker alle talområder og sætantal samt gamle rum.
 - Onlinefejl rettet: CORS/chat, MIME-type på lydklip, WebSocket-videresendelse, oplæsning af alle vendte kort, synligt æselkort, gentag tal, udfordringer uden tab af nyere chat eller opdateringsnummer. Begge onlineindgange er opdateret.
-- **Automatisk:** 34/34 Node-tests består. Ny servertest dækker begge deltagere, CORS, hurtigtekst/fri tekst/lyddata, adgang, udfordringer, begge varianter, ekstra kortstraf og vinderregler.
+- **Automatisk:** 35/35 Node-tests består. Ny servertest dækker begge deltagere, CORS, hurtigtekst/fri tekst/lyddata, adgang, udfordringer, begge varianter, ekstra kortstraf og vinderregler.
 - **Chromium/simuleret:** online mobil 390×844 og desktop 1280×800 i separate browserprofiler, Worker-logik via simuleret transport, simuleret mikrofon/afspilning, genindlæsning, lokale sprogvalg, straf og sejrspodie. Offlinekortspil ved 390×844, 844×390 og 1280×800; træk, tryk, udfordringer og CPU består.
 - **Cloudflare:** lokal Wrangler dry-run består med GAME_ROOM og eksplicit APP_ORIGIN. Eksisterende bindinger og migrationsfil er uændrede. Konfigurationens navn er `aeselklog-online-pilot`, mens den oplyste liveadresse bruger `aeselklog-online`; følg installationsvejledningens eksplicitte `--name`.
 - **Ikke bekræftet:** faktisk deployment på Cloudflare, live WebSocket på to fysiske enheder, rigtig mikrofon/lydafspilning på iPhone, installeret iPhone-PWA eller live ElevenLabs.
@@ -26,7 +27,7 @@ Lyd: 500 gemte MP3-tal (fem stemmer), valgfri baggrundsmusik, ElevenLabs kun via
 5. Ryd op: `OPDATERING-v0.9.31.md` er forældet og kan slettes.
 
 ## Næste skridt
-1. Installér filerne fra v0.9.44-pakken efter INSTALLATION-v0.9.44.md; Commit og Push origin via GitHub Desktop.
+1. Installér filerne fra v0.9.45-pakken efter INSTALLATION-v0.9.45.md; Commit og Push origin via GitHub Desktop.
 2. Deploy Worker særskilt efter aftale til den eksisterende Worker, og kontrollér GAME_ROOM og APP_ORIGIN først.
 3. Gennemfør tjeklisten med to fysiske enheder: chat, rigtig mikrofon/afspilning, sprog, udfordringer, musik og F5. Notér resultater her.
 4. Fortsæt iPhone- og familietest fra TESTPLAN.md.

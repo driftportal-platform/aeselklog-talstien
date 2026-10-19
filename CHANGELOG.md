@@ -4,6 +4,12 @@ Nyeste øverst. Én kort post pr. version. Detaljer, testresultater og filoversi
 findes i `docs/arkiv/`. Versioner uden post (fx 0.9.8 udover lydcache, 0.9.21, 0.9.26) var ikke
 dokumenteret separat i de gamle noter.
 
+## v0.9.45 – vælg 1–5 kortsæt online (19. oktober 2026)
+- Rumopretteren vælger 1–5 kortsæt: 20–100 talkort i alt, 10–50 til hver spiller. Standard er fortsat fem sæt.
+- Serveren validerer valget, gemmer det i rummet og bruger det ved kortuddeling. Begge spillere ser rummets antal sæt og kort.
+- Ældre rum/klienter uden feltet bruger fem sæt. Igangværende spil ændres ikke.
+- 35 Node-tests, online Chromium mobil/desktop samt eksisterende offline/CPU-browsertests. Alle 25 kombinationer af talområde/kortsæt dækkes; Wrangler dry-run består. Ikke deployet herfra.
+
 ## v0.9.44 – online chat, talelyd og æselkort (19. oktober 2026)
 - CORS tillader `x-player-secret`; lydklip beholder deres MIME-type, og WebSocket-upgrades videresendes intakte.
 - Alle vendte kort vises nu som ventende kort, så tale, frivillig placering og udfordringer følger offlinekortspillet. Et overset åbent kort kan udfordres.
