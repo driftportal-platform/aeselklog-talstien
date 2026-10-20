@@ -4,7 +4,7 @@ import '../adaptive.js';
 import '../boardgame-engine.js';
 const BoardGame=globalThis.AeselBoardGame;
 const boardRandom=()=>crypto.getRandomValues(new Uint32Array(1))[0]/4294967296;
-// ÆselKlog Online v0.9.68 – serverstyret kortspil og Talstien (2–6 spillere).
+// ÆselKlog Online v0.9.70 – serverstyret kortspil og Talstien (2–6 spillere).
 // Regler matcher det lokale cardgame-engine.js. Ingen CPU. Chat og genopkobling bevaret.
 const QUICK=['🫏 Hov hov!','👏 Godt spil!','😂 Haha!','🎉 Flot klaret!','🥕 Din tur!','❤️ Tak for spillet!'];
 
@@ -46,7 +46,7 @@ function remaining(state,index){const p=state.players[index];return countCards(p
 export default {
   async fetch(request,env){
     const url=new URL(request.url),origin=request.headers.get('origin');
-    if(request.method==='GET'&&url.pathname==='/health')return response({status:'ready',service:'ÆselKlog Online v0.9.68'});
+    if(request.method==='GET'&&url.pathname==='/health')return response({status:'ready',service:'ÆselKlog Online v0.9.70'});
     if(!validOrigin(request,env))return response({error:'Hjemmesiden er ikke tilladt'},403);
     if(request.method==='OPTIONS')return new Response(null,{status:204,headers:cors(origin,env)});
     if(url.pathname==='/api/create'&&request.method==='POST'){

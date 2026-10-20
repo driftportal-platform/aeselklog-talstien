@@ -7,7 +7,7 @@ Gælder både mennesker og AI-assistenter. Hold denne fil kort og kun med regler
 2. Kør `npm test` (alle Node-tests) og `node --check` på ændrede JS-filer. Kør de relevante `tests/*.py` (Playwright) hvis UI ændres.
 3. Ved hver release: hæv `VERSION` i `sw.js` og versionsmærket (`PRØVEVERSION x.y.z`) i `index.html` (en test kræver at de er ens), tilføj en post i `CHANGELOG.md` og opdatér `PROJEKTSTATUS.md`.
 4. Skeln altid mellem det, der er testet automatisk/simuleret, og det, der er prøvet på en rigtig iPhone eller med rigtig ElevenLabs. Påstå aldrig det sidste uden en faktisk prøve.
-5. Upload alle filer sammen; slet ikke `audio/` og `music/`. Versionsspecifikke INSTALLATION-/UPLOAD-vejledninger, logs (`*.log`), byggeoutput (fx Wrangler dry-run), skærmbilleder og engangs-patchfiler hører ikke hjemme i roden; læg dem i `docs/arkiv/` eller lad være med at committe dem.
+5. Vedligehold én aktuel `INSTALLATION.md`; opret ikke nye installationsfiler pr. version. Nye filnavne skal bruge ASCII (a-z, tal og bindestreg). Upload alle filer sammen; slet ikke `audio/` og `music/`. Versionsspecifikke INSTALLATION-/UPLOAD-vejledninger, logs (`*.log`), byggeoutput (fx Wrangler dry-run), skærmbilleder og engangs-patchfiler hører ikke hjemme i roden; læg dem i `docs/arkiv/` eller lad være med at committe dem.
 6. `.github/` er en skjult mappe og bliver ofte droppet ved upload via GitHubs webgrænseflade. Kontrollér efter upload at `.github/workflows/test.yml` findes.
 
 ## Produktregler
@@ -26,6 +26,7 @@ Gælder både mennesker og AI-assistenter. Hold denne fil kort og kun med regler
 - Begge online spil: tilbageværende fortsætter ved mindst to aktive spillere. Afgående talkort fordeles rundt i bunden af de resterendes lukkede bunker uden omblanding; æselkort returneres til puljen. Bevar sædeindekser og afvis handlinger fra forladte sæder. Én tilbage i et startet spil lukker runden; en lobby må vente med én.
 
 ## Talstien online
+- Fortællerstemmens hændelser kommer fra serveren med stigende ID, så alle deltagere hører samme forløb uden gentagelser ved polling/genopkobling. Online Talstien bruger offline-spillets /voices og /tts ved AI-valg eller lokal dansk stemme ved enhedsvalg. Erstat faktiske spillernavne med spillernumre før eksterne TTS-kald. Bevar eksplicit stemmevalg ved fejl og brug midlertidig enhedsstemme. Tale fra skal også gælde manuel Læs op.
 - Færdige online-ture skifter automatisk efter kort resultatvisning via Worker-alarm; ingen Næste spiller-knap. Læringsopgaver, ekstra kast, supervalg og byttevalg afsluttes først. Terningvisningen følger offline-spillets store terning; kastkontroller ligger ved banen.
 - Online-brættets serverregler i `boardgame-engine.js` genbruger `actions.js`, `engine.js` og `adaptive.js`. Ændr ikke offline `app.js` for online-regler. Rumtypen skal bevares ved invitation og genopkobling. 2–6 mennesker, ingen online-CPU. Offlineprofiler/gemninger uploades ikke.
 

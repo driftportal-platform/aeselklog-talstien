@@ -5,6 +5,18 @@ findes i `docs/arkiv/`. Versioner uden post (fx 0.9.21, 0.9.26 og 0.9.37–0.9.4
 (v0.9.61) ligger i `docs/arkiv/CHANGELOG-v0.9.61-lang.md`.
 
 
+## v0.9.70 – samme stemmevalg online og offline (20. oktober 2026)
+- Online Talstien har AI-/telefonstemmevalg, samme /voices-stemmeliste og /tts-endpoint som offline Talstien, med Mia og ÆselKlog-original når den godkendes af stemmetjenesten. Prøv valgt stemme og Opdater stemmelisten findes i lydindstillingerne.
+- Onlinevalget gemmes på enheden og arver offline-stemmeindstillinger ved første brug. Skift af stemme afbryder gammel lyd. Fejl bevarer det valgte ID og bruger telefonstemmen midlertidigt; musikken dæmpes under afspilning. Talkort/kortspil bruger fortsat deres gemte MP3-stemmer.
+- Faktiske spillernavne erstattes med spillernumre inden TTS. Ingen ny API-nøgle i klienten, ingen permanent cache af navne/opgaver; højst 24 anonyme klip i RAM.
+- 55/55 Node-tests samt simulerede browserprøver af original/anden stemme, korrekt valgt ID, cache, genindlæsning, midlertidig reserve, anonymiseret tekst og telefonstemme. Ægte ElevenLabs-lyd/iPhone-autoplay er ikke testet herfra. GitHub og Worker skal opdateres (pakken omfatter også v0.9.69).
+
+## v0.9.69 – fortællerstemme i online Talstien (20. oktober 2026)
+- Alle deltagere får talebeskeder om kast/felt, tur, de ni specialfelter, opgaver, tip, rigtige svar, bytte og sejr. Tekster genbruger offline-spillets forklaringer; brætspillets regler og automatiske turskift ændres ikke. Eksisterende æsellyd ved fejl bevares.
+- Dansk enhedsstemme, egen Tale til/fra, Hør beskeden igen og dæmpet musik under tale. Ingen nye eksterne stemmekald eller upload af navne. Talbeskeder køres i en begrænset kø; skjulte faner/chatoptagelse afbryder tale.
+- Serveren gemmer op til 32 talebeskeder med stigende ID. Klienten undgår gentagelser ved polling/genopkobling og afspiller ikke gamle felthændelser efter genindlæsning. En ny tilslutning får kun den aktuelle tur/opgave.
+- 55/55 Node-tests og simulerede Chromium-forløb med tre enheder (tur, felt, opgave, tip, ros, lokal mute og genindlæsning). Worker dry-run består. Rigtig stemme/autoplay på fysisk iPhone/iPad kræver fortsat prøve. GitHub Pages og Cloudflare skal opdateres; ikke publiceret herfra. Én aktuel INSTALLATION.md fremover.
+
 ## v0.9.68 – genopkobling og sikre gentagelser (20. oktober 2026)
 - Onlineklienten afbryder hængende forespørgsler efter 4,5 sekunder, tillader kun én statusforespørgsel ad gangen og begrænser genforsøg. WebSocket-genforsøg venter højst fem sekunder. Tydelig besked øverst ved HTTP-udfald; status hentes automatisk igen.
 - Hvert nyt træk får et requestId og forventet revision. Worker gemmer kvitteringen sammen med trækket, afviser forældede nye træk og genkender gensendelser også efter en genstart eller en udfordring. En usikker handling gemmes lokalt og afklares før næste træk. Serveren offentliggør kun egne kvitterings-ID'er, aldrig andres payloads.
