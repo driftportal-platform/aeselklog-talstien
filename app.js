@@ -632,7 +632,7 @@ $('deleteParentProfile').addEventListener('click',()=>{
  }else $('parentReportContent').textContent='Profilen kunne ikke slettes på denne enhed.';
 });
 $('homePlay').addEventListener('click',()=>show('setup'));
- $('openOnlineGame')?.addEventListener('click',()=>{location.href='./site/online.html'});
+ $('openOnlineGame')?.addEventListener('click',()=>{location.href='./site/online.html?menu=1'});
 $('homeSettings').addEventListener('click',()=>show('settings'));
 $('homeTopscore').addEventListener('click',openTopscore);
 
@@ -663,6 +663,7 @@ $('setupEditSettings').addEventListener('click',()=>show('settings'));
 
 $('addPlayer').addEventListener('click',()=>{if(setupPlayers.length<6){setupPlayers.push({name:`Spiller ${setupPlayers.length+1}`,age:7,kind:'child',difficulty:'mellem'});renderSetupPlayers()}});
 function show(view){
+ $('gameChooser').hidden=!['setup','cardsSetup','talkort'].includes(view);for(const [id,selected] of [['chooseBoardMode','setup'],['openCardSetup','cardsSetup'],['openTalkort','talkort']])$(id).setAttribute('aria-pressed',String(view===selected));
  ['home','setup','settings','game','cardsSetup','cardsGame','talkort'].forEach(id=>$(id).classList.toggle('active',view===id));
  document.body.classList.toggle('home-active',view==='home');
  window.AeselVoice?.stop?.();
@@ -689,10 +690,7 @@ function show(view){
 window.AeselShowView=show;
 $('openCardSetup').addEventListener('click',()=>show('cardsSetup'));
 $('chooseBoardMode').addEventListener('click',()=>show('setup'));
-$('cardsChooseBoard').addEventListener('click',()=>show('setup'));
-$('cardsChooseCards').addEventListener('click',()=>show('cardsSetup'));
 $('openTalkort').addEventListener('click',()=>show('talkort'));
-$('cardsOpenTalkort').addEventListener('click',()=>show('talkort'));
 function resetAsync(){gameToken++;resumeAdultMs=null;helpUsed=false;const fanfare=$('victoryFanfare');if(fanfare)fanfare.remove();clearInterval(taskTimer);taskTimer=null;taskPausedAt=null;taskDeadline=0;busy=false;extraRollUsed=false;showDiceState=null;hideDice();hideActionFlash();if(boardExpanded)setBoardExpanded(false);stopCurrentVoice();bray?.pause();}
 $('startButton').addEventListener('click',()=>{
  resetAsync();G.clear(safeStorage());renderResumeCard();

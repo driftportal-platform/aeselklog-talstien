@@ -10,6 +10,8 @@ with sync_playwright() as p:
   page.locator('#homePlay').click()
   page.locator('#openTalkort').click()
   assert page.locator('#talkortNumber').inner_text()=='1'
+  assert page.locator('#talkortNext').is_disabled()
+  page.locator('#talkortStart').click()
   page.locator('#talkortNext').click()
   assert page.locator('#talkortNumber').inner_text()=='2'
   page.locator('#talkortRange').select_option('21-40')

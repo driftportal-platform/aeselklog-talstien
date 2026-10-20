@@ -1,6 +1,6 @@
 # ÆselKlog – hvor er vi nu
 
-**Version:** 0.9.63 (lokalt valideret; ikke bekræftet publiceret). Opdateres ved hver release sammen med `CHANGELOG.md`. Hold siden på én skærm pr. afsnit: ingen versionslog her (den hører til i changelogget).
+**Version:** 0.9.64 (lokalt valideret; ikke bekræftet publiceret). Opdateres ved hver release sammen med `CHANGELOG.md`. Hold siden på én skærm pr. afsnit: ingen versionslog her (den hører til i changelogget).
 
 ## Hvad er det?
 Børnevenligt talspil som PWA (GitHub Pages, repo `driftportal-platform/aeselklog-talstien`). Matematik er altid frivillig; alt offline gemmes lokalt, ingen konti.
@@ -11,7 +11,7 @@ Børnevenligt talspil som PWA (GitHub Pages, repo `driftportal-platform/aeselklo
 Lyd: 500 gemte MP3-tal (fem stemmer + æselstemme), valgfri musik.
 
 ## Status
-- **Seneste ændring:** invitationens rumkode som almindelig beskedtekst og kopiknap; indsætning kan læse en hel besked. Spilmenu går til spilvalg, og opretterens Afslut er øverst. Fælles assets-mappe med 44 ikoner, herunder nye æselillustrationer til spilvalgene. Oprydningen fra main 2acf15c og Worker v0.9.61 er bevaret; denne opdatering kræver kun GitHub Pages.
+- **Seneste ændring:** ét fælles spilvalg med alle fire muligheder i lokale opsætninger. Online åbner begge spilvalg og tilbyder genoptagelse særskilt; genindlæsning i et rum bevares. Talkort kræver Start før oplæsning, også efter genåbning/Nulstil. Knapramme på online Spilmenu. Bygger på main 615d1a8; assets og Worker er uændrede. Kun GitHub Pages skal opdateres.
 - **Automatisk:** 50 af 50 Node-tests (`npm test`, kører i GitHub Actions når `.github/workflows/test.yml` er med). Simulerede Chromium-forløb for online med 3–6 enheder og flere skærmstørrelser.
 - **Ikke bekræftet:** faktisk Cloudflare-deployment og live WebSocket på flere fysiske enheder, rigtig mikrofon/lyd på iPhone, installeret iPhone-PWA, deling til Beskeder/Mail, live ElevenLabs, VoiceOver, familietest.
 - **Cloudflare:** konfigurationens navn er `aeselklog-online-pilot`, den oplyste liveadresse bruger `aeselklog-online`. Brug eksplicit `--name` ved deploy og kontrollér `GAME_ROOM` og `APP_ORIGIN` først.

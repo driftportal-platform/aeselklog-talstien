@@ -5,6 +5,12 @@ findes i `docs/arkiv/`. Versioner uden post (fx 0.9.21, 0.9.26 og 0.9.37–0.9.4
 (v0.9.61) ligger i `docs/arkiv/CHANGELOG-v0.9.61-lang.md`.
 
 
+## v0.9.64 – fast spilvalg og Start i Talkort (20. oktober 2026)
+- Én fælles menu med Talstien, Kortspil, Talkort og Online vises i alle lokale opsætninger. Valgene flyttes ikke mellem forskellige menuer; overflødige Spilmenu-knapper i Kortspil/Talkort-opsætning er skjult.
+- Online fra Spil-menuen viser altid Kortspil og Talstien først. Et eksisterende rum kan vælges med Genoptag dit online-spil; genindlæsning inde i et rum genoptager som hidtil. Spilmenu-linket online har knapramme og mindst 44 px trykflade.
+- Talkort er stille ved åbning, indstillingsændringer og genåbning. Start talkort sætter oplæsningen i gang; Nulstil kræver igen Start. Næste, gentagelse, Auto og optagelse er først aktive efter Start.
+- 50/50 Node-tests og relevante simulerede Chromium-/offline-PWA-forløb består. Opryddet main 615d1a8, fælles assets og Worker er bevaret; ingen Cloudflare-opdatering. Ikke publiceret eller prøvet på fysisk iPhone/iPad herfra.
+
 ## v0.9.63 – invitationstekst, spilmenu og fælles æselikoner (20. oktober 2026)
 - Invitation og deling har rumkoden som separat tekstlinje, også til Messenger. Tydelig kopiering af koden hos både afsender og modtager. Rumkodefeltet kan finde koden i en hel indsat invitationsbesked eller et invitationslink; manuel markering bruges, hvis udklipsholderen er blokeret.
 - Spilmenu vender tilbage til valg af spil, og opretterens Afslut-knap står øverst mellem tilbage og indstillinger. Samme afslutningsbekræftelse og lukning for alle bevares; gæster får ikke opretterknappen.

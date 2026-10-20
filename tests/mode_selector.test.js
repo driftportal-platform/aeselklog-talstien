@@ -5,7 +5,7 @@ const html=fs.readFileSync(path.join(root,'index.html'),'utf8');
 const app=fs.readFileSync(path.join(root,'app.js'),'utf8');
 const css=fs.readFileSync(path.join(root,'styles.css'),'utf8');
 const save=require('../savegame.js');
-const originals=['chooseBoardMode','openCardSetup','cardsChooseBoard','cardsChooseCards'];
+const originals=['chooseBoardMode','openCardSetup','openTalkort','openOnlineGame'];
 for(const id of originals){
   assert(new RegExp('<button\\b[^>]*\\bid="'+id+'"').test(html),`${id} must be a button`);
   assert(app.includes(`$('${id}')`)||['openCardSetup','cardsChooseBoard','cardsChooseCards'].includes(id),`click handler missing ${id}`);

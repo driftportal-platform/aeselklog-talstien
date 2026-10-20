@@ -2,7 +2,7 @@
 (()=>{'use strict';
 const $=id=>document.getElementById(id),NUM=window.AeselNumbers;
 if(!NUM||!$('talkort'))return;
-let number=1,opened=false,readingToken=0,autoSerial=0,auto=false,recorder=null,stream=null,chunks=[],recordedUrl=null,comparisonSerial=0,recordingSerial=0;
+let number=1,opened=false,started=false,readingToken=0,autoSerial=0,auto=false,recorder=null,stream=null,chunks=[],recordedUrl=null,comparisonSerial=0,recordingSerial=0;
 const ROLE_KEY='aeselklog-talkort-voice-role-v1',DELAY_KEY='aeselklog-talkort-auto-delay-v1',PRACTICE_KEY='aeselklog-talkort-practice-v1';
 let voiceRole='narrator';try{voiceRole=localStorage.getItem(ROLE_KEY)==='donkey'?'donkey':'narrator'}catch(_){}
 const bounds=()=>{const r=$('talkortRange').value;return r==='1-100'?[1,100]:r.split('-').map(Number)};
@@ -17,7 +17,7 @@ function stopAll(){stopAuto();readingToken++;comparisonSerial++;stopSound();stop
 // Talkort uses ONLY the five saved MP3 voices. Never call ElevenLabs or device TTS.
 function read(){
  const token=++readingToken;
- if(number<1||!$('talkort').classList.contains('active'))return Promise.resolve(false);
+ if(!started||number<1||!$('talkort').classList.contains('active'))return Promise.resolve(false);
  const profile=window.AeselAudioSettings?.forMode?.('talkort');
  if(profile?.enabled===false)return Promise.resolve(null);
  const language=NUM.normalize($('talkortLanguage').value);
@@ -38,7 +38,7 @@ function render(announce=true){const [lo,hi]=bounds();number=Math.max(number===0
  for(const id of ['talkortDots','talkortDotsBottom'])$(id).textContent=number%2===0?'● ●':'●';
  for(const id of ['talkortBlocks','talkortBlocksBottom'])$(id).textContent='▮'.repeat(tens)+(tens&&ones?' ':'')+'●'.repeat(ones);
  for(const id of ['talkortPrime','talkortPrimeBottom'])$(id).hidden=!prime;
- $('talkortPrev').disabled=number<=lo;$('talkortNext').disabled=number>=hi;
+ $('talkortStart').hidden=started;$('talkortStartInfo').hidden=started;for(const id of ['talkortRepeat','talkortAuto','talkortRecord'])$(id).disabled=!started;$('talkortPrev').disabled=!started||number<=lo;$('talkortNext').disabled=!started||number>=hi;
  $('talkortProgress').textContent=number===0?'Nulstillet · klar til start':`Tal ${number} · område ${lo}–${hi}`;
  $('talkortJump').value=String(number);$('talkortVoiceInfo').textContent=voiceRole==='donkey'?'🫏 ÆselKlogs stemme til danske tal · kun gemte MP3-lyde, ingen andre stemmer.':'🎙️ Spillelederens stemme til danske tal · kun gemte MP3-lyde, ingen andre stemmer.';
  if(announce&&number>0)return read();return Promise.resolve(null);}
@@ -47,7 +47,8 @@ function manual(target){stopAll();clearClip();number=target;return render()}
 $('talkortPrev').addEventListener('click',()=>manual(Math.max(bounds()[0],number-1)));
 $('talkortNext').addEventListener('click',()=>manual(number===0?bounds()[0]:number+1));
 $('talkortRepeat').addEventListener('click',()=>{stopAuto();stopSound();void read()});
-$('talkortReset').addEventListener('click',()=>{stopAll();clearClip();number=0;render(false)});
+$('talkortReset').addEventListener('click',()=>{stopAll();clearClip();started=false;number=0;render(false)});
+$('talkortStart').addEventListener('click',()=>{stopAll();clearClip();started=true;if(number===0)number=bounds()[0];void render()});
 const voiceSelect=$('talkortVoiceRole');if(voiceSelect){voiceSelect.value=voiceRole;voiceSelect.addEventListener('change',()=>{stopAll();voiceRole=voiceSelect.value==='donkey'?'donkey':'narrator';window.AeselAudioSettings?.update?.('talkort',{role:voiceRole});try{localStorage.setItem(ROLE_KEY,voiceRole)}catch(_){};void render()})}
 $('talkortRange').addEventListener('change',()=>{stopAll();clearClip();number=bounds()[0];fillJump();render()});
 $('talkortJump').addEventListener('change',()=>void manual(Number($('talkortJump').value)));
@@ -72,6 +73,6 @@ $('talkortRecord').addEventListener('click',async()=>{
 function playMine(){if(!recordedUrl)return Promise.resolve();const clip=new Audio(recordedUrl);return new Promise(resolve=>{clip.onended=resolve;clip.onerror=resolve;clip.play().catch(resolve)})}
 $('talkortHearMine').addEventListener('click',()=>{stopAuto();stopSound();void playMine()});
 $('talkortCompare').addEventListener('click',()=>{if(!recordedUrl||number===0)return;stopAuto();stopSound();const token=++comparisonSerial;status('Afspiller først den rigtige udtale…');void(async()=>{await read();if(token!==comparisonSerial)return;await delay(400);if(token!==comparisonSerial)return;status('Afspiller din optagelse…');await playMine();if(token===comparisonSerial)status('Du kan øve dig igen!')})()});
-function activate(){if(!$('talkort').classList.contains('active')){if(opened){stopAll();clearClip()}opened=false;return}if(opened)return;opened=true;const saved=window.AeselAudioSettings?.current?.();$('talkortLanguage').value=NUM.normalize(saved?.language||'da');fillJump();render()}
+function activate(){if(!$('talkort').classList.contains('active')){if(opened){stopAll();clearClip()}opened=false;started=false;return}if(opened)return;opened=true;started=false;const saved=window.AeselAudioSettings?.current?.();$('talkortLanguage').value=NUM.normalize(saved?.language||'da');fillJump();render(false)}
 new MutationObserver(activate).observe($('talkort'),{attributes:true,attributeFilter:['class']});fillJump();render(false);activate();
 })();

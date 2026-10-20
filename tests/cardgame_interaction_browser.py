@@ -56,7 +56,7 @@ def run(page,dimensions,touch=False):
   s=get_state(page);assert s['players'][0]['donkeys']==1 and not s['centers'] and s['pending'] is not None
   assert 'fortrudt' in page.locator('#cardsMessage').inner_text().lower()
  # Reopen deterministic two-human test state for drag and button actions.
- page.locator('#cardsFinish').click();page.locator('#cardsChooseCards').click() if page.locator('#cardsChooseCards').is_visible() else None
+ page.locator('#cardsFinish').click();page.locator('#openCardSetup').click() if page.locator('#openCardSetup').is_visible() else None
  page.locator('#cardCpuCheck').uncheck();page.locator('#cardPlayerCount').select_option('2');page.locator('#cardStart').click()
  prepare_wrong(page)
  page.locator('[data-card-flip="true"]').click()

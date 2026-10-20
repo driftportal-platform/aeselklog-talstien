@@ -39,12 +39,12 @@ def visit(page, tag):
     # Switch to card setup, validate that board controls are hidden, switch back.
     page.locator('#openCardSetup').click()
     assert page.locator('#cardsSetup').is_visible() and not page.locator('#setup').is_visible()
-    assert page.locator('#cardsChooseCards').get_attribute('aria-pressed')=='true'
-    assert page.locator('#cardsChooseBoard').get_attribute('aria-pressed')=='false'
+    assert page.locator('#openCardSetup').get_attribute('aria-pressed')=='true'
+    assert page.locator('#chooseBoardMode').get_attribute('aria-pressed')=='false'
     assert not page.locator('#cpuCheck').is_visible()
     assert page.locator('#cardRange').is_visible()
     page.screenshot(path=str(ROOT/f'preview_card_mode_{tag}.png'),full_page=True)
-    page.locator('#cardsChooseBoard').click()
+    page.locator('#chooseBoardMode').click()
     assert page.locator('#setup').is_visible() and not page.locator('#cardsSetup').is_visible()
     assert page.locator('#cpuCheck').is_visible() and not page.locator('#cardRange').is_visible()
     # Six player slots plus CPU, unique colors, save and resume unchanged.

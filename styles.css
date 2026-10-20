@@ -875,3 +875,5 @@ body.home-active #resumeCard button:active{filter:brightness(.94)}
 
 /* Same original card art as online. */
 .card-back{position:relative;overflow:hidden;place-content:stretch;padding:0;gap:0}.card-back-art{width:100%;height:100%;object-fit:cover;grid-area:1/1;pointer-events:none;user-select:none;-webkit-user-drag:none}.card-back small{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+
+.game-selection[hidden]{display:none!important}.game-selection{margin-bottom:20px}.game-selection .page-heading{margin-bottom:14px}#talkortStart{margin-bottom:10px;min-height:52px}#talkortStart[hidden],#talkortBack[hidden],#cardsSetupBack[hidden]{display:none!important}
