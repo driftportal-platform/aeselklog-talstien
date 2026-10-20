@@ -19,6 +19,9 @@ Gælder både mennesker og AI-assistenter. Hold denne fil kort og kun med regler
 ## Fælles ikoner
 - Brug assets/icons via game-icons.js og assets/images til fælles billeder. Tilføj nye filer til sw.js CORE. Navne/oversigt: assets/README.md. Spillernavne og chatindhold må ikke omformes til UI-ikoner.
 
+## Forlad online spil
+- Begge online spil: tilbageværende fortsætter ved mindst to aktive spillere. Afgående talkort fordeles rundt i bunden af de resterendes lukkede bunker uden omblanding; æselkort returneres til puljen. Bevar sædeindekser og afvis handlinger fra forladte sæder. Én tilbage i et startet spil lukker runden; en lobby må vente med én.
+
 ## Talstien online
 - Online-brættets serverregler i `boardgame-engine.js` genbruger `actions.js`, `engine.js` og `adaptive.js`. Ændr ikke offline `app.js` for online-regler. Rumtypen skal bevares ved invitation og genopkobling. 2–6 mennesker, ingen online-CPU. Offlineprofiler/gemninger uploades ikke.
 

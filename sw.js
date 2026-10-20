@@ -1,7 +1,7 @@
 /* ÆselKlog PWA-service worker.
    Hæv KUN VERSION ved en release; cachenavnet udledes derfra. Kode hentes netværk-først med
    timeout, så appen ikke hænger på dårlig wifi, men falder tilbage til cachen. */
-const VERSION='0.9.65';
+const VERSION='0.9.66';
 const CACHE_PREFIX='aeselklog-talstien-';
 const CACHE=CACHE_PREFIX+'v'+VERSION.replace(/\./g,'');
 const NETWORK_TIMEOUT_MS=3000;

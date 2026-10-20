@@ -45,3 +45,5 @@
 
 /* A revealed number is one label: never split digits onto separate lines. */
 .card.card-number{display:flex;align-items:center;justify-content:center;white-space:nowrap;overflow-wrap:normal;word-break:normal;line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.03em}.players .card.card-number.multi-digit{font-size:1.65rem}.players:has(>.player:nth-child(3)) .card.card-number.multi-digit{font-size:1.35rem}.players .card.card-number.three-digits,.players:has(>.player:nth-child(3)) .card.card-number.three-digits{font-size:1rem}.centers .card.card-number.three-digits{font-size:1.1rem}
+
+.topbar .top-leave-game{grid-column:2;grid-row:1;margin:0;padding:8px 10px;min-height:44px;font-size:.76rem;white-space:nowrap}.departure-notice{border:1px solid #d5b267;border-radius:14px;padding:12px 15px;background:#fff1ce;color:#153c65;font-weight:750;margin:0 0 12px}@media(max-width:360px){.topbar .top-leave-game{font-size:.69rem;padding:7px}}

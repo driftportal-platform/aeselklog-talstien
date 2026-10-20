@@ -5,6 +5,12 @@ findes i `docs/arkiv/`. Versioner uden post (fx 0.9.21, 0.9.26 og 0.9.37–0.9.4
 (v0.9.61) ligger i `docs/arkiv/CHANGELOG-v0.9.61-lang.md`.
 
 
+## v0.9.66 – forlad begge online spil (20. oktober 2026)
+- Ny Forlad-knap til deltagere i toppen; rumopretteren kan forlade via indstillinger eller afslutte for alle fra toppen. Alle andre får navnet på spilleren, der forlod spillet.
+- Mindst to tilbage fortsætter. Talkort, inklusive et vendt kort, fordeles rundt i bunden af de resterendes lukkede bunker uden omblanding. Æselkort returneres til puljen i begge varianter. Talstien springer den forladte spiller over, og værtens rolle overdrages ved behov.
+- En tilbage i en startet runde afslutter rummet; en lobby med én kan fortsat invitere. Kortregnskab og stabile sædeindekser bevares; gamle udfordringer nulstilles ved afgang.
+- 52/52 Node-tests samt simulerede browserforløb i begge spil og Worker dry-run. Bygger på main 2318348. GitHub Pages og Cloudflare skal opdateres. Ikke publiceret eller prøvet på fysisk iPhone/iPad herfra.
+
 ## v0.9.65 – hele tal på kortene og synlige vendte kort (20. oktober 2026)
 - Talkortenes cifre kan ikke brydes over flere linjer. To-/trecifrede tal tilpasses de kompakte spillerkort; 20, 80 og 100 er kontrolleret ved 2/6 spillere og 320–1366 px.
 - Alle deltagere ser det aktuelle vendte kort oven på spillerens lukkede bunke, også efter genindlæsning. Kun ejeren på tur kan vælge/flytte kortet. Øvrige lukkede kort og spillerhemmeligheder forbliver skjulte. Placering fjerner visningen af det vendte kort og viser kortet på målet.
