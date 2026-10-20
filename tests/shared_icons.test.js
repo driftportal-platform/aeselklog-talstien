@@ -1,0 +1,8 @@
+const fs=require('node:fs'),path=require('node:path'),assert=require('node:assert/strict'),vm=require('node:vm'),I=require('../game-icons.js');
+const root=path.resolve(__dirname,'..'),sw=fs.readFileSync(path.join(root,'sw.js'),'utf8');
+for(const name of I.names){const file='assets/icons/'+name+'.svg',svg=fs.readFileSync(path.join(root,file),'utf8');assert(svg.includes('http://www.w3.org/2000/svg'));assert(!/<script|onload=|https?:\/\/(?!www.w3.org)/.test(svg));assert(sw.includes('./'+file),'Not available offline: '+file)}
+assert.equal(I.url('hov'),I.url('donkey'));assert.equal(I.url('gulerod'),I.url('carrot'));assert.throws(()=>I.url('../private'));assert.throws(()=>I.svgImage('dice',NaN));
+for(const prefix of ['','site/']){const context={URL,document:{currentScript:{src:'https://example.test/app/game-icons.js'},baseURI:'https://example.test/app/'+prefix+'online.html',readyState:'loading',addEventListener(){}}};vm.runInNewContext(fs.readFileSync(path.join(root,'game-icons.js'),'utf8'),context);assert.equal(context.AeselIcons.url('dice'),'https://example.test/app/assets/icons/dice.svg')}
+assert(fs.readFileSync(path.join(root,'assets/images/donkey-card.webp')).equals(fs.readFileSync(path.join(root,'aeselklog-card.webp'))));
+for(const file of ['index.html','online.html','site/online.html']){const html=fs.readFileSync(path.join(root,file),'utf8');assert(html.includes('game-icons.js'));assert(html.includes('game-icons.css'));assert(html.includes('assets/images/donkey-card.webp'))}
+console.log('PASS shared icon names/aliases, root/site asset paths, complete offline cache, original card art and three entry points');

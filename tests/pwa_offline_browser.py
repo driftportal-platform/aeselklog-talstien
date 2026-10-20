@@ -32,6 +32,9 @@ try:
         assert page.locator('#homePlay').is_visible(), 'homepage failed offline'
         assert page.locator('.home-art').evaluate('e=>e.naturalWidth')==417, 'home image failed offline'
         assert page.evaluate("()=>getComputedStyle(document.body).getPropertyValue('--navy').trim()")=='#113c70', 'CSS failed offline'
+        page.wait_for_function('()=>Boolean(window.AeselIcons)')
+        loaded=page.evaluate('''async()=>{const files=AeselIcons.names.map(n=>AeselIcons.url(n));files.push(new URL('./assets/images/donkey-card.webp',location.href).href);await Promise.all(files.map(src=>new Promise((resolve,reject)=>{const i=new Image();i.onload=resolve;i.onerror=()=>reject(Error(src));i.src=src})));return files.length}''')
+        assert loaded==45, 'Shared icons/card art failed offline'
         page.locator('#homeSettings').click()
         assert page.locator('#settings').is_visible()
         page.locator('#settingsBack').click()

@@ -107,7 +107,7 @@ function field(n,specials){
  <rect class="board-tile-frame" x="-34" y="-33" width="68" height="66" rx="20" fill="${bg}" stroke="#ffffff" stroke-width="4"/>
  <rect class="board-tile-edge" x="-29" y="-28" width="58" height="56" rx="16" fill="none" stroke="${LEVELS[level].deep}" stroke-opacity=".25" stroke-width="1.4"/>
  <text class="board-tile-number" x="0" y="${texty}" text-anchor="middle" font-family="system-ui, -apple-system, Arial, sans-serif" font-size="${font}" font-weight="900" fill="#ae2a35">${n}</text>
- ${action?`<g class="board-action-symbol"><circle cx="23" cy="24" r="14.5" fill="#fff9ed" stroke="#c49459" stroke-width="2.5"/><text x="23" y="29" text-anchor="middle" font-family="Arial, sans-serif" font-size="${specials[n]==='bonus'?21:17}" font-weight="bold" fill="#bd7a2b">${action.icon}</text></g>`:''}
+ ${action?`<g class="board-action-symbol"><circle cx="23" cy="24" r="14.5" fill="#fff9ed" stroke="#c49459" stroke-width="2.5"/>${globalThis.AeselIcons?globalThis.AeselIcons.svgImage(specials[n],12,13,22,22):`<text x="23" y="29" text-anchor="middle" font-family="Arial, sans-serif" font-size="${specials[n]==='bonus'?21:17}" font-weight="bold" fill="#bd7a2b">${action.icon}</text>`}</g>`:''}
  </g>`;
 }
 function svg(specials){

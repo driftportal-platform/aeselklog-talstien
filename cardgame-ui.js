@@ -72,7 +72,7 @@ function numCard(n,small=false){
   <div class="number-card-info"><span>${n%2?'Ulige':'Lige'}</span><span>${Math.floor(n/10)} tiere + ${ones} enere</span></div>
   <strong>${n}</strong><div class="number-card-foot"><span>${prime?'★ Primtal':(n%2?'● Ulige':'●● Lige')}</span><span>ÆselKlog</span></div></article>`;
 }
-function cardBack(){return '<div class="card-back" aria-hidden="true">🫏<small>ÆselKlog</small></div>'}
+function cardBack(){return '<div class="card-back" aria-hidden="true"><img class="card-back-art" src="./assets/images/donkey-card.webp" alt=""><small>ÆselKlog</small></div>'}
 const userTurn=()=>game&&!game.finished&&!game.players[game.turn].isCPU;
 function sourceElement(source,markup){return `<div class="card-draggable ${chosenSource===source?'card-selected':''}" role="button" tabindex="0" aria-label="Vælg kort til at flytte" data-card-source="${source}">${markup}</div>`;}
 function targetAttributes(kind,index){return `data-card-target="true" data-target-kind="${kind}" data-target-index="${index}" tabindex="0" role="button" aria-label="Læg kort på ${kind==='center'?`midterrække ${index+1}`:kind==='new-center'?'ny midterrække':kind==='self-open'?'egen åbne bunke':game.players[index].name+'s åbne bunke'}"`;}
@@ -90,7 +90,7 @@ function renderStacks(){
     <div class="card-person-top"><strong>${escape(p.name)}${p.isCPU?' 🫏 CPU':''} ${active&&!game.finished?'· tur':''}</strong><span>${E.remaining(game,i)} talkort</span></div>
     <div class="card-person-cards"><div class="card-person-closed ${canFlip?'card-closed-clickable':''}" ${canFlip?'data-card-flip="true" role="button" tabindex="0" aria-label="Vend et kort fra din lukkede bunke"':''}>${p.closed.length?cardBack():'<span class="card-blank">Tom</span>'}${active&&game.pending!==null?`<div class="card-flipped-over" aria-label="Vendt kort ${game.pending}">${canAct?sourceElement('pending',numCard(game.pending,true)):numCard(game.pending,true)}</div>`:''}<small>${game.pending!==null&&active?'Vendt kort · ': 'Lukket · '}${p.closed.length}</small></div>
     <div class="card-person-open ${dest?'card-dropzone':''}" ${openAttrs}>${openSource?sourceElement('open',numCard(p.open.at(-1),true)):(p.open.length?numCard(p.open.at(-1),true):'<span class="card-blank">Tom</span>')}<small>Åben · ${p.open.length}</small></div></div>
-    <div class="card-person-donkeys">${p.donkeys?`<span class="card-donkey-icons">${Array.from({length:p.donkeys},()=>'<img src="./aeselklog-card.webp" alt="Æselkort">').join('')}</span>`:'Ingen æselkort'} <small>${p.donkeys?'· strafkort':''}</small></div></div>`;
+    <div class="card-person-donkeys">${p.donkeys?`<span class="card-donkey-icons">${Array.from({length:p.donkeys},()=>'<img src="./assets/images/donkey-card.webp" alt="Æselkort">').join('')}</span>`:'Ingen æselkort'} <small>${p.donkeys?'· strafkort':''}</small></div></div>`;
  }).join('');
 }
 function chooseSource(src){if(!userTurn())return;chosenSource=chosenSource===src?null:src;render();

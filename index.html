@@ -13,12 +13,12 @@
   <meta name="apple-mobile-web-app-title" content="ÆselKlog">
   <title>ÆselKlog · Talstien</title>
   <link rel="stylesheet" href="./styles.css">
-</head>
+<link rel="stylesheet" href="./game-icons.css"></head>
 <body class="home-active">
 <div class="shell">
   <header class="top">
     <div class="brand"><div class="logo" aria-hidden="true">🫏</div><div><h1>Æsel<span class="red">Klog</span> · Talstien</h1><small>Spil, lær og grin sammen</small></div></div>
-    <div class="top-actions"><span class="pill">PRØVEVERSION 0.9.61 (online Talstien)</span><button id="voiceToggle" class="btn soft small" type="button" aria-pressed="true">🔊 Lyd til</button></div>
+    <div class="top-actions"><span class="pill">PRØVEVERSION 0.9.63 (online-menu og ikoner)</span><button id="voiceToggle" class="btn soft small" type="button" aria-pressed="true">🔊 Lyd til</button></div>
   </header>
 
 
@@ -201,11 +201,11 @@
     <div class="talkort-stage" id="talkortStage">
       <div class="talkort-progress" id="talkortProgress" role="status" aria-live="polite">Tal 1 af 100</div>
       <article id="talkortCard" class="talkort-card zone-1" aria-label="Talkort 1">
-        <div class="talkort-corner">1</div><img class="talkort-mascot talkort-mascot-top" src="./aeselklog-card.webp" alt="" aria-hidden="true">
+        <div class="talkort-corner">1</div><img class="talkort-mascot talkort-mascot-top" src="./assets/images/donkey-card.webp" alt="" aria-hidden="true">
         <div class="talkort-info"><div><b id="talkortParity">Ulige</b><span class="talkort-parity-dots" id="talkortDots" aria-hidden="true">●</span></div><div><b id="talkortPlace">0 tiere + 1 ener</b><span class="talkort-blocks" id="talkortBlocks" aria-hidden="true">●</span></div><div id="talkortPrime" class="talkort-prime" hidden>★ Primtal</div></div>
         <strong class="talkort-number" id="talkortNumber">1</strong>
         <div class="talkort-info talkort-info-bottom" aria-hidden="true"><div><b id="talkortParityBottom">Ulige</b><span class="talkort-parity-dots" id="talkortDotsBottom">●</span></div><div><b id="talkortPlaceBottom">0 tiere + 1 ener</b><span class="talkort-blocks" id="talkortBlocksBottom">●</span></div><div id="talkortPrimeBottom" class="talkort-prime" hidden>★ Primtal</div></div>
-        <img class="talkort-mascot talkort-mascot-bottom" src="./aeselklog-card.webp" alt="" aria-hidden="true"><div class="talkort-corner talkort-corner-bottom" id="talkortCornerBottom">1</div>
+        <img class="talkort-mascot talkort-mascot-bottom" src="./assets/images/donkey-card.webp" alt="" aria-hidden="true"><div class="talkort-corner talkort-corner-bottom" id="talkortCornerBottom">1</div>
       </article>
       <div class="talkort-controls" aria-label="Bladr i talkort"><button type="button" id="talkortPrev" class="btn soft">← Forrige</button><button type="button" id="talkortRepeat" class="btn main">🔊 Læs igen</button><button type="button" id="talkortNext" class="btn soft">Næste →</button></div>
       <div class="talkort-extra-controls"><button type="button" class="btn soft" id="talkortAuto" aria-pressed="false">▶ Auto</button><label class="talkort-delay" for="talkortDelay">Pause <select id="talkortDelay"><option value="1">1 sek.</option><option value="2" selected>2 sek.</option><option value="3">3 sek.</option><option value="5">5 sek.</option><option value="10">10 sek.</option></select></label><button type="button" class="btn soft" id="talkortReset">↺ Nulstil</button></div>
@@ -230,7 +230,7 @@
       </button>
       <button type="button" id="cardsOpenTalkort" class="game-mode-card game-mode-talkort" aria-pressed="false"><span class="game-mode-icon" aria-hidden="true">🔢</span><span class="game-mode-copy"><strong>Talkort</strong><small>Se og hør tallene fra 1 til 100</small></span><span class="game-mode-check" aria-hidden="true">✓</span></button>
     </div>
-    <div class="card-setup-intro"><img src="./aeselklog-card.webp" alt="ÆselKlog-æselkort" loading="lazy"><div><strong>Spil med tallene – grin med æslet!</strong><p>Vend talkort, byg rækkerne i midten og giv æselkort som straf ved fejl. I spiller sammen på denne enhed.</p></div></div>
+    <div class="card-setup-intro"><img src="./assets/images/donkey-card.webp" alt="ÆselKlog-æselkort" loading="lazy"><div><strong>Spil med tallene – grin med æslet!</strong><p>Vend talkort, byg rækkerne i midten og giv æselkort som straf ved fejl. I spiller sammen på denne enhed.</p></div></div>
     <div id="cardsResume" class="card-resume paper" hidden><div><strong>💾 Et gemt kortspil</strong><p class="tiny" id="cardsResumeInfo"></p></div><div class="row"><button type="button" class="btn green" id="cardsContinue">▶ Fortsæt kortspil</button><button type="button" class="btn danger small" id="cardsDeleteSave">Slet</button></div></div>
     <div class="grid2 card-setup-grid">
       <div class="paper">
@@ -263,7 +263,7 @@
     <div class="card-game-top"><div><h2 id="cardsPlayTitle">🃏 ÆselKlog – Kortspil</h2><p id="cardsPlayInfo" class="tiny"></p></div><div class="row"><button class="btn soft small" id="cardsMusicToggle" type="button" aria-pressed="false">🎵 Musik fra</button><button class="btn soft small" id="cardsVoiceToggle" type="button" aria-pressed="true">🔊 Tale til</button><button class="btn soft small" id="cardsRules" type="button">📖 Regler</button><button class="btn soft small" id="cardsSaveHome" type="button">💾 Gem og tilbage</button><button class="btn danger small" id="cardsFinish" type="button">✕ Afslut</button></div></div>
     <div class="card-game-status" role="status" aria-live="polite"><h3 id="cardsTurnHeading">Næste tur</h3><p id="cardsMessage"></p></div>
     <div class="card-table">
-      <section class="paper card-game-players" aria-label="Spillernes bunker"><div class="card-section-heading"><h3>🃏 Spillernes bunker</h3><p id="cardInteractionHint" class="card-table-hint" role="status" aria-live="polite">Tryk på bunken for at vende. Træk kortet til en anden bunke.</p></div><div id="cardsPlayers" class="card-players-grid"></div><section class="paper card-challenge" aria-label="Opdagede fejl"><button id="cardsChallenge" type="button" class="card-challenge-button" disabled><img src="./aeselklog-card.webp" alt=""><span><strong>🫏 Opdaget fejl!</strong><small>Tryk på æselkortet for at udfordre det seneste træk</small></span></button><p id="cardChallengeHint" class="tiny">Kortet går tilbage, hvis trækket var forkert. Straf gives derefter.</p></section>
+      <section class="paper card-game-players" aria-label="Spillernes bunker"><div class="card-section-heading"><h3>🃏 Spillernes bunker</h3><p id="cardInteractionHint" class="card-table-hint" role="status" aria-live="polite">Tryk på bunken for at vende. Træk kortet til en anden bunke.</p></div><div id="cardsPlayers" class="card-players-grid"></div><section class="paper card-challenge" aria-label="Opdagede fejl"><button id="cardsChallenge" type="button" class="card-challenge-button" disabled><img src="./assets/images/donkey-card.webp" alt=""><span><strong>🫏 Opdaget fejl!</strong><small>Tryk på æselkortet for at udfordre det seneste træk</small></span></button><p id="cardChallengeHint" class="tiny">Kortet går tilbage, hvis trækket var forkert. Straf gives derefter.</p></section>
       <div class="card-number-repeat"><button class="btn soft" id="cardsRepeatNumber" type="button">🔊 Hør tallet igen</button></div></section>
       <section class="paper card-game-center" aria-label="Kortbunker midt på bordet"><div class="card-section-heading"><h3>🌹 Rækker i midten</h3><small>Træk eller tryk et kort hertil</small></div><div id="cardsCenter" class="card-center-piles"></div></section>
     </div>
@@ -371,7 +371,7 @@
 <div id="diceOverlay" class="dice-overlay" hidden role="dialog" aria-modal="true" aria-label="Terningeskærm">
  <div class="dice-playing-card">
   <div class="dice-head"><span class="dice-app-brand">Æsel<span> Klog</span></span><span class="dice-mini-label">Leg med tallene</span></div>
-  <div class="dice-mascot"><img src="./aeselklog-card.webp" alt="ÆselKlog-æslet" /></div>
+  <div class="dice-mascot"><img src="./assets/images/donkey-card.webp" alt="ÆselKlog-æslet" /></div>
   <div class="dice-middle"><div id="diceTitle" class="dice-title">🎲 Slå terningen</div>
    <button id="diceMain" type="button" class="dice-button" aria-label="Tryk på terningen for at slå"><span id="dicePips" class="dice-face face-1"></span><span id="diceLearnIcon" class="dice-learn-icon" hidden>★</span></button>
    <div id="dicePrompt" class="dice-prompt">Tryk på terningen!</div>
@@ -380,6 +380,7 @@
  </div>
 </div>
 
+<script src="./game-icons.js" defer></script>
 <script src="./engine.js" defer></script>
 <script src="./board.js" defer></script>
 <script src="./actions.js" defer></script>

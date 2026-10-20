@@ -5,6 +5,12 @@ findes i `docs/arkiv/`. Versioner uden post (fx 0.9.21, 0.9.26 og 0.9.37–0.9.4
 (v0.9.61) ligger i `docs/arkiv/CHANGELOG-v0.9.61-lang.md`.
 
 
+## v0.9.63 – invitationstekst, spilmenu og fælles æselikoner (20. oktober 2026)
+- Invitation og deling har rumkoden som separat tekstlinje, også til Messenger. Tydelig kopiering af koden hos både afsender og modtager. Rumkodefeltet kan finde koden i en hel indsat invitationsbesked eller et invitationslink; manuel markering bruges, hvis udklipsholderen er blokeret.
+- Spilmenu vender tilbage til valg af spil, og opretterens Afslut-knap står øverst mellem tilbage og indstillinger. Samme afslutningsbekræftelse og lukning for alle bevares; gæster får ikke opretterknappen.
+- Den fælles assets-mappe fra v0.9.62 følger med: 44 SVG-ikoner og fælles kortbilleder til offline/online. De to spilvalg har nu æselillustrationer fra det eksisterende kortmotiv. Alt er med i PWA-cachen.
+- 50/50 Node-tests og simulerede Chromium-forløb, inklusive kopiering/deling, fuld beskedindsætning, topknap ved 320 px, menu/genoptagelse, begge onlinespil og reel lokal offline-cache. Rigtig Messenger/iPhone/iPad er ikke afprøvet. Bygger på det opryddede main 2acf15c; Worker og opryddede arkiver er bevaret. Ingen Cloudflare-opdatering eller publicering herfra.
+
 ## v0.9.61 – Talstien som online-brætspil (19. oktober 2026)
 - Online-menuen vælger mellem Kortspil og Talstien. Serverstyret bondegårdsbane for 2–6 mennesker (genbruger `actions.js`, `engine.js`, `adaptive.js`): alle talområder, samme specialfelter, serverafgjort digital terning eller indtastet egen, frivillig superopgave, byt og vandpyt, Leg/Lær/Udfordring/Tabeller og voksenur på serveren.
 - Ingen online-CPU og ingen import af offlineprofiler. 49/49 Node-tests; simuleret Chromium (3–6 enheder), ikke fysiske telefoner.

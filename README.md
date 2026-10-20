@@ -10,6 +10,7 @@ Live: `https://driftportal-platform.github.io/aeselklog-talstien/`
 - `AGENTS.md` – permanente regler for udvikling
 - `TESTPLAN.md` – automatiske og manuelle tests
 - `START-HER.md`, `LYDPROEVE-VEJLEDNING.md` – generator til de 500 MP3-lyde
+- `assets/README.md`, `assets/icon-overview.html` – fælles billeder, ikoner og billedoversigt
 - `MUSIC-LICENSES.md` – musiklicenser
 - `docs/arkiv/` – ældre lange dokumenter, installationsvejledninger og skærmbilleder
 

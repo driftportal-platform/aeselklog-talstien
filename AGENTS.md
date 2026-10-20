@@ -16,6 +16,9 @@ Gælder både mennesker og AI-assistenter. Hold denne fil kort og kun med regler
 - Fysisk A3: faste specialfelter (`A.FIELDS`) skal stemme med det trykte bræt. Digitalt bræt: ny tilfældig fordeling pr. spil; gamle gemte spil beholder deres.
 - Ingen action-kædereaktioner; højst ét ekstra Gulerod-kast pr. tur.
 
+## Fælles ikoner
+- Brug assets/icons via game-icons.js og assets/images til fælles billeder. Tilføj nye filer til sw.js CORE. Navne/oversigt: assets/README.md. Spillernavne og chatindhold må ikke omformes til UI-ikoner.
+
 ## Talstien online
 - Online-brættets serverregler i `boardgame-engine.js` genbruger `actions.js`, `engine.js` og `adaptive.js`. Ændr ikke offline `app.js` for online-regler. Rumtypen skal bevares ved invitation og genopkobling. 2–6 mennesker, ingen online-CPU. Offlineprofiler/gemninger uploades ikke.
 

@@ -723,6 +723,7 @@ $('editPos').addEventListener('click',()=>{
 });
 
 function donkeySvg(color){
+ if(window.AeselIcons)return window.AeselIcons.donkey();
  // Originalt simpelt æselhoved. Pelsfarven kommer fra spillerens farve.
  return `<svg viewBox="0 0 64 64" class="donkey-svg" aria-hidden="true"><g stroke="#273449" stroke-width="3" stroke-linejoin="round"><path d="M12 25 7 5Q6 1 11 2L25 18M40 18 52 2Q57-1 56 6L51 25" fill="${color}"/><path d="M12 7 19 20 17 23 10 7M47 20 53 7 46 23" fill="#f5b7a9" stroke-width="1"/><path d="M10 31Q9 18 21 17L26 13 29 17 32 13 36 18Q56 14 56 36Q54 58 33 58Q10 57 10 31Z" fill="${color}"/><path d="M16 42Q16 35 32 36Q50 35 50 43Q50 57 33 57Q15 57 16 42Z" fill="#ffebdb"/><path d="M27 46Q24 43 22 48M40 46Q43 43 45 48" fill="none" stroke="#79574d" stroke-width="2"/><circle cx="23" cy="31" r="3.4" fill="#fff"/><circle cx="42" cy="31" r="3.4" fill="#fff"/><circle cx="23.6" cy="31.2" r="1.9" fill="#172c41" stroke="none"/><circle cx="41.5" cy="31.2" r="1.9" fill="#172c41" stroke="none"/><path d="M27 49Q32 53 38 49" fill="none" stroke="#673b36" stroke-width="2"/></g></svg>`;
 }
@@ -1312,5 +1313,7 @@ $('turnPanel').addEventListener('click',e=>{
  else if(a==='topscore')openTopscore();
  else if(a==='restart'){resetAsync();G.clear(safeStorage());config=null;players=[];phase='setup';show('home');renderResumeCard()}
 });
+function openLinkedGameMenu(){if(location.hash!=='#spilmenu')return;show('setup');history.replaceState(null,'',location.pathname+location.search)}
+window.addEventListener('hashchange',openLinkedGameMenu);openLinkedGameMenu();
 if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
 })();

@@ -13,7 +13,7 @@ const post=(url,data)=>json(url,{method:'POST',headers:{'content-type':'applicat
 function save(){try{localStorage.setItem(KEY,JSON.stringify({code,secret,at:Date.now()}))}catch{}}
 function forget(){try{localStorage.removeItem(KEY)}catch{}}
 function current(){return json(endpoint('state')+`?secret=${encodeURIComponent(secret)}`)}
-function displaySetup(){window.AeselOnlineBoard?.hide();window.AeselOnlineMenu?.showSetup();window.AeselOverlay?.setActive(false); $('setup').classList.toggle('hidden',!window.AeselOnlineMenu?.mode||!document.getElementById('onlineChooser').hidden);$('game').classList.add('hidden')}
+function displaySetup(){$('endGame').hidden=true;window.AeselOnlineBoard?.hide();window.AeselOnlineMenu?.showSetup();window.AeselOverlay?.setActive(false); $('setup').classList.toggle('hidden',!window.AeselOnlineMenu?.mode||!document.getElementById('onlineChooser').hidden);$('game').classList.add('hidden')}
 function displayGame(){window.AeselOnlineMenu?.hideChooser();window.AeselOverlay?.setActive(state?.phase!=='closed'); $('setup').classList.add('hidden');$('game').classList.remove('hidden')}
 function myTurn(){return state?.phase==='playing'&&state.turn===state.you&&!state.reviewUntil}
 function sourceValue(src){return src==='pending'?state?.pending:state?.players?.[state.you]?.open}
@@ -51,7 +51,7 @@ let boardSignature=null;
 function render(data){if(!data||!Array.isArray(data.players)||state&&data!==state&&data.move<state.move||state?.phase==='closed'&&data.phase!=='closed')return;
 if(data.phase==='closed'){
  window.AeselOnlineBoard?.hide();
- state=data;selected=null;displayGame();$('liveGame').hidden=true;$('closedPanel').hidden=false;put('closedMessage',data.message||'I kan nu oprette et nyt rum.');
+ state=data;selected=null;displayGame();$('liveGame').hidden=true;$('closedPanel').hidden=false;$('endGame').hidden=true;put('closedMessage',data.message||'I kan nu oprette et nyt rum.');
  requestSerial++;closeSocket();forget();window.AeselChat?.leave?.();window.__aeselChatRoom=null;clearDrag();stopSpeech();window.AeselSound?.stop();musicAudio.pause();return;
 }
 const signature=JSON.stringify([code,data,selected],(key,value)=>key==='remainingMs'?undefined:value);if(data!==state&&signature===boardSignature){lastUpdate=Date.now();return}boardSignature=signature;
@@ -91,7 +91,7 @@ function updateEarlyStart(){
 }
 $('startEarly').onclick=()=>action('start-early');setInterval(updateEarlyStart,1000);
 $('challenge').onclick=()=>{window.AeselSound.unlock();action('challenge',state?.lastPlayed?{moveId:state.lastPlayed.id}:{})};
-$('copyCode').onclick=async()=>{try{await navigator.clipboard.writeText(code);put('connectionStatus','Rumkoden er kopieret.')}catch{put('connectionStatus',`Rumkode: ${code}`)}};
+$('copyCode').onclick=()=>window.AeselInvite.copyCode();
 $('endGame').onclick=()=>{if(confirm('Afslut spillet for alle? I skal oprette et nyt rum for at spille igen.'))action('end-game')};
 $('newGame').onclick=()=>{
  requestSerial++;closeSocket();forget();window.AeselChat?.leave?.();window.__aeselChatRoom=null;clearDrag();state=null;selected=null;menuPhase=null;lastPenaltySoundId=null;lastNumber=null;code='';secret='';stopSpeech();window.AeselSound?.stop();musicAudio.pause();$('repeatNumber').disabled=true;$('joinCode').value='';$('invitedNotice').hidden=true;$('setup').classList.remove('has-invite');$('liveGame').hidden=false;$('closedPanel').hidden=true;
