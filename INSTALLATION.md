@@ -1,16 +1,10 @@
 # Installation af ÆselKlog
 
-Aktuel opdatering: v0.9.71 – Kast over banen, læselige feltforklaringer og navne i tale.
+Aktuel opdatering: v0.9.72 – varieret fortæller og hoppende onlinebrikker.
 
 1. Pak opdateringen ud og kopiér indholdet ind i projektmappen. Erstat filerne og bevar undermapper. Bevar assets, audio og music.
 2. Kør `npm.cmd test`: 55/55 skal bestå. Kontrollér i GitHub Desktop, Commit og Push origin. `.github/workflows/test.yml` skal fortsat findes.
-3. Opdatér Cloudflare fra projektmappen med index.html og worker-mappen:
-
-```powershell
-npx.cmd wrangler deploy --config worker/wrangler.jsonc --name aeselklog-online --keep-vars --var APP_ORIGIN:https://driftportal-platform.github.io
-```
-
-Hvis terminalen allerede står i worker-mappen, brug `--config wrangler.jsonc`. /health skal vise v0.9.71.
+3. Denne opdatering ændrer kun websiden. Cloudflare skal ikke deployes igen; Worker v0.9.71 bevares.
 
 Genindlæs alle enheder. Åbn online Talstien → Indstillinger → Lyd og musik → Fortællerstemme i Talstien. Vælg AI-stemme eller Telefonens stemme. AI-listen er den samme som i offline Talstien; tryk Opdater stemmelisten ved behov og Prøv valgt stemme. ÆselKlog-original vises kun, hvis stemmetjenesten returnerer den.
 
@@ -23,3 +17,5 @@ Prøv først valgt stemme på to fysiske enheder, derefter tur/opgave/specialfel
 Denne ene fil opdateres fremover. Ældre installationsfiler i docs/arkiv er historik.
 
 Kast-knappen ligger nu over spillepladen til højre. Tryk på terningen med teksten Kast. Felter folder alle forklaringer ud i fuld bredde lige over banen. Prøv også med smal mobilskærm og de faktiske spillernavne.
+
+Prøv et online Talstien-spil: Hov hov siges ikke ved hver almindelig besked. Brikken hopper fra felt til felt, også ved et Hov hov-felt der flytter tilbage. Hør igen gentager seneste faktisk læste besked. Ved reduceret bevægelse vises brikken direkte på sin position. Serveren bestemmer fortsat position og tur.

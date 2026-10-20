@@ -1,6 +1,6 @@
 # ÆselKlog – hvor er vi nu
 
-**Version:** 0.9.71 (lokalt valideret; ikke bekræftet publiceret). Opdateres ved hver release sammen med `CHANGELOG.md`. Hold siden på én skærm pr. afsnit: ingen versionslog her (den hører til i changelogget).
+**Version:** 0.9.72 (lokalt valideret; ikke bekræftet publiceret). Opdateres ved hver release sammen med `CHANGELOG.md`. Hold siden på én skærm pr. afsnit: ingen versionslog her (den hører til i changelogget).
 
 ## Hvad er det?
 Børnevenligt talspil som PWA (GitHub Pages, repo `driftportal-platform/aeselklog-talstien`). Matematik er altid frivillig; alt offline gemmes lokalt, ingen konti.
@@ -11,14 +11,14 @@ Børnevenligt talspil som PWA (GitHub Pages, repo `driftportal-platform/aeselklo
 Lyd: 500 gemte MP3-tal (fem stemmer + æselstemme), valgfri musik.
 
 ## Status
-- **Seneste ændring:** Kast er en firkantet terningknap over banen; feltforklaringer folder læseligt ud i fuld bredde. AI-stemmen bruger nu de indtastede spillernavne efter brugerens ønske, som offline. Kræver GitHub og Worker v0.9.71; ikke publiceret herfra. Rigtig AI-lyd på mobil er endnu ikke afprøvet.
+- **Seneste ændring:** Online Talstien varierer indledende Hov hov som offline og animerer brikker felt for felt, også frem/tilbage efter specialfelter. Ingen genafspilning ved polling/genindlæsning; reduceret bevægelse respekteres. GitHub v0.9.72, eksisterende Worker v0.9.71. Ingen ændring af serverregler, ikke publiceret herfra.
 - **Automatisk:** 55 af 55 Node-tests (`npm test`, kører i GitHub Actions når `.github/workflows/test.yml` er med). Simulerede Chromium-forløb for online med 3–6 enheder og flere skærmstørrelser.
 - **Brugerafprøvet 20. oktober:** online spil på mobil og pc; kortspillet fungerede med enkelte Cloudflare-udfald på 10–15 sekunder, som genoprettede sig selv. Worker /health blev efterfølgende verificeret til v0.9.68. Enhedsmodeller og alle enkeltfunktioner er ikke oplyst.
-- **Ikke bekræftet:** fysisk afprøvning af v0.9.71-stemmevalget, rigtig mikrofon/lyd på iPhone, installeret iPhone-PWA, deling til Beskeder/Mail, live ElevenLabs, VoiceOver, familietest.
+- **Ikke bekræftet:** fysisk afprøvning af v0.9.72-talevariation og animation, rigtig mikrofon/lyd på iPhone, installeret iPhone-PWA, deling til Beskeder/Mail, live ElevenLabs, VoiceOver, familietest.
 - **Cloudflare:** konfigurationens navn er `aeselklog-online-pilot`, den oplyste liveadresse bruger `aeselklog-online`. Brug eksplicit `--name` ved deploy og kontrollér `GAME_ROOM` og `APP_ORIGIN` først.
 
 ## Åbent før v1.0
-1. Opdatér til v0.9.71 og prøv fortællerstemmen på mindst to fysiske enheder. Bekræft tur/opgaver/felter, Tale fra, chat/mikrofon og musik sammen. Notér resultater her.
+1. Opdatér til v0.9.72 og prøv fortællerstemmen på mindst to fysiske enheder. Bekræft tur/opgaver/felter, Tale fra, chat/mikrofon og musik sammen. Notér resultater her.
 2. iPhone-PWA-test (se `TESTPLAN.md`) og familietest (regler, tempo, sværhedsgrad, touch på små skærme).
 3. **Online – drift og sikkerhed:** ingen rate limiting fundet i Worker-koden (sæt Cloudflare-regel foran oprettelse af rum). Origin-tjek er ingen sikkerhedsgrænse mod andre klienter end browsere. Spillerens hemmelighed sendes som `?secret=` ved WebSocket, hvor browsere ikke kan sætte headere; overvej en kortlivet token eller godkendelse i første besked.
 4. **Online – børn og persondata:** serveren gemmer navne og stemmeklip i 24 timer. Ved AI-stemme sendes nu også de indtastede navne i talebeskeder til samme stemmetjeneste som offline. Beskriv hvad der gemmes og hvem der må chatte (voksenstyret), før linket deles bredt.

@@ -5,6 +5,11 @@ findes i `docs/arkiv/`. Versioner uden post (fx 0.9.21, 0.9.26 og 0.9.37–0.9.4
 (v0.9.61) ligger i `docs/arkiv/CHANGELOG-v0.9.61-lang.md`.
 
 
+## v0.9.72 – varieret fortæller og hoppende onlinebrikker (20. oktober 2026)
+- Online Talstien genbruger offline-spillets narration.js: cirka 35 % af indledende Hov hov-hilsner beholdes, resten går direkte til beskeden. Hov hov-specialfeltet og andre omtaler inde i teksten bevares. Hør igen gentager den faktisk læste tekst.
+- Brikker hopper felt for felt på alle enheder, inklusive landing og efterfølgende bevægelse frem/tilbage. Den lokale animation venter på, at den store terning lukkes. Gentagne statusopdateringer starter ikke animationen forfra; genindlæsning og reduceret bevægelse viser den aktuelle serverposition direkte.
+- 55/55 Node-tests og simulerede browserforløb for frem/tilbage, polling, genindlæsning, reduceret bevægelse, talevariation og digitale kast. Serverregler og Worker ændres ikke. Kun GitHub Pages skal opdateres; ikke prøvet på fysisk iPhone herfra.
+
 ## v0.9.71 – Kast over banen, læselige felter og rigtige navne (20. oktober 2026)
 - Online Talstien har en firkantet terningknap med teksten Kast øverst til højre over banen. Digital terning/læringsterning åbner fortsat den store visning; fysiske kast beholder deres talvalg.
 - Feltforklaringer folder ud i fuld bredde mellem værktøjer og bane, uden den tidligere popup der blev afskåret på mobilen. Kontrolleret ved 320/390/768/1366 px.

@@ -178,6 +178,7 @@ function queueNumber(n,spokenLang){
  }));
 }
 function sayBoard(text,repeat=false){
+ text=window.AeselNarration?.prepare(text,{repeat})??text;
  if(!text||!audioPref.voice||document.hidden||window.AeselChat?.audioBusy)return;
  lastBoardPhrase=String(text);$('repeatNumber').disabled=false;
  if(!window.AeselBoardVoice&&(!('speechSynthesis'in window)||!('SpeechSynthesisUtterance'in window))){put('actionError','Din browser understøtter ikke oplæsning af spilbeskeder.');return}
