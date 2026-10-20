@@ -4,7 +4,7 @@ import '../adaptive.js';
 import '../boardgame-engine.js';
 const BoardGame=globalThis.AeselBoardGame;
 const boardRandom=()=>crypto.getRandomValues(new Uint32Array(1))[0]/4294967296;
-// ÆselKlog Online v0.9.66 – serverstyret kortspil og Talstien (2–6 spillere).
+// ÆselKlog Online v0.9.67 – serverstyret kortspil og Talstien (2–6 spillere).
 // Regler matcher det lokale cardgame-engine.js. Ingen CPU. Chat og genopkobling bevaret.
 const QUICK=['🫏 Hov hov!','👏 Godt spil!','😂 Haha!','🎉 Flot klaret!','🥕 Din tur!','❤️ Tak for spillet!'];
 
@@ -46,7 +46,7 @@ function remaining(state,index){const p=state.players[index];return countCards(p
 export default {
   async fetch(request,env){
     const url=new URL(request.url),origin=request.headers.get('origin');
-    if(request.method==='GET'&&url.pathname==='/health')return response({status:'ready',service:'ÆselKlog Online v0.9.66'});
+    if(request.method==='GET'&&url.pathname==='/health')return response({status:'ready',service:'ÆselKlog Online v0.9.67'});
     if(!validOrigin(request,env))return response({error:'Hjemmesiden er ikke tilladt'},403);
     if(request.method==='OPTIONS')return new Response(null,{status:204,headers:cors(origin,env)});
     if(url.pathname==='/api/create'&&request.method==='POST'){
@@ -105,7 +105,7 @@ export class GameRoom {
     }
     if(!g)return response({error:'Rummet findes ikke'},404);
     await this.settleReview(g);
-    const oldBoardEffects=g.board?.effectSeq||0;if(g.board&&g.phase==='playing'&&BoardGame.tick(g.board,Date.now(),boardRandom)){g.donkeySoundId=(g.donkeySoundId||0)+g.board.effectSeq-oldBoardEffects;this.syncBoard(g);g.move++;await this.state.storage.put('game',g);this.broadcast(g)}
+    await this.settleBoard(g);
     if(route==='/leave'&&request.method==='POST'){
       let b;try{b=await request.json()}catch{return response({error:'Ugyldigt JSON'},400)}
       const seat=this.seat(b.secret||'',g,true);if(seat<0)return response({error:'Ugyldig adgang'},401);
@@ -113,7 +113,7 @@ export class GameRoom {
       if(g.phase==='closed')return response(this.publicState(g,seat));
       const before=fingerprint(g);this.depart(g,seat);if(fingerprint(g)!==before)return response({error:'Kortregnskabet kunne ikke bevares. Prøv igen.'},409);
       if(g.phase==='closed'){for(const m of g.chat||[])await this.state.storage.delete?.('clip:'+m.id);g.chat=[];g.chatPrefs=Array(g.players.length).fill(false)}
-      await this.state.storage.put('game',g);if(g.phase==='playing'&&g.board?.question?.deadline)await this.state.storage.setAlarm?.(g.board.question.deadline);else await this.state.storage.deleteAlarm?.();this.broadcast(g);
+      await this.state.storage.put('game',g);await this.scheduleBoard(g);this.broadcast(g);
       for(const [ws,other] of this.clients){if(other===seat||g.phase==='closed'){try{ws.close(1000,'Spilleren har forladt spillet')}catch{}this.clients.delete(ws)}}
       return response(this.publicState(g,seat));
     }
@@ -151,7 +151,7 @@ export class GameRoom {
         const effects=g.board.effectSeq;
         try{BoardGame.action(g.board,seat,b,boardRandom,Date.now())}catch(e){return response({error:e.message},400)}
         g.donkeySoundId=(g.donkeySoundId||0)+g.board.effectSeq-effects;this.syncBoard(g);g.move++;
-        await this.state.storage.put('game',g);if(g.board.question?.deadline)await this.state.storage.setAlarm?.(g.board.question.deadline);else await this.state.storage.deleteAlarm?.();this.broadcast(g);return response(this.publicState(g,seat));
+        await this.state.storage.put('game',g);await this.scheduleBoard(g);this.broadcast(g);return response(this.publicState(g,seat));
       }
       const cardsBefore=fingerprint(g);
       try{
@@ -282,7 +282,22 @@ export class GameRoom {
     deck.forEach((n,i)=>g.players[active[i%active.length]].closed.push(n));
     g.phase='playing';g.message=`Spillet er startet med ${active.length} spillere. ${g.players[g.turn].name} begynder.`;
   }
-  alarm(){const result=this.queue.then(async()=>{const g=await this.state.storage.get('game');if(!g)return;if(g.board&&g.phase==='playing'){const effects=g.board.effectSeq;if(BoardGame.tick(g.board,Date.now(),boardRandom)){g.donkeySoundId=(g.donkeySoundId||0)+g.board.effectSeq-effects;this.syncBoard(g);g.move++;await this.state.storage.put('game',g);this.broadcast(g)}if(g.board.question?.deadline)await this.state.storage.setAlarm?.(g.board.question.deadline);return}if(!await this.settleReview(g)&&g.review)await this.state.storage.setAlarm?.(g.review.until)});this.queue=result.catch(()=>{});return result}
+  async scheduleBoard(g){
+    const at=g.phase==='playing'?(g.board?.question?.deadline||g.board?.advanceAt):0;
+    if(at)await this.state.storage.setAlarm?.(at);else await this.state.storage.deleteAlarm?.();
+  }
+  async settleBoard(g){
+    if(!g.board||g.phase!=='playing')return false;
+    const s=g.board,effects=s.effectSeq;let changed=BoardGame.tick(s,Date.now(),boardRandom);
+    if(['result','skipped'].includes(s.phase)&&!s.advanceAt){this.syncBoard(g);changed=true}
+    if(['result','skipped'].includes(s.phase)&&s.advanceAt&&Date.now()>=s.advanceAt){
+      const result=s.lines.length?s.lines.join(' '):s.message;
+      s.advanceAt=null;BoardGame.action(s,s.turn,{type:'board-next'},boardRandom,Date.now());s.previousResult=result;changed=true;
+    }
+    if(changed){g.donkeySoundId=(g.donkeySoundId||0)+s.effectSeq-effects;this.syncBoard(g);g.move++;await this.state.storage.put('game',g);this.broadcast(g)}
+    await this.scheduleBoard(g);return changed;
+  }
+  alarm(){const result=this.queue.then(async()=>{const g=await this.state.storage.get('game');if(!g)return;if(g.board){await this.settleBoard(g);return}if(!await this.settleReview(g)&&g.review)await this.state.storage.setAlarm?.(g.review.until)});this.queue=result.catch(()=>{});return result}
   async settleReview(g){
     if(!g.review)return false;
     // Migrate an older in-progress pause without silently moving its card.
@@ -441,7 +456,7 @@ export class GameRoom {
     this.advanceTurn(g);
     g.message=`${g.players[g.turn].name}s tur.`;
   }
-  syncBoard(g){g.turn=g.board.turn;g.phase=g.board.phase==='win'?'finished':'playing';g.winner=g.board.winner;g.message=g.board.message}
+  syncBoard(g){if(['result','skipped'].includes(g.board.phase)){const key=g.board.turn+':'+g.board.phase;if(g.board.advanceKey!==key||!g.board.advanceAt)g.board.advanceAt=Date.now()+1800;g.board.advanceKey=key}else{g.board.advanceAt=null;g.board.advanceKey=null}g.turn=g.board.turn;g.phase=g.board.phase==='win'?'finished':'playing';g.winner=g.board.winner;g.message=g.board.message}
   publicState(g,seat){
     const playerCards=g.players.reduce((sum,p)=>sum+countCards(p),0)+(g.pending!=null?1:0),centerCards=g.centers.reduce((sum,c)=>sum+c.length,0);
     return {

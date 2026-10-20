@@ -1,6 +1,6 @@
 # ÆselKlog – hvor er vi nu
 
-**Version:** 0.9.66 (lokalt valideret; ikke bekræftet publiceret). Opdateres ved hver release sammen med `CHANGELOG.md`. Hold siden på én skærm pr. afsnit: ingen versionslog her (den hører til i changelogget).
+**Version:** 0.9.67 (lokalt valideret; ikke bekræftet publiceret). Opdateres ved hver release sammen med `CHANGELOG.md`. Hold siden på én skærm pr. afsnit: ingen versionslog her (den hører til i changelogget).
 
 ## Hvad er det?
 Børnevenligt talspil som PWA (GitHub Pages, repo `driftportal-platform/aeselklog-talstien`). Matematik er altid frivillig; alt offline gemmes lokalt, ingen konti.
@@ -11,8 +11,8 @@ Børnevenligt talspil som PWA (GitHub Pages, repo `driftportal-platform/aeselklo
 Lyd: 500 gemte MP3-tal (fem stemmer + æselstemme), valgfri musik.
 
 ## Status
-- **Seneste ændring:** Forlad spillet i begge online spil. De øvrige får besked og fortsætter med mindst to spillere; talkort fordeles i bunden af deres bunker, æselkort returneres til puljen. Talstien springer forladte spillere over; værtsrollen overdrages. GitHub Pages og Worker v0.9.66 kræves. Main 2318348; automatiske kontroller består. Ingen publicering eller fysisk iPhone/iPad-test.
-- **Automatisk:** 52 af 52 Node-tests (`npm test`, kører i GitHub Actions når `.github/workflows/test.yml` er med). Simulerede Chromium-forløb for online med 3–6 enheder og flere skærmstørrelser.
+- **Seneste ændring:** Online Talstien har stor terning som offline og kastkontroller lige ved spillepladen. Turen skifter automatisk efter kort resultatvisning via en gemt Worker-alarm; opgaver/valg/ekstra kast færdiggøres først. GitHub Pages og Worker v0.9.67 kræves. Main 983a204; automatiske kontroller består. Ingen publicering eller fysisk iPhone/iPad-test.
+- **Automatisk:** 53 af 53 Node-tests (`npm test`, kører i GitHub Actions når `.github/workflows/test.yml` er med). Simulerede Chromium-forløb for online med 3–6 enheder og flere skærmstørrelser.
 - **Ikke bekræftet:** faktisk Cloudflare-deployment og live WebSocket på flere fysiske enheder, rigtig mikrofon/lyd på iPhone, installeret iPhone-PWA, deling til Beskeder/Mail, live ElevenLabs, VoiceOver, familietest.
 - **Cloudflare:** konfigurationens navn er `aeselklog-online-pilot`, den oplyste liveadresse bruger `aeselklog-online`. Brug eksplicit `--name` ved deploy og kontrollér `GAME_ROOM` og `APP_ORIGIN` først.
 

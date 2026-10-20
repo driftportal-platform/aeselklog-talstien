@@ -5,6 +5,11 @@ findes i `docs/arkiv/`. Versioner uden post (fx 0.9.21, 0.9.26 og 0.9.37–0.9.4
 (v0.9.61) ligger i `docs/arkiv/CHANGELOG-v0.9.61-lang.md`.
 
 
+## v0.9.67 – stor terning og automatisk tur online (20. oktober 2026)
+- Talstien online bruger offline-spillets store æselkort og terning med prikker, læringssymboler og hoppeanimation. Kast-knap, fysiske kast og opgaver ligger lige under spillepladen.
+- Næste spiller-knappen er fjernet. Worker gemmer en frist og skifter automatisk efter 1,8 sekunders resultatvisning, også uden den aktive spillers browser. Vandpytter springes automatisk over; opgaver, ekstra kast, super- og byttevalg afsluttes først. Sejr afslutter stadig runden.
+- 53/53 Node-tests; simulerede browserforløb for fysiske/digitale terninger, læringsopgaver, 3/6 enheder og mobil/liggende visning. Worker dry-run består. Bygger på main 983a204. GitHub Pages og Cloudflare skal opdateres; ikke publiceret eller prøvet på fysisk iPhone/iPad herfra.
+
 ## v0.9.66 – forlad begge online spil (20. oktober 2026)
 - Ny Forlad-knap til deltagere i toppen; rumopretteren kan forlade via indstillinger eller afslutte for alle fra toppen. Alle andre får navnet på spilleren, der forlod spillet.
 - Mindst to tilbage fortsætter. Talkort, inklusive et vendt kort, fordeles rundt i bunden af de resterendes lukkede bunker uden omblanding. Æselkort returneres til puljen i begge varianter. Talstien springer den forladte spiller over, og værtens rolle overdrages ved behov.
