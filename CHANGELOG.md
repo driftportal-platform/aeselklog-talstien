@@ -5,6 +5,12 @@ findes i `docs/arkiv/`. Versioner uden post (fx 0.9.21, 0.9.26 og 0.9.37–0.9.4
 (v0.9.61) ligger i `docs/arkiv/CHANGELOG-v0.9.61-lang.md`.
 
 
+## v0.9.68 – genopkobling og sikre gentagelser (20. oktober 2026)
+- Onlineklienten afbryder hængende forespørgsler efter 4,5 sekunder, tillader kun én statusforespørgsel ad gangen og begrænser genforsøg. WebSocket-genforsøg venter højst fem sekunder. Tydelig besked øverst ved HTTP-udfald; status hentes automatisk igen.
+- Hvert nyt træk får et requestId og forventet revision. Worker gemmer kvitteringen sammen med trækket, afviser forældede nye træk og genkender gensendelser også efter en genstart eller en udfordring. En usikker handling gemmes lokalt og afklares før næste træk. Serveren offentliggør kun egne kvitterings-ID'er, aldrig andres payloads.
+- 54/54 Node-tests samt simulerede browserforløb med tabt svar efter servercommit, fejl før afsendelse, hængende status, kortregnskab og automatisk genopkobling. Kort- og brætspilsforløb og Worker dry-run består. Årsagen til familiens konkrete udfald er ikke fastslået; ingen live Worker-/fysisk iPhone-test herfra.
+- GitHub Pages og Cloudflare skal opdateres sammen; klienten kræver den nye Worker for at sende spiltræk. Pakken bevarer også v0.9.67. Bygger på senest verificerede GitHub main 983a204 + lokal v0.9.67; ikke publiceret automatisk.
+
 ## v0.9.67 – stor terning og automatisk tur online (20. oktober 2026)
 - Talstien online bruger offline-spillets store æselkort og terning med prikker, læringssymboler og hoppeanimation. Kast-knap, fysiske kast og opgaver ligger lige under spillepladen.
 - Næste spiller-knappen er fjernet. Worker gemmer en frist og skifter automatisk efter 1,8 sekunders resultatvisning, også uden den aktive spillers browser. Vandpytter springes automatisk over; opgaver, ekstra kast, super- og byttevalg afsluttes først. Sejr afslutter stadig runden.

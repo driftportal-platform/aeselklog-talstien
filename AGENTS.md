@@ -19,6 +19,9 @@ Gælder både mennesker og AI-assistenter. Hold denne fil kort og kun med regler
 ## Fælles ikoner
 - Brug assets/icons via game-icons.js og assets/images til fælles billeder. Tilføj nye filer til sw.js CORE. Navne/oversigt: assets/README.md. Spillernavne og chatindhold må ikke omformes til UI-ikoner.
 
+## Onlineforbindelse
+- Nye klienters spilhandlinger bruger requestId + expectedMove. Gem kvitteringen atomisk med trækket, og bevar den ved udfordring/fortrydelse. Gensend kun samme handling med samme ID; udfør ikke et nyt træk, mens udfaldet af det første er ukendt. Statusforespørgsler har timeout og må ikke overlappe.
+
 ## Forlad online spil
 - Begge online spil: tilbageværende fortsætter ved mindst to aktive spillere. Afgående talkort fordeles rundt i bunden af de resterendes lukkede bunker uden omblanding; æselkort returneres til puljen. Bevar sædeindekser og afvis handlinger fra forladte sæder. Én tilbage i et startet spil lukker runden; en lobby må vente med én.
 
