@@ -5,6 +5,12 @@ findes i `docs/arkiv/`. Versioner uden post (fx 0.9.21, 0.9.26 og 0.9.37–0.9.4
 (v0.9.61) ligger i `docs/arkiv/CHANGELOG-v0.9.61-lang.md`.
 
 
+## v0.9.71 – Kast over banen, læselige felter og rigtige navne (20. oktober 2026)
+- Online Talstien har en firkantet terningknap med teksten Kast øverst til højre over banen. Digital terning/læringsterning åbner fortsat den store visning; fysiske kast beholder deres talvalg.
+- Feltforklaringer folder ud i fuld bredde mellem værktøjer og bane, uden den tidligere popup der blev afskåret på mobilen. Kontrolleret ved 320/390/768/1366 px.
+- Efter brugerens ønske læser AI-stemmen de indtastede spillernavne som offline. Navnene indgår dermed i TTS-teksten til den eksisterende stemmetjeneste. Lydklip ligger kun midlertidigt i RAM og gemmes ikke permanent.
+- 55/55 Node-tests, simulerede browserprøver af placering, alle ni feltforklaringer, digitale/fysiske kast og navne i TTS-payload. Ikke prøvet med ægte AI-lyd/fysisk iPhone herfra. GitHub og Worker skal opdateres; pakken bevarer v0.9.69–70.
+
 ## v0.9.70 – samme stemmevalg online og offline (20. oktober 2026)
 - Online Talstien har AI-/telefonstemmevalg, samme /voices-stemmeliste og /tts-endpoint som offline Talstien, med Mia og ÆselKlog-original når den godkendes af stemmetjenesten. Prøv valgt stemme og Opdater stemmelisten findes i lydindstillingerne.
 - Onlinevalget gemmes på enheden og arver offline-stemmeindstillinger ved første brug. Skift af stemme afbryder gammel lyd. Fejl bevarer det valgte ID og bruger telefonstemmen midlertidigt; musikken dæmpes under afspilning. Talkort/kortspil bruger fortsat deres gemte MP3-stemmer.
