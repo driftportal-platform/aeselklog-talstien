@@ -23,6 +23,7 @@ Gælder både mennesker og AI-assistenter. Hold denne fil kort og kun med regler
 - Online-brættets serverregler i `boardgame-engine.js` genbruger `actions.js`, `engine.js` og `adaptive.js`. Ændr ikke offline `app.js` for online-regler. Rumtypen skal bevares ved invitation og genopkobling. 2–6 mennesker, ingen online-CPU. Offlineprofiler/gemninger uploades ikke.
 
 ## Kortspil
+- Online: vendte kort på den lukkede bunke er synlige for alle via players[].revealed; kun ejeren på tur må flytte dem. Resterende lukkede kort må aldrig offentliggøres. Korttal må ikke brydes mellem cifre.
 - Fem talområder, fem kort af hvert tal. En ny midterrække kan kun starte med områdets laveste tal.
 - Online fra v0.9.60: nul sekunders pause ved alle placeringer. Seneste udspil forbliver synligt/udfordringsbart, indtil næste kort placeres; kortvending og genvending udskifter ikke udspillet. Fejl i midten bliver liggende indtil udfordring. Ingen tidsstyret automatisk rettelse. Højst én midterrække pr. kortsæt.
 - Onlineplacering: færrest æselkort først blandt alle, så færrest talkort og færdigrækkefølge. Ved Send æslet videre er indehaveren af det ene æselkort sidst. Et sidste åbent talkort kan beholdes med turen videre uden genvending; ved flere kort bruges almindelig bunkevending.

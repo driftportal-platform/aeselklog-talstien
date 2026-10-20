@@ -5,6 +5,12 @@ findes i `docs/arkiv/`. Versioner uden post (fx 0.9.21, 0.9.26 og 0.9.37–0.9.4
 (v0.9.61) ligger i `docs/arkiv/CHANGELOG-v0.9.61-lang.md`.
 
 
+## v0.9.65 – hele tal på kortene og synlige vendte kort (20. oktober 2026)
+- Talkortenes cifre kan ikke brydes over flere linjer. To-/trecifrede tal tilpasses de kompakte spillerkort; 20, 80 og 100 er kontrolleret ved 2/6 spillere og 320–1366 px.
+- Alle deltagere ser det aktuelle vendte kort oven på spillerens lukkede bunke, også efter genindlæsning. Kun ejeren på tur kan vælge/flytte kortet. Øvrige lukkede kort og spillerhemmeligheder forbliver skjulte. Placering fjerner visningen af det vendte kort og viser kortet på målet.
+- Worker sender det offentlige felt players[].revealed; det eksisterende pending-felt er fortsat kun til den aktive spiller. Kortregnskab, bunkeorden, tur og regler ændres ikke. Både GitHub Pages og Cloudflare Worker skal opdateres.
+- 51/51 Node-tests; simulerede browserkontroller af flere enheder, kortplacering og genindlæsning; Worker dry-run består. Bygger på main 838dbae. Ikke publiceret og ikke prøvet på fysisk iPhone/iPad herfra.
+
 ## v0.9.64 – fast spilvalg og Start i Talkort (20. oktober 2026)
 - Én fælles menu med Talstien, Kortspil, Talkort og Online vises i alle lokale opsætninger. Valgene flyttes ikke mellem forskellige menuer; overflødige Spilmenu-knapper i Kortspil/Talkort-opsætning er skjult.
 - Online fra Spil-menuen viser altid Kortspil og Talstien først. Et eksisterende rum kan vælges med Genoptag dit online-spil; genindlæsning inde i et rum genoptager som hidtil. Spilmenu-linket online har knapramme og mindst 44 px trykflade.

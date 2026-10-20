@@ -4,7 +4,7 @@ import '../adaptive.js';
 import '../boardgame-engine.js';
 const BoardGame=globalThis.AeselBoardGame;
 const boardRandom=()=>crypto.getRandomValues(new Uint32Array(1))[0]/4294967296;
-// ÆselKlog Online v0.9.61 – serverstyret kortspil og Talstien (2–6 spillere).
+// ÆselKlog Online v0.9.65 – serverstyret kortspil og Talstien (2–6 spillere).
 // Regler matcher det lokale cardgame-engine.js. Ingen CPU. Chat og genopkobling bevaret.
 const QUICK=['🫏 Hov hov!','👏 Godt spil!','😂 Haha!','🎉 Flot klaret!','🥕 Din tur!','❤️ Tak for spillet!'];
 
@@ -45,7 +45,7 @@ function remaining(state,index){const p=state.players[index];return countCards(p
 export default {
   async fetch(request,env){
     const url=new URL(request.url),origin=request.headers.get('origin');
-    if(request.method==='GET'&&url.pathname==='/health')return response({status:'ready',service:'ÆselKlog Online v0.9.61'});
+    if(request.method==='GET'&&url.pathname==='/health')return response({status:'ready',service:'ÆselKlog Online v0.9.65'});
     if(!validOrigin(request,env))return response({error:'Hjemmesiden er ikke tilladt'},403);
     if(request.method==='OPTIONS')return new Response(null,{status:204,headers:cors(origin,env)});
     if(url.pathname==='/api/create'&&request.method==='POST'){
@@ -418,7 +418,7 @@ export class GameRoom {
       reviewUntil:0,reviewRemainingMs:0,lastPlayed:g.lastPlayed||null,donkeySoundId:g.donkeySoundId||0,
       cardCount:{players:playerCards,centers:centerCards,total:playerCards+centerCards,expected:(g.deckSets??5)*20},
       attention:g.phase!=='closed'?(g.attention?.[seat]||null):null,phase:g.phase,penaltySoundId:g.penaltySoundId||0,startWaitMs:g.phase==='waiting'?this.earlyStartWait(g):0,turn:g.turn,pending:g.turn===seat?g.pending:null,centers:g.centers.map(c=>({top:c.at(-1),length:c.length,cards:[...c]})),
-      players:g.players.map((p,i)=>({name:p.name,closed:p.closed.length,turned:i===g.turn&&g.pending!=null?1:0,total:remaining(g,i),open:i===seat||true?p.open.at(-1):null,openCount:p.open.length,donkeys:p.donkeys})),
+      players:g.players.map((p,i)=>({name:p.name,closed:p.closed.length,revealed:i===g.turn&&g.pending!=null?g.pending:null,turned:i===g.turn&&g.pending!=null?1:0,total:remaining(g,i),open:i===seat||true?p.open.at(-1):null,openCount:p.open.length,donkeys:p.donkeys})),
       you:seat,playerCount:g.playerCount??2,deckSets:g.deckSets??5,variant:g.variant||'collect',extraPenalty:g.extraPenalty===true,donkeyCount:g.donkeyCount||8,message:g.message,move:g.move,canChallenge:!!g.lastMove&&g.lastMove.actor!==seat,winner:g.winner,placements:g.placements||null
     };
   }
