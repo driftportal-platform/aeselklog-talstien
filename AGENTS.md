@@ -7,7 +7,8 @@ Gælder både mennesker og AI-assistenter. Hold denne fil kort og kun med regler
 2. Kør `npm test` (alle Node-tests) og `node --check` på ændrede JS-filer. Kør de relevante `tests/*.py` (Playwright) hvis UI ændres.
 3. Ved hver release: hæv `VERSION` i `sw.js` og versionsmærket (`PRØVEVERSION x.y.z`) i `index.html` (en test kræver at de er ens), tilføj en post i `CHANGELOG.md` og opdatér `PROJEKTSTATUS.md`.
 4. Skeln altid mellem det, der er testet automatisk/simuleret, og det, der er prøvet på en rigtig iPhone eller med rigtig ElevenLabs. Påstå aldrig det sidste uden en faktisk prøve.
-5. Upload alle filer sammen; slet ikke gamle filer (især ikke `audio/` og `music/`).
+5. Upload alle filer sammen; slet ikke `audio/` og `music/`. Versionsspecifikke INSTALLATION-/UPLOAD-vejledninger, logs (`*.log`), byggeoutput (fx Wrangler dry-run), skærmbilleder og engangs-patchfiler hører ikke hjemme i roden; læg dem i `docs/arkiv/` eller lad være med at committe dem.
+6. `.github/` er en skjult mappe og bliver ofte droppet ved upload via GitHubs webgrænseflade. Kontrollér efter upload at `.github/workflows/test.yml` findes.
 
 ## Produktregler
 - Matematik er altid frivillig. Den godkendte forside (`home-fullscreen.webp`, `home-ui.js`) ændres ikke uden eksplicit godkendelse.

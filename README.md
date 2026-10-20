@@ -11,7 +11,7 @@ Live: `https://driftportal-platform.github.io/aeselklog-talstien/`
 - `TESTPLAN.md` – automatiske og manuelle tests
 - `START-HER.md`, `LYDPROEVE-VEJLEDNING.md` – generator til de 500 MP3-lyde
 - `MUSIC-LICENSES.md` – musiklicenser
-- `docs/arkiv/` – de gamle lange dokumenter (v0.9.35)
+- `docs/arkiv/` – ældre lange dokumenter, installationsvejledninger og skærmbilleder
 
 ## Udvikling
 Ingen build. `npm test` kører alle Node-tests. Åbn `index.html` via en lokal webserver (service worker kræver http/https).

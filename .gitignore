@@ -1,0 +1,5 @@
+node_modules/
+*.log
+*.bak
+worker/*dry-run*/
+.wrangler/
