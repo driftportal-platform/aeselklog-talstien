@@ -5,6 +5,11 @@ findes i `docs/arkiv/`. Versioner uden post (fx 0.9.21, 0.9.26 og 0.9.37–0.9.4
 (v0.9.61) ligger i `docs/arkiv/CHANGELOG-v0.9.61-lang.md`.
 
 
+## v0.9.75 – fælles spilikoner og roligere opsætning (21. oktober 2026)
+- Talstien og Kortspil bruger spilmenuens respektive æselikoner og én hovedoverskrift: ÆselKlog - Talstien / ÆselKlog - Kortspil. Ekstra overskriftsbjælker og kortspillets intro fjernes; Spilmenu bevares.
+- Kortspillets kort-/regel-/strafvalg og avancerede CPU-valg foldes ud som på Talstien. Spillere og Start er synlige. Talkorts talområde, sprog og stemme samles også i et lukket indstillingsfelt.
+- Browserprøver ved mobil/pc-størrelser kontrollerer ikoner, overskrifter, indstillingsvalg og start/gem/fortsæt. 58/58 Node-tests. Kun GitHub; Worker uændret.
+
 ## v0.9.74 – stabil sammenhængende talelyd (21. oktober 2026)
 - Auto og tælling genbruger samme MP3-afspiller, så mobilbrowseren ikke skal godkende et nyt lydelement for hvert tal/sprog. Første afspilning starter direkte fra brugertrykket uden unødigt asynkront mellemtrin.
 - Afslutning kontrolleres også via lydens slutposition, hvis browserens ended-besked udebliver. En fastlåst play-promise har timeout; timere og gamle hændelser ryddes ved stop/fejl. Begge sprog afsluttes før næste tal.

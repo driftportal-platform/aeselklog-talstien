@@ -42,6 +42,8 @@ def visit(page, tag):
     assert page.locator('#openCardSetup').get_attribute('aria-pressed')=='true'
     assert page.locator('#chooseBoardMode').get_attribute('aria-pressed')=='false'
     assert not page.locator('#cpuCheck').is_visible()
+    assert not page.locator('#cardRange').is_visible()
+    page.locator('#cardsSetupOptions > summary').click()
     assert page.locator('#cardRange').is_visible()
     page.screenshot(path=str(ROOT/f'preview_card_mode_{tag}.png'),full_page=True)
     page.locator('#cardsSetupBack').click()

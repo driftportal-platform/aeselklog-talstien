@@ -1,6 +1,6 @@
 # ÆselKlog – hvor er vi nu
 
-**Version:** 0.9.74 (lokalt valideret; ikke bekræftet publiceret). Opdateres ved hver release sammen med `CHANGELOG.md`. Hold siden på én skærm pr. afsnit: ingen versionslog her (den hører til i changelogget).
+**Version:** 0.9.75 (lokalt valideret; ikke bekræftet publiceret). Opdateres ved hver release sammen med `CHANGELOG.md`. Hold siden på én skærm pr. afsnit: ingen versionslog her (den hører til i changelogget).
 
 ## Hvad er det?
 Børnevenligt talspil som PWA (GitHub Pages, repo `driftportal-platform/aeselklog-talstien`). Matematik er altid frivillig; alt offline gemmes lokalt, ingen konti.
@@ -11,7 +11,7 @@ Børnevenligt talspil som PWA (GitHub Pages, repo `driftportal-platform/aeselklo
 Lyd: 500 gemte MP3-tal (fem stemmer + æselstemme), valgfri musik.
 
 ## Status
-- **Seneste ændring:** Auto og tælling deler nu ét genbrugt MP3-lydelement. Slutposition kontrolleres, hvis ended udebliver; fastlåst afspilning får timeout. Simulerede regressioner består. Brugeren oplevede fortsat stop i v0.9.73; rettelsen kræver kontrol på den berørte enhed. Kun GitHub v0.9.74; Worker uændret. Ikke publiceret herfra.
+- **Seneste ændring:** Fælles æselikoner fra spilmenuen, én hovedoverskrift pr. opsætningsside, ekstra intro fjernet. Kortspil/Talkort har indstillinger der kan foldes ud. Spillere/Start bevares. Browserprøvet på mobil/pc-størrelser; kun GitHub v0.9.75, Worker uændret. Lydrettelsen fra v0.9.74 kræver fortsat kontrol på brugerens enhed.
 - **Automatisk:** 58 af 58 Node-tests (`npm test`, kører i GitHub Actions når `.github/workflows/test.yml` er med). Simulerede Chromium-forløb for online med 3–6 enheder og flere skærmstørrelser.
 - **Brugerafprøvet 20. oktober:** online spil på mobil og pc; kortspillet fungerede med enkelte Cloudflare-udfald på 10–15 sekunder, som genoprettede sig selv. Worker /health blev efterfølgende verificeret til v0.9.68. Enhedsmodeller og alle enkeltfunktioner er ikke oplyst.
 - **Ikke bekræftet:** fysisk afprøvning af v0.9.72-talevariation og animation, rigtig mikrofon/lyd på iPhone, installeret iPhone-PWA, deling til Beskeder/Mail, live ElevenLabs, VoiceOver, familietest.

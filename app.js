@@ -677,6 +677,15 @@ function show(view){
  if(view==='setup'){if($('boardSettingsSlot')?.append){$('boardSettingsSlot').append($('settings'));$('settings').classList.add('embedded-settings');$('settingsBack').hidden=true}if(openOptions)$('boardSetupOptions').open=true;$('boardResume').hidden=!G.read(safeStorage())}
  else if(view==='settings'){$('settings').classList.remove('embedded-settings');$('settingsBack').hidden=false;document.querySelector('main')?.append($('settings'))}
  pageView=view;updatePageAddress(view);
+ const pageBrand={setup:['Talstien','board-game'],game:['Talstien','board-game'],cardsSetup:['Kortspil','card-game'],cardsGame:['Kortspil','card-game'],talkort:['Talkort','numbers']}[view];
+ if($('pageTitle')){
+  if(pageBrand)$('pageTitle').textContent='ÆselKlog - '+pageBrand[0];else $('pageTitle').innerHTML='Æsel<span class="red">Klog</span> · Talstien';
+  const icon=$('pageBrandIcon');icon.replaceChildren();
+  if(pageBrand){const img=document.createElement('img');img.src='./assets/icons/'+pageBrand[1]+'.svg';img.alt='';icon.append(img)}
+  else icon.textContent='🫏';
+  icon.classList.toggle('game-brand-icon',Boolean(pageBrand));
+ }
+
  $('gameChooser').hidden=view!=='menu';for(const [id,selected] of [['chooseBoardMode','setup'],['openCardSetup','cardsSetup'],['openTalkort','talkort']])$(id).setAttribute('aria-pressed',String(view===selected));
  ['home','setup','settings','game','cardsSetup','cardsGame','talkort'].forEach(id=>$(id).classList.toggle('active',view===id));
  document.body.classList.toggle('home-active',view==='home');
@@ -691,10 +700,10 @@ function show(view){
  const target={
   home:$('homePlay'),
   menu:document.querySelector('#gameChooser h2'),
-  setup:document.querySelector('#setup .page-heading h2'),
+  setup:$('pageTitle'),
   settings:document.querySelector('#settings .page-heading h2'),
   game:$('boardHud'),
-  cardsSetup:document.querySelector('#cardsSetup .page-heading h2'),
+  cardsSetup:$('pageTitle'),
   cardsGame:$('cardsTurnHeading'),
   talkort:$('talkortProgress')
  }[view];

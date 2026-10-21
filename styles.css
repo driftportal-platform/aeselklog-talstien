@@ -881,3 +881,8 @@ body.home-active #resumeCard button:active{filter:brightness(.94)}
 #settings.embedded-settings{display:block;margin:12px 0 0}#settings.embedded-settings>.page-heading{padding:0;background:transparent;border:0;box-shadow:none}#settings.embedded-settings .paper{box-shadow:none}.board-setup-options>summary{font-size:1rem;font-weight:800;cursor:pointer}.game-menu-back{margin-bottom:12px}#boardResume{margin-bottom:12px}.card-game-top{flex-wrap:wrap}
 
 #talkort .talkort-stage{margin-top:0}#talkort .talkort-options{margin-top:16px}#talkortCard{cursor:pointer}#talkortCard:focus-visible{outline:4px solid #3281b7;outline-offset:4px}.talkort-delay input{width:90px;min-height:44px}.talkort-counter textarea{width:100%;font:inherit;padding:10px;border:1px solid #cad7e6;border-radius:11px}.talkort-counter .field{min-width:0}#talkortCountStatus{margin-top:10px}
+
+/* Shared game headings and compact, expandable setup. */
+.game-page-nav{margin:0 0 16px}.game-brand-icon{background:#e9f3ff;border:1px solid #c6dbef;transform:none;flex-shrink:0}.game-brand-icon>img{width:100%;height:100%;object-fit:contain;padding:4px}.game-options>summary{font-weight:800;cursor:pointer;min-height:44px;align-content:center}.options-content{padding-top:16px}.card-setup-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:16px}.card-setup-grid>.paper{margin:0}.game-options:not([open])>.talkort-options{display:none}.game-options .talkort-options{padding-top:12px;margin-bottom:0}#settingsSummary[hidden]{display:none!important}
+
+#pageTitle:focus{outline:none}#cardCpuErrorSettings[hidden],#cardDonkeySetting[hidden]{display:none!important}

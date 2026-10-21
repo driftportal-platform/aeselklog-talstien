@@ -1,16 +1,13 @@
 # Installation af ÆselKlog
 
-Aktuel opdatering: v0.9.74 – rettelse af Auto og tælling i Talkort.
+Aktuel opdatering: v0.9.75 – ikoner, overskrifter og indstillinger.
 
-1. Pak opdateringen ud i projektmappen. Erstat filerne og bevar undermapperne. Bevar audio, music og assets.
+1. Pak opdateringen ud i projektmappen. Erstat filerne og bevar undermapperne samt audio, music og assets.
 2. Kør `npm.cmd test`: 58/58 skal bestå. Commit og Push origin i GitHub Desktop. Bevar `.github/workflows/test.yml`.
 3. Kun GitHub skal opdateres. Cloudflare-koden er uændret.
-4. Når GitHub Pages er færdig, genåbn appen og kontrollér versionsmærket **0.9.74**, før du prøver igen.
+4. Vent på GitHub Pages, genåbn appen, og kontrollér versionsmærket 0.9.75.
 
-## Prøv på den enhed, hvor tællingen stoppede
-- Talkort: Auto fra 1 til 100, først dansk, derefter dansk + engelsk.
-- Nedtælling fra 25 til 0 med slutbesked; optælling fra 1 til 25. Vælg fx 1 sekund mellem tal.
-- Begge sprog skal afsluttes inden næste tal. Stop skal stoppe straks. Skjul siden under et tal, og gå tilbage: samme tal skal genoptages.
-- Ved reel manglende lydfil eller blokering skal Prøv lyden igen fortsat være tilgængelig; der springes ikke lydløst over tal.
+## Prøv siderne
+Talstien og Kortspil har én overskrift og samme æselikon som spilmenuen. Den ekstra intro er væk. Åbn indstillingerne, skift talområde, luk dem og tryk Start: det valgte område skal bruges. Spilmenu, gem og fortsæt bevares. Talkorts talområde, sprog og stemme ligger i et felt der kan foldes ud under kortet.
 
-Afspilleren genbruges nu i stedet for at blive oprettet på ny for hvert tal. Den kan registrere slutningen selv ved manglende ended-hændelse. Det er kontrolleret i automatiske fejlscenarier, som fejler med den gamle kode. Browserlyd er simuleret; den konkrete mobilfejl er endnu ikke bekræftet løst på fysisk telefon.
+58/58 automatiske Node-tests og simulerede browserprøver ved mobil/pc-størrelser. Ingen fysisk telefonprøve herfra. Lydrettelsen fra 0.9.74 er med; prøv fortsat Auto og tælling på den berørte telefon.
