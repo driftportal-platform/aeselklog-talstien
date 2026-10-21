@@ -5,6 +5,11 @@ findes i `docs/arkiv/`. Versioner uden post (fx 0.9.21, 0.9.26 og 0.9.37–0.9.4
 (v0.9.61) ligger i `docs/arkiv/CHANGELOG-v0.9.61-lang.md`.
 
 
+## v0.9.79 – reglerknapper i TorskeKlog og 500 (21. oktober 2026)
+- Tydelig Regler-knap både før start og under spillet i de to offline- og onlineudgaver. Fælles læsevenligt vindue med fulde regler, point, turforløb og forlad; Luk, Escape og rulning på mobil.
+- Reglerne ligger uden for spillebordets genoptegning, så onlineopdateringer ikke lukker dem. Åbning/lukning flytter ingen kort og viser ikke private hænder. Det tidligere indlejrede 500-regelfelt erstattes af knappen.
+- 62/62 Node-tests samt browserprøve af begge offline-spil og onlineklienter ved 320 px, inklusive genopkobling mens reglerne er åbne. PWA-offline kontrolleret. Kun GitHub; Worker v0.9.78 bevares.
+
 ## v0.9.78 – ÆselKlog 500 offline og online (21. oktober 2026)
 - Nyt 500-spil i samme design som de øvrige spil: 2–6 spillere, talkort uden kulører, tre æseljokere, ens sæt og talrækker, træk/afkast og til-lægning til eksisterende sæt. Talområde 1–20 som standard; øvrige 20-talsområder kan vælges.
 - Afkastbunken kan tages fra et valgt kort; det skal bruges straks. Optagning kan lægges helt tilbage, før andre handlinger. Jokeres værdi fastholdes. Fejl ændrer ingen kort.

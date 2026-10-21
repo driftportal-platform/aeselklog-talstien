@@ -49,6 +49,10 @@ try:
         assert page.locator('#fishSetup').is_visible()
         page.locator('#fishStart').click()
         assert page.locator('#fishGame').is_visible()
+        page.locator('#fishGame [data-game-rules]').click()
+        assert page.locator('#newGameRulesDialog').is_visible()
+        assert 'TorskeKlog' in page.locator('#newGameRulesTitle').inner_text()
+        page.get_by_role('button',name='Luk regler',exact=True).click()
         assert page.locator('#fishLocalTable .fish-number').count()==0
         page.get_by_role('button',name='Vis mine kort · Spiller 1').click()
         assert page.locator('#fishLocalTable .fish-number').count()>0
@@ -56,6 +60,10 @@ try:
         assert page.locator('#rummySetup').is_visible()
         page.locator('#rummyStart').click()
         assert page.locator('#rummyGame').is_visible()
+        page.locator('#rummyGame [data-game-rules]').click()
+        assert page.locator('#newGameRulesDialog').is_visible()
+        assert '500' in page.locator('#newGameRulesTitle').inner_text()
+        page.get_by_role('button',name='Luk regler',exact=True).click()
         page.get_by_role('button',name='Vis mine kort · Spiller 1').click()
         assert page.locator('#rummyLocalTable > .fish-cards .rummy-card').count()==7
         assert not errors,errors
