@@ -5,6 +5,13 @@ findes i `docs/arkiv/`. Versioner uden post (fx 0.9.21, 0.9.26 og 0.9.37–0.9.4
 (v0.9.61) ligger i `docs/arkiv/CHANGELOG-v0.9.61-lang.md`.
 
 
+## v0.9.77 – TorskeKlog offline og online (21. oktober 2026)
+- Nyt selvstændigt Fisk-spil med talkort: 2–6 spillere, fem talområder, fire af hvert tal, 7/5 kort på hånden, fiskedam, fire ens, fortsat tur efter modtagne kort og næste tur efter fiskeri. Tomme hænder genopfyldes fra dammen; delt sejr understøttes.
+- Offline: privat håndoverdragelse på samme enhed, privat visning af fisket kort og separat gem/fortsæt. Tal læses med de eksisterende gemte MP3'er og respekt for Lyd fra.
+- Online: nyt spilvalg, invitation/rumkode, kun egen hånd fra serveren, eksisterende chat/lyd, genopkobling, requestId/expectedMove, Afslut og Forlad. Afgående hånd returneres til dammen; færdige sæt bevares i kortregnskabet.
+- Fælles fisk-/æselikon, fælles DOM-visning og regelmotor. Service worker cacher nye offline-filer. Talkort-menuerne fra v0.9.76 er med.
+- 60/60 Node-tests: 60 komplette lokale regelsimulationer og komplette Worker-spil med 2–6 spillere. Browserprøve af offline + tre onlineklienter, invitation, genindlæsning, forlad og faktisk lokal HTTP/PWA-offline. Worker bundler med Wrangler dry-run; ingen publicering eller fysisk telefonprøve herfra. Både GitHub og Cloudflare skal opdateres.
+
 ## v0.9.76 – samlede Talkort-menuer (21. oktober 2026)
 - Talkort har fire lukkede menuer under kort/pile: Talområde, sprog og stemme (inkl. pause), Automatisk oplæsning, Tæl op eller ned, Øv min udtale.
 - Stop, prøv igen og kørestatus står uden for menuerne, så et forløb kan stoppes selv med indstillingerne foldet sammen. Sammenfoldning ændrer ikke valg eller afbryder lyd.

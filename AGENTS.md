@@ -45,6 +45,11 @@ Gælder både mennesker og AI-assistenter. Hold denne fil kort og kun med regler
 - Talkort åbner tavst med kortet øverst og valg nedenunder. Kort, pil og Læs igen aktiverer oplæsning uden særskilt Start. Auto venter på hele dobbeltsproget lyd; genoptag afbrudt tal ved tilbagevenden, og tilbyd retry ved varig lydfejl.
 - De gemte MP3-tal 1–100 bevares. Tællingens nul og valgfri slutbesked må efter brugerens ønske bruge den valgte AI-/enhedsstemme. Ingen permanent TTS-cache af fritekst.
 
+## TorskeKlog
+- `fish-engine.js` er fælles regelmotor for offline og Worker. 80 talkort, fire af hvert tal i ét 20-talsområde; 7 kort hver ved 2–3 aktive spillere, ellers 5. Få alle efterspurgte kort og spørg igen; efter Fisk trækkes ét kort, og turen går videre, også ved match. Fire ens samles automatisk; delt sejr ved lige mange sæt.
+- Onlinevisningen må kun indeholde egen hånd, dammens antal og modstandernes kortantal/sæt. Ingen rå fiskedam eller skjult trukket kort i offentlige hændelser. Genbrug requestId/expectedMove og eksisterende chat/invitation.
+- Offline gemmes separat som `aeselklog-torskeklog-v1`. Hånden skjules ved tursskifte og genoptagelse; et trukket kort vises privat før enheden gives videre. Ved online-forlad returneres hånden til dammen; færdige sæt forbliver ude af spillet.
+
 ## Gemte data og privatliv
 - Lagernøgler må ikke ændres uden migrering: `aeselklog-igangvaerende-v1` (Talstien, schema 1), `aeselklog-kortspil-v1`, `aeselklog-laereprofiler-v1`. Gamle gemninger skal fortsat kunne læses.
 - Alt er lokalt; ingen automatisk cloud-upload af profiler, navne eller lyd. Intet fritekst eller børnenavne i permanent TTS-cache.

@@ -2,9 +2,11 @@ import '../actions.js';
 import '../engine.js';
 import '../adaptive.js';
 import '../boardgame-engine.js';
+import '../fish-engine.js';
+const Fish=globalThis.TorskeKlog;
 const BoardGame=globalThis.AeselBoardGame;
 const boardRandom=()=>crypto.getRandomValues(new Uint32Array(1))[0]/4294967296;
-// ÆselKlog Online v0.9.71 – serverstyret kortspil og Talstien (2–6 spillere).
+// ÆselKlog Online v0.9.77 – serverstyret kortspil og Talstien (2–6 spillere).
 // Regler matcher det lokale cardgame-engine.js. Ingen CPU. Chat og genopkobling bevaret.
 const QUICK=['🫏 Hov hov!','👏 Godt spil!','😂 Haha!','🎉 Flot klaret!','🥕 Din tur!','❤️ Tak for spillet!'];
 
@@ -38,7 +40,7 @@ function preferredTarget(state,n,fromPlayer=state.turn){
 function sameTarget(a,b){return !!a&&!!b&&a.kind===b.kind&&a.index===b.index}
 function snapshot(state){const s=JSON.parse(JSON.stringify(state));s.lastMove=null;return s}
 function countCards(p){return (p.closed?.length||0)+(p.open?.length||0)}
-function allCards(g){return [...g.players.flatMap(p=>[...p.closed,...p.open]),...g.centers.flat(),...(g.pending!=null?[g.pending]:[])]}
+function allCards(g){if(g.fish)return [...g.fish.pond,...g.fish.players.flatMap(p=>p.hand),...g.fish.players.flatMap(p=>p.books.flatMap(n=>Array(4).fill(n)))];return [...g.players.flatMap(p=>[...p.closed,...p.open]),...g.centers.flat(),...(g.pending!=null?[g.pending]:[])]}
 function fingerprint(g){return allCards(g).sort((a,b)=>a-b).join(',')}
 function activeSeats(g){return g.players.map((p,i)=>p.leftAt?null:i).filter(i=>i!==null)}
 function remaining(state,index){const p=state.players[index];return countCards(p)+(state.turn===index&&state.pending!==null?1:0)}
@@ -46,12 +48,12 @@ function remaining(state,index){const p=state.players[index];return countCards(p
 export default {
   async fetch(request,env){
     const url=new URL(request.url),origin=request.headers.get('origin');
-    if(request.method==='GET'&&url.pathname==='/health')return response({status:'ready',service:'ÆselKlog Online v0.9.71'});
+    if(request.method==='GET'&&url.pathname==='/health')return response({status:'ready',service:'ÆselKlog Online v0.9.77'});
     if(!validOrigin(request,env))return response({error:'Hjemmesiden er ikke tilladt'},403);
     if(request.method==='OPTIONS')return new Response(null,{status:204,headers:cors(origin,env)});
     if(url.pathname==='/api/create'&&request.method==='POST'){
       let input;try{input=await request.json()}catch{return response({error:'Ugyldigt JSON'},400,cors(origin,env))}
-      const gameType=input.gameType??'cards';if(!['cards','board'].includes(gameType))return response({error:'Vælg kortspil eller Talstien'},400,cors(origin,env));
+      const gameType=input.gameType??'cards';if(!['cards','board','fish'].includes(gameType))return response({error:'Vælg kortspil, Talstien eller TorskeKlog'},400,cors(origin,env));
       let boardConfig,boardProfile;try{if(gameType==='board'){boardConfig=BoardGame.config(input.boardConfig);boardProfile=BoardGame.profile(input.boardProfile)}}catch(e){return response({error:e.message},400,cors(origin,env))}
       const name=String(input.name||'').trim().slice(0,25);if(!name)return response({error:'Skriv et spillernavn'},400,cors(origin,env));
       const range=['1-20','21-40','41-60','61-80','81-100'].includes(input.range)?input.range:'1-20';
@@ -100,7 +102,7 @@ export class GameRoom {
       const playerCount=b.playerCount===undefined?2:b.playerCount;
       if(!Number.isInteger(playerCount)||playerCount<2||playerCount>6)return response({error:'Vælg 2–6 spillere'},400);
       g={code:b.code,range:b.range,deckSets,playerCount,variant:b.variant==='passing'?'passing':'collect',extraPenalty:b.extraPenalty===true,donkeyCount:b.variant==='passing'?1:Number(b.donkeyCount)||8,phase:'waiting',turn:0,pending:null,centers:[],players:[{name:b.name,secret:b.secret,closed:[],open:[],donkeys:0}],chat:[],chatPrefs:Array(playerCount).fill(false),created:Date.now(),move:0,lastMove:null,message:`Venter på spillere: 1 af ${playerCount} er tilmeldt.`};
-      g.gameType=b.gameType==='board'?'board':'cards';if(g.gameType==='board'){try{g.boardConfig=BoardGame.config(b.boardConfig);g.players[0].boardProfile=BoardGame.profile(b.boardProfile)}catch(e){return response({error:e.message},400)}}
+      g.gameType=['board','fish'].includes(b.gameType)?b.gameType:'cards';if(g.gameType==='board'){try{g.boardConfig=BoardGame.config(b.boardConfig);g.players[0].boardProfile=BoardGame.profile(b.boardProfile)}catch(e){return response({error:e.message},400)}}
       await this.state.storage.put('game',g);return response({code:b.code,secret:b.secret});
     }
     if(!g)return response({error:'Rummet findes ikke'},404);
@@ -151,6 +153,12 @@ export class GameRoom {
         if(!Number.isInteger(b.expectedMove)||b.expectedMove!==g.move)return response({error:'Spillet er opdateret. Se den seneste status og prøv igen.'},409);
       }
       if(g.phase==='closed'&&b.type!=='end-game')return response({error:'Spillet er afsluttet. Opret et nyt rum.'},409);
+      if(g.gameType==='fish'&&!['end-game','start-early'].includes(b.type)){
+        if(!b.requestId)return response({error:'Manglende træknr.'},400);
+        if(g.phase!=='playing'||!g.fish)return response({error:'TorskeKlog er ikke startet'},400);
+        try{Fish.action(g.fish,seat,b)}catch(e){return response({error:e.message},400)}
+        this.syncFish(g);g.move++;this.noteAction(g,seat,b);await this.state.storage.put('game',g);this.broadcast(g);return response(this.publicState(g,seat));
+      }
       if(g.gameType==='board'&&!['end-game','start-early','challenge'].includes(b.type)){
         if(g.phase!=='playing'||!g.board)return response({error:'Brætspillet er ikke startet'},400);
         if(b.expectedMove!==undefined&&b.expectedMove!==g.move)return response({error:'Spillet er opdateret. Prøv igen.'},409);
@@ -261,7 +269,7 @@ export class GameRoom {
     const p=g.players[seat],at=Date.now();p.leftAt=at;p.donkeys=0;const active=activeSeats(g);
     if(g.phase!=='waiting')g.playerCount=active.length;g.departure={id:token(),seat,name:p.name,at};g.lastMove=null;g.lastPlayed=null;g.review=null;
     if((g.hostSeat??0)===seat&&active.length)g.hostSeat=active[0];
-    if(g.gameType==='board'&&g.board){
+    if(g.gameType==='fish'&&g.fish){Fish.leave(g.fish,seat,boardRandom);this.syncFish(g)}else if(g.gameType==='board'&&g.board){
       g.board.players[seat].leftAt=at;
       if(g.phase==='playing'&&g.board.turn===seat&&active.length){g.board.phase='result';BoardGame.action(g.board,seat,{type:'board-next'},boardRandom,at);this.syncBoard(g)}
     }else if(active.length&&g.phase==='playing'){
@@ -281,6 +289,7 @@ export class GameRoom {
     // Close vacant seats before dealing, so late invitations cannot change this game.
     const active=activeSeats(g);g.playerCount=active.length;g.turn=active[0];
     g.chatPrefs=this.chatPrefs(g);
+    if(g.gameType==='fish'){g.fish=Fish.start({range:g.range,names:g.players},boardRandom);this.syncFish(g);return}
     if(g.gameType==='board'){g.board=BoardGame.start(g.boardConfig,g.players,boardRandom);this.syncBoard(g);return}
     const [lo,hi]=bounds(g.range),deck=[];
     for(let n=lo;n<=hi;n++)for(let i=0;i<(g.deckSets??5);i++)deck.push(n);
@@ -463,11 +472,12 @@ export class GameRoom {
     this.advanceTurn(g);
     g.message=`${g.players[g.turn].name}s tur.`;
   }
+  syncFish(g){g.turn=g.fish.turn;g.phase=g.fish.phase;g.message=g.fish.message;g.winner=g.fish.winners?.[0];}
   syncBoard(g){if(['result','skipped'].includes(g.board.phase)){const key=g.board.turn+':'+g.board.phase;if(g.board.advanceKey!==key||!g.board.advanceAt)g.board.advanceAt=Date.now()+1800;g.board.advanceKey=key}else{g.board.advanceAt=null;g.board.advanceKey=null}g.turn=g.board.turn;g.phase=g.board.phase==='win'?'finished':'playing';g.winner=g.board.winner;g.message=g.board.message}
   publicState(g,seat){
     const playerCards=g.players.reduce((sum,p)=>sum+countCards(p),0)+(g.pending!=null?1:0),centerCards=g.centers.reduce((sum,c)=>sum+c.length,0);
     return {
-      acknowledgedActions:(g.actionReceipts||[]).filter(x=>x.seat===seat).map(x=>x.id),hostSeat:g.hostSeat??0,activeCount:activeSeats(g).length,departure:g.departure||null,youLeft:!!g.players[seat].leftAt,gameType:g.gameType||'cards',board:g.board?BoardGame.view(g.board,seat):null,boardConfig:g.boardConfig||null,
+      acknowledgedActions:(g.actionReceipts||[]).filter(x=>x.seat===seat).map(x=>x.id),hostSeat:g.hostSeat??0,activeCount:activeSeats(g).length,departure:g.departure||null,youLeft:!!g.players[seat].leftAt,gameType:g.gameType||'cards',fish:g.fish?Fish.view(g.fish,seat):null,board:g.board?BoardGame.view(g.board,seat):null,boardConfig:g.boardConfig||null,
       reviewUntil:0,reviewRemainingMs:0,lastPlayed:g.lastPlayed||null,donkeySoundId:g.donkeySoundId||0,
       cardCount:{players:playerCards,centers:centerCards,total:playerCards+centerCards,expected:(g.deckSets??5)*20},
       attention:g.phase!=='closed'?(g.attention?.[seat]||null):null,phase:g.phase,penaltySoundId:g.penaltySoundId||0,startWaitMs:g.phase==='waiting'?this.earlyStartWait(g):0,turn:g.turn,pending:g.turn===seat?g.pending:null,centers:g.centers.map(c=>({top:c.at(-1),length:c.length,cards:[...c]})),

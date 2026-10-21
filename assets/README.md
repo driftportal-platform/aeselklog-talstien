@@ -14,3 +14,5 @@ Nye ikoner: tilføj SVG her, registrér navnet i game-icons.js og tilføj filen 
 Gamle billedfiler i projektroden beholdes af hensyn til tidligere versioner og gemte genveje. Opret ikke nye kopier der.
 
 Spilvalg: card-game.svg og board-game.svg bruger det eksisterende originale æselkort som motiv, med en lille Talsti til brætspillet. De samme to illustrationer bruges i offline- og online-spilvalg.
+
+- `icons/fish-game.svg`: fælles TorskeKlog-ikon til offline/online; genbruger æselvektoren med en fisk.

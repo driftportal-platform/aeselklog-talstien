@@ -9,8 +9,8 @@
  let activeGame='';
  function setRoom(code,game=window.AeselOnlineGameType||'cards'){
   if(code===activeCode&&game===activeGame)return;activeGame=game;
-  activeCode=code;const url=new URL(location.href);url.search='';url.hash='';url.searchParams.set('room',code);if(game==='board')url.searchParams.set('game','board');
-  const text=`Vil du være med til ÆselKlog? 🫏\nÅbn linket, skriv dit navn, og deltag i vores ${game==='board'?'Talstien-brætspil':'kortspil'}.\n\nRumkode:\n${code}\n\n${url.href}`;
+  activeCode=code;const url=new URL(location.href);url.search='';url.hash='';url.searchParams.set('room',code);if(['board','fish'].includes(game))url.searchParams.set('game',game);
+  const text=`Vil du være med til ÆselKlog? 🫏\nÅbn linket, skriv dit navn, og deltag i vores ${game==='fish'?'TorskeKlog-spil':game==='board'?'Talstien-brætspil':'kortspil'}.\n\nRumkode:\n${code}\n\n${url.href}`;
   invite={title:'Kom og spil ÆselKlog',text,url:url.href};
   $('inviteCodeValue').value=code;$('inviteLink').value=url.href;$('inviteText').value=text;
   $('inviteEmail').href=`mailto:?subject=${encodeURIComponent('Kom og spil ÆselKlog 🫏')}&body=${encodeURIComponent(text)}`;
@@ -24,7 +24,7 @@
  $('shareInvite').onclick=async()=>{
   if(!invite)return;
   if(!navigator.share){await copy();return}
-  try{await navigator.share({title:invite.title,text:`Kom og spil ÆselKlog med mig! 🫏\n${activeGame==='board'?'Talstien':'Kortspil'}\n\nRumkode:\n${activeCode}\n\nÅbn linket og skriv dit navn:`,url:invite.url});status('Invitationen er klar i den valgte app.')}
+  try{await navigator.share({title:invite.title,text:`Kom og spil ÆselKlog med mig! 🫏\n${activeGame==='fish'?'TorskeKlog':activeGame==='board'?'Talstien':'Kortspil'}\n\nRumkode:\n${activeCode}\n\nÅbn linket og skriv dit navn:`,url:invite.url});status('Invitationen er klar i den valgte app.')}
   catch(e){if(e?.name!=='AbortError')status('Deling kunne ikke åbnes. Brug Kopiér invitation eller Invitér via mail.')}
  };
  async function copyCode(){const value=activeCode||room;if(!value)return;try{await navigator.clipboard.writeText(value);codeStatus('Rumkoden er kopieret. Sæt den ind i Messenger eller en anden besked.')}catch{const input=activeCode?$('inviteCodeValue'):$('joinCode');input.focus();input.select();input.setSelectionRange(0,input.value.length);codeStatus('Rumkoden er markeret. Hold på den, og vælg Kopiér.')}}

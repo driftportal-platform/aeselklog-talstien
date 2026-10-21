@@ -34,7 +34,7 @@ try:
         assert page.evaluate("()=>getComputedStyle(document.body).getPropertyValue('--navy').trim()")=='#113c70', 'CSS failed offline'
         page.wait_for_function('()=>Boolean(window.AeselIcons)')
         loaded=page.evaluate('''async()=>{const files=AeselIcons.names.map(n=>AeselIcons.url(n));files.push(new URL('./assets/images/donkey-card.webp',location.href).href);await Promise.all(files.map(src=>new Promise((resolve,reject)=>{const i=new Image();i.onload=resolve;i.onerror=()=>reject(Error(src));i.src=src})));return files.length}''')
-        assert loaded==45, 'Shared icons/card art failed offline'
+        assert loaded==46, 'Shared icons/card art failed offline'
         page.locator('#homeSettings').click()
         assert page.locator('#settings').is_visible()
         page.locator('#settingsBack').click()
@@ -43,8 +43,15 @@ try:
         assert page.locator('#setup').is_visible()
         page.goto(url+'?spil=talkort',wait_until='load')
         assert page.locator('#talkort').is_visible()
-        assert page.locator('#talkortCountStart').is_visible()
+        assert not page.locator('#talkortCountStart').is_visible()
         assert page.locator('#talkortNext').is_enabled()
+        page.goto(url+'?spil=torskeklog',wait_until='load')
+        assert page.locator('#fishSetup').is_visible()
+        page.locator('#fishStart').click()
+        assert page.locator('#fishGame').is_visible()
+        assert page.locator('#fishLocalTable .fish-number').count()==0
+        page.get_by_role('button',name='Vis mine kort · Spiller 1').click()
+        assert page.locator('#fishLocalTable .fish-number').count()>0
         assert not errors,errors
         print('PASS: real local HTTP PWA installation, cached HTML/CSS/illustration, offline reload + menus')
         context.close();browser.close()
