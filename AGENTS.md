@@ -50,6 +50,12 @@ Gælder både mennesker og AI-assistenter. Hold denne fil kort og kun med regler
 - Onlinevisningen må kun indeholde egen hånd, dammens antal og modstandernes kortantal/sæt. Ingen rå fiskedam eller skjult trukket kort i offentlige hændelser. Genbrug requestId/expectedMove og eksisterende chat/invitation.
 - Offline gemmes separat som `aeselklog-torskeklog-v1`. Hånden skjules ved tursskifte og genoptagelse; et trukket kort vises privat før enheden gives videre. Ved online-forlad returneres hånden til dammen; færdige sæt forbliver ude af spillet.
 
+## ÆselKlog 500
+- `rummy-engine.js` er fælles offline/Worker-regler. 83 kort: fire af hvert tal i et 20-talsområde og tre æseljokere. 7 kort hver, 2–6 mennesker. Mindst tre kort i sæt; ens sæt højst fire; rækker er fortløbende uden kulører. Mindst to talkort pr. sæt. Jokerens talværdi fastlægges ved nedlægning og flyttes ikke senere.
+- Træk før nedlægning og ét afkast afslutter turen; sidste kort kan lukke som afkast eller nedlægning. Ved tagning fra afkastbunken skal det valgte kort bruges i første nedlægning; ellers kan hele optagningen fortrydes før anden handling. Ingen delvise kortflytninger ved fejl.
+- Talkort er 5 point, joker 25. Hvert bordkort giver point til kortets ejer, også ved til-lægning til andres sæt. Hånd giver minus. Point bevares mellem runder; højeste score ved mindst 500 vinder (delt sejr tilladt). Rumopretteren starter næste runde.
+- Offline gemmes separat i `aeselklog-500-v1`, med skjult hånd ved tursskifte/genoptagelse. Online må kun egen hånd og offentlige afkast/sæt sendes. Genbrug requestId/expectedMove. Ved forlad går hånd til trækbunken, nedlagte kort bliver på bordet.
+
 ## Gemte data og privatliv
 - Lagernøgler må ikke ændres uden migrering: `aeselklog-igangvaerende-v1` (Talstien, schema 1), `aeselklog-kortspil-v1`, `aeselklog-laereprofiler-v1`. Gamle gemninger skal fortsat kunne læses.
 - Alt er lokalt; ingen automatisk cloud-upload af profiler, navne eller lyd. Intet fritekst eller børnenavne i permanent TTS-cache.

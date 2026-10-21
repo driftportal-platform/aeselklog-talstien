@@ -5,6 +5,13 @@ findes i `docs/arkiv/`. Versioner uden post (fx 0.9.21, 0.9.26 og 0.9.37–0.9.4
 (v0.9.61) ligger i `docs/arkiv/CHANGELOG-v0.9.61-lang.md`.
 
 
+## v0.9.78 – ÆselKlog 500 offline og online (21. oktober 2026)
+- Nyt 500-spil i samme design som de øvrige spil: 2–6 spillere, talkort uden kulører, tre æseljokere, ens sæt og talrækker, træk/afkast og til-lægning til eksisterende sæt. Talområde 1–20 som standard; øvrige 20-talsområder kan vælges.
+- Afkastbunken kan tages fra et valgt kort; det skal bruges straks. Optagning kan lægges helt tilbage, før andre handlinger. Jokeres værdi fastholdes. Fejl ændrer ingen kort.
+- Automatisk plus/minus ved rundens slutning, ejerpoint for til-lægning, score på tværs af runder, ny runde og sejr ved 500 point. Uafgjort giver delt sejr. Tom trækbunke genbruger ældre afkast; uden mulighed for træk afsluttes runden.
+- Offline: privat håndoverdragelse og separat gem/fortsæt. Online: privat hånd, invitation, chat/lyd, idempotente træk, genopkobling, Forlad og Afslut. Afgående hånd returneres til trækbunken; bordkort bliver liggende.
+- Fælles regelmotor, visning og spilmenuikon. 62/62 Node-tests inklusive komplette kampe med 2–6 spillere frem til 500; browserprøve af tre onlineklienter og offline runde/point/afkast. PWA-offline og Worker dry-run kontrolleret; ingen deployment eller fysisk telefonprøve herfra. Både GitHub og Cloudflare opdateres.
+
 ## v0.9.77 – TorskeKlog offline og online (21. oktober 2026)
 - Nyt selvstændigt Fisk-spil med talkort: 2–6 spillere, fem talområder, fire af hvert tal, 7/5 kort på hånden, fiskedam, fire ens, fortsat tur efter modtagne kort og næste tur efter fiskeri. Tomme hænder genopfyldes fra dammen; delt sejr understøttes.
 - Offline: privat håndoverdragelse på samme enhed, privat visning af fisket kort og separat gem/fortsæt. Tal læses med de eksisterende gemte MP3'er og respekt for Lyd fra.

@@ -1,6 +1,6 @@
 # ÆselKlog – hvor er vi nu
 
-**Version:** 0.9.77 (lokalt valideret; ikke bekræftet publiceret). Opdateres ved hver release sammen med `CHANGELOG.md`. Hold siden på én skærm pr. afsnit: ingen versionslog her (den hører til i changelogget).
+**Version:** 0.9.78 (lokalt valideret; ikke bekræftet publiceret). Opdateres ved hver release sammen med `CHANGELOG.md`. Hold siden på én skærm pr. afsnit: ingen versionslog her (den hører til i changelogget).
 
 ## Hvad er det?
 Børnevenligt talspil som PWA (GitHub Pages, repo `driftportal-platform/aeselklog-talstien`). Matematik er altid frivillig; alt offline gemmes lokalt, ingen konti.
@@ -8,12 +8,13 @@ Børnevenligt talspil som PWA (GitHub Pages, repo `driftportal-platform/aeselklo
 - **Kortspil** – fem talområder, 1–6 personer + CPU-æsel, frie træk, fejl udfordres med æselkortet.
 - **Talkort** – ét kort ad gangen med sprogvalg, Auto og udtaletræning.
 - **TorskeKlog** – Fisk med fire ens talkort, 2–6 mennesker offline på samme enhed eller online på hver sin.
-- **Online** (`online.html`, Cloudflare Worker + Durable Objects) – Kortspil, Talstien og TorskeKlog for 2–6 mennesker med rumkode, invitationer, chat (slået fra som standard), prik og æsellyd. Ingen online-CPU.
+- **ÆselKlog 500** – talkort uden kulører, æseljokere, sæt og talrækker; flere runder til 500.
+- **Online** (`online.html`, Cloudflare Worker + Durable Objects) – Kortspil, Talstien, TorskeKlog og 500 for 2–6 mennesker med rumkode, invitationer, chat (slået fra som standard), prik og æsellyd. Ingen online-CPU.
 Lyd: 500 gemte MP3-tal (fem stemmer + æselstemme), valgfri musik.
 
 ## Status
-- **Seneste ændring:** TorskeKlog (Fisk) er tilføjet offline/online for 2–6 mennesker, med talkort, fire ens, privat hånd, dam, gem/fortsæt og fælles regler. Browserprøvet med tre onlineklienter samt faktisk lokal PWA-offline; Worker dry-run gennemført. Både GitHub og Worker v0.9.77 kræves. Ikke publiceret herfra.
-- **Automatisk:** 60 af 60 Node-tests (`npm test`, kører i GitHub Actions når `.github/workflows/test.yml` er med). Simulerede Chromium-forløb for online med 3–6 enheder og flere skærmstørrelser.
+- **Seneste ændring:** ÆselKlog 500 er tilføjet offline/online, med talkortsæt/-rækker, æseljokere, afkastbunke, til-lægning, plus/minuspoint og flere runder til 500. Samme layout og privat hånd/gem/invitation som øvrige spil. Browserprøvet; både GitHub og Worker v0.9.78 kræves. Ikke publiceret herfra.
+- **Automatisk:** 62 af 62 Node-tests (`npm test`, kører i GitHub Actions når `.github/workflows/test.yml` er med). Simulerede Chromium-forløb for online med 3–6 enheder og flere skærmstørrelser.
 - **Brugerafprøvet 20. oktober:** online spil på mobil og pc; kortspillet fungerede med enkelte Cloudflare-udfald på 10–15 sekunder, som genoprettede sig selv. Worker /health blev efterfølgende verificeret til v0.9.68. Enhedsmodeller og alle enkeltfunktioner er ikke oplyst.
 - **Ikke bekræftet:** fysisk afprøvning af v0.9.72-talevariation og animation, rigtig mikrofon/lyd på iPhone, installeret iPhone-PWA, deling til Beskeder/Mail, live ElevenLabs, VoiceOver, familietest.
 - **Cloudflare:** konfigurationens navn er `aeselklog-online-pilot`, den oplyste liveadresse bruger `aeselklog-online`. Brug eksplicit `--name` ved deploy og kontrollér `GAME_ROOM` og `APP_ORIGIN` først.

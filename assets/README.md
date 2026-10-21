@@ -16,3 +16,5 @@ Gamle billedfiler i projektroden beholdes af hensyn til tidligere versioner og g
 Spilvalg: card-game.svg og board-game.svg bruger det eksisterende originale æselkort som motiv, med en lille Talsti til brætspillet. De samme to illustrationer bruges i offline- og online-spilvalg.
 
 - `icons/fish-game.svg`: fælles TorskeKlog-ikon til offline/online; genbruger æselvektoren med en fisk.
+
+- `icons/500-game.svg`: fælles spilmenuikon til ÆselKlog 500, bygget på kortvektoren.

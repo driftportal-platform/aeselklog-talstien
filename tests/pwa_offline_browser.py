@@ -34,7 +34,7 @@ try:
         assert page.evaluate("()=>getComputedStyle(document.body).getPropertyValue('--navy').trim()")=='#113c70', 'CSS failed offline'
         page.wait_for_function('()=>Boolean(window.AeselIcons)')
         loaded=page.evaluate('''async()=>{const files=AeselIcons.names.map(n=>AeselIcons.url(n));files.push(new URL('./assets/images/donkey-card.webp',location.href).href);await Promise.all(files.map(src=>new Promise((resolve,reject)=>{const i=new Image();i.onload=resolve;i.onerror=()=>reject(Error(src));i.src=src})));return files.length}''')
-        assert loaded==46, 'Shared icons/card art failed offline'
+        assert loaded==47, 'Shared icons/card art failed offline'
         page.locator('#homeSettings').click()
         assert page.locator('#settings').is_visible()
         page.locator('#settingsBack').click()
@@ -52,6 +52,12 @@ try:
         assert page.locator('#fishLocalTable .fish-number').count()==0
         page.get_by_role('button',name='Vis mine kort · Spiller 1').click()
         assert page.locator('#fishLocalTable .fish-number').count()>0
+        page.goto(url+'?spil=500',wait_until='load')
+        assert page.locator('#rummySetup').is_visible()
+        page.locator('#rummyStart').click()
+        assert page.locator('#rummyGame').is_visible()
+        page.get_by_role('button',name='Vis mine kort · Spiller 1').click()
+        assert page.locator('#rummyLocalTable > .fish-cards .rummy-card').count()==7
         assert not errors,errors
         print('PASS: real local HTTP PWA installation, cached HTML/CSS/illustration, offline reload + menus')
         context.close();browser.close()
