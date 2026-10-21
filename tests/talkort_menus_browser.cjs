@@ -1,0 +1,15 @@
+const assert=require('node:assert/strict'),fixture=require('./online-browser-harness.cjs');
+(async()=>{const f=await fixture({count:2});try{const p=await f.contexts[0].newPage();p.on('pageerror',e=>f.errors.push(e.message));
+for(const width of [390,1280]){await p.setViewportSize({width,height:900});await p.goto(f.origin+'/aeselklog-talstien/index.html?spil=talkort');await p.locator('#talkort.active').waitFor();
+ assert.equal(await p.locator('.talkort-settings-group > details').count(),4);assert.equal(await p.locator('.talkort-settings-group > details[open]').count(),0);
+ assert(await p.locator('#talkortNext').isVisible());assert(await p.locator('#talkortOptions .aesel-audio-open').isHidden());assert(await p.locator('#talkortCountFrom').isHidden());assert(await p.locator('#talkortAuto').isHidden());assert(await p.locator('#talkortPracticeEnabled').isHidden());
+ await p.evaluate(()=>{window.__read=[];AeselOfflineNumbers.play=async(n,l)=>{__read.push([n,l]);return true};AeselVoice.sayWithVoice=async()=>{}});
+ await p.locator('#talkortOptions > summary').click();await p.locator('#talkortLanguage').selectOption('da-en');await p.locator('#talkortDelay').fill('.1');await p.locator('#talkortOptions > summary').click();
+ await p.locator('#talkortCounterOptions > summary').click();await p.locator('#talkortCountFrom').fill('8');await p.locator('#talkortCountStart').click();await p.locator('#talkortCounterOptions > summary').click();
+ assert(await p.locator('#talkortCountStop').isVisible());await p.locator('#talkortCountStop').click();assert((await p.locator('#talkortCountStatus').textContent()).startsWith('Stoppet ved'));
+ await p.locator('#talkortCounterOptions > summary').click();assert.equal(await p.locator('#talkortCountFrom').inputValue(),'8');await p.locator('#talkortCountFrom').fill('2');await p.locator('#talkortCountStart').click();await p.locator('#talkortCounterOptions > summary').click();await p.waitForFunction(()=>document.querySelector('#talkortCountStatus').textContent==='Færdig ved 0.');
+ assert((await p.evaluate(()=>__read)).every(x=>x[1]==='da-en'));
+ await p.locator('#talkortAutoOptions > summary').click();await p.locator('#talkortAuto').click();await p.locator('#talkortAutoOptions > summary').click();await p.locator('#talkortCountStop').click();
+ await p.locator('#talkortPracticeOptions > summary').click();await p.locator('#talkortPracticeEnabled').check();assert(await p.locator('#talkortRecord').isVisible());await p.locator('#talkortPracticeOptions > summary').click();assert(await p.locator('#talkortRecord').isHidden());
+ assert(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));await p.screenshot({path:f.root+'/preview_talkort_menus_'+width+'_v0976.png',fullPage:true});
+}assert.deepEqual(f.errors,[]);console.log('PASS four closed Talkort menus, saved choices, counting/Auto continue when collapsed, external stop/status, practice and responsive layout');}finally{await f.close()}})().catch(e=>{console.error(e);process.exitCode=1});

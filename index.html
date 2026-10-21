@@ -18,7 +18,7 @@
 <div class="shell">
   <header class="top">
     <div class="brand"><div class="logo" id="pageBrandIcon" aria-hidden="true">🫏</div><div><h1 id="pageTitle">Æsel<span class="red">Klog</span> · Talstien</h1><small>Spil, lær og grin sammen</small></div></div>
-    <div class="top-actions"><span class="pill">PRØVEVERSION 0.9.75 (hver sit spil)</span><button id="voiceToggle" class="btn soft small" type="button" aria-pressed="true">🔊 Lyd til</button></div>
+    <div class="top-actions"><span class="pill">PRØVEVERSION 0.9.76 (hver sit spil)</span><button id="voiceToggle" class="btn soft small" type="button" aria-pressed="true">🔊 Lyd til</button></div>
   </header>
 
 
@@ -197,12 +197,12 @@
         <img class="talkort-mascot talkort-mascot-bottom" src="./assets/images/donkey-card.webp" alt="" aria-hidden="true"><div class="talkort-corner talkort-corner-bottom" id="talkortCornerBottom">1</div>
       </article>
       <div class="talkort-controls" aria-label="Bladr i talkort"><button type="button" id="talkortPrev" class="btn soft">← Forrige</button><button type="button" id="talkortRepeat" class="btn main">🔊 Læs igen</button><button type="button" id="talkortNext" class="btn soft">Næste →</button></div>
-      <div class="talkort-extra-controls"><button type="button" class="btn soft" id="talkortAuto" aria-pressed="false">▶ Auto</button><label class="talkort-delay" for="talkortDelay">Pause i sek. <input id="talkortDelay" type="number" min="0.1" max="60" step="0.1" value="2"></label><button type="button" class="btn soft" id="talkortReset">↺ Nulstil</button></div>
-      <label class="talkort-practice-switch"><input id="talkortPracticeEnabled" type="checkbox"> 🎙️ Øv min udtale (valgfrit)</label>
-      <div id="talkortPractice" class="talkort-practice" hidden><p>Optag dit tal og sammenlign det med ÆselKlogs rigtige oplæsning. Optagelsen gemmes ikke på serveren.</p><div class="talkort-practice-buttons"><button type="button" class="btn soft" id="talkortRecord">🎙️ Optag</button><button type="button" class="btn soft" id="talkortHearMine" disabled>▶ Hør mig</button><button type="button" class="btn soft" id="talkortCompare" disabled>🔁 Sammenlign</button></div><p id="talkortPracticeStatus" role="status" aria-live="polite"></p></div>
       <p class="talkort-note" id="talkortVoiceInfo">Tryk på kortet, pilene eller Læs igen for at høre tallet.</p>
     </div>
-<section class="paper talkort-counter" aria-label="Tæl op eller ned"><h3>Tæl op eller ned</h3><div class="grid2"><label class="field">Retning<select id="talkortCountDirection"><option value="down">Tæl ned til 0</option><option value="up">Tæl op til et valgt tal</option></select></label><label class="field">Starttal (0–100)<input id="talkortCountFrom" type="number" min="0" max="100" step="1" value="25"></label><label class="field" id="talkortCountToField" hidden>Sluttal (0–100)<input id="talkortCountTo" type="number" min="0" max="100" step="1" value="25"></label></div><label class="field">Besked efter tællingen (valgfri)<textarea id="talkortCountMessage" maxlength="350" rows="2" placeholder="Fx: Nu må I åbne øjnene!"></textarea></label><label class="field">Stemme til slutbeskeden<select id="talkortCountVoice"><option value="current">Spillelederens valgte stemme</option><option value="device">Telefonens stemme</option></select></label><div class="row"><button id="talkortCountStart" type="button" class="btn main">▶ Start tælling</button><button id="talkortCountStop" type="button" class="btn soft" hidden>■ Stop</button><button id="talkortCountResume" type="button" class="btn soft" hidden>▶ Prøv lyden igen</button></div><p id="talkortCountStatus" class="tiny" role="status"></p><p class="tiny">Vælg sprog og pause på siden. Ved dobbeltsprog læses begge sprog, før næste tal vises. Nul og slutbeskeder læses med en stemme; 1–100 bruger de gemte talelyde.</p></section>
+
+
+    <div class="talkort-run-status" aria-live="polite"><button id="talkortCountStop" type="button" class="btn soft" hidden>■ Stop</button><button id="talkortCountResume" type="button" class="btn soft" hidden>▶ Prøv lyden igen</button><p id="talkortCountStatus" class="tiny" role="status"></p></div>
+    <div class="talkort-settings-group" aria-label="Talkorts indstillinger">
     <details id="talkortOptions" class="paper game-options"><summary>⚙️ Talområde, sprog og stemme</summary><div class="talkort-options">
       <label class="field" for="talkortRange">Talområde
         <select id="talkortRange"><option value="1-100">Alle tal · 1–100</option><option value="1-20">🔵 1–20</option><option value="21-40">🌸 21–40</option><option value="41-60">🟡 41–60</option><option value="61-80">🟢 61–80</option><option value="81-100">🟣 81–100</option></select>
@@ -216,7 +216,14 @@
       <label class="field" for="talkortJump">Gå til tal
         <select id="talkortJump" aria-label="Vælg tal"></select>
       </label>
-    </div></details>
+<label class="talkort-delay" for="talkortDelay">Pause i sek. <input id="talkortDelay" type="number" min="0.1" max="60" step="0.1" value="2"></label>    </div></details>
+    <details id="talkortAutoOptions" class="paper game-options"><summary>▶ Automatisk oplæsning</summary><div class="options-content"><p class="tiny">Læs automatisk fra det viste tal til slutningen af talområdet. Pausen vælges under Talområde, sprog og stemme.</p>      <div class="talkort-extra-controls"><button type="button" class="btn soft" id="talkortAuto" aria-pressed="false">▶ Auto</button><button type="button" class="btn soft" id="talkortReset">↺ Nulstil</button></div>
+</div></details>
+<details id="talkortCounterOptions" class="paper game-options talkort-counter"><summary>🔢 Tæl op eller ned</summary><div class="options-content"><div class="grid2"><label class="field">Retning<select id="talkortCountDirection"><option value="down">Tæl ned til 0</option><option value="up">Tæl op til et valgt tal</option></select></label><label class="field">Starttal (0–100)<input id="talkortCountFrom" type="number" min="0" max="100" step="1" value="25"></label><label class="field" id="talkortCountToField" hidden>Sluttal (0–100)<input id="talkortCountTo" type="number" min="0" max="100" step="1" value="25"></label></div><label class="field">Besked efter tællingen (valgfri)<textarea id="talkortCountMessage" maxlength="350" rows="2" placeholder="Fx: Nu må I åbne øjnene!"></textarea></label><label class="field">Stemme til slutbeskeden<select id="talkortCountVoice"><option value="current">Spillelederens valgte stemme</option><option value="device">Telefonens stemme</option></select></label><div class="row"><button id="talkortCountStart" type="button" class="btn main">▶ Start tælling</button></div><p class="tiny">Vælg sprog og pause under Talområde, sprog og stemme. Ved dobbeltsprog læses begge sprog, før næste tal vises. Nul og slutbeskeder læses med en stemme; 1–100 bruger de gemte talelyde.</p></div></details>
+    <details id="talkortPracticeOptions" class="paper game-options"><summary>🎙️ Øv min udtale</summary><div class="options-content">      <label class="talkort-practice-switch"><input id="talkortPracticeEnabled" type="checkbox"> 🎙️ Øv min udtale (valgfrit)</label>
+      <div id="talkortPractice" class="talkort-practice" hidden><p>Optag dit tal og sammenlign det med ÆselKlogs rigtige oplæsning. Optagelsen gemmes ikke på serveren.</p><div class="talkort-practice-buttons"><button type="button" class="btn soft" id="talkortRecord">🎙️ Optag</button><button type="button" class="btn soft" id="talkortHearMine" disabled>▶ Hør mig</button><button type="button" class="btn soft" id="talkortCompare" disabled>🔁 Sammenlign</button></div><p id="talkortPracticeStatus" role="status" aria-live="polite"></p></div>
+</div></details>
+    </div>
   </section>
 
   <section id="cardsSetup" class="view" aria-label="Opsæt ÆselKlog kortspil">

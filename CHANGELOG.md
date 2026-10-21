@@ -5,6 +5,11 @@ findes i `docs/arkiv/`. Versioner uden post (fx 0.9.21, 0.9.26 og 0.9.37–0.9.4
 (v0.9.61) ligger i `docs/arkiv/CHANGELOG-v0.9.61-lang.md`.
 
 
+## v0.9.76 – samlede Talkort-menuer (21. oktober 2026)
+- Talkort har fire lukkede menuer under kort/pile: Talområde, sprog og stemme (inkl. pause), Automatisk oplæsning, Tæl op eller ned, Øv min udtale.
+- Stop, prøv igen og kørestatus står uden for menuerne, så et forløb kan stoppes selv med indstillingerne foldet sammen. Sammenfoldning ændrer ikke valg eller afbryder lyd.
+- 58/58 Node-tests samt browserprøve på mobil/pc-størrelser af menuer, valg, tælling/Auto og Stop. Ingen Worker-ændring.
+
 ## v0.9.75 – fælles spilikoner og roligere opsætning (21. oktober 2026)
 - Talstien og Kortspil bruger spilmenuens respektive æselikoner og én hovedoverskrift: ÆselKlog - Talstien / ÆselKlog - Kortspil. Ekstra overskriftsbjælker og kortspillets intro fjernes; Spilmenu bevares.
 - Kortspillets kort-/regel-/strafvalg og avancerede CPU-valg foldes ud som på Talstien. Spillere og Start er synlige. Talkorts talområde, sprog og stemme samles også i et lukket indstillingsfelt.

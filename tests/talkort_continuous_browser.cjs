@@ -1,7 +1,7 @@
 const assert=require('node:assert/strict'),fixture=require('./online-browser-harness.cjs');
 (async()=>{const f=await fixture({count:2});try{
  const p=await f.contexts[0].newPage();p.on('pageerror',e=>f.errors.push(e.message));
- await p.goto(f.origin+'/aeselklog-talstien/index.html?spil=talkort');await p.locator('#talkort.active').waitFor();await p.locator('#talkortOptions > summary').click();
+ await p.goto(f.origin+'/aeselklog-talstien/index.html?spil=talkort');await p.locator('#talkort.active').waitFor();await p.locator('#talkortOptions > summary').click();await p.evaluate(()=>document.querySelectorAll('#talkort details').forEach(e=>e.open=true));
  await p.evaluate(()=>{window.__clips=[];window.__numberPlayer=null;const old=Audio.prototype.play;
  Audio.prototype.play=function(){if(!this.src.includes('audio/numbers/'))return old.call(this);
  if(__numberPlayer&&__numberPlayer!==this)return Promise.reject(Error('NotAllowedError: new media element'));

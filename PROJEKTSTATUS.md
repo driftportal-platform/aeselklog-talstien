@@ -1,6 +1,6 @@
 # ÆselKlog – hvor er vi nu
 
-**Version:** 0.9.75 (lokalt valideret; ikke bekræftet publiceret). Opdateres ved hver release sammen med `CHANGELOG.md`. Hold siden på én skærm pr. afsnit: ingen versionslog her (den hører til i changelogget).
+**Version:** 0.9.76 (lokalt valideret; ikke bekræftet publiceret). Opdateres ved hver release sammen med `CHANGELOG.md`. Hold siden på én skærm pr. afsnit: ingen versionslog her (den hører til i changelogget).
 
 ## Hvad er det?
 Børnevenligt talspil som PWA (GitHub Pages, repo `driftportal-platform/aeselklog-talstien`). Matematik er altid frivillig; alt offline gemmes lokalt, ingen konti.
@@ -11,7 +11,7 @@ Børnevenligt talspil som PWA (GitHub Pages, repo `driftportal-platform/aeselklo
 Lyd: 500 gemte MP3-tal (fem stemmer + æselstemme), valgfri musik.
 
 ## Status
-- **Seneste ændring:** Fælles æselikoner fra spilmenuen, én hovedoverskrift pr. opsætningsside, ekstra intro fjernet. Kortspil/Talkort har indstillinger der kan foldes ud. Spillere/Start bevares. Browserprøvet på mobil/pc-størrelser; kun GitHub v0.9.75, Worker uændret. Lydrettelsen fra v0.9.74 kræver fortsat kontrol på brugerens enhed.
+- **Seneste ændring:** Talkorts indstillinger er samlet i fire lukkede menuer under kortet. Pause ligger sammen med sprog/område. Stop, retry og status er tilgængelige uden for menuerne. Browserprøvet på mobil/pc-størrelser. Kun GitHub v0.9.76; Worker uændret. Lydrettelsen fra v0.9.74 kræver fortsat fysisk kontrol.
 - **Automatisk:** 58 af 58 Node-tests (`npm test`, kører i GitHub Actions når `.github/workflows/test.yml` er med). Simulerede Chromium-forløb for online med 3–6 enheder og flere skærmstørrelser.
 - **Brugerafprøvet 20. oktober:** online spil på mobil og pc; kortspillet fungerede med enkelte Cloudflare-udfald på 10–15 sekunder, som genoprettede sig selv. Worker /health blev efterfølgende verificeret til v0.9.68. Enhedsmodeller og alle enkeltfunktioner er ikke oplyst.
 - **Ikke bekræftet:** fysisk afprøvning af v0.9.72-talevariation og animation, rigtig mikrofon/lyd på iPhone, installeret iPhone-PWA, deling til Beskeder/Mail, live ElevenLabs, VoiceOver, familietest.
