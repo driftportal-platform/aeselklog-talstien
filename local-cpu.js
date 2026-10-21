@@ -1,0 +1,2 @@
+/* A cancellable local turn timer. Reading rules, hidden tabs and leaving pause it. */
+(()=>{'use strict';window.AeselCpuTurns={create({active,ready,run,error}){let timer=null,epoch=0;function stop(){epoch++;clearTimeout(timer);timer=null}function schedule(){stop();if(!active()||!ready())return;const id=epoch;timer=setTimeout(()=>{timer=null;if(id!==epoch||!active()||!ready())return;if(document.hidden||document.querySelector('dialog[open]')){schedule();return}try{run()}catch(e){stop();error(e)}},1000)}return {schedule,stop}}}})();

@@ -66,6 +66,17 @@ try:
         page.get_by_role('button',name='Luk regler',exact=True).click()
         page.get_by_role('button',name='Vis mine kort · Spiller 1').click()
         assert page.locator('#rummyLocalTable > .fish-cards .rummy-card').count()==7
+        for route,prefix,key in [('torskeklog','fish','aeselklog-torskeklog-v1'),('500','rummy','aeselklog-500-v1')]:
+            page.goto(url+'?spil='+route,wait_until='load')
+            page.locator('#'+prefix+'CpuCheck').check()
+            page.once('dialog',lambda d:d.accept())
+            page.locator('#'+prefix+'Start').click()
+            assert page.evaluate('(key)=>JSON.parse(localStorage.getItem(key)).cpuSeats[0]',key)==1
+            page.evaluate('''key=>{const g=JSON.parse(localStorage.getItem(key));g.turn=1;g.pending=null;if(g.stock)g.step='draw';localStorage.setItem(key,JSON.stringify(g))}''',key)
+            page.reload(wait_until='load')
+            page.locator('#'+prefix+'Resume').click()
+            seq=page.evaluate('(key)=>JSON.parse(localStorage.getItem(key)).seq',key)
+            page.wait_for_function('''({key,seq})=>JSON.parse(localStorage.getItem(key)).seq>seq''',arg={'key':key,'seq':seq},timeout=7000)
         assert not errors,errors
         print('PASS: real local HTTP PWA installation, cached HTML/CSS/illustration, offline reload + menus')
         context.close();browser.close()

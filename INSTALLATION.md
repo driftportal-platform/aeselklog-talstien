@@ -1,15 +1,15 @@
 # Installation af ÆselKlog
 
-Aktuel opdatering: v0.9.79 – Regler-knapper til TorskeKlog og 500.
+Aktuel opdatering: v0.9.80 – Spil mod Æslet i TorskeKlog og 500 offline.
 
-1. Pak opdateringen ud i projektmappen. Erstat filerne og bevar undermapper. Slet ikke audio, music eller assets.
-2. Kør `npm.cmd test`: 62/62 skal bestå. Commit og Push origin i GitHub Desktop. Bevar `.github/workflows/test.yml`.
-3. Kun GitHub skal opdateres denne gang. Worker v0.9.78 er uændret og skal ikke deployes igen.
-4. Efter GitHub Pages er færdig, genåbn appen og kontrollér versionsmærket 0.9.79.
+1. Pak opdateringen ud i projektmappen. Erstat filerne, og bevar undermapper samt audio, music og assets. De nye card-cpu.js og local-cpu.js skal med.
+2. Kør `npm.cmd test`: 63/63 skal bestå. Commit og Push origin i GitHub Desktop. Bevar `.github/workflows/test.yml`.
+3. Kun GitHub opdateres. Worker v0.9.78 og online-reglerne er uændrede.
+4. Efter GitHub Pages er færdig: genåbn appen og kontrollér versionsmærket 0.9.80.
 
-## Prøv reglerne
-TorskeKlog og 500 har nu en Regler-knap ved Spilmenu både i opsætningen og under offline-spillet. Online har Regler sin egen knap i toppen under spillet og ved opsætningens overskrift før start.
+## Prøv Æslet
+Vælg TorskeKlog eller ÆselKlog 500 offline. Slå Spil mod Æslet til. Vælg 1 person til solo eller 2–5 personer plus Æslet. Start spillet; Æslet tager automatisk sine egne ture.
 
-Åbn reglerne, rul teksten, og luk med Luk eller Escape. Kort, tur og score skal være uændrede. Offline må en skjult hånd fortsat være skjult. Online må genopkobling/statusopdatering ikke lukke vinduet.
+Med én person vises dine egne kort også under Æslets tur. Dets hånd er skjult. Flere mennesker bruger privat håndoverdragelse som før. Regler/dialoger og skjult side holder pause; Spilmenu stopper automatikken og gemmer. Prøv Fortsæt, også fra en gemt Æsel-tur. Ældre gemninger uden Æsel skal stadig fungere.
 
-62/62 Node-tests og simulerede browserprøver af begge spil offline/online ved lille skærm samt reel lokal HTTP/PWA-offlineprøve. Ingen fysisk telefonprøve eller publicering herfra.
+Valideret: 63/63 Node-tests, komplette spil gennem CPU-strategier, browserprøver af solo/flere mennesker, pause/stop/genoptag og reel lokal HTTP/PWA-offline. Ingen fysisk telefonprøve eller publicering herfra.

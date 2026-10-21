@@ -5,6 +5,12 @@ findes i `docs/arkiv/`. Versioner uden post (fx 0.9.21, 0.9.26 og 0.9.37–0.9.4
 (v0.9.61) ligger i `docs/arkiv/CHANGELOG-v0.9.61-lang.md`.
 
 
+## v0.9.80 – Spil mod Æslet offline i TorskeKlog og 500 (21. oktober 2026)
+- Nyt Spil mod Æslet-valg: én person alene mod Æslet eller op til fem personer og Æslet. Æslet er ekstra spiller; højst seks i alt. Automatisk spørgen/fiskeri i TorskeKlog og træk, afkastoptagning, sæt, til-lægning og afkast i 500.
+- Lokal strategi bruger kun egen hånd og offentlige oplysninger. Æslets hånd vises aldrig. Solospilleren beholder sin egen hånd på skærmen; flere mennesker bruger privat håndoverdragelse.
+- CPU-valg og ture bevares i separate eksisterende gemninger. Timeren pauser ved skjult side/regler/dialog og annulleres ved menu/nystart. Gamle menneskespil fortsætter som før.
+- 63/63 Node-tests, herunder 20 komplette Fisk-spil og fem 500-kampe med 2–6 pladser gennem CPU-strategien. Browserprøvet solo/flere mennesker, skjulte kort, regelsidepause, stop/genoptag og reel PWA-offline. Kun GitHub; online og Worker v0.9.78 bevares.
+
 ## v0.9.79 – reglerknapper i TorskeKlog og 500 (21. oktober 2026)
 - Tydelig Regler-knap både før start og under spillet i de to offline- og onlineudgaver. Fælles læsevenligt vindue med fulde regler, point, turforløb og forlad; Luk, Escape og rulning på mobil.
 - Reglerne ligger uden for spillebordets genoptegning, så onlineopdateringer ikke lukker dem. Åbning/lukning flytter ingen kort og viser ikke private hænder. Det tidligere indlejrede 500-regelfelt erstattes af knappen.

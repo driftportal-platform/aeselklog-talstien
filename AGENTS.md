@@ -56,6 +56,11 @@ Gælder både mennesker og AI-assistenter. Hold denne fil kort og kun med regler
 - Talkort er 5 point, joker 25. Hvert bordkort giver point til kortets ejer, også ved til-lægning til andres sæt. Hånd giver minus. Point bevares mellem runder; højeste score ved mindst 500 vinder (delt sejr tilladt). Rumopretteren starter næste runde.
 - Offline gemmes separat i `aeselklog-500-v1`, med skjult hånd ved tursskifte/genoptagelse. Online må kun egen hånd og offentlige afkast/sæt sendes. Genbrug requestId/expectedMove. Ved forlad går hånd til trækbunken, nedlagte kort bliver på bordet.
 
+## Offline-Æsel i TorskeKlog og 500
+- `card-cpu.js` må kun vælge ud fra regelmotorens spillervisning: egen hånd og offentlige oplysninger. Ingen læsning af andres hænder/trækbunke og ingen AI-/netværkskald. CPU-pladser gemmes lokalt i `cpuSeats`; gamle gemninger uden feltet er menneskespil.
+- 1–5 personer + ét Æsel, højst 6 i alt. I solospil vises kun menneskets hånd, også under Æslets tur. Ved flere mennesker er hænder skjult under CPU-turen. Online har fortsat ingen CPU.
+- Automatiske ture går gennem de samme regler som mennesketræk og gemmes efter hvert træk. `local-cpu.js` skal stoppe ved menu/nystart og holde pause ved skjult side eller åben dialog; genoptagelse må ikke give dobbelte ture.
+
 ## Gemte data og privatliv
 - Lagernøgler må ikke ændres uden migrering: `aeselklog-igangvaerende-v1` (Talstien, schema 1), `aeselklog-kortspil-v1`, `aeselklog-laereprofiler-v1`. Gamle gemninger skal fortsat kunne læses.
 - Alt er lokalt; ingen automatisk cloud-upload af profiler, navne eller lyd. Intet fritekst eller børnenavne i permanent TTS-cache.

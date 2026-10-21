@@ -15,3 +15,8 @@ Vores aftalte variant følger brugerens regler. Fisk har flere turvarianter; her
 - Taloplæsning bruger samme gemte MP3-tal som Talkort. Offline vælges sprog under indstillinger; online i lydmenuen. Online bruger den eksisterende chat og invitation.
 
 Baggrund: [Wikipedia om Fisk](https://da.wikipedia.org/wiki/Fisk_(kortspil)) og [Davoserjas om Fisk](https://davoserjas.dk/fisk-kortspil/). Beskrivelsen ovenfor er vores konkrete talkortvariant.
+
+## Spil mod Æslet offline
+Slå Spil mod Æslet til, og vælg 1–5 personer. Æslet kommer med som ekstra spiller og tager sine ture automatisk. Der er højst seks spillere i alt. Æslet ser sin egen hånd og offentlige oplysninger. Det kigger ikke i dine kort eller i trækbunken.
+
+Med én person vises din egen hånd også under Æslets tur. Med flere personer skjules hænderne ved tursskifte. Æslets hånd vises aldrig. Regler og andre dialoger pauser CPU-turen; Spilmenu stopper den og gemmer. Fortsæt genoptager også et spil midt i Æslets tur. Online har fortsat kun mennesker.
