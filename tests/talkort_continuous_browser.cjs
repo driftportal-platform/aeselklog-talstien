@@ -1,0 +1,20 @@
+const assert=require('node:assert/strict'),fixture=require('./online-browser-harness.cjs');
+(async()=>{const f=await fixture({count:2});try{
+ const p=await f.contexts[0].newPage();p.on('pageerror',e=>f.errors.push(e.message));
+ await p.goto(f.origin+'/aeselklog-talstien/index.html?spil=talkort');await p.locator('#talkort.active').waitFor();
+ await p.evaluate(()=>{window.__clips=[];window.__numberPlayer=null;const old=Audio.prototype.play;
+ Audio.prototype.play=function(){if(!this.src.includes('audio/numbers/'))return old.call(this);
+ if(__numberPlayer&&__numberPlayer!==this)return Promise.reject(Error('NotAllowedError: new media element'));
+ __numberPlayer=this;__clips.push(this.src);this.currentTime=0;this.duration=.1;this.ended=false;
+ setTimeout(()=>{this.currentTime=.1;this.ended=true;/* simulate missing ended */},15);return Promise.resolve()};
+ AeselVoice.sayWithVoice=async()=>{};
+ });
+ await p.locator('#talkortLanguage').selectOption('da-en');await p.locator('#talkortDelay').fill('.1');
+ await p.locator('#talkortCountDirection').selectOption('up');await p.locator('#talkortCountFrom').fill('1');await p.locator('#talkortCountTo').fill('8');await p.locator('#talkortCountStart').click();
+ await p.waitForFunction(()=>document.querySelector('#talkortCountStatus').textContent==='Færdig ved 8.',{},{timeout:20000});
+ assert.equal(await p.evaluate(()=>__clips.length),16);
+ await p.locator('#talkortRange').selectOption('1-20');await p.locator('#talkortJump').selectOption('17');await p.evaluate(()=>__clips=[]);await p.locator('#talkortAuto').click();
+ await p.waitForFunction(()=>document.querySelector('#talkortCountStatus').textContent==='Færdig ved 20.');
+ const clips=await p.evaluate(()=>__clips);assert.equal(clips.length,8);assert(clips[0].endsWith('/017.mp3'));assert(clips.at(-1).endsWith('en/020.mp3'));
+ assert.deepEqual(f.errors,[]);console.log('PASS actual counting AND Auto survive per-element mobile permission and missing ended events, complete both languages');
+ }finally{await f.close()}})().catch(e=>{console.error(e);process.exitCode=1});

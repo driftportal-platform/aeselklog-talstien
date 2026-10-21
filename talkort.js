@@ -64,13 +64,13 @@ $('talkortPracticeEnabled').addEventListener('change',()=>{const on=$('talkortPr
 const alive=id=>auto&&autoSerial===id&&$('talkort').classList.contains('active');
 async function waitVisible(id){while(alive(id)&&document.hidden)await delay(100);return alive(id)}
 async function readForRun(id){let attempts=0;while(alive(id)){
- if(!await waitVisible(id))return false;const epoch=visibilityEpoch,ok=await read();if(!alive(id))return false;if(epoch!==visibilityEpoch||ok==='interrupted')continue;if(ok!==false)return true;
+ if(document.hidden&&!await waitVisible(id))return false;const epoch=visibilityEpoch,ok=await read();if(!alive(id))return false;if(epoch!==visibilityEpoch||ok==='interrupted')continue;if(ok!==false)return true;
  if(++attempts<=2){$('talkortCountStatus').textContent=`Prøver lyden til ${number} igen …`;await delay(400);continue}
  runPaused=true;$('talkortCountResume').hidden=false;$('talkortAuto').textContent='▶ Fortsæt Auto';$('talkortCountStatus').textContent=`Lyden kunne ikke afspilles. Sat på pause ved ${number}; tryk Prøv lyden igen.`;
  while(alive(id)&&runPaused)await delay(100);attempts=0;
  }return false}
 async function run(sequence,kind){stopAll();clearClip();started=true;auto=true;runKind=kind;if(kind==='count'){$('talkortRange').value='1-100';fillJump()}const id=++autoSerial;$('talkortCountStart').disabled=true;$('talkortCountStop').hidden=false;$('talkortAuto').textContent='■ Stop Auto';$('talkortAuto').setAttribute('aria-pressed','true');
- try{for(let i=0;i<sequence.length;i++){if(!await waitVisible(id))return;number=sequence[i];render(false);$('talkortCountStatus').textContent=(kind==='count'?'Tæller':'Auto')+`: ${number}`;if(!await readForRun(id))return;if(i<sequence.length-1){await delay(window.AeselCounter.pause($('talkortDelay').value));if(!alive(id))return}}
+ try{for(let i=0;i<sequence.length;i++){if(document.hidden&&!await waitVisible(id))return;number=sequence[i];render(false);$('talkortCountStatus').textContent=(kind==='count'?'Tæller':'Auto')+`: ${number}`;if(!await readForRun(id))return;if(i<sequence.length-1){await delay(window.AeselCounter.pause($('talkortDelay').value));if(!alive(id))return}}
  if(kind==='count'&&alive(id)){const text=$('talkortCountMessage').value.trim();if(text&&window.AeselAudioSettings?.forMode?.('talkort')?.enabled!==false){if(!await waitVisible(id))return;await window.AeselVoice?.sayWithVoice?.(text,{voice:$('talkortCountVoice').value})}}
  if(alive(id))$('talkortCountStatus').textContent=`Færdig ved ${number}.`;
  }catch(e){if(alive(id))$('talkortCountStatus').textContent=e.message||'Oplæsningen kunne ikke afsluttes.'}finally{if(autoSerial===id)stopAuto()}}

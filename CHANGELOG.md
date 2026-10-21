@@ -5,6 +5,11 @@ findes i `docs/arkiv/`. Versioner uden post (fx 0.9.21, 0.9.26 og 0.9.37–0.9.4
 (v0.9.61) ligger i `docs/arkiv/CHANGELOG-v0.9.61-lang.md`.
 
 
+## v0.9.74 – stabil sammenhængende talelyd (21. oktober 2026)
+- Auto og tælling genbruger samme MP3-afspiller, så mobilbrowseren ikke skal godkende et nyt lydelement for hvert tal/sprog. Første afspilning starter direkte fra brugertrykket uden unødigt asynkront mellemtrin.
+- Afslutning kontrolleres også via lydens slutposition, hvis browserens ended-besked udebliver. En fastlåst play-promise har timeout; timere og gamle hændelser ryddes ved stop/fejl. Begge sprog afsluttes før næste tal.
+- Regressionstest fremkalder fejl med v0.9.73 og består med rettelsen. 58/58 Node-tests samt simulerede browserprøver af Auto/tælling, afbrydelse og slutstemme. Fysisk iPhone-afprøvning mangler. Kun GitHub; ingen Worker-ændring.
+
 ## v0.9.73 – egne spilsider og tælling i Talkort (21. oktober 2026)
 - Menuen viser kun fire spilvalg. Talstien, Kortspil og Talkort får egne adresser, indstillinger/Start og Spilmenu tilbage. Browsertilbage, genindlæsning og online-linket understøttes; Talstiens indstillinger er samlet på dets side. Gem/fortsæt bevares.
 - Talkort viser kortet først, derefter kontroller og valg. Indgang/indstillinger er tavse; kort, pil eller Læs igen læser uden særskilt Start.
