@@ -18,7 +18,7 @@
 <div class="shell">
   <header class="top">
     <div class="brand"><div class="logo" aria-hidden="true">🫏</div><div><h1>Æsel<span class="red">Klog</span> · Talstien</h1><small>Spil, lær og grin sammen</small></div></div>
-    <div class="top-actions"><span class="pill">PRØVEVERSION 0.9.72 (levende brikker)</span><button id="voiceToggle" class="btn soft small" type="button" aria-pressed="true">🔊 Lyd til</button></div>
+    <div class="top-actions"><span class="pill">PRØVEVERSION 0.9.73 (hver sit spil)</span><button id="voiceToggle" class="btn soft small" type="button" aria-pressed="true">🔊 Lyd til</button></div>
   </header>
 
 
@@ -46,7 +46,7 @@
   </section>
 
   <section id="settings" class="view" aria-label="Indstillinger for ÆselKlog">
-    <div class="page-heading"><button type="button" class="btn soft small" id="settingsBack">← Forside</button><h2>⚙️ Indstillinger</h2><p>Vælg spillemåde, terninger, talområde og stemmer. Valgene gemmes automatisk på denne enhed.</p></div>
+    <div class="page-heading"><button type="button" class="btn soft small" id="settingsBack">← Spilmenu</button><h2>⚙️ Indstillinger</h2><p>Vælg spillemåde, terninger, talområde og stemmer. Valgene gemmes automatisk på denne enhed.</p></div>
     <div class="grid2" id="gameOptions">
       <div class="paper"><h2>🎲 Vælg spil</h2>
         <div class="field"><label for="range">Hvilket talområde?</label><select id="range"><option value="1-100">Hele Talstien · 1–100</option><option value="1-20">Lyseblå · 1–20</option><option value="21-40">Koral · 21–40</option><option value="41-60">Gul · 41–60</option><option value="61-80">Grøn · 61–80</option><option value="81-100">Lilla · 81–100</option></select></div>
@@ -157,7 +157,7 @@
         <button type="button" id="musicPreview" class="btn soft">▶ Hør melodi</button>
       </div>
     </section>
-    <button type="button" id="settingsDone" class="btn main block settings-done">✓ Gem indstillinger og gå til forsiden</button>
+    <button type="button" id="settingsDone" class="btn main block settings-done">✓ Gem indstillinger og tilbage</button>
   </section>
 
 <section id="gameChooser" class="game-selection" aria-label="Vælg spil" hidden><div class="page-heading"><button type="button" class="btn soft small" id="setupBack">← Forside</button><h2>Hvad vil du spille?</h2></div>
@@ -177,16 +177,32 @@
     </div>
 </section>
   <section id="setup" class="view" aria-label="Vælg spillere">
-    <div class="page-heading"><h2>🎲 Hvem skal spille?</h2></div>
+    <div class="page-heading"><button type="button" class="btn soft small" id="boardSetupBack">← Spilmenu</button><h2>🎲 Talstien</h2><p>Vælg indstillinger og spillere. Tryk Start, når I er klar.</p></div><button id="boardResume" type="button" class="btn soft block" hidden>▶ Fortsæt gemt Talstien-spil</button>
 
     <div class="settings-glance" id="settingsSummary" aria-live="polite"><span>⚙️ Spillet er klar med dine indstillinger.</span><button type="button" id="setupEditSettings" class="btn soft small">Skift indstillinger</button></div>
-    <div class="paper"><div class="row between"><div><h2>👨‍👩‍👧 Spillere</h2></div><button type="button" id="addPlayer" class="btn soft small">+ Tilføj spiller</button></div><p class="tiny setup-player-limit" id="boardPlayerLimitNote">Op til 6 spillere samt eventuelt CPU-æslet.</p><div id="playerInputs"></div>
+    <details id="boardSetupOptions" class="paper board-setup-options"><summary>⚙️ Spillemåde, terninger og lyd</summary><div id="boardSettingsSlot"></div></details><div class="paper"><div class="row between"><div><h2>👨‍👩‍👧 Spillere</h2></div><button type="button" id="addPlayer" class="btn soft small">+ Tilføj spiller</button></div><p class="tiny setup-player-limit" id="boardPlayerLimitNote">Op til 6 spillere samt eventuelt CPU-æslet.</p><div id="playerInputs"></div>
       <label class="option cpu-quick-toggle"><input type="checkbox" id="cpuCheck"><span><strong>🫏 Spil mod Æsel</strong></span></label><button type="button" id="startButton" class="btn main block" style="margin-top:12px">Start spillet 🥕</button></div>
 
   </section>
 
   <section id="talkort" class="view" aria-label="Talkort – se og hør tal">
-    <div class="page-heading talkort-heading"><button type="button" class="btn soft small" id="talkortBack" hidden>← Spilmenu</button><h2>🔢 Talkort · 1–100</h2><p>Bladr gennem tallene og hør dem på dit valgte sprog. Helt uden spilregler.</p></div>
+    <div class="page-heading talkort-heading"><button type="button" class="btn soft small" id="talkortBack">← Spilmenu</button><h2>🔢 Talkort · 1–100</h2><p>Bladr gennem tallene og hør dem på dit valgte sprog. Helt uden spilregler.</p></div>
+    <div class="talkort-stage" id="talkortStage">
+      <div class="talkort-progress" id="talkortProgress" role="status" aria-live="polite">Tal 1 af 100</div>
+      <article id="talkortCard" class="talkort-card zone-1" role="button" tabindex="0" aria-label="Talkort 1">
+        <div class="talkort-corner">1</div><img class="talkort-mascot talkort-mascot-top" src="./assets/images/donkey-card.webp" alt="" aria-hidden="true">
+        <div class="talkort-info"><div><b id="talkortParity">Ulige</b><span class="talkort-parity-dots" id="talkortDots" aria-hidden="true">●</span></div><div><b id="talkortPlace">0 tiere + 1 ener</b><span class="talkort-blocks" id="talkortBlocks" aria-hidden="true">●</span></div><div id="talkortPrime" class="talkort-prime" hidden>★ Primtal</div></div>
+        <strong class="talkort-number" id="talkortNumber">1</strong>
+        <div class="talkort-info talkort-info-bottom" aria-hidden="true"><div><b id="talkortParityBottom">Ulige</b><span class="talkort-parity-dots" id="talkortDotsBottom">●</span></div><div><b id="talkortPlaceBottom">0 tiere + 1 ener</b><span class="talkort-blocks" id="talkortBlocksBottom">●</span></div><div id="talkortPrimeBottom" class="talkort-prime" hidden>★ Primtal</div></div>
+        <img class="talkort-mascot talkort-mascot-bottom" src="./assets/images/donkey-card.webp" alt="" aria-hidden="true"><div class="talkort-corner talkort-corner-bottom" id="talkortCornerBottom">1</div>
+      </article>
+      <div class="talkort-controls" aria-label="Bladr i talkort"><button type="button" id="talkortPrev" class="btn soft">← Forrige</button><button type="button" id="talkortRepeat" class="btn main">🔊 Læs igen</button><button type="button" id="talkortNext" class="btn soft">Næste →</button></div>
+      <div class="talkort-extra-controls"><button type="button" class="btn soft" id="talkortAuto" aria-pressed="false">▶ Auto</button><label class="talkort-delay" for="talkortDelay">Pause i sek. <input id="talkortDelay" type="number" min="0.1" max="60" step="0.1" value="2"></label><button type="button" class="btn soft" id="talkortReset">↺ Nulstil</button></div>
+      <label class="talkort-practice-switch"><input id="talkortPracticeEnabled" type="checkbox"> 🎙️ Øv min udtale (valgfrit)</label>
+      <div id="talkortPractice" class="talkort-practice" hidden><p>Optag dit tal og sammenlign det med ÆselKlogs rigtige oplæsning. Optagelsen gemmes ikke på serveren.</p><div class="talkort-practice-buttons"><button type="button" class="btn soft" id="talkortRecord">🎙️ Optag</button><button type="button" class="btn soft" id="talkortHearMine" disabled>▶ Hør mig</button><button type="button" class="btn soft" id="talkortCompare" disabled>🔁 Sammenlign</button></div><p id="talkortPracticeStatus" role="status" aria-live="polite"></p></div>
+      <p class="talkort-note" id="talkortVoiceInfo">Tryk på kortet, pilene eller Læs igen for at høre tallet.</p>
+    </div>
+<section class="paper talkort-counter" aria-label="Tæl op eller ned"><h3>Tæl op eller ned</h3><div class="grid2"><label class="field">Retning<select id="talkortCountDirection"><option value="down">Tæl ned til 0</option><option value="up">Tæl op til et valgt tal</option></select></label><label class="field">Starttal (0–100)<input id="talkortCountFrom" type="number" min="0" max="100" step="1" value="25"></label><label class="field" id="talkortCountToField" hidden>Sluttal (0–100)<input id="talkortCountTo" type="number" min="0" max="100" step="1" value="25"></label></div><label class="field">Besked efter tællingen (valgfri)<textarea id="talkortCountMessage" maxlength="350" rows="2" placeholder="Fx: Nu må I åbne øjnene!"></textarea></label><label class="field">Stemme til slutbeskeden<select id="talkortCountVoice"><option value="current">Spillelederens valgte stemme</option><option value="device">Telefonens stemme</option></select></label><div class="row"><button id="talkortCountStart" type="button" class="btn main">▶ Start tælling</button><button id="talkortCountStop" type="button" class="btn soft" hidden>■ Stop</button><button id="talkortCountResume" type="button" class="btn soft" hidden>▶ Prøv lyden igen</button></div><p id="talkortCountStatus" class="tiny" role="status"></p><p class="tiny">Vælg sprog og pause på siden. Ved dobbeltsprog læses begge sprog, før næste tal vises. Nul og slutbeskeder læses med en stemme; 1–100 bruger de gemte talelyde.</p></section>
     <div class="talkort-options paper">
       <label class="field" for="talkortRange">Talområde
         <select id="talkortRange"><option value="1-100">Alle tal · 1–100</option><option value="1-20">🔵 1–20</option><option value="21-40">🌸 21–40</option><option value="41-60">🟡 41–60</option><option value="61-80">🟢 61–80</option><option value="81-100">🟣 81–100</option></select>
@@ -201,25 +217,10 @@
         <select id="talkortJump" aria-label="Vælg tal"></select>
       </label>
     </div>
-    <div class="talkort-stage" id="talkortStage"><button id="talkortStart" type="button" class="btn main block">▶ Start talkort</button><p id="talkortStartInfo" class="hint">Vælg dine indstillinger. Tryk Start, når du er klar til at høre tallene.</p>
-      <div class="talkort-progress" id="talkortProgress" role="status" aria-live="polite">Tal 1 af 100</div>
-      <article id="talkortCard" class="talkort-card zone-1" aria-label="Talkort 1">
-        <div class="talkort-corner">1</div><img class="talkort-mascot talkort-mascot-top" src="./assets/images/donkey-card.webp" alt="" aria-hidden="true">
-        <div class="talkort-info"><div><b id="talkortParity">Ulige</b><span class="talkort-parity-dots" id="talkortDots" aria-hidden="true">●</span></div><div><b id="talkortPlace">0 tiere + 1 ener</b><span class="talkort-blocks" id="talkortBlocks" aria-hidden="true">●</span></div><div id="talkortPrime" class="talkort-prime" hidden>★ Primtal</div></div>
-        <strong class="talkort-number" id="talkortNumber">1</strong>
-        <div class="talkort-info talkort-info-bottom" aria-hidden="true"><div><b id="talkortParityBottom">Ulige</b><span class="talkort-parity-dots" id="talkortDotsBottom">●</span></div><div><b id="talkortPlaceBottom">0 tiere + 1 ener</b><span class="talkort-blocks" id="talkortBlocksBottom">●</span></div><div id="talkortPrimeBottom" class="talkort-prime" hidden>★ Primtal</div></div>
-        <img class="talkort-mascot talkort-mascot-bottom" src="./assets/images/donkey-card.webp" alt="" aria-hidden="true"><div class="talkort-corner talkort-corner-bottom" id="talkortCornerBottom">1</div>
-      </article>
-      <div class="talkort-controls" aria-label="Bladr i talkort"><button type="button" id="talkortPrev" class="btn soft">← Forrige</button><button type="button" id="talkortRepeat" class="btn main">🔊 Læs igen</button><button type="button" id="talkortNext" class="btn soft">Næste →</button></div>
-      <div class="talkort-extra-controls"><button type="button" class="btn soft" id="talkortAuto" aria-pressed="false">▶ Auto</button><label class="talkort-delay" for="talkortDelay">Pause <select id="talkortDelay"><option value="1">1 sek.</option><option value="2" selected>2 sek.</option><option value="3">3 sek.</option><option value="5">5 sek.</option><option value="10">10 sek.</option></select></label><button type="button" class="btn soft" id="talkortReset">↺ Nulstil</button></div>
-      <label class="talkort-practice-switch"><input id="talkortPracticeEnabled" type="checkbox"> 🎙️ Øv min udtale (valgfrit)</label>
-      <div id="talkortPractice" class="talkort-practice" hidden><p>Optag dit tal og sammenlign det med ÆselKlogs rigtige oplæsning. Optagelsen gemmes ikke på serveren.</p><div class="talkort-practice-buttons"><button type="button" class="btn soft" id="talkortRecord">🎙️ Optag</button><button type="button" class="btn soft" id="talkortHearMine" disabled>▶ Hør mig</button><button type="button" class="btn soft" id="talkortCompare" disabled>🔁 Sammenlign</button></div><p id="talkortPracticeStatus" role="status" aria-live="polite"></p></div>
-      <p class="talkort-note" id="talkortVoiceInfo">Tallet bliver læst op, når kortet vises. Tryk Læs igen for at øve.</p>
-    </div>
   </section>
 
   <section id="cardsSetup" class="view" aria-label="Opsæt ÆselKlog kortspil">
-    <div class="page-heading"><button class="btn soft small" id="cardsSetupBack" type="button" hidden>← Spilmenu</button><h2>🃏 ÆselKlog – Kortspil</h2><p>Et selvstændigt kortspil uden spilleplade og terning. Matematik er valgfri.</p></div>
+    <div class="page-heading"><button class="btn soft small" id="cardsSetupBack" type="button">← Spilmenu</button><h2>🃏 ÆselKlog – Kortspil</h2><p>Et selvstændigt kortspil uden spilleplade og terning. Matematik er valgfri.</p></div>
 
     <div class="card-setup-intro"><img src="./assets/images/donkey-card.webp" alt="ÆselKlog-æselkort" loading="lazy"><div><strong>Spil med tallene – grin med æslet!</strong><p>Vend talkort, byg rækkerne i midten og giv æselkort som straf ved fejl. I spiller sammen på denne enhed.</p></div></div>
     <div id="cardsResume" class="card-resume paper" hidden><div><strong>💾 Et gemt kortspil</strong><p class="tiny" id="cardsResumeInfo"></p></div><div class="row"><button type="button" class="btn green" id="cardsContinue">▶ Fortsæt kortspil</button><button type="button" class="btn danger small" id="cardsDeleteSave">Slet</button></div></div>
@@ -251,7 +252,7 @@
   </section>
 
   <section id="cardsGame" class="view" aria-label="ÆselKlog kortspil">
-    <div class="card-game-top"><div><h2 id="cardsPlayTitle">🃏 ÆselKlog – Kortspil</h2><p id="cardsPlayInfo" class="tiny"></p></div><div class="row"><button class="btn soft small" id="cardsMusicToggle" type="button" aria-pressed="false">🎵 Musik fra</button><button class="btn soft small" id="cardsVoiceToggle" type="button" aria-pressed="true">🔊 Tale til</button><button class="btn soft small" id="cardsRules" type="button">📖 Regler</button><button class="btn soft small" id="cardsSaveHome" type="button">💾 Gem og tilbage</button><button class="btn danger small" id="cardsFinish" type="button">✕ Afslut</button></div></div>
+    <div class="card-game-top"><button id="cardsGameMenu" type="button" class="btn soft small">← Spilmenu</button><div><h2 id="cardsPlayTitle">🃏 ÆselKlog – Kortspil</h2><p id="cardsPlayInfo" class="tiny"></p></div><div class="row"><button class="btn soft small" id="cardsMusicToggle" type="button" aria-pressed="false">🎵 Musik fra</button><button class="btn soft small" id="cardsVoiceToggle" type="button" aria-pressed="true">🔊 Tale til</button><button class="btn soft small" id="cardsRules" type="button">📖 Regler</button><button class="btn soft small" id="cardsSaveHome" type="button">💾 Gem og tilbage</button><button class="btn danger small" id="cardsFinish" type="button">✕ Afslut</button></div></div>
     <div class="card-game-status" role="status" aria-live="polite"><h3 id="cardsTurnHeading">Næste tur</h3><p id="cardsMessage"></p></div>
     <div class="card-table">
       <section class="paper card-game-players" aria-label="Spillernes bunker"><div class="card-section-heading"><h3>🃏 Spillernes bunker</h3><p id="cardInteractionHint" class="card-table-hint" role="status" aria-live="polite">Tryk på bunken for at vende. Træk kortet til en anden bunke.</p></div><div id="cardsPlayers" class="card-players-grid"></div><section class="paper card-challenge" aria-label="Opdagede fejl"><button id="cardsChallenge" type="button" class="card-challenge-button" disabled><img src="./assets/images/donkey-card.webp" alt=""><span><strong>🫏 Opdaget fejl!</strong><small>Tryk på æselkortet for at udfordre det seneste træk</small></span></button><p id="cardChallengeHint" class="tiny">Kortet går tilbage, hvis trækket var forkert. Straf gives derefter.</p></section>
@@ -264,7 +265,7 @@
     <button id="cardsHome" type="button" class="btn soft">← Til kortspil-menuen</button>
   </section>
 
-  <section id="game" class="view" aria-label="Talstien spil">
+  <section id="game" class="view" aria-label="Talstien spil"><button id="gameMenu" type="button" class="btn soft small game-menu-back">← Spilmenu</button>
     <div class="status"><div class="row between"><div><div class="tiny" id="rangeTitle">Hele talstien</div><h2 id="turnTitle">Næste tur</h2><div id="turnSubtitle" class="hint" style="margin-bottom:0">Nu skal der spilles!</div></div><div class="row"><button type="button" class="btn soft small" id="speakAgain">🔊 Gentag</button><button type="button" class="btn soft small" id="numberRepeatBoard">🔊 Hør tallet igen</button><button type="button" class="btn soft small" id="newGame">↩ Nyt spil</button><button type="button" class="btn exit-shortcut" id="gameExit">⏻ Afslut</button><button type="button" class="btn soft small" id="gameMusicToggle" aria-pressed="false">🎵 Musik fra</button></div></div><div id="scores" class="score"></div></div>
     <section id="physicalGuide" class="physical-guide" aria-label="Spilleleder til fysisk spilleplade" hidden>
       <div class="physical-guide-header"><strong>🏡 Fysisk A3-plade</strong><span class="physical-guide-pill">Spilleleder</span></div>
@@ -277,7 +278,7 @@
     <section class="boardbox" id="boardBox" aria-label="ÆselKlog spilleplade">
       <div class="board-head">
         <div class="board-heading"><h3>🗺️ Talstien · den levende bondegård</h3><span class="tiny" id="boardModeLabel">Digital spilleplade</span></div>
-        <div class="board-main-actions">
+        <div class="board-main-actions"><button id="boardMenuExpanded" type="button" class="btn soft small" hidden>← Spilmenu</button>
           <button class="btn soft small" type="button" id="openTopscoreGame">🏆 Topscore</button><button class="btn soft small" type="button" id="saveGame">💾 Gem &amp; afslut</button><button class="btn soft small" type="button" id="editPos">✏️ Ret felt</button>
           <button class="btn main small" type="button" id="boardExpand" aria-controls="boardBox" aria-expanded="false">⛶ Stor plade</button>
           <button class="btn board-close small" type="button" id="boardClose" hidden aria-label="Luk stor spilleplade">✕ Luk</button><button class="btn board-exit small" type="button" id="boardExit" hidden>⏻ Afslut</button><button type="button" class="btn soft small" id="boardMusicToggle" aria-pressed="false">🎵 Musik fra</button>
@@ -391,6 +392,6 @@
 <script src="./cardgame-ui.js" defer></script>
 <script src="./home-ui.js" defer></script>
 <script src="./offline-talkort.js" defer></script>
-<script src="./talkort.js" defer></script>
+<script src="./talkort-counter.js" defer></script><script src="./talkort.js" defer></script>
 <script src="./audio-settings.js" defer></script>
 </body></html>

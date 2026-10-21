@@ -877,3 +877,7 @@ body.home-active #resumeCard button:active{filter:brightness(.94)}
 .card-back{position:relative;overflow:hidden;place-content:stretch;padding:0;gap:0}.card-back-art{width:100%;height:100%;object-fit:cover;grid-area:1/1;pointer-events:none;user-select:none;-webkit-user-drag:none}.card-back small{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
 
 .game-selection[hidden]{display:none!important}.game-selection{margin-bottom:20px}.game-selection .page-heading{margin-bottom:14px}#talkortStart{margin-bottom:10px;min-height:52px}#talkortStart[hidden],#talkortBack[hidden],#cardsSetupBack[hidden]{display:none!important}
+
+#settings.embedded-settings{display:block;margin:12px 0 0}#settings.embedded-settings>.page-heading{padding:0;background:transparent;border:0;box-shadow:none}#settings.embedded-settings .paper{box-shadow:none}.board-setup-options>summary{font-size:1rem;font-weight:800;cursor:pointer}.game-menu-back{margin-bottom:12px}#boardResume{margin-bottom:12px}.card-game-top{flex-wrap:wrap}
+
+#talkort .talkort-stage{margin-top:0}#talkort .talkort-options{margin-top:16px}#talkortCard{cursor:pointer}#talkortCard:focus-visible{outline:4px solid #3281b7;outline-offset:4px}.talkort-delay input{width:90px;min-height:44px}.talkort-counter textarea{width:100%;font:inherit;padding:10px;border:1px solid #cad7e6;border-radius:11px}.talkort-counter .field{min-width:0}#talkortCountStatus{margin-top:10px}

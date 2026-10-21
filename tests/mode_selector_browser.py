@@ -26,10 +26,10 @@ def visit(page, tag):
     faults=[];page.on('pageerror',lambda e:faults.append(str(e)))
     load(page)
     page.locator('#homePlay').click()
-    assert page.locator('#setup').is_visible()
+    assert page.locator('#gameChooser').is_visible() and not page.locator('#setup').is_visible()
     assert page.locator('#chooseBoardMode').is_visible()
     assert page.locator('#openCardSetup').is_visible()
-    assert page.locator('#chooseBoardMode').get_attribute('aria-pressed')=='true'
+    assert page.locator('#chooseBoardMode').get_attribute('aria-pressed')=='false'
     assert page.locator('#openCardSetup').get_attribute('aria-pressed')=='false'
     # All selection surfaces are large and the visible cards don't overlap.
     board=page.locator('#chooseBoardMode').bounding_box();cards=page.locator('#openCardSetup').bounding_box()
@@ -44,6 +44,7 @@ def visit(page, tag):
     assert not page.locator('#cpuCheck').is_visible()
     assert page.locator('#cardRange').is_visible()
     page.screenshot(path=str(ROOT/f'preview_card_mode_{tag}.png'),full_page=True)
+    page.locator('#cardsSetupBack').click()
     page.locator('#chooseBoardMode').click()
     assert page.locator('#setup').is_visible() and not page.locator('#cardsSetup').is_visible()
     assert page.locator('#cpuCheck').is_visible() and not page.locator('#cardRange').is_visible()

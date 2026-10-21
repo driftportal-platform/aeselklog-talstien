@@ -10,7 +10,7 @@ const ui=id=>document.getElementById(id);
 const pathFor=(number,lang,role)=>`${base}${lang==='da'?(role==='donkey'?'donkey':'narrator'):lang}/${String(number).padStart(3,'0')}.mp3`;
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
 function stop(){serial++;if(active){active.pause();active.removeAttribute('src');active.load();active=null}if(activeResolve){const done=activeResolve;activeResolve=null;done()}}
-async function play(number,selection,role='narrator'){
+async function play(number,selection,role='narrator',options={}){
  const n=Number(number),parts=window.AeselNumbers?.parts(n,selection)||[];
  if(!Number.isInteger(n)||n<1||n>100||!parts.length)return false;
  const paths=parts.filter(p=>langs.has(p.lang)).map(p=>pathFor(n,p.lang,role));
@@ -19,14 +19,14 @@ async function play(number,selection,role='narrator'){
  const duck=window.AeselMusic?.beginSpeech?.();
  try{
   for(let i=0;i<paths.length;i++){
-   if(id!==serial)return true;
-   if(i){await wait(650);if(id!==serial)return true}
+   if(id!==serial)return options.reliable?'interrupted':true;
+   if(i){await wait(650);if(id!==serial)return options.reliable?'interrupted':true}
    const audio=new Audio(paths[i]);active=audio;audio.volume=1;audio.preload='auto';
-   await new Promise((resolve,reject)=>{const finish=()=>{if(activeResolve===finish)activeResolve=null;resolve()};activeResolve=finish;audio.onended=finish;audio.onerror=()=>{if(activeResolve===finish)activeResolve=null;reject(new Error('MP3 mangler eller er beskadiget'))};audio.play().catch(error=>{if(activeResolve===finish)activeResolve=null;reject(error)})});
+   await new Promise((resolve,reject)=>{let timer;const finish=()=>{clearTimeout(timer);if(activeResolve===finish)activeResolve=null;resolve()};activeResolve=finish;audio.onended=finish;audio.onerror=()=>{clearTimeout(timer);if(activeResolve===finish)activeResolve=null;reject(new Error('MP3 mangler eller er beskadiget'))};timer=setTimeout(()=>{if(activeResolve===finish)activeResolve=null;reject(new Error('Talelyden svarede ikke'))},12000);audio.play().catch(error=>{clearTimeout(timer);if(activeResolve===finish)activeResolve=null;reject(error)})});
   }
-  return true;
+  if(id!==serial)return options.reliable?'interrupted':true;return true;
  }catch(err){
-  if(id!==serial)return true;
+  if(id!==serial)return options.reliable?'interrupted':true;
   console.warn('Gemt talelyd ikke tilgængelig – brug fallback',err);
   return false;
  }finally{if(id===serial)active=null;if(duck!==undefined)window.AeselMusic?.endSpeech?.(duck)}

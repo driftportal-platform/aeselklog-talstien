@@ -1,21 +1,21 @@
 # Installation af ÆselKlog
 
-Aktuel opdatering: v0.9.72 – varieret fortæller og hoppende onlinebrikker.
+Aktuel opdatering: v0.9.73 – egne spilsider og tælling i Talkort.
 
-1. Pak opdateringen ud og kopiér indholdet ind i projektmappen. Erstat filerne og bevar undermapper. Bevar assets, audio og music.
-2. Kør `npm.cmd test`: 55/55 skal bestå. Kontrollér i GitHub Desktop, Commit og Push origin. `.github/workflows/test.yml` skal fortsat findes.
-3. Denne opdatering ændrer kun websiden. Cloudflare skal ikke deployes igen; Worker v0.9.71 bevares.
+1. Pak opdateringen ud og kopiér indholdet ind i projektmappen. Erstat filerne og bevar undermapper. Slet ikke assets, audio eller music.
+2. Kør `npm.cmd test`: 57/57 skal bestå. Kontrollér GitHub Desktop, Commit og Push origin. Bevar `.github/workflows/test.yml`.
+3. Kun GitHub skal opdateres denne gang. Cloudflare-koden er uændret; eksisterende Worker bevares.
 
-Genindlæs alle enheder. Åbn online Talstien → Indstillinger → Lyd og musik → Fortællerstemme i Talstien. Vælg AI-stemme eller Telefonens stemme. AI-listen er den samme som i offline Talstien; tryk Opdater stemmelisten ved behov og Prøv valgt stemme. ÆselKlog-original vises kun, hvis stemmetjenesten returnerer den.
+## Prøv navigationen
+Spilmenuen viser kun de fire valg. Hvert offline-spil åbner sin egen adresse og side. Talstien har spillere, Start og indstillinger der kan foldes ud. Tilbage går via Spilmenu. Gem og fortsæt skal fungere i begge spil. Browserens tilbageknap og genindlæsning skal åbne den rigtige side. Online spil har fortsat sine egne to spilvalg.
 
-Hver enhed gemmer sit eget onlinevalg; ved første brug arves offline-valget. Stemmetjenestens Worker er den samme som offline; dens eksisterende API-nøgle skal ikke kopieres til spillet eller GitHub. Denne pakke ændrer ikke stemme-Workerens kode.
+## Prøv Talkort
+Kortet vises øverst uden lyd. Tryk på kortet, Læs igen eller en pil for at læse. Vælg fx dobbeltsprog Dansk + engelsk og pause 1 sekund.
 
-AI-stemmen bruger nu de indtastede navne, som ønsket. Navnene indgår i teksten til den samme stemmetjeneste som offline; der gemmes ikke en permanent lydcache med navnene. Ved fejl bruges telefonstemmen midlertidigt, mens det valgte AI-ID bevares. Slå Tale fra for at stoppe talebeskeder. Musikkens lydstyrke dæmpes under tale.
+Tæl ned: vælg starttal 25 og en valgfri besked/stemme. Tryk Start tælling. Den læser 25 til 0 og derefter beskeden. Tæl op: vælg starttal og sluttal. Begge sprog skal være færdige før næste tal.
 
-Prøv først valgt stemme på to fysiske enheder, derefter tur/opgave/specialfelt, Tale fra, musik og genindlæsning. 55/55 Node-tests og simulerede browserprøver består; ægte ElevenLabs-lyd og iPhone-autoplay er ikke testet herfra.
+Tallene 1–100 bruger de gemte MP3'er. Nul og slutbeskeden bruger den valgte stemme. Vælges AI, sendes slutteksten til samme stemmetjeneste som offline, uden permanent cache af teksten. Telefonstemme kan vælges i stedet. Ingen ny API-nøgle kræves.
 
-Denne ene fil opdateres fremover. Ældre installationsfiler i docs/arkiv er historik.
+Auto genprøver samme tal ved kort lydfejl. Ved vedvarende fejl forbliver forløbet på pause og kan genoptages med Prøv lyden igen. Skjules siden, pauser den og fortsætter ved retur. Stop og tilbage må ikke udløse en senere slutbesked.
 
-Kast-knappen ligger nu over spillepladen til højre. Tryk på terningen med teksten Kast. Felter folder alle forklaringer ud i fuld bredde lige over banen. Prøv også med smal mobilskærm og de faktiske spillernavne.
-
-Prøv et online Talstien-spil: Hov hov siges ikke ved hver almindelig besked. Brikken hopper fra felt til felt, også ved et Hov hov-felt der flytter tilbage. Hør igen gentager seneste faktisk læste besked. Ved reduceret bevægelse vises brikken direkte på sin position. Serveren bestemmer fortsat position og tur.
+57/57 Node-tests og simulerede Chromium-prøver, herunder reel lokal HTTP/PWA-offlineprøve. Stemmeafspilning er simuleret; prøv især dobbeltsprog, nul, sluttekst og baggrund/retur på fysisk iPhone/iPad og pc.

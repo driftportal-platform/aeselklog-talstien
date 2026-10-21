@@ -36,6 +36,7 @@ function updateVoiceToggle(){cardVoiceOn=window.AeselAudioSettings?.forMode?.('c
 function announceCard(){return Promise.resolve()} // Ingen ekstra AI-kommentarer, kun MP3-tal.
 function stopVoice(){audioGeneration++;window.AeselOfflineNumbers?.stop?.();window.AeselVoice?.stop?.();speechDone=Promise.resolve();}
 
+window.AeselCardGamePause=()=>{if(game)save();stopTimers();stopVoice()};
 function navigate(view){if(typeof window.AeselShowView==='function')window.AeselShowView(view)}
 function safeStore(){try{return window.localStorage}catch(_){return null}}
 function readSaved(){try{return E.restore(safeStore()?.getItem(E.SAVE_KEY)||null)}catch(_){return null}}
@@ -246,7 +247,8 @@ $('cardCpuCheck').addEventListener('change',syncCpuSetting);
  $('cardCpuMistakes')?.addEventListener('change',()=>{$('cardCpuErrorPercent').disabled=!$('cardCpuMistakes').checked});
 $('cardPlayerCount').addEventListener('change',()=>renderNameInputs(Number($('cardPlayerCount').value)));
 $('openCardSetup').addEventListener('click',()=>{renderResume();navigate('cardsSetup')});
-$('cardsSetupBack').addEventListener('click',()=>navigate('setup'));
+$('cardsSetupBack').addEventListener('click',()=>navigate('menu'));
+$('cardsGameMenu').addEventListener('click',()=>{save();menu();navigate('menu')});
 $('cardStart').addEventListener('click',()=>{
  $('cardsSetupError').textContent='';const names=[...$('cardPlayerNames').querySelectorAll('input')].map(input=>input.value.trim());
  if(readSaved()&&!window.confirm('Et tidligere kortspil bliver erstattet. Vil I starte et nyt?'))return;

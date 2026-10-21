@@ -177,13 +177,13 @@ function waitForPlayback(begin,maxMs){
   try{begin(finish)}catch(e){console.warn('Oplæsning kunne ikke afspilles',e);finish()}
  });
 }
-function speakLocally(text,{cpu=false}={}){
+function speakLocally(text,{cpu=false,language='da-DK'}={}){
  if(!('speechSynthesis' in window)||!sound.on)return Promise.resolve();
  try{
   const sentence=normalizedSpeech(text);
   const u=new SpeechSynthesisUtterance(sentence);
-  u.lang='da-DK';u.rate=cpu?Math.min(1.15,sound.rate*1.04):sound.rate;u.pitch=cpu?Math.min(1.5,sound.pitch*1.17):sound.pitch;
-  const ds=danishVoices();const narrator=ds.find(v=>(v.voiceURI||v.name)===sound.selected)||ds.find(v=>/premium|enhanced/i.test(v.name))||ds.find(v=>v.default)||ds[0]||null;
+  u.lang=language;u.rate=cpu?Math.min(1.15,sound.rate*1.04):sound.rate;u.pitch=cpu?Math.min(1.5,sound.pitch*1.17):sound.pitch;
+  const ds=language==='da-DK'?danishVoices():voiceOptions().filter(v=>(v.lang||'').slice(0,2)===language.slice(0,2));const narrator=ds.find(v=>(v.voiceURI||v.name)===sound.selected)||ds.find(v=>/premium|enhanced/i.test(v.name))||ds.find(v=>v.default)||ds[0]||null;
   u.voice=cpu?(ds.find(v=>v!==narrator)||narrator):narrator;
   return waitForPlayback(done=>{u.onend=done;u.onerror=done;speechSynthesis.speak(u)},Math.min(28000,4000+sentence.length*160));
  }catch(e){console.warn('Lokal oplæsning kunne ikke starte',e);return Promise.resolve()}
@@ -198,10 +198,10 @@ function ensureAudioContext(){
 // iOS tillader pålideligt Web Audio efter en brugerhandling (tryk på spil/terning).
 document.addEventListener('pointerdown',()=>{if(sound.on&&sound.mode==='ai')ensureAudioContext()}, {passive:true});
 document.addEventListener('keydown',()=>{if(sound.on&&sound.mode==='ai')ensureAudioContext()}, {passive:true});
-async function speakAI(text,id,{cpu=false,strictVoice=false,boost=1}={}){
+async function speakAI(text,id,{cpu=false,strictVoice=false,boost=1,voiceOverride=null,language='da-DK'}={}){
  const endpoint=AI_TTS_ENDPOINT;
  // Brug det faktisk valgte ID (inkl. CPU'ens eget valg), ikke rollen eller standardnavnet.
- const voiceId=cpu?CV.chooseVoice(aiVoices,sound.aiVoice,sound.cpuVoice):sound.aiVoice;
+ const voiceId=voiceOverride||(cpu?CV.chooseVoice(aiVoices,sound.aiVoice,sound.cpuVoice):sound.aiVoice);
  const clip={endpoint,voiceId,text};
  const key=endpoint+'|'+voiceId+'|'+text;
  let bytes=null,downloaded=false,fromStoredCache=false;
@@ -219,7 +219,7 @@ async function speakAI(text,id,{cpu=false,strictVoice=false,boost=1}={}){
    if(navigator.onLine===false||Date.now()<aiRetryAfter){
     aiStatus('🫏 Denne oplæsning er ikke gemt. Telefonens stemme bruges midlertidigt.');
     if(strictVoice){aiStatus('⚠️ Den valgte AI-stemme er midlertidigt utilgængelig. Prøv Læs igen.');document.getElementById('talkortVoiceInfo')?.replaceChildren(document.createTextNode('⚠️ Spillelederens stemme er midlertidigt utilgængelig. Tryk Læs igen.'));return;}
-    return speakLocally(text,{cpu});
+    return speakLocally(text,{cpu,language});
    }
    const abort=new AbortController();aiFetch=abort;
    const timeout=setTimeout(()=>abort.abort(),25000);
@@ -269,7 +269,7 @@ async function speakAI(text,id,{cpu=false,strictVoice=false,boost=1}={}){
   const reason=/HTTP 502|HTTP 429|HTTP 402/.test(String(e?.message||''))?' Tjek også din ElevenLabs-creditgrænse.':'';
   aiStatus('🫏 AI-lyden er ikke tilgængelig lige nu.'+reason+' Telefonens stemme bruges midlertidigt.');
   if(strictVoice){aiStatus('⚠️ Kunne ikke afspille den valgte AI-stemme. Tryk Læs igen for et nyt forsøg.');document.getElementById('talkortVoiceInfo')?.replaceChildren(document.createTextNode('⚠️ Spillelederens stemme er utilgængelig. Tryk Læs igen.'));return;}
-  return speakLocally(text,{cpu});
+  return speakLocally(text,{cpu,language});
  }finally{if(id===speechSerial)aiFetch=null}
 }
 
@@ -342,7 +342,11 @@ window.AeselApplyAudioProfile=function(profile){
  const music=window.AeselMusic;
  if(music){music.setTrack(profile.track||'gonefishin');music.setVolume(profile.volume??32);music.setEnabled(profile.music===true);}
 };
-window.AeselVoice={say:(text,options={})=>say(text,options),number:(number,options={})=>speakNumber(number,options),repeatNumber:()=>lastSpokenNumber!==null?speakNumber(lastSpokenNumber,{repeat:true}):Promise.resolve(),stop:stopCurrentVoice,enabled:()=>sound.on,choices:()=>({mode:sound.mode,aiVoice:sound.aiVoice,cpuVoice:sound.cpuVoice,numberLanguage})};
+async function sayWithVoice(text,{voice='current',language='da-DK'}={}){
+ if(!sound.on)return;const line=normalizedSpeech(text);if(!line)return;stopCurrentVoice();const id=speechSerial,duck=window.AeselMusic?.beginSpeech?.();
+ try{if(voice==='device'||voice==='current'&&sound.mode==='device')return await speakLocally(line,{language});if(voice!=='current'&&voice!=='donkey'&&!aiVoices.some(v=>v.id===voice))throw Error('Vælg en tilgængelig stemme');const chosen=voice==='current'?sound.aiVoice:voice==='donkey'?CV.chooseVoice(aiVoices,sound.aiVoice,sound.cpuVoice):voice;return await speakAI(line,id,{voiceOverride:chosen,language})}finally{if(duck!==undefined)window.AeselMusic?.endSpeech?.(duck)}
+}
+window.AeselVoice={sayWithVoice,listVoices:()=>aiVoices.map(v=>({...v})),loadVoices:()=>loadAIVoices(),say:(text,options={})=>say(text,options),number:(number,options={})=>speakNumber(number,options),repeatNumber:()=>lastSpokenNumber!==null?speakNumber(lastSpokenNumber,{repeat:true}):Promise.resolve(),stop:stopCurrentVoice,enabled:()=>sound.on,choices:()=>({mode:sound.mode,aiVoice:sound.aiVoice,cpuVoice:sound.cpuVoice,numberLanguage})};
 const numberSelect=$('numberLanguageChoice');if(numberSelect){numberSelect.value=numberLanguage;numberSelect.addEventListener('change',e=>{numberLanguage=NUM.normalize(e.target.value);try{localStorage.setItem(NUMBER_LANGUAGE_KEY,numberLanguage)}catch(_){};numberSelect.value=numberLanguage;});}
 $('numberPreview')?.addEventListener('click',()=>void speakNumber(14));
 $('numberRepeatBoard')?.addEventListener('click',()=>void speakNumber(players?.[turn]?.pos||1));
@@ -476,8 +480,9 @@ function openExitDialog(){
  const dlg=$('exitGameDialog');
  if(typeof dlg.showModal==='function')dlg.showModal();else dlg.setAttribute('open','');
 }
-$('gameExit').addEventListener('click',openExitDialog);
-$('boardExit').addEventListener('click',openExitDialog);
+$('gameExit').addEventListener('click',()=>{exitToMenu=false;openExitDialog()});
+for(const id of ['gameMenu','boardMenuExpanded'])$(id).addEventListener('click',()=>{exitToMenu=true;openExitDialog()});
+$('boardExit').addEventListener('click',()=>{exitToMenu=false;openExitDialog()});
 $('exitCancel').addEventListener('click',closeExitDialog);
 $('exitGameDialog').addEventListener('cancel',event=>{event.preventDefault();closeExitDialog()});
 $('exitSave').addEventListener('click',()=>{if($('exitSave').disabled)return;closeExitDialog();saveAndLeave()});
@@ -485,7 +490,7 @@ $('exitDiscard').addEventListener('click',()=>{
  if(!window.confirm('Afslutte uden at gemme? Det nuværende spil kan så ikke fortsættes.'))return;
  closeExitDialog();resetAsync();G.clear(safeStorage());
  config=null;players=[];phase='setup';winner=null;pending=null;challenge=null;
- show('home');renderResumeCard();
+ show(exitToMenu?'menu':'home');renderResumeCard();
 });
 $('physicalShowBoard').addEventListener('click',()=>setBoardExpanded(true));
 
@@ -494,7 +499,7 @@ function saveAndLeave(){
  if(busy||!safePhase()||showDiceState){updateSaveBadge('🫏 Gem spillet efter den igangværende handling.');return;}
  if(!saveCheckpoint({notify:true})){window.alert('Spillet kunne ikke gemmes. Kontrollér, at privat browsing eller browserlager ikke blokerer.');return;}
  resetAsync();config=null;players=[];phase='setup';winner=null;pending=null;challenge=null;
- show('home');renderResumeCard();
+ show(exitToMenu?'menu':'home');renderResumeCard();
 }
 async function resumeSavedGame(){
  if(busy)return;
@@ -631,7 +636,8 @@ $('deleteParentProfile').addEventListener('click',()=>{
   refreshLearningProfileStatus();refreshParentReport();
  }else $('parentReportContent').textContent='Profilen kunne ikke slettes på denne enhed.';
 });
-$('homePlay').addEventListener('click',()=>show('setup'));
+let pageView='home',applyingAddress=false,exitToMenu=false;
+$('homePlay').addEventListener('click',()=>show('menu'));
  $('openOnlineGame')?.addEventListener('click',()=>{location.href='./site/online.html?menu=1'});
 $('homeSettings').addEventListener('click',()=>show('settings'));
 $('homeTopscore').addEventListener('click',openTopscore);
@@ -656,25 +662,35 @@ if(bgMusic){
  for(const id of ['gameMusicToggle','boardMusicToggle','cardsMusicToggle'])$(id)?.addEventListener('click',()=>bgMusic.setEnabled(!bgMusic.get().enabled));
  bgMusic.onChange(syncMusicButtons);syncMusicButtons();bgMusic.syncView('home');
 }
-$('settingsBack').addEventListener('click',()=>{saveGameOptions();show('home')});
-$('settingsDone').addEventListener('click',()=>{saveGameOptions();show('home')});
+function finishSettings(){saveGameOptions();if($('settings').classList.contains('embedded-settings')){$('boardSetupOptions').open=false;show('setup')}else show('menu')}
+$('settingsBack').addEventListener('click',finishSettings);
+$('settingsDone').addEventListener('click',finishSettings);
+$('boardSetupBack').addEventListener('click',()=>{saveGameOptions();show('menu')});
+$('boardResume').addEventListener('click',resumeSavedGame);
 $('setupBack').addEventListener('click',()=>show('home'));
 $('setupEditSettings').addEventListener('click',()=>show('settings'));
 
 $('addPlayer').addEventListener('click',()=>{if(setupPlayers.length<6){setupPlayers.push({name:`Spiller ${setupPlayers.length+1}`,age:7,kind:'child',difficulty:'mellem'});renderSetupPlayers()}});
 function show(view){
- $('gameChooser').hidden=!['setup','cardsSetup','talkort'].includes(view);for(const [id,selected] of [['chooseBoardMode','setup'],['openCardSetup','cardsSetup'],['openTalkort','talkort']])$(id).setAttribute('aria-pressed',String(view===selected));
+ if(view!=='cardsGame')window.AeselCardGamePause?.();
+ let openOptions=false;if(view==='settings'&&pageView==='setup'&&!applyingAddress){view='setup';openOptions=true}
+ if(view==='setup'){if($('boardSettingsSlot')?.append){$('boardSettingsSlot').append($('settings'));$('settings').classList.add('embedded-settings');$('settingsBack').hidden=true}if(openOptions)$('boardSetupOptions').open=true;$('boardResume').hidden=!G.read(safeStorage())}
+ else if(view==='settings'){$('settings').classList.remove('embedded-settings');$('settingsBack').hidden=false;document.querySelector('main')?.append($('settings'))}
+ pageView=view;updatePageAddress(view);
+ $('gameChooser').hidden=view!=='menu';for(const [id,selected] of [['chooseBoardMode','setup'],['openCardSetup','cardsSetup'],['openTalkort','talkort']])$(id).setAttribute('aria-pressed',String(view===selected));
  ['home','setup','settings','game','cardsSetup','cardsGame','talkort'].forEach(id=>$(id).classList.toggle('active',view===id));
  document.body.classList.toggle('home-active',view==='home');
  window.AeselVoice?.stop?.();
  window.AeselAudioSettings?.activate?.(view);
  window.AeselMusic?.syncView?.(view);
  if(view==='setup')updateSettingsSummary();
+ document.title=({menu:'Spilmenu',setup:'Talstien',game:'Talstien',cardsSetup:'Kortspil',cardsGame:'Kortspil',talkort:'Talkort',settings:'Indstillinger'}[view]||'Talstien')+' · ÆselKlog';
  if(view==='home')renderResumeCard();
  window.scrollTo({top:0,behavior:'instant'});
  // Flyt også tastatur- og skærmlæserfokus, når den tidligere side skjules.
  const target={
   home:$('homePlay'),
+  menu:document.querySelector('#gameChooser h2'),
   setup:document.querySelector('#setup .page-heading h2'),
   settings:document.querySelector('#settings .page-heading h2'),
   game:$('boardHud'),
@@ -692,7 +708,7 @@ $('openCardSetup').addEventListener('click',()=>show('cardsSetup'));
 $('chooseBoardMode').addEventListener('click',()=>show('setup'));
 $('openTalkort').addEventListener('click',()=>show('talkort'));
 function resetAsync(){gameToken++;resumeAdultMs=null;helpUsed=false;const fanfare=$('victoryFanfare');if(fanfare)fanfare.remove();clearInterval(taskTimer);taskTimer=null;taskPausedAt=null;taskDeadline=0;busy=false;extraRollUsed=false;showDiceState=null;hideDice();hideActionFlash();if(boardExpanded)setBoardExpanded(false);stopCurrentVoice();bray?.pause();}
-$('startButton').addEventListener('click',()=>{
+$('startButton').addEventListener('click',()=>{ saveGameOptions();
  resetAsync();G.clear(safeStorage());renderResumeCard();
  const raw=$('range').value,all=raw==='1-100';
  const start=all?0:Number(raw.split('-')[0])-1,goal=all?100:Number(raw.split('-')[1]);
@@ -779,7 +795,7 @@ function setBoardExpanded(expanded){
  document.body.classList.toggle('board-expanded',expanded);
  $('boardExpand').hidden=expanded;
  $('boardClose').hidden=!expanded;
- $('boardExit').hidden=!expanded;
+ $('boardExit').hidden=!expanded;$('boardMenuExpanded').hidden=!expanded;
  $('boardExpand').setAttribute('aria-expanded',String(expanded));
  // Behold den eksisterende opgave-komponent og alle dens event listeners.
  (expanded?$('boardPanelDock'):$('turnPanelHome')).append($('turnPanel'));
@@ -1311,7 +1327,17 @@ $('turnPanel').addEventListener('click',e=>{
  else if(a==='topscore')openTopscore();
  else if(a==='restart'){resetAsync();G.clear(safeStorage());config=null;players=[];phase='setup';show('home');renderResumeCard()}
 });
-function openLinkedGameMenu(){if(location.hash!=='#spilmenu')return;show('setup');history.replaceState(null,'',location.pathname+location.search)}
-window.addEventListener('hashchange',openLinkedGameMenu);openLinkedGameMenu();
+function updatePageAddress(view){
+ if(applyingAddress||typeof history==='undefined'||!location.href)return;
+ try{const url=new URL(location.href),names={menu:'menu',setup:'talstien',game:'talstien',cardsSetup:'kortspil',cardsGame:'kortspil',talkort:'talkort',settings:'indstillinger'};if(names[view])url.searchParams.set('spil',names[view]);else url.searchParams.delete('spil');url.hash='';if(url.href!==location.href)history.pushState(null,'',url)}catch{}
+}
+function openGameAddress(){
+ let selected;try{selected=new URL(location.href).searchParams.get('spil')}catch{return}
+ const view=location.hash==='#spilmenu'?'menu':({menu:'menu',talstien:'setup',kortspil:'cardsSetup',talkort:'talkort',indstillinger:'settings'}[selected]||'home');
+ if($('game').classList.contains('active')){if(config&&!busy&&!showDiceState&&safePhase())saveCheckpoint();resetAsync()}
+ applyingAddress=true;show(view);applyingAddress=false;
+}
+window.addEventListener('hashchange',openGameAddress);window.addEventListener('popstate',openGameAddress);
+if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',openGameAddress,{once:true});else openGameAddress();
 if('serviceWorker' in navigator&&location.protocol.startsWith('http'))navigator.serviceWorker.register('./sw.js').catch(()=>{});
 })();

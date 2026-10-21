@@ -5,6 +5,14 @@ findes i `docs/arkiv/`. Versioner uden post (fx 0.9.21, 0.9.26 og 0.9.37–0.9.4
 (v0.9.61) ligger i `docs/arkiv/CHANGELOG-v0.9.61-lang.md`.
 
 
+## v0.9.73 – egne spilsider og tælling i Talkort (21. oktober 2026)
+- Menuen viser kun fire spilvalg. Talstien, Kortspil og Talkort får egne adresser, indstillinger/Start og Spilmenu tilbage. Browsertilbage, genindlæsning og online-linket understøttes; Talstiens indstillinger er samlet på dets side. Gem/fortsæt bevares.
+- Talkort viser kortet først, derefter kontroller og valg. Indgang/indstillinger er tavse; kort, pil eller Læs igen læser uden særskilt Start.
+- Tæl ned fra valgt 0–100-tal til 0 eller op fra start til valgt sluttal. Pause 0,1–60 sekunder, begge sprog færdige før næste tal, valgfri sluttekst (350 tegn) og stemme fra den eksisterende stemmeliste.
+- Auto forsøger samme tal igen ved kort lydfejl; varig fejl pauser med retryknap i stedet for at afslutte. Skjult side pauser, og et afbrudt dobbeltsproget tal læses færdigt igen ved retur. MP3-afspilning har timeout og rapporterer afbrydelse til tællingen.
+- 1–100 bruger fortsat de 500 gemte MP3'er. Nul og sluttekst bruger den valgte stemme (AI eller enhed); AI-sluttekst går til den eksisterende stemmetjeneste uden permanent cache af fritekst.
+- 57/57 Node-tests; Chromium-prøver af separate sider, gem/fortsæt, offline PWA, tælling/begge sprog, fejl/retry, valgt slutstemme og tavs indgang. Ægte lyd/mikrofon og iPhone skal fortsat prøves fysisk. Kun GitHub-opdatering; Cloudflare-koden er uændret.
+
 ## v0.9.72 – varieret fortæller og hoppende onlinebrikker (20. oktober 2026)
 - Online Talstien genbruger offline-spillets narration.js: cirka 35 % af indledende Hov hov-hilsner beholdes, resten går direkte til beskeden. Hov hov-specialfeltet og andre omtaler inde i teksten bevares. Hør igen gentager den faktisk læste tekst.
 - Brikker hopper felt for felt på alle enheder, inklusive landing og efterfølgende bevægelse frem/tilbage. Den lokale animation venter på, at den store terning lukkes. Gentagne statusopdateringer starter ikke animationen forfra; genindlæsning og reduceret bevægelse viser den aktuelle serverposition direkte.

@@ -10,8 +10,6 @@ test('Talkort has optional local recording and compare controls',()=>{
  assert.match(src,/URL\.revokeObjectURL/);
  assert.doesNotMatch(src,/fetch\([^)]*recordedUrl/);
 });
-test('Talkort auto follows narration and stops at end',()=>{
- assert.match(src,/await render\(true\)/);assert.match(src,/await delay\(Number\(\$\('talkortDelay'\)\.value\)\*1000\)/);
- assert.match(src,/if\(number>=bounds\(\)\[1\]\)break/);
- assert.match(src,/stopAuto\(\)/);
+test('Talkort auto waits for complete audio, preserves interruption and offers retry',()=>{
+ assert.match(src,/await readForRun\(id\)/);assert.match(src,/ok==='interrupted'/);assert.match(src,/talkortCountResume/);assert.match(src,/AeselCounter.pause/);assert.match(src,/stopAuto\(\)/);
 });

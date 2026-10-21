@@ -10,8 +10,7 @@ with sync_playwright() as p:
   page.locator('#homePlay').click()
   page.locator('#openTalkort').click()
   assert page.locator('#talkortNumber').inner_text()=='1'
-  assert page.locator('#talkortNext').is_disabled()
-  page.locator('#talkortStart').click()
+  assert page.locator('#talkortNext').is_enabled()
   page.locator('#talkortNext').click()
   assert page.locator('#talkortNumber').inner_text()=='2'
   page.locator('#talkortRange').select_option('21-40')
@@ -23,7 +22,7 @@ with sync_playwright() as p:
   assert not page.locator('#talkortPrime').is_hidden()
   page.locator('#talkortRange').select_option('81-100')
   page.locator('#talkortJump').select_option('100')
-  assert page.locator('#talkortNext').is_disabled()
+  assert page.locator('#talkortNext').is_enabled()
   assert 'zone-5' in page.locator('#talkortCard').get_attribute('class')
   page.close()
  browser.close()

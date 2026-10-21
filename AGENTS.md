@@ -40,6 +40,11 @@ Gælder både mennesker og AI-assistenter. Hold denne fil kort og kun med regler
 - Øvrig fri placering: forkerte træk forhindres ikke på forhånd. Et tryk på æselkortet udfordrer, fortryder kun det seneste træk og giver straf. Et korrekt træk straffes ikke.
 - CPU-æslet bruger kun lokal regelkode (ingen AI-kald): skal spille sit åbne kort før det vender, opdager andres fejl med ca. 72 %, begår selv fejl i ca. 7 % af valg med mulige ugyldige mål. Justér først efter familietest.
 
+## Spilsider og Talkort
+- Spilmenuen viser kun spilvalg; egne adresser `?spil=talstien`, `kortspil`, `talkort` skal kunne genindlæses. Start først spil ved udtrykkelig handling; bevar gemninger ved retur.
+- Talkort åbner tavst med kortet øverst og valg nedenunder. Kort, pil og Læs igen aktiverer oplæsning uden særskilt Start. Auto venter på hele dobbeltsproget lyd; genoptag afbrudt tal ved tilbagevenden, og tilbyd retry ved varig lydfejl.
+- De gemte MP3-tal 1–100 bevares. Tællingens nul og valgfri slutbesked må efter brugerens ønske bruge den valgte AI-/enhedsstemme. Ingen permanent TTS-cache af fritekst.
+
 ## Gemte data og privatliv
 - Lagernøgler må ikke ændres uden migrering: `aeselklog-igangvaerende-v1` (Talstien, schema 1), `aeselklog-kortspil-v1`, `aeselklog-laereprofiler-v1`. Gamle gemninger skal fortsat kunne læses.
 - Alt er lokalt; ingen automatisk cloud-upload af profiler, navne eller lyd. Intet fritekst eller børnenavne i permanent TTS-cache.
