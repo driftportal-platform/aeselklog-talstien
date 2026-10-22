@@ -34,7 +34,18 @@ try:
         assert page.evaluate("()=>getComputedStyle(document.body).getPropertyValue('--navy').trim()")=='#113c70', 'CSS failed offline'
         page.wait_for_function('()=>Boolean(window.AeselIcons)')
         loaded=page.evaluate('''async()=>{const files=AeselIcons.names.map(n=>AeselIcons.url(n));files.push(new URL('./assets/images/donkey-card.webp',location.href).href);await Promise.all(files.map(src=>new Promise((resolve,reject)=>{const i=new Image();i.onload=resolve;i.onerror=()=>reject(Error(src));i.src=src})));return files.length}''')
-        assert loaded==47, 'Shared icons/card art failed offline'
+        assert loaded==48, 'Shared icons/card art failed offline'
+        page.goto(url+'?spil=regneklog',wait_until='load')
+        assert page.locator('#mathSetup').is_visible()
+        page.locator('#mathStart').click()
+        assert page.locator('#mathGame').is_visible()
+        assert page.locator('#mathVisual .math-carrot').count()>0
+        page.locator('#mathHelp').click()
+        page.locator('#mathHintNext').click()
+        page.locator('#mathSolution').click()
+        assert page.locator('#mathNext').is_visible()
+        assert page.locator('#mathScore').inner_text()=='0 point'
+        page.goto(url,wait_until='load')
         page.locator('#homeSettings').click()
         assert page.locator('#settings').is_visible()
         page.locator('#settingsBack').click()

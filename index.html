@@ -12,13 +12,13 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="ÆselKlog">
   <title>ÆselKlog · Talstien</title>
-  <link rel="stylesheet" href="./styles.css"><link rel="stylesheet" href="./fish.css"><link rel="stylesheet" href="./rummy.css">
+  <link rel="stylesheet" href="./styles.css"><link rel="stylesheet" href="./fish.css"><link rel="stylesheet" href="./rummy.css"><link rel="stylesheet" href="./math-game.css">
 <link rel="stylesheet" href="./game-icons.css"></head>
 <body class="home-active">
 <div class="shell">
   <header class="top">
     <div class="brand"><div class="logo" id="pageBrandIcon" aria-hidden="true">🫏</div><div><h1 id="pageTitle">Æsel<span class="red">Klog</span> · Talstien</h1><small>Spil, lær og grin sammen</small></div></div>
-    <div class="top-actions"><span class="pill">PRØVEVERSION 0.9.81 (hver sit spil)</span><button id="voiceToggle" class="btn soft small" type="button" aria-pressed="true">🔊 Lyd til</button></div>
+    <div class="top-actions"><span class="pill">PRØVEVERSION 0.9.82 (hver sit spil)</span><button id="voiceToggle" class="btn soft small" type="button" aria-pressed="true">🔊 Lyd til</button></div>
   </header>
 
 
@@ -175,6 +175,7 @@
       <button type="button" id="openTalkort" class="game-mode-card game-mode-talkort" aria-pressed="false"><span class="game-mode-icon" aria-hidden="true">🔢</span><span class="game-mode-copy"><strong>Talkort</strong><small>Se og hør tallene fra 1 til 100</small></span><span class="game-mode-check" aria-hidden="true">✓</span></button>
       <button type="button" id="openFishSetup" class="game-mode-card"><span class="game-mode-icon" aria-hidden="true"><span class="game-icon" data-game-icon="fish-game"><img class="game-icon-image" src="./assets/icons/fish-game.svg" alt="" draggable="false"></span></span><span class="game-mode-copy"><strong>TorskeKlog</strong><small>Fisk med talkort · saml fire ens</small></span><span class="game-mode-check" aria-hidden="true">➜</span></button>
       <button type="button" id="openRummySetup" class="game-mode-card"><span class="game-mode-icon" aria-hidden="true"><span class="game-icon" data-game-icon="500-game"><img class="game-icon-image" src="./assets/icons/500-game.svg" alt="" draggable="false"></span></span><span class="game-mode-copy"><strong>ÆselKlog – 500</strong><small>Sæt, talrækker og æseljokere</small></span><span class="game-mode-check" aria-hidden="true">➜</span></button>
+      <button type="button" id="openMathSetup" class="game-mode-card"><span class="game-mode-icon" aria-hidden="true"><span class="game-icon" data-game-icon="math-game"><img class="game-icon-image" src="./assets/icons/math-game.svg" alt="" draggable="false"></span></span><span class="game-mode-copy"><strong>RegneKlog</strong><small>Plus, minus, gange og division · lær med billeder</small></span><span class="game-mode-check" aria-hidden="true">➜</span></button>
       <button type="button" id="openOnlineGame" class="game-mode-card game-mode-online" aria-label="Online Kortspil, Talstien og TorskeKlog – voksenstyret pilot"><span class="game-mode-icon" aria-hidden="true">🌐</span><span class="game-mode-copy"><strong>Online spil 🔒</strong><small>Kortspil, Talstien, TorskeKlog og 500 · på hver sin enhed</small></span><span class="game-mode-check" aria-hidden="true">➜</span></button>
     </div>
 </section>
@@ -226,6 +227,33 @@
       <div id="talkortPractice" class="talkort-practice" hidden><p>Optag dit tal og sammenlign det med ÆselKlogs rigtige oplæsning. Optagelsen gemmes ikke på serveren.</p><div class="talkort-practice-buttons"><button type="button" class="btn soft" id="talkortRecord">🎙️ Optag</button><button type="button" class="btn soft" id="talkortHearMine" disabled>▶ Hør mig</button><button type="button" class="btn soft" id="talkortCompare" disabled>🔁 Sammenlign</button></div><p id="talkortPracticeStatus" role="status" aria-live="polite"></p></div>
 </div></details>
     </div>
+  </section>
+
+  <section id="mathSetup" class="view math-page" aria-label="RegneKlog – vælg opgaver">
+    <nav class="game-page-nav"><button id="mathSetupBack" class="btn soft" type="button">← Spilmenu</button></nav>
+    <section class="paper math-intro"><img src="./assets/icons/donkey.svg" width="64" height="64" alt=""><div><h2>Små skridt. Store regneglæder.</h2><p>Regn med billeder eller tal. Æslet hjælper dig hele vejen – i dit eget tempo.</p></div></section>
+    <details class="paper game-options" open><summary>⚙️ Vælg dine opgaver</summary><div class="options-content">
+      <fieldset class="math-operations"><legend>Hvad vil du øve?</legend><label><input type="checkbox" name="mathOperation" value="add" checked> + Plus</label><label><input type="checkbox" name="mathOperation" value="subtract"> − Minus</label><label><input type="checkbox" name="mathOperation" value="multiply"> × Gange</label><label><input type="checkbox" name="mathOperation" value="divide"> ÷ Division</label></fieldset>
+      <div class="grid2"><label class="field">Sværhedsgrad<select id="mathLevel"><option value="easy">Let · tal op til 10</option><option value="medium">Mellem · tal op til 20</option><option value="hard">Svær · tal op til 100</option></select></label><label class="field">Sådan vil jeg regne<select id="mathMode"><option value="visual">Med billeder og tal</option><option value="numbers">Kun regnestykker</option></select></label><label class="field">Antal opgaver<select id="mathLength"><option value="5">5 opgaver</option><option value="10" selected>10 opgaver</option><option value="20">20 opgaver</option></select></label></div>
+      <p class="tiny">Minus går aldrig under 0. Division går op uden rest. Gange og division bruger tabeller op til 10, og tallene holder sig inden for den valgte sværhedsgrad.</p>
+    </div></details>
+    <details class="paper game-options"><summary>📖 Hjælp og point</summary><div class="options-content"><p>10 point for et rigtigt svar uden hjælp. 5 point, når du har brugt hjælpen. Du kan prøve igen uden at miste point. Viser du løsningen, giver opgaven 0 point.</p><p>Hjælp viser først et lille tip og derefter en visuel forklaring. Du vælger selv, hvornår du vil se løsningen. Ingen tidspres. Point gælder det aktuelle forløb; dine valg huskes på denne enhed.</p><p>I billederne er én gulerod 1. En ramme med ti gulerødder er 10. Ved division deler vi lige mellem kurvene.</p></div></details>
+    <button id="mathStart" class="btn main block" type="button">▶ Start RegneKlog</button><p id="mathSetupError" role="alert"></p>
+  </section>
+  <section id="mathGame" class="view math-page" aria-label="RegneKlog – regn med Æslet">
+    <nav class="game-page-nav"><button id="mathGameBack" class="btn soft" type="button">← Spilmenu</button><button id="mathNew" class="btn soft" type="button">⚙️ Nye valg</button></nav>
+    <section class="paper math-play">
+      <div class="math-hud"><span id="mathProgress"></span><strong id="mathScore" aria-live="polite">0 point</strong></div>
+      <div id="mathTask"><p id="mathTaskLabel" class="math-task-label"></p><h2 id="mathEquation" class="math-equation" tabindex="-1"></h2><p id="mathStory" class="math-story"></p>
+        <div id="mathVisual" class="math-visual"></div>
+        <form id="mathAnswerForm" novalidate><label for="mathAnswer">Dit svar</label><div class="math-answer-row"><input id="mathAnswer" type="text" inputmode="numeric" pattern="[0-9]*" autocomplete="off" maxlength="3" aria-describedby="mathFeedback"><button id="mathCheck" class="btn main" type="submit">Tjek svar</button></div></form>
+        <p id="mathFeedback" class="math-feedback" role="status" aria-live="polite"></p>
+        <div class="math-actions"><button id="mathHelp" class="btn soft" type="button">💡 Hjælp mig</button><button id="mathNext" class="btn main" type="button" hidden>Næste opgave →</button></div>
+        <section id="mathGuide" class="math-guide" aria-label="Trinvis hjælp" hidden><h3 id="mathGuideTitle"></h3><p id="mathGuideText" role="status" aria-live="polite"></p><div class="math-actions"><button id="mathHintNext" class="btn soft" type="button">Næste trin →</button><button id="mathSolution" class="btn soft" type="button" hidden>Vis løsningen · 0 point</button><button id="mathHideHelp" class="btn soft small" type="button">Skjul hjælp</button></div></section>
+      </div>
+      <div id="mathSummary" class="math-summary" hidden><img src="./assets/icons/star.svg" width="72" height="72" alt=""><h2>Godt regnet!</h2><p id="mathSummaryText"></p><p id="mathSummaryDetail"></p><button id="mathAgain" class="btn main" type="button">▶ Prøv et nyt forløb</button></div>
+    </section>
+    <p class="tiny math-footnote">Tag dig god tid. Du kan altid bede Æslet om hjælp.</p>
   </section>
 
   <section id="fishSetup" class="view"><nav class="game-page-nav"><button id="fishSetupBack" class="btn soft" type="button">← Spilmenu</button><button type="button" class="btn soft" data-game-rules="fish">📖 Regler</button></nav><button id="fishResume" class="btn soft block" type="button" hidden>▶ Fortsæt TorskeKlog</button><details class="paper game-options"><summary>⚙️ Tal, lyd og regler</summary><div class="options-content"><label class="field">Talområde<select id="fishRange"><option value="1-20">1–20</option><option value="21-40">21–40</option><option value="41-60">41–60</option><option value="61-80">61–80</option><option value="81-100">81–100</option></select></label><label class="field">Sprog til tallene<select id="fishLanguage"><option value="da">Dansk</option><option value="en">Engelsk</option><option value="de">Tysk</option><option value="es">Spansk</option><option value="da-en">Dansk + engelsk</option><option value="da-de">Dansk + tysk</option><option value="da-es">Dansk + spansk</option></select></label><p>Fire af hvert tal · 80 talkort. I får 7 kort hver ved 2–3 spillere og 5 ved 4–6.</p><p>Spørg en modspiller om et tal fra din egen hånd. Du får alle modspillerens kort med tallet og må spørge igen. Har modspilleren ingen, siger de Fisk! Træk ét kort fra fiskedammen, så går turen videre. Fire ens lægges automatisk som et sæt. Flest sæt vinder; lige mange deler sejren.</p><p>En tom hånd får et nyt kort fra dammen ved turens start. Når dammen er tom, springes tomme hænder over. Spillet slutter, når alle sæt er samlet.</p></div></details><section class="paper"><h2>Spillere</h2><label class="field">Antal personer<select id="fishPlayerCount"><option value="1" disabled>1 person · mod Æslet</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option></select></label><label class="option cpu-quick-toggle"><input type="checkbox" id="fishCpuCheck"><span><strong>🫏 Spil mod Æslet</strong><small>1–5 personer og Æslet. Æslet spiller automatisk med skjulte kort.</small></span></label><div id="fishNames" class="grid2"></div><button id="fishStart" class="btn main block" type="button">🐟 Start TorskeKlog</button><p id="fishSetupError" role="alert"></p></section></section>
@@ -405,7 +433,7 @@
 <script src="./numbers.js" defer></script>
 <script src="./fish-engine.js" defer></script><script src="./game-rules.js" defer></script><script src="./fish-view.js" defer></script><script src="./rummy-engine.js" defer></script><script src="./rummy-view.js" defer></script><script src="./app.js" defer></script>
 <script src="./cardgame-ui.js" defer></script>
-<script src="./card-cpu.js" defer></script><script src="./local-cpu.js" defer></script><script src="./fish-local.js" defer></script><script src="./rummy-local.js" defer></script><script src="./home-ui.js" defer></script>
+<script src="./card-cpu.js" defer></script><script src="./local-cpu.js" defer></script><script src="./fish-local.js" defer></script><script src="./rummy-local.js" defer></script><script src="./home-ui.js" defer></script><script src="./math-engine.js" defer></script><script src="./math-game.js" defer></script>
 <script src="./offline-talkort.js" defer></script>
 <script src="./talkort-counter.js" defer></script><script src="./talkort.js" defer></script>
 <script src="./audio-settings.js" defer></script>

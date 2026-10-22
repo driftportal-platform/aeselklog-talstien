@@ -5,6 +5,13 @@ findes i `docs/arkiv/`. Versioner uden post (fx 0.9.21, 0.9.26 og 0.9.37–0.9.4
 (v0.9.61) ligger i `docs/arkiv/CHANGELOG-v0.9.61-lang.md`.
 
 
+## v0.9.82 – RegneKlog med billeder, hjælp og point (22. oktober 2026)
+- Nyt selvstændigt offline-regnespil via spilmenuen og `?spil=regneklog`. Plus, minus, gange og division kan vælges enkeltvis eller blandes. Let: op til 10; mellem: 20; svær: 100. Ingen negative resultater eller division med rest; tabeller op til 10.
+- Visuelt med fælles gulerodsikon, tierammer, overstregning, lige store grupper og deling i kurve. Alternativt rene regnestykker. Hjælp i to trin kan altid åbne billeder; løsningen vises kun efter eget valg.
+- 5, 10 eller 20 opgaver. 10 point for rigtigt uden hjælp, 5 med hjælp, 0 ved vist løsning. Ubegrænsede forsøg, ingen tidspres eller pointtab; afslutning med samlet pointoversigt. Valg gemmes separat lokalt; point gælder ét forløb.
+- Alle nye filer og ikon er med i offlinecachen. Ikonrettelsen fra v0.9.81 bevares. Forsidens artwork, de øvrige gemninger og Worker v0.9.78 ændres ikke.
+- 64/64 Node-tests; browserprøver af alle 12 regneart/niveau-kombinationer, komplette pointforløb, ren talvisning/hjælp, navigation, 320–1280 px samt reel lokal HTTP/PWA-offline. Eksisterende spilsider og responsive menu prøvet. Ikke prøvet på fysisk telefon og ikke publiceret herfra.
+
 ## v0.9.81 – ens ikonstørrelse i spilmenuen (22. oktober 2026)
 - TorskeKlog og 500 bruger samme ikonramme og responsive størrelse som de øvrige spil. Ikonerne overlapper ikke længere teksten på mobil.
 - Valideret: 63/63 Node-tests, ikonmål og ingen overlap ved 320/390/768/1280 px i Chromium samt eksisterende responsive spilmenuprøver. Ingen fysisk telefonprøve.

@@ -1,11 +1,12 @@
 # ÆselKlog – hvor er vi nu
 
-**Version:** 0.9.81 (lokalt valideret; ikke bekræftet publiceret). Opdateres ved hver release sammen med `CHANGELOG.md`. Hold siden på én skærm pr. afsnit: ingen versionslog her (den hører til i changelogget).
+**Version:** 0.9.82 (lokalt valideret; ikke bekræftet publiceret). Opdateres ved hver release sammen med `CHANGELOG.md`. Hold siden på én skærm pr. afsnit: ingen versionslog her (den hører til i changelogget).
 
 ## Hvad er det?
 Børnevenligt talspil som PWA (GitHub Pages, repo `driftportal-platform/aeselklog-talstien`). Matematik er altid frivillig; alt offline gemmes lokalt, ingen konti.
 - **Talstien** – brætspil 1–100, digital eller fysisk A3-plade, op til 6 spillere + CPU-æsel, specialfelter, valgfri læring med forældreoversigt.
 - **Kortspil** – fem talområder, 1–6 personer + CPU-æsel, frie træk, fejl udfordres med æselkortet.
+- **RegneKlog** – regn visuelt eller med tal; plus, minus, gange og division, tre niveauer, hjælp og point.
 - **Talkort** – ét kort ad gangen med sprogvalg, Auto og udtaletræning.
 - **TorskeKlog** – Fisk med fire ens talkort, 2–6 spillere offline (evt. Æsel) eller 2–6 mennesker online på hver sin enhed.
 - **ÆselKlog 500** – talkort uden kulører, æseljokere, sæt og talrækker; flere runder til 500.
@@ -13,8 +14,8 @@ Børnevenligt talspil som PWA (GitHub Pages, repo `driftportal-platform/aeselklo
 Lyd: 500 gemte MP3-tal (fem stemmer + æselstemme), valgfri musik.
 
 ## Status
-- **Seneste ændring:** TorskeKlog- og 500-ikonerne bruger samme størrelse som de øvrige ikoner i spilmenuen. Kun GitHub v0.9.81; Worker v0.9.78 er uændret. Ikke publiceret herfra.
-- **Automatisk:** 63 af 63 Node-tests (`npm test`, kører i GitHub Actions når `.github/workflows/test.yml` er med). Simulerede Chromium-forløb for online med 3–6 enheder og flere skærmstørrelser.
+- **Seneste ændring:** RegneKlog offline: fire regnearter, tre niveauer, billeder/tal, trinvis hjælp og point. 64/64 Node-tests samt browser- og PWA-offlineprøver. Ikonrettelsen fra v0.9.81 er med. Kun GitHub v0.9.82; Worker v0.9.78 er uændret. Ikke publiceret herfra.
+- **Automatisk:** 64 af 64 Node-tests (`npm test`, kører i GitHub Actions når `.github/workflows/test.yml` er med). Simulerede Chromium-forløb for online med 3–6 enheder og flere skærmstørrelser.
 - **Brugerafprøvet 20. oktober:** online spil på mobil og pc; kortspillet fungerede med enkelte Cloudflare-udfald på 10–15 sekunder, som genoprettede sig selv. Worker /health blev efterfølgende verificeret til v0.9.68. Enhedsmodeller og alle enkeltfunktioner er ikke oplyst.
 - **Ikke bekræftet:** fysisk afprøvning af v0.9.72-talevariation og animation, rigtig mikrofon/lyd på iPhone, installeret iPhone-PWA, deling til Beskeder/Mail, live ElevenLabs, VoiceOver, familietest.
 - **Cloudflare:** konfigurationens navn er `aeselklog-online-pilot`, den oplyste liveadresse bruger `aeselklog-online`. Brug eksplicit `--name` ved deploy og kontrollér `GAME_ROOM` og `APP_ORIGIN` først.

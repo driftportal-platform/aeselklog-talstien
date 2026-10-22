@@ -18,3 +18,11 @@ Notér dato, enhed og iOS-version samt fund i `PROJEKTSTATUS.md`.
 
 ## Før v1.0
 Familietest, A3-plade mod app, trykte kort, rettigheder til billeder og lyd.
+
+
+## RegneKlog (v0.9.82)
+- Åbn fra spilmenu og direkte ?spil=regneklog. Prøv tilbage og genindlæsning; valgene huskes, spillet starter først ved Start.
+- Prøv plus, minus, gange og division i Let/Mellem/Svær og blandede opgaver. Minus skal være mindst 0, division uden rest. Maksimalt tal 10/20/100.
+- Prøv billeder og kun tal; Hjælp skal kunne vise billeder i begge. To trin før Vis løsningen. Overstregninger i minus og lige fordeling i division skal passe.
+- Rigtigt uden hjælp: 10 point. Med hjælp: 5. Vist løsning: 0. Forkerte/ugyldige svar må ikke give/tab point eller gå videre. Samme opgave giver kun point én gang.
+- Afslut 5/10/20 opgaver og kontrollér samlet oversigt. Prøv 320 px og stor tekst. Afprøv på fysisk iPhone/Android og installeret PWA; endnu ikke bekræftet.

@@ -18,3 +18,5 @@ Spilvalg: card-game.svg og board-game.svg bruger det eksisterende originale æse
 - `icons/fish-game.svg`: fælles TorskeKlog-ikon til offline/online; genbruger æselvektoren med en fisk.
 
 - `icons/500-game.svg`: fælles spilmenuikon til ÆselKlog 500, bygget på kortvektoren.
+
+- `icons/math-game.svg`: RegneKlogs fælles ikon med de fire regnearter.
