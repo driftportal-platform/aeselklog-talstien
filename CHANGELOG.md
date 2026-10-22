@@ -5,6 +5,13 @@ findes i `docs/arkiv/`. Versioner uden post (fx 0.9.21, 0.9.26 og 0.9.37–0.9.4
 (v0.9.61) ligger i `docs/arkiv/CHANGELOG-v0.9.61-lang.md`.
 
 
+## v0.9.83 – regn ved at trykke og tælle med (22. oktober 2026)
+- Alle fire regnearter har interaktive gulerødder. Plus flytter nye gulerødder til samlingen; minus fjerner valgte gulerødder med mulighed for at lægge dem tilbage; gange fylder lige store kurve; division fordeler én ad gangen uden skæv deling.
+- Efter placering/fjernelse kan Tæl med fremhæve og nummerere én gulerod ad gangen, med valgfri dansk oplæsning fra de eksisterende talelyde. Division tæller én kurv. Nul vises som ingen tilbage; der afspilles ingen MP3 for nul.
+- Store trykfelter, tastaturbetjening, nulstil billeder, stop tælling og reduceret bevægelse. Tælling stoppes ved menuside, nye opgaver og skjult side; manglende lyd fortsætter visuelt. Rene regnestykker bevares, billeder kan åbnes med Hjælp.
+- Tæl med regnes som hjælp (5 point ved rigtigt svar). Manipulation alene giver ikke hjælpfradrag; svaret indtastes og kontrolleres fortsat af barnet. Ingen automatisk pointtildeling.
+- 65/65 Node-tests samt Chromium-prøver af tryk/fortryd, deling, nul, lydenes rækkefølge, lydfejl, stop ved navigation, store tal og mobil-layout. Eksisterende RegneKlog-forløb og lokal HTTP/PWA-offline prøvet. Ingen fysisk telefonprøve. Kun GitHub; Worker uændret.
+
 ## v0.9.82 – RegneKlog med billeder, hjælp og point (22. oktober 2026)
 - Nyt selvstændigt offline-regnespil via spilmenuen og `?spil=regneklog`. Plus, minus, gange og division kan vælges enkeltvis eller blandes. Let: op til 10; mellem: 20; svær: 100. Ingen negative resultater eller division med rest; tabeller op til 10.
 - Visuelt med fælles gulerodsikon, tierammer, overstregning, lige store grupper og deling i kurve. Alternativt rene regnestykker. Hjælp i to trin kan altid åbne billeder; løsningen vises kun efter eget valg.

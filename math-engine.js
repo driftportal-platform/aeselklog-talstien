@@ -43,7 +43,7 @@
  function story(p){const {a,b,op}=p;return op==='add'?`Du har ${a} gulerødder og får ${b} mere. Hvor mange har du i alt?`:op==='subtract'?`Du har ${a} gulerødder. Æslet spiser ${b}. Hvor mange er der tilbage?`:op==='multiply'?`Der er ${a} kurve med ${b} gulerødder i hver. Hvor mange er der i alt?`:`Fordel ${a} gulerødder lige i ${b} kurve. Hvor mange får hver kurv?`}
  function guide(p){const {a,b,answer,op}=p;let steps;
   if(op==='add')steps=[`Plus betyder, at vi samler. Find først de ${a} gulerødder.`, `Læg de ${b} nye gulerødder til. Tæl alle gulerødderne. En hel tieramme tæller som 10.`];
-  if(op==='subtract')steps=[`Minus betyder, at vi tager noget væk. Start med ${a} gulerødder.`, `Stryg ${b} gulerødder over. Tæl kun dem, der er tilbage. De overstregede tæller ikke med.`];
+  if(op==='subtract')steps=[`Minus betyder, at vi tager noget væk. Start med ${a} gulerødder.`, `Tryk ${b} gulerødder væk. Tæl kun dem, der er tilbage. Du kan trykke Tæl med, når du er klar.`];
   if(op==='multiply')steps=[`Gange er lige store grupper. Find ${a} kurve.`, `Læg ${b} gulerødder i hver kurv. Tæl dem alle eller læg ${Array(a).fill(b).join(' + ')} sammen.`];
   if(op==='divide')steps=[`Division betyder at dele lige. Find ${a} gulerødder og ${b} kurve.`, `Læg én gulerod i hver kurv og gentag, til alle er fordelt. Kurvene skal have lige mange. Tæl i én kurv.`];
   return [...steps,`${expression(p,true)}. ${op==='divide'?`Der er ${answer} i hver kurv.`:op==='subtract'?`Der er ${answer} tilbage.`:`Der er ${answer} i alt.`}`];

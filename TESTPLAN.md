@@ -26,3 +26,8 @@ Familietest, A3-plade mod app, trykte kort, rettigheder til billeder og lyd.
 - Prøv billeder og kun tal; Hjælp skal kunne vise billeder i begge. To trin før Vis løsningen. Overstregninger i minus og lige fordeling i division skal passe.
 - Rigtigt uden hjælp: 10 point. Med hjælp: 5. Vist løsning: 0. Forkerte/ugyldige svar må ikke give/tab point eller gå videre. Samme opgave giver kun point én gang.
 - Afslut 5/10/20 opgaver og kontrollér samlet oversigt. Prøv 320 px og stor tekst. Afprøv på fysisk iPhone/Android og installeret PWA; endnu ikke bekræftet.
+
+
+## Interaktive gulerødder (v0.9.83)
+Prøv 10−3: fjern tre vilkårlige gulerødder, fortryd én, fjern igen. Der må ikke kunne fjernes for mange. Tæl med skal fremhæve de syv tilbage i rækkefølge og vente på hvert lydklip. Prøv også 3−3 og 100−1.
+Prøv plus som flytning, gange som kurve og division som ligelig fordeling. I division tælles kun én kurv. Brug tastatur, 320 px og reduceret bevægelse. Stop eller forlad siden midt i tællingen; der må ikke komme forsinkede tal. Lydfejl må ikke blokere den visuelle tælling. Rigtigt efter tællehjælp giver kun 5 point én gang.

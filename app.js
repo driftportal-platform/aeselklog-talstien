@@ -672,6 +672,7 @@ $('setupEditSettings').addEventListener('click',()=>show('settings'));
 
 $('addPlayer').addEventListener('click',()=>{if(setupPlayers.length<6){setupPlayers.push({name:`Spiller ${setupPlayers.length+1}`,age:7,kind:'child',difficulty:'mellem'});renderSetupPlayers()}});
 function show(view){
+ if(view!=='mathGame')window.AeselMathPause?.();
  if(view!=='cardsGame')window.AeselCardGamePause?.();if(view!=='fishGame')window.AeselFishPause?.();if(view!=='rummyGame')window.AeselRummyPause?.();
  let openOptions=false;if(view==='settings'&&pageView==='setup'&&!applyingAddress){view='setup';openOptions=true}
  if(view==='setup'){if($('boardSettingsSlot')?.append){$('boardSettingsSlot').append($('settings'));$('settings').classList.add('embedded-settings');$('settingsBack').hidden=true}if(openOptions)$('boardSetupOptions').open=true;$('boardResume').hidden=!G.read(safeStorage())}
