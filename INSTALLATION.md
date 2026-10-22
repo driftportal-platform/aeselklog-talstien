@@ -1,20 +1,19 @@
 # Installation af ÆselKlog
 
-Aktuel opdatering: v0.9.83 – tryk på gulerødder og tæl med i RegneKlog.
+Aktuel opdatering: v0.9.84 – oplæsning, spillernavn og venlig feedback i RegneKlog.
 
-1. Pak ZIP-filen ud i en separat mappe. Kopiér indholdet ind i din eksisterende projektmappe, og vælg Erstat filerne. Bevar eksisterende assets, audio, music, .git og .github; vælg ikke Opret kopier. Den nye math-objects.js skal med.
-2. Kør `npm.cmd test`: 65/65 skal bestå. Commit og Push origin i GitHub Desktop. Bevar `.github/workflows/test.yml`.
-3. Kun GitHub opdateres. Cloudflare/Worker v0.9.78 er uændret.
-4. Genåbn appen efter GitHub Pages er færdig. Kontrollér versionsmærket 0.9.83.
+1. Pak ZIP-filen ud i en separat mappe. Kopiér indholdet ind i projektmappen og vælg Erstat filerne. Bevar eksisterende assets, audio, music, .git og .github. Vælg ikke Opret kopier. Den nye math-speech.js skal med.
+2. Kør `npm.cmd test`: 66/66 skal bestå. Commit og Push origin i GitHub Desktop. Bevar `.github/workflows/test.yml`.
+3. Kun GitHub opdateres. Cloudflare/Worker er uændret.
+4. Genåbn appen efter GitHub Pages er færdig og kontrollér version 0.9.84.
 
-## Prøv RegneKlog
-- Plus: tryk de nye gulerødder hen til din samling.
-- Minus: tryk det antal væk, der skal trækkes fra. Tryk en tom plads for at lægge en tilbage.
-- Gange: læg én gulerod ad gangen i kurvene, til hver kurv har det ønskede antal.
-- Division: del én til hver kurv, indtil alle gulerødder er fordelt ligeligt.
-- Tryk Tæl med. Gulerødderne fremhæves og tælles én ad gangen. I division tælles én kurv. Lyd kan slås til/fra; bruger den valgte fortællers eksisterende danske MP3-tal. Lyden skal være hentet for at kunne bruges helt offline; uden lyd tæller skærmen videre.
-- Tæl med giver hjælpstatus (5 point ved et efterfølgende rigtigt svar). Du skriver stadig selv svaret. Manipulation uden tællehjælp bevarer muligheden for 10 point. Vis løsningen giver stadig 0.
+## Navn, stemme og oplæsning
+Åbn RegneKlog → Navn og spillelederens stemme. Skriv fx Aya. Vælg Spillelederens valgte stemme, enhedens danske stemme eller tryk Hent spillelederstemmer og vælg en af de tilgængelige stemmer. Du kan ændre valgene både før og under spillet.
 
-Prøv også 3−3 (nul), Stop tælling, Start billederne forfra, retur til Spilmenu under tale og kun tal + Hjælp. Tællingen stopper ved skjult side og genstartes med Tæl med.
+Læs nye regnestykker op og Læs mit svar og tilbagemeldingen op kan slås til/fra hver for sig. Læs stykket op og Læs hjælpen op kan altid bruges manuelt, når Lyd er til. Gentagelse giver ikke ekstra hjælpfradrag. Stop oplæsning afbryder talen.
 
-Valideret: 65/65 Node-tests, Chromium-prøver og lokal HTTP/PWA-offline. Ingen fysisk telefon-/lydprøve eller publicering herfra.
+Ved Tjek svar læses det indtastede tal og feedback med navnet. Forkert svar: samme opgave bliver stående, og barnet kan rette tallet, få hjælp og prøve igen så mange gange, det vil. Ingen point tabes. Rigtigt svar giver fortsat 10 point uden hjælp eller 5 med hjælp; kun én gang. Vis løsningen giver 0.
+
+AI-stemmer bruger den eksisterende tjeneste og modtager teksten med barnets navn. Der gemmes ingen navngivne lydklip i permanent TTS-cache. Enhedens stemme kan bruges uden AI-tjenesten; offlineudtale afhænger af installerede stemmer. De eksisterende gulerods- og MP3-tællefunktioner bevares.
+
+Valideret: 66/66 Node-tests, Chromium med simuleret lyd/HTTP, valgte stemme-ID'er og tekster, stop/retry/gemte valg, øvrige regneforløb samt lokal HTTP/PWA-offline. Ikke afprøvet med rigtig iPhone-lyd eller live ElevenLabs. Ikke publiceret herfra.

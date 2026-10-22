@@ -65,6 +65,8 @@ Gælder både mennesker og AI-assistenter. Hold denne fil kort og kun med regler
 - Separat lokalt regnespil via `?spil=regneklog`; `math-engine.js` er ren regne-/pointlogik. Minus er ikke-negativ, division går op uden rest. Sværhedsgradens højeste tal gælder både operander og svar.
 - Højst én pointtildeling pr. opgave: 10 uden hjælp, 5 med hjælp, 0 ved vist løsning. Forkerte forsøg trækker ikke point. Vis aldrig løsningen automatisk. Valg gemmes kun i `aeselklog-regneklog-settings-v1`, point gælder det aktuelle forløb.
 
+- Oplæsning af regnestykke, indtastet svar/feedback og hjælp bruger fælles `AeselVoice.sayWithVoice`. Respektér Lyd fra og eksplicit stemmevalg; afbryd gammel tale ved nyt svar/trin, tælling, skjult side og navigation. Navn er valgfrit, og navngivne lydklip må ikke gemmes permanent. RegneKlogs stemmevalg gemmes i samme separate RegneKlog-nøgle.
+
 ## Gemte data og privatliv
 - Lagernøgler må ikke ændres uden migrering: `aeselklog-igangvaerende-v1` (Talstien, schema 1), `aeselklog-kortspil-v1`, `aeselklog-laereprofiler-v1`. Gamle gemninger skal fortsat kunne læses.
 - Alt er lokalt; ingen automatisk cloud-upload af profiler, navne eller lyd. Intet fritekst eller børnenavne i permanent TTS-cache.

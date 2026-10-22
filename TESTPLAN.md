@@ -31,3 +31,11 @@ Familietest, A3-plade mod app, trykte kort, rettigheder til billeder og lyd.
 ## Interaktive gulerødder (v0.9.83)
 Prøv 10−3: fjern tre vilkårlige gulerødder, fortryd én, fjern igen. Der må ikke kunne fjernes for mange. Tæl med skal fremhæve de syv tilbage i rækkefølge og vente på hvert lydklip. Prøv også 3−3 og 100−1.
 Prøv plus som flytning, gange som kurve og division som ligelig fordeling. I division tælles kun én kurv. Brug tastatur, 320 px og reduceret bevægelse. Stop eller forlad siden midt i tællingen; der må ikke komme forsinkede tal. Lydfejl må ikke blokere den visuelle tælling. Rigtigt efter tællehjælp giver kun 5 point én gang.
+
+
+## RegneKlog-stemme (v0.9.84)
+- Skriv Aya og vælg en af de samme spillelederstemmer. Prøv også enhedsstemme, tomt navn og Lyd fra. Åbning af valgsiden skal være tavs.
+- Start, gentag stykket og skift opgave. Tjek forkert svar: indtastet tal/navn skal siges, samme opgave blive stående, og tallet kunne rettes. Rigtigt svar læser tal og ros og tildeler kun point én gang.
+- Åbn Hjælp og tryk Læs hjælpen op på begge trin. Gentagelse skal hverken flytte trin eller vise løsningen. Slå automatisk opgave-/feedbacklæsning fra og prøv manuelle knapper.
+- Afbryd med Stop, næste trin, tælling, nyt svar, Lyd fra og Spilmenu. Skjul siden mens stemmer hentes; der må ikke komme forsinket tale. Genindlæs og kontrollér navn/stemme/valg.
+- Fysisk telefon og live stemmetjeneste skal stadig afprøves. Navngivne klip må ikke komme i permanent TTS-cache.

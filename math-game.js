@@ -2,14 +2,35 @@
 (()=>{'use strict';
  const $=id=>document.getElementById(id),E=window.AeselMath,KEY='aeselklog-regneklog-settings-v1';
  let session=null,guideOpen=false,objects=null,countSerial=0,counting=false,countAbort=null,countSound=true;
- const M=window.AeselMathObjects;
+ const M=window.AeselMathObjects,N=window.AeselMathSpeech;
+ let speechPrefs={name:'',voice:'current',autoRead:true,feedback:true};
+ try{const saved=JSON.parse(localStorage.getItem(KEY))?.speech;if(saved){speechPrefs.name=N.name(saved.name);if(typeof saved.voice==='string'&&/^[a-zA-Z0-9_-]{1,50}$/.test(saved.voice))speechPrefs.voice=saved.voice;speechPrefs.autoRead=saved.autoRead!==false;speechPrefs.feedback=saved.feedback!==false}}catch(_){}
+ function saveSpeech(){try{const saved=JSON.parse(localStorage.getItem(KEY)||'{}')||{};saved.speech={...speechPrefs};localStorage.setItem(KEY,JSON.stringify(saved))}catch(_){} }
+ const speaker=N.create({isActive:()=>$('mathGame').classList.contains('active')&&!document.hidden&&!!session&&!session.finished,isEnabled:()=>window.AeselVoice?.enabled?.()!==false,getVoice:()=>speechPrefs.voice,listVoices:()=>window.AeselVoice?.listVoices?.()||[],loadVoices:()=>window.AeselVoice?.loadVoices?.(),say:(text,options)=>window.AeselVoice.sayWithVoice(text,options),stop:()=>window.AeselVoice?.stop?.(),status(text,busy=false){if(text!==null)$('mathSpeechStatus').textContent=text;$('mathStopRead').hidden=!busy;}});
+ function readLine(text){stopCount();if(objects&&session&&!session.finished&&$('mathGame').classList.contains('active'))renderVisual();void speaker.read(text)}
+ function voiceOptions(){
+  const voices=window.AeselVoice?.listVoices?.()||[];
+  document.querySelectorAll('.math-speech-voice').forEach(select=>{
+   select.replaceChildren();for(const v of [{id:'current',name:'Spillelederens valgte stemme'},{id:'device',name:'Enhedens danske stemme'},...voices]){const option=document.createElement('option');option.value=v.id;option.textContent=v.name;select.append(option)}
+   if(![...select.options].some(v=>v.value===speechPrefs.voice)){const option=document.createElement('option');option.value=speechPrefs.voice;option.textContent='Tidligere valgt stemme · hent stemmer';select.append(option)}select.value=speechPrefs.voice;
+  });
+ }
+ function syncSpeech(){
+  document.querySelectorAll('.math-player-name').forEach(n=>{n.value=speechPrefs.name});document.querySelectorAll('.math-auto-read').forEach(n=>{n.checked=speechPrefs.autoRead});document.querySelectorAll('.math-read-feedback').forEach(n=>{n.checked=speechPrefs.feedback});voiceOptions();
+ }
+ document.querySelectorAll('.math-player-name').forEach(n=>n.addEventListener('input',()=>{speaker.stop();speechPrefs.name=N.name(n.value);document.querySelectorAll('.math-player-name').forEach(other=>{if(other!==n)other.value=speechPrefs.name});saveSpeech()}));
+ document.querySelectorAll('.math-speech-voice').forEach(n=>n.addEventListener('change',()=>{speaker.stop();speechPrefs.voice=n.value;syncSpeech();saveSpeech()}));
+ for(const [selector,key] of [['.math-auto-read','autoRead'],['.math-read-feedback','feedback']])document.querySelectorAll(selector).forEach(n=>n.addEventListener('change',()=>{speaker.stop();speechPrefs[key]=n.checked;syncSpeech();saveSpeech()}));
+ document.querySelectorAll('.math-load-voices').forEach(n=>n.addEventListener('click',async()=>{n.disabled=true;try{await window.AeselVoice.loadVoices();voiceOptions();const count=window.AeselVoice.listVoices().length;document.querySelectorAll('.math-voice-info').forEach(p=>{p.textContent=count+' spillelederstemme(r) tilgængelig. Vælg i listen.'})}catch(_){document.querySelectorAll('.math-voice-info').forEach(p=>{p.textContent='Stemmerne kunne ikke hentes lige nu. Dit valg er bevaret.'})}finally{n.disabled=false}}));
+ $('mathRead').onclick=()=>{if(session&&!session.finished)readLine(N.question(session.tasks[session.index],speechPrefs.name))};$('mathStopRead').onclick=()=>speaker.stop();$('voiceToggle').addEventListener('click',()=>speaker.stop());syncSpeech();
+
  function stopCount(){countSerial++;countAbort?.abort();countAbort=null;if(counting)window.AeselOfflineNumbers?.stop();counting=false;}
- window.AeselMathPause=stopCount;
- document.addEventListener('visibilitychange',()=>{if(document.hidden){stopCount();if(objects&&session&&!session.finished&&$('mathGame').classList.contains('active'))renderVisual()}});
+ window.AeselMathPause=()=>{stopCount();speaker.stop()};
+ document.addEventListener('visibilitychange',()=>{if(document.hidden){speaker.stop();stopCount();if(objects&&session&&!session.finished&&$('mathGame').classList.contains('active'))renderVisual()}});
  const wait=(ms,signal)=>new Promise(resolve=>{const done=()=>{clearTimeout(timer);signal.removeEventListener('abort',done);resolve()};const timer=setTimeout(done,ms);signal.addEventListener('abort',done,{once:true});if(signal.aborted)done()});
  async function countObjects(){
   if(!objects||!M.ready(objects)||session.resolved||counting)return;
-  if(!session.help)E.hint(session);
+  speaker.stop();if(!session.help)E.hint(session);
   stopCount();const serial=countSerial,controller=new AbortController();countAbort=controller;counting=true;
   renderGuide();renderVisual(true);
   const ids=M.items(objects),status=$('mathCountStatus');let playSound=countSound&&window.AeselVoice?.enabled?.()!==false,audioFailed=false;
@@ -83,28 +104,29 @@
   $('mathHintNext').hidden=s.help!==1||s.resolved;$('mathSolution').hidden=s.help<2||s.resolved;
  }
  function renderTask(){
-  stopCount();const s=session,p=s.tasks[s.index];guideOpen=false;objects=M.create(p);
+  speaker.stop();stopCount();const s=session,p=s.tasks[s.index];guideOpen=false;objects=M.create(p);
   $('mathSummary').hidden=true;$('mathTask').hidden=false;
   $('mathProgress').textContent=`Opgave ${s.index+1} af ${s.tasks.length}`;$('mathScore').textContent=s.points+' point';
   $('mathTaskLabel').textContent=E.OPS[p.op].name+' · '+{easy:'Let',medium:'Mellem',hard:'Svær'}[s.options.level];
   $('mathEquation').textContent=E.expression(p);$('mathStory').textContent=E.story(p);
   $('mathAnswer').value='';$('mathAnswer').disabled=false;$('mathCheck').disabled=false;$('mathFeedback').textContent='';$('mathFeedback').className='math-feedback';
   $('mathHelp').hidden=false;$('mathNext').hidden=true;$('mathNext').textContent=s.index+1===s.tasks.length?'Se dine point →':'Næste opgave →';
-  renderGuide();renderVisual();$('mathEquation').focus({preventScroll:true});
+  renderGuide();renderVisual();$('mathEquation').focus({preventScroll:true});if(speechPrefs.autoRead)readLine(N.question(p,speechPrefs.name));
  }
- function start(){try{session=E.start({operations:[...document.querySelectorAll('[name="mathOperation"]:checked')].map(n=>n.value),level:$('mathLevel').value,mode:$('mathMode').value,length:Number($('mathLength').value)});try{localStorage.setItem(KEY,JSON.stringify(session.options))}catch(_){}$('mathSetupError').textContent='';window.AeselShowView('mathGame');renderTask()}catch(e){$('mathSetupError').textContent=e.message}}
+ function start(){try{session=E.start({operations:[...document.querySelectorAll('[name="mathOperation"]:checked')].map(n=>n.value),level:$('mathLevel').value,mode:$('mathMode').value,length:Number($('mathLength').value)});try{localStorage.setItem(KEY,JSON.stringify({...session.options,speech:{...speechPrefs}}))}catch(_){}$('mathSetupError').textContent='';window.AeselShowView('mathGame');renderTask()}catch(e){$('mathSetupError').textContent=e.message}}
  function complete(){stopCount();const s=session;$('mathScore').textContent=s.points+' point';$('mathAnswer').disabled=true;$('mathCheck').disabled=true;$('mathNext').hidden=false;$('mathHelp').hidden=true;renderGuide();renderVisual();$('mathNext').focus({preventScroll:true})}
- $('mathAnswerForm').onsubmit=event=>{event.preventDefault();if(!session||session.resolved||session.finished)return;const result=E.check(session,$('mathAnswer').value),feedback=$('mathFeedback');feedback.className='math-feedback';
-  if(!result.valid){feedback.textContent='Skriv et helt tal fra 0 til 100.';$('mathAnswer').focus();return}
-  if(!result.correct){feedback.textContent='Det passer ikke helt endnu. Prøv igen, eller få et lille tip fra Æslet.';$('mathAnswer').select();return}
-  feedback.classList.add('math-success');feedback.textContent=`Rigtigt! +${result.points} point. ${E.expression(session.tasks[session.index],true)}`;complete();
+ $('mathAnswerForm').onsubmit=event=>{event.preventDefault();if(!session||session.resolved||session.finished)return;speaker.stop();if(counting){stopCount();renderVisual()}const result=E.check(session,$('mathAnswer').value),feedback=$('mathFeedback');feedback.className='math-feedback';
+  if(!result.valid){speaker.stop();stopCount();feedback.textContent='Skriv et helt tal fra 0 til 100.';$('mathAnswer').focus();return}
+  if(!result.correct){const line=N.answer($('mathAnswer').value,false,speechPrefs.name);feedback.textContent=line;$('mathAnswer').select();if(speechPrefs.feedback)readLine(line);return}
+  const line=N.answer($('mathAnswer').value,true,speechPrefs.name);feedback.classList.add('math-success');feedback.textContent=`${line} +${result.points} point. ${E.expression(session.tasks[session.index],true)}`;complete();if(speechPrefs.feedback)readLine(line);
  };
- $('mathHelp').onclick=()=>{if(!session||session.resolved)return;if(!session.help)E.hint(session);guideOpen=true;renderGuide();renderVisual()};
- $('mathHintNext').onclick=()=>{if(!session||session.resolved)return;E.hint(session);renderGuide();renderVisual()};
- $('mathSolution').onclick=()=>{if(!session||session.resolved)return;const text=E.solution(session);$('mathFeedback').textContent='Vi fandt løsningen sammen. Denne opgave giver 0 point.';$('mathEquation').textContent=E.expression(session.tasks[session.index],true);$('mathGuideText').textContent=text;complete()};
- $('mathHideHelp').onclick=()=>{guideOpen=false;renderGuide();renderVisual();if(!session.resolved)$('mathHelp').focus()};
+ $('mathReadHelp').onclick=()=>{if(session&&guideOpen&&!session.finished)readLine($('mathGuideText').textContent)};
+ $('mathHelp').onclick=()=>{speaker.stop();if(!session||session.resolved)return;if(!session.help)E.hint(session);guideOpen=true;renderGuide();renderVisual()};
+ $('mathHintNext').onclick=()=>{speaker.stop();if(!session||session.resolved)return;E.hint(session);renderGuide();renderVisual()};
+ $('mathSolution').onclick=()=>{speaker.stop();if(!session||session.resolved)return;const text=E.solution(session);$('mathFeedback').textContent='Vi fandt løsningen sammen. Denne opgave giver 0 point.';$('mathEquation').textContent=E.expression(session.tasks[session.index],true);$('mathGuideText').textContent=text;complete()};
+ $('mathHideHelp').onclick=()=>{speaker.stop();guideOpen=false;renderGuide();renderVisual();if(!session.resolved)$('mathHelp').focus()};
  $('mathNext').onclick=()=>{if(!session?.resolved||session.finished)return;if(E.next(session)){renderTask();window.scrollTo({top:0,behavior:'instant'});return}
-  $('mathTask').hidden=true;$('mathSummary').hidden=false;$('mathProgress').textContent='Forløbet er færdigt';
+  speaker.stop();$('mathTask').hidden=true;$('mathSummary').hidden=false;$('mathProgress').textContent='Forløbet er færdigt';
   const count=kind=>session.records.filter(r=>r.kind===kind).length;
   $('mathSummaryText').textContent=`Du fik ${session.points} af ${session.tasks.length*10} mulige point.`;
   $('mathSummaryDetail').textContent=`${count('own')} løst selv · ${count('helped')} løst med hjælp · ${count('shown')} løsninger gennemgået.`;

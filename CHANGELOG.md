@@ -5,6 +5,14 @@ findes i `docs/arkiv/`. Versioner uden post (fx 0.9.21, 0.9.26 og 0.9.37–0.9.4
 (v0.9.61) ligger i `docs/arkiv/CHANGELOG-v0.9.61-lang.md`.
 
 
+## v0.9.84 – spillelederstemme og personlig opmuntring i RegneKlog (22. oktober 2026)
+- Nyt valgfrit navnefelt og valg mellem de samme tilgængelige spillelederstemmer som de øvrige spil, den aktuelt valgte fortæller eller enhedens danske stemme. Indstillinger kan åbnes før og under spillet og gemmes separat med RegneKlogs eksisterende valg.
+- Læs stykket op-knap, valgfri automatisk oplæsning af nye opgaver og Læs hjælpen op ved hvert trin. Gentagelse flytter ingen trin, afslører ingen ekstra løsning og ændrer ingen point.
+- Tjek svar læser det indtastede tal og venlig feedback med navn: Du svarede 7. Flot klaret, Aya! Det er helt rigtigt. Forkerte svar bliver på samme opgave, med mulighed for at rette, få hjælp og prøve igen uden pointtab.
+- Genbruger AeselVoice.sayWithVoice og eksisterende stemmetjeneste. Ingen ny Worker eller API-nøgle. Navngivne sætninger tilføjes ikke til permanent TTS-cache. AI-valg modtager teksten med navnet, enhedsvalg bruger lokal stemme.
+- Tale kan stoppes og afbrydes ved nyt svar, tælling, nyt trin, stemme-/navneskift, Lyd fra, skjult side og navigation. Et forældet stemmeliste-svar kan ikke starte forsinket tale. Manglende eksplicit stemmevalg bevares og meldes.
+- 66/66 Node-tests; Chromium-prøver med simuleret lyd/HTTP af valgte stemme-ID'er, navn, indtastede svar, hjælp, retry, stop/mute og gemte valg. Eksisterende regne-/gulerodsforløb, mobilstørrelser og lokal HTTP/PWA-offline prøvet. Ingen live ElevenLabs-/telefonlydprøve. Kun GitHub.
+
 ## v0.9.83 – regn ved at trykke og tælle med (22. oktober 2026)
 - Alle fire regnearter har interaktive gulerødder. Plus flytter nye gulerødder til samlingen; minus fjerner valgte gulerødder med mulighed for at lægge dem tilbage; gange fylder lige store kurve; division fordeler én ad gangen uden skæv deling.
 - Efter placering/fjernelse kan Tæl med fremhæve og nummerere én gulerod ad gangen, med valgfri dansk oplæsning fra de eksisterende talelyde. Division tæller én kurv. Nul vises som ingen tilbage; der afspilles ingen MP3 for nul.
