@@ -1,6 +1,6 @@
 # ÆselKlog – hvor er vi nu
 
-**Version:** 0.9.80 (lokalt valideret; ikke bekræftet publiceret). Opdateres ved hver release sammen med `CHANGELOG.md`. Hold siden på én skærm pr. afsnit: ingen versionslog her (den hører til i changelogget).
+**Version:** 0.9.81 (lokalt valideret; ikke bekræftet publiceret). Opdateres ved hver release sammen med `CHANGELOG.md`. Hold siden på én skærm pr. afsnit: ingen versionslog her (den hører til i changelogget).
 
 ## Hvad er det?
 Børnevenligt talspil som PWA (GitHub Pages, repo `driftportal-platform/aeselklog-talstien`). Matematik er altid frivillig; alt offline gemmes lokalt, ingen konti.
@@ -13,7 +13,7 @@ Børnevenligt talspil som PWA (GitHub Pages, repo `driftportal-platform/aeselklo
 Lyd: 500 gemte MP3-tal (fem stemmer + æselstemme), valgfri musik.
 
 ## Status
-- **Seneste ændring:** Spil mod Æslet i TorskeKlog/500 offline, 1–5 personer og ét Æsel. Lokale strategier uden skjulte modstanderkort eller netværk, automatisk tur og gem/genoptag. Browser- og PWA-offlineprøvet. Kun GitHub v0.9.80; Worker v0.9.78 er uændret. Ikke publiceret herfra.
+- **Seneste ændring:** TorskeKlog- og 500-ikonerne bruger samme størrelse som de øvrige ikoner i spilmenuen. Kun GitHub v0.9.81; Worker v0.9.78 er uændret. Ikke publiceret herfra.
 - **Automatisk:** 63 af 63 Node-tests (`npm test`, kører i GitHub Actions når `.github/workflows/test.yml` er med). Simulerede Chromium-forløb for online med 3–6 enheder og flere skærmstørrelser.
 - **Brugerafprøvet 20. oktober:** online spil på mobil og pc; kortspillet fungerede med enkelte Cloudflare-udfald på 10–15 sekunder, som genoprettede sig selv. Worker /health blev efterfølgende verificeret til v0.9.68. Enhedsmodeller og alle enkeltfunktioner er ikke oplyst.
 - **Ikke bekræftet:** fysisk afprøvning af v0.9.72-talevariation og animation, rigtig mikrofon/lyd på iPhone, installeret iPhone-PWA, deling til Beskeder/Mail, live ElevenLabs, VoiceOver, familietest.

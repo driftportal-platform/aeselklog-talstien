@@ -5,6 +5,11 @@ findes i `docs/arkiv/`. Versioner uden post (fx 0.9.21, 0.9.26 og 0.9.37–0.9.4
 (v0.9.61) ligger i `docs/arkiv/CHANGELOG-v0.9.61-lang.md`.
 
 
+## v0.9.81 – ens ikonstørrelse i spilmenuen (22. oktober 2026)
+- TorskeKlog og 500 bruger samme ikonramme og responsive størrelse som de øvrige spil. Ikonerne overlapper ikke længere teksten på mobil.
+- Valideret: 63/63 Node-tests, ikonmål og ingen overlap ved 320/390/768/1280 px i Chromium samt eksisterende responsive spilmenuprøver. Ingen fysisk telefonprøve.
+- Kun GitHub; Worker og spilleregler er uændrede.
+
 ## v0.9.80 – Spil mod Æslet offline i TorskeKlog og 500 (21. oktober 2026)
 - Nyt Spil mod Æslet-valg: én person alene mod Æslet eller op til fem personer og Æslet. Æslet er ekstra spiller; højst seks i alt. Automatisk spørgen/fiskeri i TorskeKlog og træk, afkastoptagning, sæt, til-lægning og afkast i 500.
 - Lokal strategi bruger kun egen hånd og offentlige oplysninger. Æslets hånd vises aldrig. Solospilleren beholder sin egen hånd på skærmen; flere mennesker bruger privat håndoverdragelse.
