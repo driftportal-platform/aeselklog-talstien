@@ -49,3 +49,9 @@ Prøv plus som flytning, gange som kurve og division som ligelig fordeling. I di
 
 ## Varierede tilbagemeldinger (v0.9.86)
 Prøv gentagne forkerte og rigtige svar med/uden navn. Samme variant må ikke komme direkte igen, og det indtastede tal skal være med i både tekst og tale. Forkert svar bliver på samme opgave uden pointtab. Genblanding efter 10 varianter må ikke starte med den senest brugte variant. Stemmevalg og Lyd fra skal stadig respekteres.
+
+
+## Voksenniveauer (v0.9.87)
+- Prøv Voksen · svær og Voksen · ekstra svær med hver regneart og blandet. Ingen billeder må vises, heller ikke med hjælp åben. Børneniveauernes billeder skal fortsat virke.
+- Prøv fx 4876+2978, 2300−4876, 123×47 og 8460÷36, store svar og ±. Decimaler/tusindtalsseparatorer afvises; fejl bliver på samme opgave uden pointtab.
+- Hjælp skal forklare en gyldig metode, kunne læses op og give 5 point ved rigtigt svar. Uden hjælp 10, vist løsning 0. Prøv negative svar på mobil og valgene efter genindlæsning.

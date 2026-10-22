@@ -5,6 +5,13 @@ findes i `docs/arkiv/`. Versioner uden post (fx 0.9.21, 0.9.26 og 0.9.37–0.9.4
 (v0.9.61) ligger i `docs/arkiv/CHANGELOG-v0.9.61-lang.md`.
 
 
+## v0.9.87 – svære voksenopgaver i RegneKlog (22. oktober 2026)
+- To nye niveauer: Voksen · svær og Voksen · ekstra svær. Alle fire regnearter med større heltal, flercifrede gangestykker og divisioner, der går op uden rest. Minus kan give negative svar. Opgaver skabes lokalt uden store lister af tal.
+- Kun regnestykker på voksenniveauerne, også når hjælpen er åben. Hjælp mig viser en tekstmetode i to trin: opdeling, delprodukter, negative forskelle eller første skridt i skriftlig division. Vis løsningen viser mellemregninger/kontrol. Hjælp kan læses med den valgte spillelederstemme.
+- Større svarfelt og ±-knap til negative svar på telefon. Voksenniveauet gemmes i RegneKlogs eksisterende indstillinger. Børnenes tre niveauer og gulerødder bevares. Point, varieret feedback og mulighed for at prøve igen er uændrede.
+- 67/67 Node-tests, herunder store tal, negative resultater, eksakt division, metoder og point. Browserprøvet alle otte kombinationer af voksenniveau/regneart, uden billeder, oplæselig hjælp, fortegn og 320–1280 px. Eksisterende børne-/gulerods-/stemmeforløb og lokal HTTP/PWA-offline prøvet. Lyd er simuleret; ingen fysisk telefonprøve.
+- Indeholder også v0.9.85–86-opdateringerne. Kun GitHub; Worker uændret.
+
 ## v0.9.86 – 20 forskellige tilbagemeldinger i RegneKlog (22. oktober 2026)
 - 10 replikker til rigtige svar og 10 venlige replikker til forkerte. Det indtastede tal siges først, og det valgfrie spillernavn bruges i alle varianter. Samme tekst vises på skærmen og læses med den valgte stemme.
 - Separate blandede sæt til rigtigt/forkert: alle 10 varianter bruges før ny blanding, og samme variant gentages ikke direkte over blandingsgrænsen. Ingen ændring af point, retry, regnestykker eller stemmevalg. Personlige replikker tilføjes ikke til permanent lydcache.

@@ -1,12 +1,12 @@
 # ÆselKlog – hvor er vi nu
 
-**Version:** 0.9.86 (lokalt valideret; ikke bekræftet publiceret). Opdateres ved hver release sammen med `CHANGELOG.md`. Hold siden på én skærm pr. afsnit: ingen versionslog her (den hører til i changelogget).
+**Version:** 0.9.87 (lokalt valideret; ikke bekræftet publiceret). Opdateres ved hver release sammen med `CHANGELOG.md`. Hold siden på én skærm pr. afsnit: ingen versionslog her (den hører til i changelogget).
 
 ## Hvad er det?
 Børnevenligt talspil som PWA (GitHub Pages, repo `driftportal-platform/aeselklog-talstien`). Matematik er altid frivillig; alt offline gemmes lokalt, ingen konti.
 - **Talstien** – brætspil 1–100, digital eller fysisk A3-plade, op til 6 spillere + CPU-æsel, specialfelter, valgfri læring med forældreoversigt.
 - **Kortspil** – fem talområder, 1–6 personer + CPU-æsel, frie træk, fejl udfordres med æselkortet.
-- **RegneKlog** – regn visuelt eller med tal; plus, minus, gange og division, tre niveauer, hjælp og point.
+- **RegneKlog** – regn visuelt eller med tal; plus, minus, gange og division, tre børneniveauer og to voksenniveauer, hjælp og point.
 - **Talkort** – ét kort ad gangen med sprogvalg, Auto og udtaletræning.
 - **TorskeKlog** – Fisk med fire ens talkort, 2–6 spillere offline (evt. Æsel) eller 2–6 mennesker online på hver sin enhed.
 - **ÆselKlog 500** – talkort uden kulører, æseljokere, sæt og talrækker; flere runder til 500.
@@ -14,8 +14,8 @@ Børnevenligt talspil som PWA (GitHub Pages, repo `driftportal-platform/aeselklo
 Lyd: 500 gemte MP3-tal (fem stemmer + æselstemme), valgfri musik.
 
 ## Status
-- **Seneste ændring:** RegneKlog har 10 replikker til rigtige og 10 til forkerte svar med indtastet tal/navn, blandet uden direkte gentagelse. 66/66 Node-tests og browser-/PWA-prøver med simuleret lyd. Musik- og stemmerettelser fra v0.9.85 er med. Kun GitHub v0.9.86; Worker v0.9.78 er uændret.
-- **Automatisk:** 66 af 66 Node-tests (`npm test`, kører i GitHub Actions når `.github/workflows/test.yml` er med). Simulerede Chromium-forløb for online med 3–6 enheder og flere skærmstørrelser.
+- **Seneste ændring:** RegneKlog har to voksenniveauer med større heltal/negative minusresultater, ingen billeder, teksthjælp med mellemregninger og ±-knap. 67/67 Node-tests og browser-/PWA-prøver med simuleret lyd. Opdateringer fra v0.9.85–86 er med. Kun GitHub v0.9.87; Worker v0.9.78 er uændret.
+- **Automatisk:** 67 af 67 Node-tests (`npm test`, kører i GitHub Actions når `.github/workflows/test.yml` er med). Simulerede Chromium-forløb for online med 3–6 enheder og flere skærmstørrelser.
 - **Brugerafprøvet 20. oktober:** online spil på mobil og pc; kortspillet fungerede med enkelte Cloudflare-udfald på 10–15 sekunder, som genoprettede sig selv. Worker /health blev efterfølgende verificeret til v0.9.68. Enhedsmodeller og alle enkeltfunktioner er ikke oplyst.
 - **Ikke bekræftet:** fysisk afprøvning af v0.9.72-talevariation og animation, rigtig mikrofon/lyd på iPhone, installeret iPhone-PWA, deling til Beskeder/Mail, live ElevenLabs, VoiceOver, familietest.
 - **Cloudflare:** konfigurationens navn er `aeselklog-online-pilot`, den oplyste liveadresse bruger `aeselklog-online`. Brug eksplicit `--name` ved deploy og kontrollér `GAME_ROOM` og `APP_ORIGIN` først.
