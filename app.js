@@ -166,27 +166,27 @@ function stopCurrentVoice(){
 function waitForPlayback(begin,maxMs){
  return new Promise(resolve=>{
   let finished=false,timer;
-  const finish=()=>{
+  const finish=(ok=true)=>{
    if(finished)return;
    finished=true;clearTimeout(timer);
    if(activeVoiceDone===finish)activeVoiceDone=null;
-   resolve();
+   resolve(ok!==false);
   };
   activeVoiceDone=finish;
-  timer=setTimeout(finish,maxMs);
-  try{begin(finish)}catch(e){console.warn('Oplæsning kunne ikke afspilles',e);finish()}
+  timer=setTimeout(()=>finish(false),maxMs);
+  try{begin(finish)}catch(e){console.warn('Oplæsning kunne ikke afspilles',e);finish(false)}
  });
 }
 function speakLocally(text,{cpu=false,language='da-DK'}={}){
- if(!('speechSynthesis' in window)||!sound.on)return Promise.resolve();
+ if(!('speechSynthesis' in window)||!sound.on)return Promise.resolve(false);
  try{
   const sentence=normalizedSpeech(text);
   const u=new SpeechSynthesisUtterance(sentence);
   u.lang=language;u.rate=cpu?Math.min(1.15,sound.rate*1.04):sound.rate;u.pitch=cpu?Math.min(1.5,sound.pitch*1.17):sound.pitch;
   const ds=language==='da-DK'?danishVoices():voiceOptions().filter(v=>(v.lang||'').slice(0,2)===language.slice(0,2));const narrator=ds.find(v=>(v.voiceURI||v.name)===sound.selected)||ds.find(v=>/premium|enhanced/i.test(v.name))||ds.find(v=>v.default)||ds[0]||null;
   u.voice=cpu?(ds.find(v=>v!==narrator)||narrator):narrator;
-  return waitForPlayback(done=>{u.onend=done;u.onerror=done;speechSynthesis.speak(u)},Math.min(28000,4000+sentence.length*160));
- }catch(e){console.warn('Lokal oplæsning kunne ikke starte',e);return Promise.resolve()}
+  return waitForPlayback(done=>{u.onend=()=>done(true);u.onerror=()=>done(false);speechSynthesis.speak(u)},Math.min(28000,4000+sentence.length*160));
+ }catch(e){console.warn('Lokal oplæsning kunne ikke starte',e);return Promise.resolve(false)}
 }
 function ensureAudioContext(){
  const C=window.AudioContext||window.webkitAudioContext;
@@ -240,24 +240,26 @@ async function speakAI(text,id,{cpu=false,strictVoice=false,boost=1,voiceOverrid
   const ctx=ensureAudioContext();
   if(ctx){
    if(ctx.state==='suspended')await ctx.resume();
+   if(ctx.state!=='running')throw Error('Lyd kræver et nyt tryk for at starte.');
    const decoded=await ctx.decodeAudioData(bytes.slice(0));
    if(id!==speechSerial||!sound.on)return;
    // Gem først når lyden er valideret af dekoderen. Fejlende lyd må ikke lagres.
    if(downloaded&&VC.isSafePhrase(text))void VC.put(clip,bytes).then(ok=>{if(ok&&$('voiceSettings').open)void refreshAudioCacheStatus()});
    const node=ctx.createBufferSource();node.buffer=decoded;node.playbackRate.value=cpu?1.07:1;if(boost!==1){const gain=ctx.createGain();gain.gain.value=boost;node.connect(gain);gain.connect(ctx.destination)}else node.connect(ctx.destination);aiSource=node;
    aiStatus(cacheLabel+': '+chosen+(cpu?' · CPU-æsel.':'.'));
-   await waitForPlayback(done=>{node.onended=()=>{if(aiSource===node)aiSource=null;done()};node.start()},Math.min(45000,Math.max(2000,decoded.duration*1000/(cpu?1.07:1)+2000)));
+   return await waitForPlayback(done=>{node.onended=()=>{if(aiSource===node)aiSource=null;done()};node.start()},Math.min(45000,Math.max(2000,decoded.duration*1000/(cpu?1.07:1)+2000)));
   }else{
    const blob=new Blob([bytes],{type:'audio/mpeg'});
    const objectUrl=URL.createObjectURL(blob);
    const audio=new Audio(objectUrl);audio._blobUrl=objectUrl;audio.playbackRate=cpu?1.07:1;aiHtmlAudio=audio;
    aiStatus(cacheLabel+': '+chosen+(cpu?' · CPU-æsel.':'.'));
    try{
-    await waitForPlayback(done=>{
-     audio.onended=done;audio.onerror=done;
-     audio.play().catch(done);
+    const played=await waitForPlayback(done=>{
+     audio.onended=()=>done(true);audio.onerror=()=>done(false);
+     audio.play().catch(()=>done(false));
     },45000);
-    if(downloaded&&VC.isSafePhrase(text))void VC.put(clip,bytes).then(ok=>{if(ok&&$('voiceSettings').open)void refreshAudioCacheStatus()});
+    if(played&&downloaded&&VC.isSafePhrase(text))void VC.put(clip,bytes).then(ok=>{if(ok&&$('voiceSettings').open)void refreshAudioCacheStatus()});
+    return played;
    }finally{URL.revokeObjectURL(objectUrl);if(aiHtmlAudio===audio)aiHtmlAudio=null;audio.src='';}
   }
  }catch(e){
@@ -322,7 +324,7 @@ async function speakNumber(number,{repeat=false,cpu=false,preferSelectedVoice=fa
   const u=new SpeechSynthesisUtterance(part.text);u.lang=part.locale;u.rate=sound.rate;u.pitch=sound.pitch;u.volume=parts.length>1&&part.lang!=='da'?0.82:1;
   const voices=speechSynthesis.getVoices();const choices=voices.filter(v=>(v.lang||'').toLowerCase().startsWith(part.lang));
   const selected=choices.find(v=>v.default)||choices[0];if(selected)u.voice=selected;
-  return waitForPlayback(done=>{u.onend=done;u.onerror=done;speechSynthesis.speak(u)},Math.min(22000,5000+part.text.length*180));
+  return waitForPlayback(done=>{u.onend=()=>done(true);u.onerror=()=>done(false);speechSynthesis.speak(u)},Math.min(22000,5000+part.text.length*180));
  };
  const playing=(async()=>{for(let i=0;i<parts.length;i++){
   if(id!==speechSerial)break;
@@ -346,7 +348,7 @@ async function sayWithVoice(text,{voice='current',language='da-DK'}={}){
  if(!sound.on)return;const line=normalizedSpeech(text);if(!line)return;stopCurrentVoice();const id=speechSerial,duck=window.AeselMusic?.beginSpeech?.();
  try{if(voice==='device'||voice==='current'&&sound.mode==='device')return await speakLocally(line,{language});if(voice!=='current'&&voice!=='donkey'&&!aiVoices.some(v=>v.id===voice))throw Error('Vælg en tilgængelig stemme');const chosen=voice==='current'?sound.aiVoice:voice==='donkey'?CV.chooseVoice(aiVoices,sound.aiVoice,sound.cpuVoice):voice;return await speakAI(line,id,{voiceOverride:chosen,language})}finally{if(duck!==undefined)window.AeselMusic?.endSpeech?.(duck)}
 }
-window.AeselVoice={sayWithVoice,listVoices:()=>aiVoices.map(v=>({...v})),loadVoices:()=>loadAIVoices(),say:(text,options={})=>say(text,options),number:(number,options={})=>speakNumber(number,options),repeatNumber:()=>lastSpokenNumber!==null?speakNumber(lastSpokenNumber,{repeat:true}):Promise.resolve(),stop:stopCurrentVoice,enabled:()=>sound.on,choices:()=>({mode:sound.mode,aiVoice:sound.aiVoice,cpuVoice:sound.cpuVoice,numberLanguage})};
+window.AeselVoice={unlock:()=>{if(sound.on){try{ensureAudioContext()}catch(e){console.warn('Lyd kræver et nyt tryk',e)}}},sayWithVoice,listVoices:()=>aiVoices.map(v=>({...v})),loadVoices:()=>loadAIVoices(),say:(text,options={})=>say(text,options),number:(number,options={})=>speakNumber(number,options),repeatNumber:()=>lastSpokenNumber!==null?speakNumber(lastSpokenNumber,{repeat:true}):Promise.resolve(),stop:stopCurrentVoice,enabled:()=>sound.on,choices:()=>({mode:sound.mode,aiVoice:sound.aiVoice,cpuVoice:sound.cpuVoice,numberLanguage})};
 const numberSelect=$('numberLanguageChoice');if(numberSelect){numberSelect.value=numberLanguage;numberSelect.addEventListener('change',e=>{numberLanguage=NUM.normalize(e.target.value);try{localStorage.setItem(NUMBER_LANGUAGE_KEY,numberLanguage)}catch(_){};numberSelect.value=numberLanguage;});}
 $('numberPreview')?.addEventListener('click',()=>void speakNumber(14));
 $('numberRepeatBoard')?.addEventListener('click',()=>void speakNumber(players?.[turn]?.pos||1));
@@ -693,6 +695,7 @@ function show(view){
  window.AeselVoice?.stop?.();
  window.AeselAudioSettings?.activate?.(view);
  window.AeselMusic?.syncView?.(view);
+ window.AeselMusicControls?.activate(view);
  if(view==='setup')updateSettingsSummary();
  document.title=({mathSetup:'RegneKlog',mathGame:'RegneKlog',rummySetup:'500',rummyGame:'500',fishSetup:'TorskeKlog',fishGame:'TorskeKlog',menu:'Spilmenu',setup:'Talstien',game:'Talstien',cardsSetup:'Kortspil',cardsGame:'Kortspil',talkort:'Talkort',settings:'Indstillinger'}[view]||'Talstien')+' · ÆselKlog';
  if(view==='home')renderResumeCard();

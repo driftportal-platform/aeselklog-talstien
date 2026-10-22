@@ -1,6 +1,6 @@
 const assert=require('node:assert/strict'),E=require('../math-engine.js');
 let seed=7;const random=()=>{seed=(seed*1664525+1013904223)>>>0;return seed/2**32};
-for(const [level,max] of Object.entries(E.LEVELS))for(const op of Object.keys(E.OPS)){
+for(const [level,max] of Object.entries(E.LEVELS).filter(([level])=>!E.isAdult(level)))for(const op of Object.keys(E.OPS)){
  let previous=null;
  for(let i=0;i<300;i++){
   const p=E.generate(op,level,random,previous);assert(p.a>=0&&p.a<=max);assert(p.b>0&&p.b<=max);assert(Number.isInteger(p.answer)&&p.answer>=0&&p.answer<=max);

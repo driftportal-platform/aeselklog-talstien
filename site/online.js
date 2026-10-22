@@ -148,10 +148,14 @@ const AUDIO_KEY='aeselklog-online-audio-v0942';
 let audioPref={voice:true,language:'da',music:false,track:'gonefishin',volume:32,effects:true};
 try{Object.assign(audioPref,JSON.parse(localStorage.getItem(AUDIO_KEY)||'{}'))}catch{}
 const trackPaths={gonefishin:'../music/gone-fishin.mp3',march:'../music/childrens-march.mp3',beary:'../music/beary-fishy.mp3'};
+const MUSIC_KEY='aeselklog-online-musik-v1';let musicProfiles={},musicMode=null;
+try{const saved=JSON.parse(localStorage.getItem(MUSIC_KEY));if(saved&&typeof saved==='object')musicProfiles=saved;else musicProfiles.cards={music:audioPref.music===true,track:audioPref.track,volume:audioPref.volume}}catch{}
+function syncMusicProfile(){const mode=state?.gameType||window.AeselOnlineMenu?.mode||'cards';if(mode===musicMode)return;musicMode=mode;const p=musicProfiles[mode]||{};audioPref.music=p.music===true;audioPref.track=Object.hasOwn(trackPaths,p.track)?p.track:'gonefishin';const volume=Number(p.volume??32);audioPref.volume=Number.isFinite(volume)?Math.max(0,Math.min(100,volume)):32}
 let speechQueue=Promise.resolve(),soundSerial=0,spoken=null,lastNumber=null,boardUtterance=null,lastBoardPhrase='',boardAudioRoom='',boardAudioSeq=null,boardPendingCount=0;
 const musicAudio=new Audio();musicAudio.loop=true;musicAudio.preload='none';
-function saveAudio(){try{localStorage.setItem(AUDIO_KEY,JSON.stringify(audioPref))}catch{}}
+function saveAudio(){try{musicProfiles[musicMode||'cards']={music:audioPref.music,track:audioPref.track,volume:audioPref.volume};localStorage.setItem(MUSIC_KEY,JSON.stringify(musicProfiles));localStorage.setItem(AUDIO_KEY,JSON.stringify(audioPref))}catch{}}
 function updateAudio(){
+ syncMusicProfile();const topMusic=$('onlineMusicToggle');topMusic.hidden=!state||state.phase==='closed';topMusic.textContent=audioPref.music?'🎵 Musik til':'🎵 Musik fra';topMusic.setAttribute('aria-pressed',String(audioPref.music));$('musicToggle').setAttribute('aria-pressed',String(audioPref.music));
  $('effectToggle').textContent=audioPref.effects?'🫏 Æsellyd til':'🫏 Æsellyd fra';
  $('voiceToggle').textContent=audioPref.voice?'🔊 Tale til':'🔇 Tale fra';
  $('voiceLanguage').value=audioPref.language;
@@ -214,6 +218,7 @@ $('voiceToggle').onclick=()=>{audioPref.voice=!audioPref.voice;if(!audioPref.voi
 $('voiceLanguage').onchange=e=>{audioPref.language=e.target.value;stopSpeech();saveAudio();updateAudio()};
 window.addEventListener('aesel-chat-audio',()=>{if(window.AeselChat?.audioBusy)stopSpeech();updateAudio()});
 $('musicToggle').onclick=()=>{audioPref.music=!audioPref.music;saveAudio();updateAudio()};
+$('onlineMusicToggle').onclick=$('musicToggle').onclick;window.addEventListener('aesel-online-mode',updateAudio);
 $('musicTrack').onchange=e=>{audioPref.track=e.target.value;saveAudio();updateAudio()};
 $('musicVolume').oninput=e=>{audioPref.volume=Number(e.target.value);saveAudio();updateAudio()};
 document.addEventListener('visibilitychange',()=>{if(document.hidden)stopSpeech();updateAudio()});

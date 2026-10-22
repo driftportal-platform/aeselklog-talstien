@@ -48,6 +48,8 @@ M.endSpeech(token);assert.equal(volumeChanges.at(-1),normal,'restores music volu
 M.setTrack('beary');assert(plays.at(-1).endsWith('beary-fishy.mp3'));
 M.syncView('home');assert.equal(M.getState().playing,false,'music off outside game');
 M.syncView('cardsGame');assert.equal(M.getState().playing,true,'music starts in card game');
+for(const view of ['talkort','fishGame','rummyGame','mathGame']){M.syncView(view);assert(M.getState().playing,'Music allowed in '+view)}
+M.syncView('mathSetup');assert(!M.getState().playing);M.syncView('mathGame');
 doc.hidden=true;events.visibilitychange();assert.equal(M.getState().playing,false,'music stops in background');
 doc.hidden=false;events.visibilitychange();assert.equal(M.getState().playing,true,'music resumes');
 M.setEnabled(false);assert.equal(M.getState().playing,false);

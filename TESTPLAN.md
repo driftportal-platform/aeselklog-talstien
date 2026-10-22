@@ -39,3 +39,19 @@ Prøv plus som flytning, gange som kurve og division som ligelig fordeling. I di
 - Åbn Hjælp og tryk Læs hjælpen op på begge trin. Gentagelse skal hverken flytte trin eller vise løsningen. Slå automatisk opgave-/feedbacklæsning fra og prøv manuelle knapper.
 - Afbryd med Stop, næste trin, tælling, nyt svar, Lyd fra og Spilmenu. Skjul siden mens stemmer hentes; der må ikke komme forsinket tale. Genindlæs og kontrollér navn/stemme/valg.
 - Fysisk telefon og live stemmetjeneste skal stadig afprøves. Navngivne klip må ikke komme i permanent TTS-cache.
+
+
+## Musik og lydaktivering (v0.9.85)
+- Prøv topknap/menu, alle tre melodier og lydstyrke i alle seks offline-spil og fire online-spil. Valgene skal være adskilt pr. spil/enhed og huskes efter genindlæsning, også direkte adresser. Kontroller begge onlineadresser.
+- Talstien: prøv normal/stor plade og musikmenu fra værktøjslinjen. Musik må ikke fortsætte på forsiden/menu eller skjult side. Tale skal dæmpe musikken og fortsætte ved ændring af musikstyrken.
+- RegneKlog: med fælles fortæller sat til enhed og særskilt AI-valg skal Prøv valgt stemme/Start/Læs op aktivere lyd ved trykket. Fejl i afspilning skal være synlig, og nyt tryk skal kunne prøve igen. Fysisk iPhone og rigtig stemmetjeneste skal prøves.
+
+
+## Varierede tilbagemeldinger (v0.9.86)
+Prøv gentagne forkerte og rigtige svar med/uden navn. Samme variant må ikke komme direkte igen, og det indtastede tal skal være med i både tekst og tale. Forkert svar bliver på samme opgave uden pointtab. Genblanding efter 10 varianter må ikke starte med den senest brugte variant. Stemmevalg og Lyd fra skal stadig respekteres.
+
+
+## Voksenniveauer (v0.9.87)
+- Prøv Voksen · svær og Voksen · ekstra svær med hver regneart og blandet. Ingen billeder må vises, heller ikke med hjælp åben. Børneniveauernes billeder skal fortsat virke.
+- Prøv fx 4876+2978, 2300−4876, 123×47 og 8460÷36, store svar og ±. Decimaler/tusindtalsseparatorer afvises; fejl bliver på samme opgave uden pointtab.
+- Hjælp skal forklare en gyldig metode, kunne læses op og give 5 point ved rigtigt svar. Uden hjælp 10, vist løsning 0. Prøv negative svar på mobil og valgene efter genindlæsning.
