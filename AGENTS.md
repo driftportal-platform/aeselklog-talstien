@@ -67,8 +67,6 @@ Gælder både mennesker og AI-assistenter. Hold denne fil kort og kun med regler
 
 - Oplæsning af regnestykke, indtastet svar/feedback og hjælp bruger fælles `AeselVoice.sayWithVoice`. Respektér Lyd fra og eksplicit stemmevalg; afbryd gammel tale ved nyt svar/trin, tælling, skjult side og navigation. Navn er valgfrit, og navngivne lydklip må ikke gemmes permanent. RegneKlogs stemmevalg gemmes i samme separate RegneKlog-nøgle.
 
-- Voksenniveauerne i RegneKlog bruger `math-adult.js`, kun hele tal og ingen visuelle objekter (heller ikke under hjælp). Minus må være negativ; division går op. Undgå at allokere gulerødder/lister ud fra voksental. Hjælpen forklarer metoden, og ± understøtter mobilinput. Børneniveauernes grænser/regler bevares.
-
 ## Gemte data og privatliv
 - Lagernøgler må ikke ændres uden migrering: `aeselklog-igangvaerende-v1` (Talstien, schema 1), `aeselklog-kortspil-v1`, `aeselklog-laereprofiler-v1`. Gamle gemninger skal fortsat kunne læses.
 - Alt er lokalt; ingen automatisk cloud-upload af profiler, navne eller lyd. Intet fritekst eller børnenavne i permanent TTS-cache.
