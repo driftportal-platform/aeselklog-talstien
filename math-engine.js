@@ -26,7 +26,8 @@
   const filtered=choices.filter(p=>!previous||p.op!==previous.op||p.a!==previous.a||p.b!==previous.b);
   return filtered[randomIndex(filtered.length,random)];
  }
- function start({operations=['add'],level='easy',mode='visual',length=10,combined=false}={},random=Math.random){
+ function start({operations=['add'],level='easy',mode='visual',length=10,combined=false,smallNumbers=false}={},random=Math.random){
+  if(typeof smallNumbers!=='boolean')throw Error('Ugyldigt talvalg.');
   if(typeof combined!=='boolean')throw Error('Ugyldigt kombivalg.');
   if(combined&&!isAdult(level))throw Error('Kombi er kun til voksne.');
   if(!Array.isArray(operations)||!combined&&!operations.length||operations.some(op=>!OPS[op])||new Set(operations).size!==operations.length)throw Error('Vælg mindst én regneart.');
@@ -34,8 +35,8 @@
   const order=[];while(!combined&&order.length<Number(length)){
    const bag=[...operations];for(let i=bag.length-1;i>0;i--){const j=randomIndex(i+1,random);[bag[i],bag[j]]=[bag[j],bag[i]]}order.push(...bag);
   }
-  const tasks=[];if(combined){const next=Combined.generator(level,random);for(let i=0;i<Number(length);i++)tasks.push(next())}else for(const op of order.slice(0,Number(length)))tasks.push(generate(op,level,random,tasks.at(-1)));
-  return {options:{operations:[...operations],level,combined:combined===true,mode:isAdult(level)?'numbers':mode,length:Number(length)},tasks,index:0,points:0,records:[],help:0,attempts:0,resolved:false,finished:false};
+  const tasks=[];if(combined){const next=Combined.generator(level,random,smallNumbers);for(let i=0;i<Number(length);i++)tasks.push(next())}else for(const op of order.slice(0,Number(length)))tasks.push(generate(op,level,random,tasks.at(-1)));
+  return {options:{operations:[...operations],level,combined:combined===true,smallNumbers:smallNumbers===true,mode:isAdult(level)?'numbers':mode,length:Number(length)},tasks,index:0,points:0,records:[],help:0,attempts:0,resolved:false,finished:false};
  }
  function active(s){if(!s||s.finished||s.resolved)throw Error('Opgaven er afsluttet.');return s.tasks[s.index]}
  function complete(s,kind,points){s.points+=points;s.resolved=true;s.records.push({kind,points,attempts:s.attempts});return points}

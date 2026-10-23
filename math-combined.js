@@ -24,11 +24,26 @@
   else{steps(n.left,out);steps(n.right,out);out.push(`${evaluate(n.left)} ${symbols[n.op]} ${evaluate(n.right)} = ${evaluate(n)}`)}return out;
  }
  function problem(ast,level){const answer=evaluate(ast),max=level==='adult'?1000000:level==='expert'?100000000:0;if(!max||Math.abs(answer)>max||ast.op==='number')throw Error('Ugyldigt voksenniveau eller for stort svar.');return {op:'combined',level,ast,answer,text:expression(ast),spoken:spoken(ast)}}
- function generator(level,random=Math.random){
+ function generator(level,random=Math.random,smallNumbers=false){
   if(!['adult','expert'].includes(level))throw Error('Kombi er kun til voksne.');const expert=level==='expert',rates=[5,10,12,15,20,25,30,40,50,75];let bag=[],last=-1,previous='';
   const pick=(min,max)=>{const n=Number(random());if(!Number.isFinite(n)||n<0||n>=1)throw Error('Ugyldigt tilfældigt tal.');return min+Math.floor(n*(max-min+1))},n=(min,max)=>number(pick(min,max)),rate=()=>rates[pick(0,rates.length-1)],pc=()=>percent(rate(),number(100*pick(expert?100:10,expert?5000:500)));
   const add=(a,b)=>binary('add',a,b),sub=(a,b)=>binary('subtract',a,b),mul=(a,b)=>binary('multiply',a,b),div=(a,b)=>binary('divide',a,b),quotient=()=>{const d=pick(12,99);return div(number(d*pick(expert?100:12,expert?9999:999)),number(d))};
-  const builders=expert?[
+  const smallBuilders=[
+   ()=>add(n(2,20),mul(n(2,9),n(2,9))),
+   ()=>mul(sub(n(2,15),n(2,15)),n(2,6)),
+   ()=>{const d=pick(2,8),q=pick(2,12);return sub(div(number(d*q),number(d)),n(2,20))},
+   ()=>add(percent(25,number(4*pick(2,20))),mul(n(2,8),n(2,8))),
+   ()=>{const d=pick(2,6),a=pick(2,9),b=pick(2,9);return div(add(number(d*a),number(d*b)),number(d))},
+   ()=>sub(n(2,20),mul(sub(n(2,12),n(2,12)),n(2,5)))
+  ];
+  const hardSmallBuilders=[
+   ()=>sub(mul(sub(n(2,12),n(2,12)),add(n(2,6),n(2,6))),n(2,20)),
+   ()=>{const d=pick(2,6),a=pick(2,9),b=pick(2,9);return add(div(sub(number(d*a),number(d*b)),number(d)),mul(n(2,6),n(2,6)))},
+   ()=>mul(add(percent(25,number(4*pick(2,20))),n(2,9)),sub(n(2,8),n(2,8))),
+   ()=>sub(n(2,20),sub(mul(n(2,9),n(2,9)),percent(50,number(2*pick(2,40))))),
+   ()=>{const d=pick(2,8);return sub(div(number(d*pick(2,12)),number(d)),mul(sub(n(2,9),n(2,9)),n(2,6)))}
+  ];
+  const builders=smallNumbers?(expert?hardSmallBuilders:smallBuilders):expert?[
    ()=>sub(mul(add(pc(),quotient()),n(12,199)),n(1000,999999)),
    ()=>{const d=pick(12,99);return div(sub(mul(number(d*pick(101,999)),n(12,999)),number(d*pick(100,9999))),number(d))},
    ()=>add(mul(sub(n(1000,99999),n(1000,99999)),n(12,199)),pc()),

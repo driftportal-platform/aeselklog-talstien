@@ -1,11 +1,14 @@
 # Installation af ÆselKlog
 
-Aktuel opdatering: v0.9.88 – Pas og kombinationsopgaver i RegneKlog. Musik-/stemme-/tekstændringerne fra v0.9.85–86 er også med.
+Aktuel opdatering: v0.9.89 – Pas og kombinationsopgaver i RegneKlog. Musik-/stemme-/tekstændringerne fra v0.9.85–86 er også med.
 
 1. Pak ZIP-filen ud i en separat mappe. Kopiér indholdet ind i projektmappen og vælg Erstat filerne. Bevar assets, audio, music, .git og .github. Vælg ikke Opret kopier. De nye music-controls.js, math-adult.js og math-combined.js skal med.
 2. Kør `npm.cmd test`: 68/68 skal bestå. Commit og Push origin i GitHub Desktop. Bevar `.github/workflows/test.yml`.
 3. Kun GitHub opdateres. Cloudflare/Worker er uændret.
-4. Genindlæs, luk appen helt, og åbn igen efter GitHub Pages er færdig. Kontrollér version 0.9.88.
+4. Genindlæs, luk appen helt, og åbn igen efter GitHub Pages er færdig. Kontrollér version 0.9.89.
+
+## Svære opgaver med små tal
+Vælg et voksenniveau, slå Kombinationsopgaver til og vælg Små tal · svær regnerækkefølge. Tallene i opgaven er højst 100; svar og mellemregninger kan være større eller negative. Ekstra svær har flere trin og indlejrede parenteser. Store tal er stadig et valg, og valget gemmes.
 
 ## Pas og kombinationsopgaver
 Pas springer straks til næste opgave og giver 0 point. På sidste opgave åbnes pointoversigten, som tæller de oversprungne opgaver.

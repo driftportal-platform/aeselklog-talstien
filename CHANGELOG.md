@@ -5,6 +5,11 @@ findes i `docs/arkiv/`. Versioner uden post (fx 0.9.21, 0.9.26 og 0.9.37–0.9.4
 (v0.9.61) ligger i `docs/arkiv/CHANGELOG-v0.9.61-lang.md`.
 
 
+## v0.9.89 – svære opgaver med små tal (23. oktober 2026)
+- Kombinationsopgaver har valg mellem små og store tal; valget gemmes. Små tal er højst 100 i selve opgaven, med hele, eventuelt negative svar.
+- Sværhedsgraden ligger i regnerækkefølge, procent og parenteser; ekstra svær har flere trin og indlejrede parenteser. Eksisterende store opgaver bevares.
+- Test af 4000 små kombinationsopgaver samt browserkontrol af valg, hjælp, layout og gemte valg. Worker uændret.
+
 ## v0.9.88 – Pas og kombinationsopgaver (22. oktober 2026)
 - Pas går straks videre uden point; oversprungne opgaver tælles i oversigten.
 - Voksen-niveauer kan blande plus, minus, gange, division og procent med parenteser og hele svar. Hjælpen viser regnerækkefølge og mellemregninger; oplæsning bruger regneord.
