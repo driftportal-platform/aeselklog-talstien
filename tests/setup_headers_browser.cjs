@@ -6,7 +6,7 @@ for(const width of [390,1280]){await p.setViewportSize({width,height:900});
  assert.equal(await p.locator('#pageTitle').textContent(),'ÆselKlog - '+title);assert((await p.locator('#pageBrandIcon img').getAttribute('src')).endsWith('/'+icon+'.svg'));
  assert.equal(await p.locator('.view.active > .page-heading').count(),0);assert.equal(await p.locator('.card-setup-intro').count(),0);
  assert(await p.locator('#'+field).isHidden());assert(await p.locator('#'+start).isVisible());
- await p.screenshot({path:f.root+'/preview_setup_'+route+'_'+width+'_v0975.png',fullPage:true});
+ await p.screenshot({path:f.shots+'/preview_setup_'+route+'_'+width+'_v0975.png',fullPage:true});
  await p.locator('#'+options+' > summary').click();assert(await p.locator('#'+field).isVisible());await p.locator('#'+field).selectOption('21-40');
  await p.locator('#'+options+' > summary').click();assert(await p.locator('#'+field).isHidden());assert.equal(await p.locator('#'+field).inputValue(),'21-40');
  assert(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));

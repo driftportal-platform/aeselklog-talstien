@@ -2,7 +2,9 @@
 from pathlib import Path
 from playwright.sync_api import sync_playwright
 import base64,re
+import os,tempfile
 ROOT=Path(__file__).parents[1]
+SHOTS=Path(os.environ.get('PREVIEW_DIR') or tempfile.gettempdir())
 JS=['engine.js','board.js','actions.js','leaderboard.js','adaptive.js','profiles.js','parentreport.js','savegame.js','cpuvoice.js','voicecache.js','narration.js','actionfx.js','app.js']
 
 def load(page,previous=None):
@@ -32,13 +34,13 @@ with sync_playwright() as p:
         assert page.locator('#home').is_visible(),'home missing'
         assert page.locator('#homePlay').is_visible() and page.locator('#homeSettings').is_visible()
         assert not page.locator('#setup').is_visible()
-        page.screenshot(path=str(ROOT/f'preview_home_{name}.png'),full_page=True)
+        page.screenshot(path=str(SHOTS/f'preview_home_{name}.png'),full_page=True)
         page.locator('#homeSettings').click(); assert page.locator('#settings').is_visible()
         page.locator('#range').select_option('21-40')
         page.locator('input[name=learning][value=leg]').check(force=True)
         page.locator('#gamePace').select_option('ekstra')
         page.locator('#adultDifficultySetting').select_option('let')
-        page.screenshot(path=str(ROOT/f'preview_settings_{name}.png'),full_page=True)
+        page.screenshot(path=str(SHOTS/f'preview_settings_{name}.png'),full_page=True)
         page.locator('#settingsDone').click();assert page.locator('#home').is_visible()
         page.locator('#homePlay').click();assert page.locator('#setup').is_visible()
         assert not page.locator('#range').is_visible(),'options leaked into quick setup'
@@ -47,7 +49,7 @@ with sync_playwright() as p:
         assert page.locator('#playerInputs .player-input').count()==2
         page.locator('#playerInputs .age-select').first.select_option('adult')
         assert page.locator('#playerInputs select.difficulty').count()==0
-        page.screenshot(path=str(ROOT/f'preview_players_{name}.png'),full_page=True)
+        page.screenshot(path=str(SHOTS/f'preview_players_{name}.png'),full_page=True)
         page.locator('#cpuCheck').check(force=True)
         # Disable voice so this does not contact a live API.
         page.locator('#voiceToggle').click()

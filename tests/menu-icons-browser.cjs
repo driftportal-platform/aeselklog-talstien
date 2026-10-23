@@ -18,6 +18,6 @@ const assert=require('node:assert/strict'),fixture=require('./online-browser-har
   }
   assert(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));
  }
- await p.setViewportSize({width:390,height:844});await p.screenshot({path:f.root+'/preview-icons.png',fullPage:true});
+ await p.setViewportSize({width:390,height:844});await p.screenshot({path:f.shots+'/preview-icons.png',fullPage:true});
  console.log('PASS menu icons: matching dimensions, contained artwork, no label overlap at 320/390/768/1280 px');
 }finally{await f.close()}})().catch(e=>{console.error(e);process.exitCode=1});

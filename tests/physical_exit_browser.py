@@ -2,7 +2,9 @@
 from pathlib import Path
 from playwright.sync_api import sync_playwright
 import re,base64
+import os,tempfile
 ROOT=Path(__file__).resolve().parents[1]
+SHOTS=Path(os.environ.get('PREVIEW_DIR') or tempfile.gettempdir())
 SCRIPTS=['engine.js','board.js','actions.js','leaderboard.js','adaptive.js','profiles.js','parentreport.js','savegame.js','cpuvoice.js','voicecache.js','narration.js','actionfx.js','app.js','home-ui.js']
 def bootstrap(page,items=None):
     html=(ROOT/'index.html').read_text('utf-8').replace('<link rel="stylesheet" href="./styles.css">','<style>'+(ROOT/'styles.css').read_text('utf-8')+'</style>')
@@ -58,7 +60,7 @@ with sync_playwright() as playwright:
         page.locator('#turnPanel [data-act="move-3"]').click()
         phase(page,'result')
         assert 'felt 3' in page.locator('#physicalGuidePosition').inner_text()
-        if size==(390,844): page.screenshot(path=str(ROOT/'preview_physical_assistant_iPhone.png'),full_page=True)
+        if size==(390,844): page.screenshot(path=str(SHOTS/'preview_physical_assistant_iPhone.png'),full_page=True)
         page.locator('#physicalShowBoard').click()
         assert page.locator('#boardBox').evaluate('(el)=>el.classList.contains("expanded")')
         assert page.locator('#boardExit').is_visible()
@@ -66,10 +68,10 @@ with sync_playwright() as playwright:
         # Clickability and hit area in portrait/landscape/full-width.
         hit=page.locator('#boardExit').evaluate('''el=>{const r=el.getBoundingClientRect();return document.elementFromPoint(r.x+r.width/2,r.y+r.height/2)?.closest("button")?.id}''')
         assert hit=='boardExit',(size,'exit occluded',hit)
-        page.screenshot(path=str(ROOT/('preview_physical_expanded_%dx%d.png'%size)))
+        page.screenshot(path=str(SHOTS/('preview_physical_expanded_%dx%d.png'%size)))
         page.locator('#boardExit').click()
         assert page.locator('#exitGameDialog').evaluate('el=>el.open')
-        if size==(390,844): page.screenshot(path=str(ROOT/'preview_exit_menu_iPhone.png'))
+        if size==(390,844): page.screenshot(path=str(SHOTS/'preview_exit_menu_iPhone.png'))
         assert page.locator('#exitSave').is_enabled()
         page.locator('#exitCancel').click()
         assert not page.locator('#exitGameDialog').evaluate('el=>el.open')

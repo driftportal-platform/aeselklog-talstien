@@ -4,7 +4,9 @@ Uses local files and simulated voice/Storage, no paid API.
 from pathlib import Path
 import re
 from playwright.sync_api import sync_playwright
+import os,tempfile
 ROOT=Path(__file__).resolve().parents[1]
+SHOTS=Path(os.environ.get('PREVIEW_DIR') or tempfile.gettempdir())
 SCRIPTS=['engine.js','board.js','actions.js','leaderboard.js','adaptive.js','profiles.js','parentreport.js','savegame.js','cpuvoice.js','voicecache.js','narration.js','actionfx.js','music.js','cardgame-engine.js','app.js','cardgame-ui.js','home-ui.js']
 
 def load(page, storage=None):
@@ -35,7 +37,7 @@ def visit(page, tag):
     board=page.locator('#chooseBoardMode').bounding_box();cards=page.locator('#openCardSetup').bounding_box()
     assert board and cards and board['height']>=85 and cards['height']>=85
     assert board['x']+board['width']<=cards['x']+1 or board['y']+board['height']<=cards['y']+1
-    page.screenshot(path=str(ROOT/f'preview_game_modes_{tag}.png'),full_page=True)
+    page.screenshot(path=str(SHOTS/f'preview_game_modes_{tag}.png'),full_page=True)
     # Switch to card setup, validate that board controls are hidden, switch back.
     page.locator('#openCardSetup').click()
     assert page.locator('#cardsSetup').is_visible() and not page.locator('#setup').is_visible()
@@ -45,7 +47,7 @@ def visit(page, tag):
     assert not page.locator('#cardRange').is_visible()
     page.locator('#cardsSetupOptions > summary').click()
     assert page.locator('#cardRange').is_visible()
-    page.screenshot(path=str(ROOT/f'preview_card_mode_{tag}.png'),full_page=True)
+    page.screenshot(path=str(SHOTS/f'preview_card_mode_{tag}.png'),full_page=True)
     page.locator('#cardsSetupBack').click()
     page.locator('#chooseBoardMode').click()
     assert page.locator('#setup').is_visible() and not page.locator('#cardsSetup').is_visible()
@@ -57,7 +59,7 @@ def visit(page, tag):
     colors=page.locator('#playerInputs .player-dot').evaluate_all('(nodes)=>nodes.map(n=>getComputedStyle(n).backgroundColor)')
     assert len(set(colors))==6,colors
     assert page.locator('#boardPlayerLimitNote').is_visible()
-    page.screenshot(path=str(ROOT/f'preview_six_players_{tag}.png'),full_page=True)
+    page.screenshot(path=str(SHOTS/f'preview_six_players_{tag}.png'),full_page=True)
     page.locator('#cpuCheck').check()
     page.locator('#voiceToggle').click()
     page.locator('#startButton').click()

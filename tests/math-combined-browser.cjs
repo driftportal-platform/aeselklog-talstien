@@ -1,0 +1,10 @@
+const assert=require('node:assert/strict'),fixture=require('./online-browser-harness.cjs');
+(async()=>{const f=await fixture({count:2});try{
+ const p=await f.contexts[0].newPage(),errors=[];p.on('pageerror',e=>errors.push(e.message));p.on('dialog',d=>d.accept());await p.goto(f.origin+'/aeselklog-talstien/index.html?spil=regneklog');
+ assert(await p.locator('#mathCombinedOptions').isHidden());await p.locator('#mathStart').click();await p.locator('#mathPass').click();assert.match(await p.locator('#mathProgress').textContent(),/2/);assert.equal(await p.locator('#mathScore').textContent(),'0 point');await p.locator('#mathNew').click();
+ await p.locator('#mathLevel').selectOption('expert');await p.locator('#mathCombined').check();assert(await p.locator('.math-operations').evaluate(el=>el.disabled));await p.locator('#mathStart').click();assert(await p.locator('#mathGame.math-combined').isVisible());assert(await p.locator('#mathVisual').isHidden());
+ await p.locator('#mathHelp').click();assert(await p.locator('#mathVisual').isHidden());
+ for(const width of [320,390,768,1280]){await p.setViewportSize({width,height:844});assert(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'overflow '+width)}
+ await p.locator('#mathPass').click();assert.equal(await p.locator('#mathScore').textContent(),'0 point');
+ await p.setViewportSize({width:390,height:844});await p.screenshot({path:f.shots+'/preview-combined-math.png',fullPage:true});assert.deepEqual(errors,[]);console.log('PASS skip, adult-only mixed option, nonvisual help and responsive layout');
+}finally{await f.close()}})().catch(e=>{console.error(e);process.exitCode=1});

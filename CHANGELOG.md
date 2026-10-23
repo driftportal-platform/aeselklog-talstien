@@ -5,6 +5,11 @@ findes i `docs/arkiv/`. Versioner uden post (fx 0.9.21, 0.9.26 og 0.9.37–0.9.4
 (v0.9.61) ligger i `docs/arkiv/CHANGELOG-v0.9.61-lang.md`.
 
 
+## v0.9.88 – Pas og kombinationsopgaver (22. oktober 2026)
+- Pas går straks videre uden point; oversprungne opgaver tælles i oversigten.
+- Voksen-niveauer kan blande plus, minus, gange, division og procent med parenteser og hele svar. Hjælpen viser regnerækkefølge og mellemregninger; oplæsning bruger regneord.
+- 68/68 Node-tests, browserkontrol af børne-/voksenforløb og smalle skærme. Worker uændret.
+
 ## v0.9.87 – svære voksenopgaver i RegneKlog (22. oktober 2026)
 - To nye niveauer: Voksen · svær og Voksen · ekstra svær. Alle fire regnearter med større heltal, flercifrede gangestykker og divisioner, der går op uden rest. Minus kan give negative svar. Opgaver skabes lokalt uden store lister af tal.
 - Kun regnestykker på voksenniveauerne, også når hjælpen er åben. Hjælp mig viser en tekstmetode i to trin: opdeling, delprodukter, negative forskelle eller første skridt i skriftlig division. Vis løsningen viser mellemregninger/kontrol. Hjælp kan læses med den valgte spillelederstemme.

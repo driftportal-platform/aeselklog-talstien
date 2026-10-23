@@ -2,7 +2,9 @@
 from pathlib import Path
 from playwright.sync_api import sync_playwright
 import re
+import os,tempfile
 ROOT=Path(__file__).parents[1]
+SHOTS=Path(os.environ.get('PREVIEW_DIR') or tempfile.gettempdir())
 
 
 def bootstrap(page,store=None):
@@ -61,7 +63,7 @@ with sync_playwright() as p:
     assert out['phase']=='result' and out['players'][0]['pos']==21,out
     page.locator('#boardExit').click();page.locator('#exitSave').click()
     assert page.locator('#resumeCard').is_visible(),'Resume card not shown after leaving'
-    page.screenshot(path=str(ROOT/'preview_resume_setup.png'))
+    page.screenshot(path=str(SHOTS/'preview_resume_setup.png'))
     current=page.evaluate('()=>window.__localItems');page.close()
 
     page=ctx.new_page();page.on('pageerror',lambda e:errors.append(str(e)+' STACK '+str(e.stack)));bootstrap(page,current)
@@ -69,7 +71,7 @@ with sync_playwright() as p:
     page.locator('#resumeGame').click();phase(page,'result')
     out=page.evaluate('(key)=>JSON.parse(window.__localItems[key])',key)
     assert [x['pos'] for x in out['players']]==[21,20]
-    page.screenshot(path=str(ROOT/'preview_resumed_board.png'))
+    page.screenshot(path=str(SHOTS/'preview_resumed_board.png'))
     page.locator('#turnPanel [data-act="next"]').click();phase(page,'move')
     assert page.locator('#turnTitle').inner_text().startswith('Spiller 2')
     current=page.evaluate('()=>window.__localItems');page.close()
@@ -103,7 +105,7 @@ with sync_playwright() as p:
     assert data['players'][0]['learning']['attempted']==1,data
     assert data['players'][0]['stats']['correct']==1,data
     assert not errors,errors
-    page.screenshot(path=str(ROOT/'preview_adaptive_game.png'))
+    page.screenshot(path=str(SHOTS/'preview_adaptive_game.png'))
     # Real UI: three correct answers should increase this child's skill by one.
     adaptive=ctx.new_page();adaptive.on('pageerror',lambda e:errors.append(str(e)))
     bootstrap(adaptive);adaptive.locator('#homeSettings').click();adaptive.locator('#voiceToggle').click()

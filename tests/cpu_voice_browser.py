@@ -5,7 +5,9 @@ from pathlib import Path
 from playwright.sync_api import sync_playwright
 from io import BytesIO
 import re, wave, base64
+import os,tempfile
 ROOT=Path(__file__).parents[1]
+SHOTS=Path(os.environ.get('PREVIEW_DIR') or tempfile.gettempdir())
 buf=BytesIO()
 with wave.open(buf,'wb') as wav:
     wav.setnchannels(1);wav.setsampwidth(2);wav.setframerate(16000)
@@ -75,6 +77,6 @@ with sync_playwright() as p:
     cpu=[x for x in page.evaluate('window.__ttsLog') if x['voice']=='glenn123']
     assert cpu, 'No spoken CPU answer over chosen AI voice'
     assert not errors,errors
-    page.screenshot(path=str(ROOT/'preview_cpu_tale.png'))
+    page.screenshot(path=str(SHOTS/'preview_cpu_tale.png'))
     print('PASS: AI narrator, CPU alternative voice, preview, saved selection, actual spoken CPU answer, CPU round')
     browser.close()

@@ -108,15 +108,15 @@
   speaker.stop();stopCount();const s=session,p=s.tasks[s.index];guideOpen=false;objects=E.isAdult(s.options.level)?null:M.create(p);
   $('mathSummary').hidden=true;$('mathTask').hidden=false;
   $('mathProgress').textContent=`Opgave ${s.index+1} af ${s.tasks.length}`;$('mathScore').textContent=s.points+' point';
-  $('mathTaskLabel').textContent=E.OPS[p.op].name+' · '+{easy:'Let',medium:'Mellem',hard:'Svær',adult:'Voksen · svær',expert:'Voksen · ekstra svær'}[s.options.level];
+  $('mathTaskLabel').textContent=(p.op==='combined'?'Kombi':E.OPS[p.op].name)+' · '+{easy:'Let',medium:'Mellem',hard:'Svær',adult:'Voksen · svær',expert:'Voksen · ekstra svær'}[s.options.level];
   $('mathEquation').textContent=E.expression(p);$('mathStory').textContent=E.story(p);
-  $('mathGame').classList.toggle('math-adult',E.isAdult(s.options.level));$('mathAnswer').maxLength=E.isAdult(s.options.level)?10:3;$('mathAnswer').pattern=E.isAdult(s.options.level)?'-?[0-9]*':'[0-9]*';$('mathSign').hidden=!E.isAdult(s.options.level);$('mathSign').disabled=false;
+  $('mathGame').classList.toggle('math-combined',p.op==='combined');$('mathGame').classList.toggle('math-adult',E.isAdult(s.options.level));$('mathAnswer').maxLength=E.isAdult(s.options.level)?10:3;$('mathAnswer').pattern=E.isAdult(s.options.level)?'-?[0-9]*':'[0-9]*';$('mathSign').hidden=!E.isAdult(s.options.level);$('mathSign').disabled=false;
   $('mathAnswer').value='';$('mathAnswer').disabled=false;$('mathCheck').disabled=false;$('mathFeedback').textContent='';$('mathFeedback').className='math-feedback';
-  $('mathHelp').hidden=false;$('mathNext').hidden=true;$('mathNext').textContent=s.index+1===s.tasks.length?'Se dine point →':'Næste opgave →';
+  $('mathHelp').hidden=false;$('mathPass').hidden=false;$('mathNext').hidden=true;$('mathNext').textContent=s.index+1===s.tasks.length?'Se dine point →':'Næste opgave →';
   renderGuide();renderVisual();$('mathEquation').focus({preventScroll:true});if(speechPrefs.autoRead)readLine(N.question(p,speechPrefs.name));
  }
- function start(){try{session=E.start({operations:[...document.querySelectorAll('[name="mathOperation"]:checked')].map(n=>n.value),level:$('mathLevel').value,mode:$('mathMode').value,length:Number($('mathLength').value)});try{localStorage.setItem(KEY,JSON.stringify({...session.options,speech:{...speechPrefs}}))}catch(_){}$('mathSetupError').textContent='';window.AeselShowView('mathGame');renderTask()}catch(e){$('mathSetupError').textContent=e.message}}
- function complete(){stopCount();const s=session;$('mathScore').textContent=s.points+' point';$('mathAnswer').disabled=true;$('mathCheck').disabled=true;$('mathSign').disabled=true;$('mathNext').hidden=false;$('mathHelp').hidden=true;renderGuide();renderVisual();$('mathNext').focus({preventScroll:true})}
+ function start(){try{session=E.start({operations:[...document.querySelectorAll('[name="mathOperation"]:checked')].map(n=>n.value),level:$('mathLevel').value,mode:$('mathMode').value,length:Number($('mathLength').value),combined:E.isAdult($('mathLevel').value)&&$('mathCombined').checked});try{localStorage.setItem(KEY,JSON.stringify({...session.options,speech:{...speechPrefs}}))}catch(_){}$('mathSetupError').textContent='';window.AeselShowView('mathGame');renderTask()}catch(e){$('mathSetupError').textContent=e.message}}
+ function complete(){stopCount();const s=session;$('mathScore').textContent=s.points+' point';$('mathAnswer').disabled=true;$('mathCheck').disabled=true;$('mathSign').disabled=true;$('mathNext').hidden=false;$('mathHelp').hidden=true;$('mathPass').hidden=true;renderGuide();renderVisual();$('mathNext').focus({preventScroll:true})}
  $('mathSign').onclick=()=>{if(!session||session.resolved||session.finished)return;const input=$('mathAnswer');input.value=input.value.startsWith('-')?input.value.slice(1):'-'+input.value;input.focus()};
  $('mathAnswerForm').onsubmit=event=>{event.preventDefault();if(!session||session.resolved||session.finished)return;speaker.stop();if(counting){stopCount();renderVisual()}const result=E.check(session,$('mathAnswer').value),feedback=$('mathFeedback');feedback.className='math-feedback';
   if(!result.valid){speaker.stop();stopCount();feedback.textContent=E.isAdult(session.options.level)?'Skriv et helt tal uden punktum eller komma. Brug ± til et negativt svar.':'Skriv et helt tal fra 0 til 100.';$('mathAnswer').focus();return}
@@ -128,19 +128,21 @@
  $('mathHintNext').onclick=()=>{speaker.stop();if(!session||session.resolved)return;E.hint(session);renderGuide();renderVisual()};
  $('mathSolution').onclick=()=>{speaker.stop();if(!session||session.resolved)return;const text=E.solution(session);$('mathFeedback').textContent='Vi fandt løsningen sammen. Denne opgave giver 0 point.';$('mathEquation').textContent=E.expression(session.tasks[session.index],true);$('mathGuideText').textContent=text;complete()};
  $('mathHideHelp').onclick=()=>{speaker.stop();guideOpen=false;renderGuide();renderVisual();if(!session.resolved)$('mathHelp').focus()};
- $('mathNext').onclick=()=>{if(!session?.resolved||session.finished)return;if(E.next(session)){renderTask();window.scrollTo({top:0,behavior:'instant'});return}
+ function advance(){if(!session?.resolved||session.finished)return;if(E.next(session)){renderTask();window.scrollTo({top:0,behavior:'instant'});return}
   speaker.stop();$('mathTask').hidden=true;$('mathSummary').hidden=false;$('mathProgress').textContent='Forløbet er færdigt';
   const count=kind=>session.records.filter(r=>r.kind===kind).length;
   $('mathSummaryText').textContent=`Du fik ${session.points} af ${session.tasks.length*10} mulige point.`;
-  $('mathSummaryDetail').textContent=`${count('own')} løst selv · ${count('helped')} løst med hjælp · ${count('shown')} løsninger gennemgået.`;
+  $('mathSummaryDetail').textContent=`${count('own')} løst selv · ${count('helped')} løst med hjælp · ${count('shown')} løsninger gennemgået · ${count('skipped')} sprunget over.`;
   $('mathAgain').focus({preventScroll:true});
  };
+ $('mathNext').onclick=advance;
+ $('mathPass').onclick=()=>{if(!session||session.resolved||session.finished)return;speaker.stop();stopCount();E.skip(session);advance()};
  const setup=()=>{$('mathSetupError').textContent='';window.AeselShowView('mathSetup')};
  $('openMathSetup').onclick=setup;$('mathStart').onclick=start;$('mathAgain').onclick=setup;
  $('mathSetupBack').onclick=()=>window.AeselShowView('menu');$('mathGameBack').onclick=()=>window.AeselShowView('menu');
  $('mathNew').onclick=()=>{if(session&&!session.finished&&!confirm('Afslut dette forløb og vælg nye opgaver?'))return;setup()};
- try{const options=JSON.parse(localStorage.getItem(KEY));if(options){if(E.LEVELS[options.level])$('mathLevel').value=options.level;if(['visual','numbers'].includes(options.mode))$('mathMode').value=options.mode;if([5,10,20].includes(options.length))$('mathLength').value=options.length;if(Array.isArray(options.operations)&&options.operations.some(op=>E.OPS[op]))document.querySelectorAll('[name="mathOperation"]').forEach(n=>{n.checked=options.operations.includes(n.value)})}}catch(_){}
+ try{const options=JSON.parse(localStorage.getItem(KEY));if(options){$('mathCombined').checked=options.combined===true;if(E.LEVELS[options.level])$('mathLevel').value=options.level;if(['visual','numbers'].includes(options.mode))$('mathMode').value=options.mode;if([5,10,20].includes(options.length))$('mathLength').value=options.length;if(Array.isArray(options.operations)&&options.operations.some(op=>E.OPS[op]))document.querySelectorAll('[name="mathOperation"]').forEach(n=>{n.checked=options.operations.includes(n.value)})}}catch(_){}
 let childMode=E.isAdult($('mathLevel').value)?'visual':$('mathMode').value;
- function syncLevel(){const adult=E.isAdult($('mathLevel').value);if(adult){if(!$('mathMode').disabled)childMode=$('mathMode').value;$('mathMode').value='numbers'}else if($('mathMode').disabled)$('mathMode').value=childMode;$('mathMode').disabled=adult;$('mathLevelNote').textContent=adult?'Voksenopgaver med større heltal. Minus kan give negative svar; division går op uden rest. Ingen billeder, men Hjælp mig forklarer metoden. Brug ± ved et negativt svar.':'Minus går aldrig under 0. Division går op uden rest. Gange og division bruger tabeller op til 10, og tallene holder sig inden for den valgte sværhedsgrad.'}
- $('mathLevel').onchange=syncLevel;syncLevel();
+ function syncLevel(){const adult=E.isAdult($('mathLevel').value);$('mathCombinedOptions').hidden=!adult;document.querySelector('.math-operations').disabled=adult&&$('mathCombined').checked;if(adult){if(!$('mathMode').disabled)childMode=$('mathMode').value;$('mathMode').value='numbers'}else if($('mathMode').disabled)$('mathMode').value=childMode;$('mathMode').disabled=adult;$('mathLevelNote').textContent=adult?'Voksenopgaver med større heltal. Minus kan give negative svar; division går op uden rest. Ingen billeder, men Hjælp mig forklarer metoden. Brug ± ved et negativt svar.':'Minus går aldrig under 0. Division går op uden rest. Gange og division bruger tabeller op til 10, og tallene holder sig inden for den valgte sværhedsgrad.'}
+ $('mathLevel').onchange=syncLevel;$('mathCombined').onchange=syncLevel;syncLevel();
 })();

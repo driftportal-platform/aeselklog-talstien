@@ -5,7 +5,9 @@ from pathlib import Path
 from playwright.sync_api import sync_playwright
 import re
 
+import os,tempfile
 ROOT=Path(__file__).parents[1]
+SHOTS=Path(os.environ.get('PREVIEW_DIR') or tempfile.gettempdir())
 JS=['engine.js','board.js','actions.js','leaderboard.js','adaptive.js','profiles.js',
     'parentreport.js','savegame.js','cpuvoice.js','voicecache.js','narration.js','actionfx.js','app.js','home-ui.js']
 
@@ -91,7 +93,7 @@ with sync_playwright() as playwright:
     assert page.locator('.parent-skill').count()==4
     assert '3 af 3 rigtige' in page.locator('#parentReportContent').inner_text()
     assert page.locator('.parent-trend').count()==1
-    page.locator('#parentReportDialog').screenshot(path=str(ROOT/'preview_parent_overview_portrait.png'))
+    page.locator('#parentReportDialog').screenshot(path=str(SHOTS/'preview_parent_overview_portrait.png'))
     page.locator('#deleteParentProfile').click()
     assert page.locator('#parentReportSelect').input_value()=='Mathilde'
     assert 'karla' not in page.evaluate('()=>window.__localItems["aeselklog-laereprofiler-v1"]')
@@ -119,6 +121,6 @@ with sync_playwright() as playwright:
     }''')
     wide.locator('#homeSettings').click();wide.locator('#openParentReport').click()
     assert wide.locator('.parent-trend').count()==1
-    wide.locator('#parentReportDialog').screenshot(path=str(ROOT/'preview_parent_overview_desktop.png'))
+    wide.locator('#parentReportDialog').screenshot(path=str(SHOTS/'preview_parent_overview_desktop.png'))
     wide.close();browser.close()
     print('PASS: local parent view, historic migration, actual learning answers, trends, selective deletion, preserved save, phone/desktop layout')

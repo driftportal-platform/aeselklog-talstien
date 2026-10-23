@@ -3,7 +3,7 @@
  'use strict';
  const words={add:'plus',subtract:'minus',multiply:'gange',divide:'divideret med'};
  const name=value=>String(value||'').replace(/\s+/g,' ').trim().slice(0,25);
- function question(p,player){const n=name(player);return `${n?n+', ':''}hvad er ${p.a} ${words[p.op]} ${p.b}?`}
+ function question(p,player){const n=name(player);return `${n?n+', ':''}hvad er ${p.op==='combined'?p.spoken:p.a+' '+words[p.op]+' '+p.b}?`}
  const replies=Object.freeze({
   right:Object.freeze([
    'Flot klaret{name}! Det er helt rigtigt.',

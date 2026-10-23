@@ -2,7 +2,9 @@
 import json,re,os
 from pathlib import Path
 from playwright.sync_api import sync_playwright,expect
+import os,tempfile
 ROOT=Path(__file__).resolve().parents[1]
+SHOTS=Path(os.environ.get('PREVIEW_DIR') or tempfile.gettempdir())
 ORDER=['engine.js','board.js','actions.js','leaderboard.js','adaptive.js','profiles.js','parentreport.js','savegame.js','cpuvoice.js','voicecache.js','narration.js','actionfx.js','music.js','cardgame-engine.js','app.js','home-ui.js','cardgame-ui.js']
 def load(page):
  html=(ROOT/'index.html').read_text(encoding='utf8').replace('<head>', '<head><base href="https://aeselklog.test/">')
@@ -79,7 +81,7 @@ def run(page,dimensions,touch=False):
  # A player can throw a card on their own open pile, even if it should fit elsewhere.
  page.locator('#cardDiscard').click() if page.locator('#cardDiscard').count() else page.locator('#cardPlayPending').click()
  assert get_state(page)['turn']==1
- page.screenshot(path=str(ROOT/f'preview_card_interaction_{dimensions}.png'),full_page=True)
+ page.screenshot(path=str(SHOTS/f'preview_card_interaction_{dimensions}.png'),full_page=True)
  assert not errors,(dimensions,errors)
  print('PASS card gesture/challenge',dimensions)
 

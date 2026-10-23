@@ -8,7 +8,7 @@ const assert=require('node:assert/strict'),fixture=require('./online-browser-har
  for(let i=0;i<3;i++)await p.locator(`#mathVisual [data-object="start-${i}"]`).click();assert(await p.locator('#mathCount').isEnabled());assert.equal(await p.locator('.math-removed').count(),3);
  await p.locator('[data-object="start-1"]').click();assert(await p.locator('#mathCount').isDisabled());await p.locator('[data-object="start-1"]').press('Enter');
  await p.locator('#mathCount').click();await p.waitForFunction(()=>document.querySelectorAll('.math-counted').length===7);await p.waitForFunction(()=>document.querySelector('#mathCount').textContent==='Tæl igen');assert.deepEqual(await p.evaluate(()=>__spoken),[1,2,3,4,5,6,7]);assert.match(await p.locator('#mathCountStatus').textContent(),/7 tilbage/);
- await p.setViewportSize({width:390,height:844});await p.screenshot({path:f.root+'/preview-interactive-minus.png',fullPage:true});
+ await p.setViewportSize({width:390,height:844});await p.screenshot({path:f.shots+'/preview-interactive-minus.png',fullPage:true});
  await p.locator('#mathAnswer').fill('7');await p.locator('#mathCheck').click();assert.equal(await p.locator('#mathScore').textContent(),'5 point');await p.locator('#mathNew').click();
  for(const [op,a,b] of [['add',2,3],['multiply',2,3],['divide',6,2]]){
   await begin(op,a,b);

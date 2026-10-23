@@ -2,7 +2,9 @@
 from pathlib import Path
 from playwright.sync_api import sync_playwright, expect
 import re, json, os
+import os,tempfile
 ROOT=Path(__file__).resolve().parents[1]
+SHOTS=Path(os.environ.get('PREVIEW_DIR') or tempfile.gettempdir())
 ORDER=['engine.js','board.js','actions.js','leaderboard.js','adaptive.js','profiles.js','parentreport.js','savegame.js','cpuvoice.js','voicecache.js','narration.js','actionfx.js','music.js','cardgame-engine.js','app.js','home-ui.js','cardgame-ui.js']
 
 def load(page):
@@ -62,7 +64,7 @@ def run(page, dimensions):
     assert page.locator('#cardsGame').is_visible()
     assert page.locator('.card-person-donkeys').nth(1).locator('img').count()==1
     assert not errors,(dimensions,errors)
-    page.screenshot(path=str(ROOT/f'preview_cards_{dimensions}.png'),full_page=True)
+    page.screenshot(path=str(SHOTS/f'preview_cards_{dimensions}.png'),full_page=True)
     page.locator('#cardsSaveHome').click()
     page.locator('#cardsDeleteSave').click()
     assert not page.locator('#cardsResume').is_visible()

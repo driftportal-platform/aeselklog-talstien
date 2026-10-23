@@ -11,5 +11,5 @@ for(const width of [390,1280]){await p.setViewportSize({width,height:900});await
  assert((await p.evaluate(()=>__read)).every(x=>x[1]==='da-en'));
  await p.locator('#talkortAutoOptions > summary').click();await p.locator('#talkortAuto').click();await p.locator('#talkortAutoOptions > summary').click();await p.locator('#talkortCountStop').click();
  await p.locator('#talkortPracticeOptions > summary').click();await p.locator('#talkortPracticeEnabled').check();assert(await p.locator('#talkortRecord').isVisible());await p.locator('#talkortPracticeOptions > summary').click();assert(await p.locator('#talkortRecord').isHidden());
- assert(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));await p.screenshot({path:f.root+'/preview_talkort_menus_'+width+'_v0976.png',fullPage:true});
+ assert(await p.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));await p.screenshot({path:f.shots+'/preview_talkort_menus_'+width+'_v0976.png',fullPage:true});
 }assert.deepEqual(f.errors,[]);console.log('PASS four closed Talkort menus, saved choices, counting/Auto continue when collapsed, external stop/status, practice and responsive layout');}finally{await f.close()}})().catch(e=>{console.error(e);process.exitCode=1});

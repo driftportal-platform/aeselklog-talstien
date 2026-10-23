@@ -1,11 +1,16 @@
 # Installation af ÆselKlog
 
-Aktuel opdatering: v0.9.87 – voksenopgaver i RegneKlog. Musik-/stemme-/tekstændringerne fra v0.9.85–86 er også med.
+Aktuel opdatering: v0.9.88 – Pas og kombinationsopgaver i RegneKlog. Musik-/stemme-/tekstændringerne fra v0.9.85–86 er også med.
 
-1. Pak ZIP-filen ud i en separat mappe. Kopiér indholdet ind i projektmappen og vælg Erstat filerne. Bevar assets, audio, music, .git og .github. Vælg ikke Opret kopier. De nye music-controls.js og math-adult.js skal med.
-2. Kør `npm.cmd test`: 67/67 skal bestå. Commit og Push origin i GitHub Desktop. Bevar `.github/workflows/test.yml`.
+1. Pak ZIP-filen ud i en separat mappe. Kopiér indholdet ind i projektmappen og vælg Erstat filerne. Bevar assets, audio, music, .git og .github. Vælg ikke Opret kopier. De nye music-controls.js, math-adult.js og math-combined.js skal med.
+2. Kør `npm.cmd test`: 68/68 skal bestå. Commit og Push origin i GitHub Desktop. Bevar `.github/workflows/test.yml`.
 3. Kun GitHub opdateres. Cloudflare/Worker er uændret.
-4. Genindlæs, luk appen helt, og åbn igen efter GitHub Pages er færdig. Kontrollér version 0.9.87.
+4. Genindlæs, luk appen helt, og åbn igen efter GitHub Pages er færdig. Kontrollér version 0.9.88.
+
+## Pas og kombinationsopgaver
+Pas springer straks til næste opgave og giver 0 point. På sidste opgave åbnes pointoversigten, som tæller de oversprungne opgaver.
+
+Vælg et voksenniveau og slå Kombinationsopgaver til. Her blandes +, minus, gange, division og procent. % betyder procent (fx 25 % af 2400), ikke restdivision. Hjælp mig forklarer regnerækkefølgen og mellemregningerne. Alle svar er hele tal.
 
 ## Voksenopgaver
 Vælg RegneKlog → Sværhedsgrad → Voksen · svær eller Voksen · ekstra svær. Vælg de ønskede regnearter og start. Opgaverne er med større heltal; minus kan give negative resultater, og division går op uden rest.
@@ -23,4 +28,4 @@ Online har alle fire spil en topknap og de samme valg under Indstillinger → Ly
 ## Hvis stemmen ikke høres
 I RegneKlog: åbn Navn og spillelederens stemme, vælg stemmen og tryk Prøv valgt stemme. Kontrollér Lyd til øverst og telefonens medielydstyrke. Opdateringen aktiverer lyden under selve trykket, før stemmen hentes. Hvis afspilningen fejler, vises en besked, og du kan prøve igen eller vælge enhedens danske stemme. AI-stemmer kræver den eksisterende stemmeforbindelse; valget bevares ved fejl.
 
-Valideret: 67/67 Node-tests, voksenopgaver og eksisterende børneforløb, Chromium med simuleret lyd/HTTP, musikprofiler og knapper i alle spil, begge onlineklienter, RegneKlog-stemme med simuleret trykbegrænsning, navigation og lokal HTTP/PWA-offline. Ikke prøvet med rigtig iPhone-lyd eller live AI-lyd. Ikke publiceret herfra.
+Valideret: 68/68 Node-tests, voksenopgaver og eksisterende børneforløb, Chromium med simuleret lyd/HTTP, musikprofiler og knapper i alle spil, begge onlineklienter, RegneKlog-stemme med simuleret trykbegrænsning, navigation og lokal HTTP/PWA-offline. Ikke prøvet med rigtig iPhone-lyd eller live AI-lyd. Ikke publiceret herfra.

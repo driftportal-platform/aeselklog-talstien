@@ -2,7 +2,9 @@
 from pathlib import Path
 from playwright.sync_api import sync_playwright
 import re
+import os,tempfile
 ROOT=Path(__file__).resolve().parents[1]
+SHOTS=Path(os.environ.get('PREVIEW_DIR') or tempfile.gettempdir())
 ORDER=['engine.js','board.js','actions.js','leaderboard.js','adaptive.js','profiles.js','parentreport.js','savegame.js','cpuvoice.js','voicecache.js','narration.js','actionfx.js','music.js','cardgame-engine.js','app.js','home-ui.js','cardgame-ui.js']
 def load(page):
  html=(ROOT/'index.html').read_text(encoding='utf-8').replace('<head>','<head><base href="https://aeselklog.test/">')
@@ -66,7 +68,7 @@ def run(page,w,h):
  page.locator('#cardsMusicToggle').click()
  assert not page.evaluate('window.AeselMusic.get().enabled')
  assert page.locator('#cardsMusicToggle').get_attribute('aria-pressed')=='false'
- page.screenshot(path=str(ROOT/f'preview_v0918_cards_{w}x{h}.png'),full_page=True)
+ page.screenshot(path=str(SHOTS/f'preview_v0918_cards_{w}x{h}.png'),full_page=True)
  assert not errors,(w,h,errors)
  print('PASS v0.9.19 compact cards + shared voice + MP3 music',w,h)
 def cpu_waits_for_voice(page):

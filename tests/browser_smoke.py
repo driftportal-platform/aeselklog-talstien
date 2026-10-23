@@ -2,7 +2,9 @@
 from pathlib import Path
 from playwright.sync_api import sync_playwright, expect
 import re, time
+import os,tempfile
 ROOT=Path(__file__).parents[1]
+SHOTS=Path(os.environ.get('PREVIEW_DIR') or tempfile.gettempdir())
 
 
 def load(page):
@@ -65,7 +67,7 @@ with sync_playwright() as p:
         assert 'Næste spiller' in page.locator('#turnPanel').inner_text()
         assert not errors, (config,errors)
         name=f'{config["width"]}x{config["height"]}'
-        page.screenshot(path=str(ROOT/f'preview_{name}.png'))
+        page.screenshot(path=str(SHOTS/f'preview_{name}.png'))
         page.close()
         print('OK child round:',name)
 
@@ -86,7 +88,7 @@ with sync_playwright() as p:
     page.wait_for_function('() => document.querySelector("#turnTitle").textContent.includes("Æsel")',timeout=7000)
     page.wait_for_function('() => {const t=document.querySelector("#boardPanelDock").dataset.phase;return t === "result" || t === "move" && !document.querySelector("#turnTitle").textContent.includes("Æsel")}',timeout=15000)
     assert not errors,errors
-    page.screenshot(path=str(ROOT/'preview_cpu.png'))
+    page.screenshot(path=str(SHOTS/'preview_cpu.png'))
     print('OK CPU dice round')
     page.close()
 
@@ -128,7 +130,7 @@ with sync_playwright() as p:
     assert rec and 'Spiller 1' in rec,rec
     assert page.locator('#turnPanel [data-act=topscore]').count()==1
     assert page.locator('#victoryFanfare').count()==1, 'Winner celebration missing'
-    page.screenshot(path=str(ROOT/'preview_win.png'))
+    page.screenshot(path=str(SHOTS/'preview_win.png'))
     page.locator('#turnPanel [data-act=topscore]').click()
     assert page.locator('#topscoreDialog').get_attribute('open') is not None, 'Topscore dialog not open'
     assert 'Spiller 1' in page.locator('#topscoreContent').inner_text()

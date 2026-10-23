@@ -35,7 +35,7 @@ const assert=require('node:assert/strict'),fixture=require('./online-browser-har
  const m=(await q.locator('#mathEquation').textContent()).match(/(\d+) ([+−×÷]) (\d+)/),a=+m[1],b=+m[3],answer=m[2]==='+'?a+b:m[2]==='−'?a-b:m[2]==='×'?a*b:a/b;
  await q.locator('#mathAnswer').fill(String(answer));await q.locator('#mathCheck').click();await q.waitForFunction(()=>document.querySelector('#mathStopRead').hidden);assert.equal(requests.at(-1).voice,'anne');assert.match(requests.at(-1).text,new RegExp('Du svarede '+answer+'.*Aya'));
  await q.locator('#mathNext').click();await q.locator('#mathHelp').click();await q.locator('#mathReadHelp').click();await q.waitForFunction(()=>document.querySelector('#mathStopRead').hidden);assert.equal(requests.at(-1).text,await q.locator('#mathGuideText').textContent());
- await q.setViewportSize({width:390,height:844});await q.screenshot({path:f.root+'/preview-math-speech.png',fullPage:true});
+ await q.setViewportSize({width:390,height:844});await q.screenshot({path:f.shots+'/preview-math-speech.png',fullPage:true});
 
  // iOS-like gesture restriction: explicit AI choice while the shared narrator is
  // set to device must unlock Web Audio synchronously, before voice-list/TTS awaits.
