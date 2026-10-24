@@ -5,6 +5,13 @@ findes i `docs/arkiv/`. Versioner uden post (fx 0.9.21, 0.9.26 og 0.9.37–0.9.4
 (v0.9.61) ligger i `docs/arkiv/CHANGELOG-v0.9.61-lang.md`.
 
 
+## v0.9.94 – voksentid og automatisk retur (24. oktober 2026)
+- Læringsterningens voksne får synlig nedtælling: 60/30/10 sekunder efter niveau eller valgt 15/30/60/90/120 sekunder i indstillinger. Børn er uden tidsfrist.
+- Tiden starter efter første oplæsning, holder pause ved skjult side og bevares ved genoptagelse. Deadline kontrolleres også ved indsendelse af svar.
+- Korrekt, forkert og udløbet tid afslutter opgaven én gang. Timeout tæller som forkert. Efter eventuel feedbackoplæsning og 1,5 sekunders resultatvisning lukkes opgaven til valgt terning/ikoner. Ingen nye forsøg på den afsluttede opgave.
+- Browsertest med kontrolleret tid: timeout, låste svar, børns manglende tidsfrist, korrekt/forkert retur, første oplæsning før nedtælling, resultatoplæsning før retur, sidepause og gemt tidsvalg. 69/69 Node-tests og lokal offlinekontrol. Lyd simuleret.
+- Denne ændring er klientkode; GitHub opdateres. Tidligere v0.9.92 kræver stadig Cloudflare, hvis ikke allerede deployet.
+
 ## v0.9.93 – dansk oplæsning i læringsterningen (24. oktober 2026)
 - Korte notationer læses som hele danske sætninger, fx Hvad er 28 minus 1?, så TTS får tydelig sproglig kontekst. Skærmens regnestykke bevares.
 - Standardvalget hedder Samme stemme som Talstien og bruger det samme valgte fortællerstemme-ID. Andre eksplicit valgte stemmer bevares.
