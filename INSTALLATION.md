@@ -1,7 +1,17 @@
 # Installation af ÆselKlog
 
-Aktuel opdatering: v0.9.91 – Talstiens læringsterning som selvstændig aktivitet. Musik-/stemme-/tekstændringerne fra v0.9.85–86 er også med.
+Aktuel opdatering: v0.9.93 – Talstiens læringsterning som selvstændig aktivitet. Musik-/stemme-/tekstændringerne fra v0.9.85–86 er også med.
 
+
+## Dansk stemme i læringsterningen
+Åbn tandhjulet → Spillelederens stemme → Samme stemme som Talstien. Det følger Talstiens valgte fortæller. Du kan også hente og vælge de samme spillelederstemmer direkte i listen. Prøv stemme afprøver dit valg.
+
+Regnestykker bliver læst som hele danske spørgsmål. Ved Enhedens danske stemme kræves en dansk stemme på telefonen; ellers vises en besked frem for at læse med en udenlandsk stemme. Vælg da en spillelederstemme eller installer dansk tale på enheden. Din valgte stemme ændres ikke automatisk.
+
+Lydrettelsen er i GitHub-filerne. Pakken indeholder også v0.9.92: Cloudflare skal genudgives, hvis den rettelse endnu ikke er deployet. Kommandoen står nedenfor.
+
+## Korrekte børneoverskrifter
+Opgavens overskrift følger indholdet på barnets niveau. Er 16 deleligt med 2 uden rest? står under Delelighed med 2. Plus-, tælle- og talgenkendelsesopgaver får også passende overskrifter. Primtal står ved egentlige primtalsspørgsmål. Dette gælder Læringsterningen og Talstien offline/online. Opdatér også Cloudflare med kommandoen nedenfor.
 
 ## Læringsterningen
 Siden viser børne-/voksenvalg og en stor terning. Tryk på terningen for samme hop-animation som Talstien. Spørgsmålet åbner i en dialog; Tilbage til terningen gør klar til næste kast.
@@ -22,7 +32,7 @@ Det er samme Worker-navn som i brugerens tidligere deployment. Bevar eksisterend
 1. Pak ZIP-filen ud i en separat mappe. Kopiér indholdet ind i projektmappen og vælg Erstat filerne. Bevar assets, audio, music, .git og .github. Vælg ikke Opret kopier. De nye music-controls.js, math-adult.js og math-combined.js skal med.
 2. Kør `npm.cmd test`: 69/69 skal bestå. Commit og Push origin i GitHub Desktop. Bevar `.github/workflows/test.yml`.
 3. Opdatér både GitHub og Cloudflare som beskrevet ovenfor.
-4. Genindlæs, luk appen helt, og åbn igen efter GitHub Pages er færdig. Kontrollér version 0.9.91.
+4. Genindlæs, luk appen helt, og åbn igen efter GitHub Pages er færdig. Kontrollér version 0.9.93.
 
 ## Svære opgaver med små tal
 Vælg et voksenniveau, slå Kombinationsopgaver til og vælg Små tal · svær regnerækkefølge. Tallene i opgaven er højst 100; svar og mellemregninger kan være større eller negative. Ekstra svær har flere trin og indlejrede parenteser. Store tal er stadig et valg, og valget gemmes.

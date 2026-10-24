@@ -5,6 +5,18 @@ findes i `docs/arkiv/`. Versioner uden post (fx 0.9.21, 0.9.26 og 0.9.37–0.9.4
 (v0.9.61) ligger i `docs/arkiv/CHANGELOG-v0.9.61-lang.md`.
 
 
+## v0.9.93 – dansk oplæsning i læringsterningen (24. oktober 2026)
+- Korte notationer læses som hele danske sætninger, fx Hvad er 28 minus 1?, så TTS får tydelig sproglig kontekst. Skærmens regnestykke bevares.
+- Standardvalget hedder Samme stemme som Talstien og bruger det samme valgte fortællerstemme-ID. Andre eksplicit valgte stemmer bevares.
+- Læringsterningen kræver dansk ved enhedsstemme/fallback: venter kort på stemmelisten og afviser udenlandsk reserve, hvis dansk ikke findes. Vis besked med mulighed for stemmevalg frem for forkert sprog. Andre modulers fallback er uændret.
+- 69/69 Node-tests og browserkontrol af det faktiske stemmeadapterkald med mock-HTTP/lyd, dansk tekst og stemme-ID, lokal dansk stemme trods engelsk standard samt manglende dansk stemme. Ingen live AI-lyd eller rigtig telefon testet.
+
+## v0.9.92 – opgavens overskrift følger børneniveauet (24. oktober 2026)
+- Fælles taskTitle vælger overskrift efter det faktiske spørgsmål: Talgenkendelse, Tæl gulerødder, Plus eller Delelighed med 2 ved de yngre børns tilpassede opgaver. Primtal bruges ved primtalsspørgsmål.
+- Læringsterningen og Talstien offline bruger samme overskrift, også ved ældre gemte spørgsmål. Onlinevisningen får den korrekte offentlige overskrift fra Worker uden at afsløre svaret.
+- Alle børnealdre 3–17/områder, browserkontrol af 7–8-åriges primtalsikon, eksisterende onlineforløb og lokal PWA-offline. 69/69 Node-tests. Lyd simuleret; ikke live telefon-/AI-lyd.
+- Cloudflare-genudgivelse kræves sammen med GitHub-opdateringen. Ikke deployet herfra.
+
 ## v0.9.91 – enkel terningsside og plus/minus i alle spil (24. oktober 2026)
 - Læringsterningen er en side til bordbrug med børne-/voksenvalg og enten stor terning eller kun ikoner. Niveau, stemme, svarmåde, musik og betjeningsvalg ligger i indstillingsdialogen. Opgaven åbnes i en særskilt dialog.
 - Terningen bruger Talstiens eksisterende diceHop-animation og skiftende symboler; reduceret bevægelse respekteres, og kast annulleres ved navigation/skjult side.

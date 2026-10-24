@@ -24,6 +24,17 @@ function numericOptions(correct,rng=Math.random,count=3,min=0){
  for(let d=1;out.length<count;d++){const x=correct+d;if(x>=min&&!out.includes(x))out.push(x);}
  return shuf(out,rng).map(String);
 }
+// Resolve the displayed topic from the actual age-adapted task, including old saves.
+function taskTitle(task){
+ if(task.tableLabel)return task.tableLabel;
+ const q=String(task.question||'');
+ if(/^Tryk på tallet /.test(q))return 'Talgenkendelse';
+ if(/^Tæl gulerødderne:/.test(q))return 'Tæl gulerødder';
+ if(/^Er \d+ deleligt med 2 uden rest/.test(q))return 'Delelighed med 2';
+ if(task.type===4&&/^Hvor meget er \d+ \+ \d+/.test(q))return 'Plus';
+ if(task.type===4&&/^Hvad er \d+ \+ \d+/.test(q))return 'Plus';
+ return TASKS[task.type-1]?.name||'Talopgave';
+}
 function pack(type,question,correct,options,help,tier,extra={}){
  if(type===1){
   let m=question.match(/^Hvilket tal kommer (efter|før) (\d+)\?$/),n,step,add;
@@ -35,7 +46,7 @@ function pack(type,question,correct,options,help,tier,extra={}){
 
  const a=options.map(String), corr=String(correct);
  if(!a.includes(corr)||new Set(a).size!==a.length) throw new Error('Ugyldigt svarforslag: '+question);
- return {type,question,correct:corr,options:a,help,tier,...extra};
+ return {type,question,correct:corr,options:a,help,tier,...extra,topicLabel:taskTitle({type,question,...extra})};
 }
 function ageTier(p){if(p.kind==='adult')return 'voksen';const age=Number(p.age);if(age<=4)return '3–4 år';if(age<=6)return '5–6 år';if(age<=8)return '7–8 år';if(age<=12)return '9–12 år';return '13–17 år';}
 function toddler(type,age,rng){
@@ -158,5 +169,5 @@ function makeChallenge({player,type,field=1,roll=1,tables='auto',forceTable=fals
  area=task.skillArea||area;
  return {...task,skillArea:area,adaptiveStep:task.adaptiveStep??forArea(area)};
 }
-return {TASKS,TIME_LIMITS,makeChallenge,tableChallenge,prime,numericOptions,ageTier};
+return {TASKS,TIME_LIMITS,taskTitle,makeChallenge,tableChallenge,prime,numericOptions,ageTier};
 });
