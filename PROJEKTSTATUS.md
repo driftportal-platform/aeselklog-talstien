@@ -1,10 +1,12 @@
 # ÆselKlog – hvor er vi nu
 
-**Version:** 0.9.90 (lokalt valideret; ikke bekræftet publiceret). Opdateres ved hver release sammen med `CHANGELOG.md`. Hold siden på én skærm pr. afsnit: ingen versionslog her (den hører til i changelogget).
+**Version:** 0.9.91 (lokalt valideret; ikke bekræftet publiceret). Opdateres ved hver release sammen med `CHANGELOG.md`. Hold siden på én skærm pr. afsnit: ingen versionslog her (den hører til i changelogget).
 
 Små/store tal i kombinationsopgaver, Pas og voksen-kombinationsopgaver er valideret lokalt: 69/69 Node-tests samt browserkontrol af navigation, hjælp, point og mobilbredder. Ikke publiceret herfra.
 
 Læringsterningen: separat side med ikon-/terningvalg, niveauer, valgte eller skrevne svar, hjælp og fælles oplæsning. 48 niveau/område-forløb samt navigation/layout og offline kontrolleret automatisk. Ingen live AI-/telefonlyd i denne omgang.
+
+v0.9.91: enkel terningsside med separat indstilling/opgavedialog. Fælles plus/minus-formuleringer i alle spil. Cloudflare-genudgivelse kræves; ikke deployet herfra.
 
 ## Hvad er det?
 Børnevenligt talspil som PWA (GitHub Pages, repo `driftportal-platform/aeselklog-talstien`). Matematik er altid frivillig; alt offline gemmes lokalt, ingen konti.
@@ -18,7 +20,7 @@ Børnevenligt talspil som PWA (GitHub Pages, repo `driftportal-platform/aeselklo
 Lyd: 500 gemte MP3-tal (fem stemmer + æselstemme), valgfri musik.
 
 ## Status
-- **Seneste ændring:** RegneKlog har to voksenniveauer med større heltal/negative minusresultater, ingen billeder, teksthjælp med mellemregninger og ±-knap. 69/69 Node-tests og browser-/PWA-prøver med simuleret lyd. Opdateringer fra v0.9.85–86 er med. Kun GitHub v0.9.90; Worker v0.9.78 er uændret.
+- **Seneste ændring:** RegneKlog har to voksenniveauer med større heltal/negative minusresultater, ingen billeder, teksthjælp med mellemregninger og ±-knap. 69/69 Node-tests og browser-/PWA-prøver med simuleret lyd. Opdateringer fra v0.9.85–86 er med. Kun GitHub v0.9.91; Worker v0.9.78 er uændret.
 - **Automatisk:** 67 af 67 Node-tests (`npm test`, kører i GitHub Actions når `.github/workflows/test.yml` er med). Simulerede Chromium-forløb for online med 3–6 enheder og flere skærmstørrelser.
 - **Brugerafprøvet 20. oktober:** online spil på mobil og pc; kortspillet fungerede med enkelte Cloudflare-udfald på 10–15 sekunder, som genoprettede sig selv. Worker /health blev efterfølgende verificeret til v0.9.68. Enhedsmodeller og alle enkeltfunktioner er ikke oplyst.
 - **Ikke bekræftet:** fysisk afprøvning af v0.9.72-talevariation og animation, rigtig mikrofon/lyd på iPhone, installeret iPhone-PWA, deling til Beskeder/Mail, live ElevenLabs, VoiceOver, familietest.

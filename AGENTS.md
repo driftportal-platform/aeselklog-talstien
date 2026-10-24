@@ -87,3 +87,5 @@ Gælder både mennesker og AI-assistenter. Hold denne fil kort og kun med regler
 ## Læringsterningen
 - ?spil=laering genbruger engine.js uden at skrive Talstiens gemte spil eller læringsprofiler. Egne valg i aeselklog-laeringsterning-v1; musik deler board-profilen.
 - Ingen tidsgrænse. Bevar begge svarmåder, ubegrænsede nye forsøg og fælles stemmeadapter med cancellation ved navigation/skjult side. Alderstilpasningen er den samme som brætspillets.
+
+- Før/efter-opgaver vises som plus/minus i fælles engine.js. Worker skal genudgives ved ændringer her. Læringsterningens bordside viser kun målgruppe og valgt betjening (terning eller ikoner), med indstillinger/opgaver i dialoger.

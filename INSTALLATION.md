@@ -1,17 +1,28 @@
 # Installation af ÆselKlog
 
-Aktuel opdatering: v0.9.90 – Talstiens læringsterning som selvstændig aktivitet. Musik-/stemme-/tekstændringerne fra v0.9.85–86 er også med.
+Aktuel opdatering: v0.9.91 – Talstiens læringsterning som selvstændig aktivitet. Musik-/stemme-/tekstændringerne fra v0.9.85–86 er også med.
 
 
 ## Læringsterningen
-På Spilmenu findes Læringsterningen lige efter Talstien. Vælg niveau under Niveau og oplæsning og derefter et ikon, eller kast læringsterningen. Du kan vælge svarforslag eller skrive hele svaret. Hjælp og Læs spørgsmålet bruger samme spillelederstemmer som de øvrige spil. Hent stemmer viser tilgængelige stemmer; Prøv stemme tester dit valg. Lyd fra øverst gælder også manuel oplæsning. Ingen tidsgrænse og mulighed for at prøve igen.
+Siden viser børne-/voksenvalg og en stor terning. Tryk på terningen for samme hop-animation som Talstien. Spørgsmålet åbner i en dialog; Tilbage til terningen gør klar til næste kast.
 
-De nye learning-engine.js, learning.js og learning.css skal med. Valgene gemmes lokalt i aeselklog-laeringsterning-v1; brætspillets gemte runde ændres ikke. Musik deler Talstiens valg.
+Tandhjulet åbner indstillinger: vælg Kun læringsikoner for at skjule terningen, eller Stor læringsterning for at skjule ikonerne. Vælg børneniveau og voksenniveau hver for sig, svarforslag/skrevet svar og oplæsning. Musik og Lyd til/fra ligger også her. Valgene gemmes lokalt.
+
+Før/efter-spørgsmål bliver nu vist som plus-/minusstykker i alle spil. Allerede gemte eller igangværende spørgsmål ændres ikke; nye spørgsmål bruger de nye formuleringer.
+
+## Cloudflare skal også opdateres denne gang
+Worker bruger den fælles engine.js. Efter filerne er erstattet, åbn PowerShell i projektets rodmappe (mappen med index.html) og kør:
+
+```powershell
+npx.cmd wrangler deploy --config worker/wrangler.jsonc --name aeselklog-online --keep-vars --var APP_ORIGIN:https://driftportal-platform.github.io
+```
+
+Det er samme Worker-navn som i brugerens tidligere deployment. Bevar eksisterende secrets og bindings. Koden er ikke deployet herfra.
 
 1. Pak ZIP-filen ud i en separat mappe. Kopiér indholdet ind i projektmappen og vælg Erstat filerne. Bevar assets, audio, music, .git og .github. Vælg ikke Opret kopier. De nye music-controls.js, math-adult.js og math-combined.js skal med.
 2. Kør `npm.cmd test`: 69/69 skal bestå. Commit og Push origin i GitHub Desktop. Bevar `.github/workflows/test.yml`.
-3. Kun GitHub opdateres. Cloudflare/Worker er uændret.
-4. Genindlæs, luk appen helt, og åbn igen efter GitHub Pages er færdig. Kontrollér version 0.9.90.
+3. Opdatér både GitHub og Cloudflare som beskrevet ovenfor.
+4. Genindlæs, luk appen helt, og åbn igen efter GitHub Pages er færdig. Kontrollér version 0.9.91.
 
 ## Svære opgaver med små tal
 Vælg et voksenniveau, slå Kombinationsopgaver til og vælg Små tal · svær regnerækkefølge. Tallene i opgaven er højst 100; svar og mellemregninger kan være større eller negative. Ekstra svær har flere trin og indlejrede parenteser. Store tal er stadig et valg, og valget gemmes.

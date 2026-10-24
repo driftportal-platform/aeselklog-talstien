@@ -22,7 +22,7 @@ if(!A||!A.validate()){document.body.textContent='ÆselKlog kan ikke starte: acti
 let SPECIAL=A.FIELDS; // Den gamle bane bruges kun til eksisterende gemninger uden eget layout.
 const SPECIAL_ICON=Object.fromEntries(Object.entries(A.DETAILS).map(([key,d])=>[key,d.icon]));
 const AF=window.AeselActionFX; // Præsentation alene; ingen ekstra AI-kald eller turændringer.
-const LEARN_DIE=['1 2 3','L / U','10 + 1','👑','> <','+ −'];
+const LEARN_DIE=['+ −','L / U','10 + 1','👑','> <','+ −'];
 const rand=(a,b)=>a+Math.floor(Math.random()*(b-a+1));
 const radio=name=>qs(`input[name="${name}"]:checked`)?.value;
 const defer=(ms)=>new Promise(ok=>setTimeout(ok,ms));
@@ -972,7 +972,7 @@ function showDie(kind){
  $('diceTitle').textContent=kind==='move'?`${p.name} · almindelig terning`:`${p.name} · læringsterning`;
  $('dicePrompt').textContent=auto?'🫏 Æslet gør klar til at kaste!':'Tryk på terningen for at slå!';
  $('dicePips').hidden=kind!=='move';$('diceLearnIcon').hidden=kind==='move';
- $('dicePips').className='dice-face face-1';$('diceLearnIcon').textContent='1 2 3';
+ $('dicePips').className='dice-face face-1';$('diceLearnIcon').textContent='+ −';
  $('diceMain').classList.remove('is-rolling');$('diceMain').disabled=auto;
  $('diceCancel').hidden=auto;
  const g=gameToken;

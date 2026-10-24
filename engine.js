@@ -7,7 +7,7 @@
 'use strict';
 const TIME_LIMITS={let:60,mellem:30,svaer:10};
 const TASKS=[
-  {name:'Før / efter',icon:'🔢',short:'1 2 3'},
+  {name:'Plus / minus',icon:'🔢',short:'+ −'},
   {name:'Lige / ulige',icon:'🔴🔵',short:'L / U'},
   {name:'Tiere / enere',icon:'🧊',short:'10 + 1'},
   {name:'Primtal',icon:'👑',short:'👑'},
@@ -25,6 +25,14 @@ function numericOptions(correct,rng=Math.random,count=3,min=0){
  return shuf(out,rng).map(String);
 }
 function pack(type,question,correct,options,help,tier,extra={}){
+ if(type===1){
+  let m=question.match(/^Hvilket tal kommer (efter|før) (\d+)\?$/),n,step,add;
+  if(m){n=Number(m[2]);step=1;add=m[1]==='efter'}
+  else if((m=question.match(/^Hvad kommer (\d+) (efter|før) (\d+)\?$/))){n=Number(m[3]);step=Number(m[1]);add=m[2]==='efter'}
+  else if((m=question.match(/^Hvad er (\d+) (mere|mindre) end (\d+)\?$/))){n=Number(m[3]);step=Number(m[1]);add=m[2]==='mere'}
+  if(n!==undefined){question=`${n} ${add?'+':'−'} ${step} = ?`;help=add?`Start med ${n}, og læg ${step} til. Tæl ${step} frem.`:`Start med ${n}, og træk ${step} fra. Tæl ${step} tilbage.`}
+ }
+
  const a=options.map(String), corr=String(correct);
  if(!a.includes(corr)||new Set(a).size!==a.length) throw new Error('Ugyldigt svarforslag: '+question);
  return {type,question,correct:corr,options:a,help,tier,...extra};

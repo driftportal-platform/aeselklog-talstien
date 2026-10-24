@@ -18,7 +18,7 @@
 <div class="shell">
   <header class="top">
     <div class="brand"><div class="logo" id="pageBrandIcon" aria-hidden="true">🫏</div><div><h1 id="pageTitle">Æsel<span class="red">Klog</span> · Talstien</h1><small>Spil, lær og grin sammen</small></div></div>
-    <div class="top-actions"><span class="pill">PRØVEVERSION 0.9.90 (hver sit spil)</span><button id="voiceToggle" class="btn soft small" type="button" aria-pressed="true">🔊 Lyd til</button></div>
+    <div class="top-actions"><span class="pill">PRØVEVERSION 0.9.91 (hver sit spil)</span><button id="voiceToggle" class="btn soft small" type="button" aria-pressed="true">🔊 Lyd til</button></div>
   </header>
 
 
@@ -231,20 +231,22 @@
   </section>
 
   <section id="learning" class="view math-page" aria-label="Talstien – læringsterningen">
-    <nav class="game-page-nav"><button id="learningBack" class="btn soft" type="button">← Spilmenu</button></nav>
-    <section class="paper learning-panel">
-      <p>Øv Talstiens seks læringsområder. Tryk på et ikon, eller lad læringsterningen vælge. Du har god tid og kan prøve igen.</p>
-      <details class="game-options" open><summary>⚙️ Niveau og oplæsning</summary><div class="options-content">
-        <div class="grid2"><label class="field">Sværhedsgrad<select id="learningLevel"><option value="child3">Begynder · 3–4 år</option><option value="child5">Let · 5–6 år</option><option value="child7" selected>Mellem · 7–8 år</option><option value="child10">Svær · 9–12 år</option><option value="child15">Udfordring · 13–17 år</option><option value="adult-let">Voksen · let</option><option value="adult-mellem">Voksen · mellem</option><option value="adult-svaer">Voksen · svær</option></select></label><label class="field">Svarmulighed<select id="learningAnswerMode"><option value="choices">Vælg et svar</option><option value="write">Skriv svaret</option></select></label></div>
+    <nav class="learning-nav"><button id="learningBack" class="btn soft" type="button">← Spilmenu</button><button id="learningSettings" class="btn soft" type="button" aria-label="Indstillinger">⚙️</button></nav>
+    <div class="learning-surface">
+      <fieldset class="learning-audience"><legend>Spørgsmål til</legend><label><input type="radio" name="learningAudience" value="child" checked> Børn</label><label><input type="radio" name="learningAudience" value="adult"> Voksne</label></fieldset>
+      <div class="learning-controls"><button id="learningRoll" class="dice-button" type="button" aria-label="Kast læringsterningen"><span id="learningDieFace" class="dice-learn-icon">+ −</span></button><p id="learningRollStatus" role="status">Tryk på terningen</p></div>
+      <div id="learningIcons" class="learning-icons" aria-label="Vælg læringsområde" hidden></div>
+    </div>
+    <dialog id="learningSettingsDialog" class="learning-dialog" aria-labelledby="learningSettingsTitle"><div class="learning-dialog-head"><h2 id="learningSettingsTitle">Indstillinger</h2><button id="learningCloseSettings" class="btn soft" type="button">✕ Luk</button></div>
+<label class="field">Vælg betjening<select id="learningControlMode"><option value="dice">Stor læringsterning</option><option value="icons">Kun læringsikoner</option></select></label><label class="field">Voksenspørgsmål · niveau<select id="learningAdultLevel"><option value="adult-let">Let</option><option value="adult-mellem" selected>Mellem</option><option value="adult-svaer">Svær</option></select></label>      <div class="options-content">
+        <div class="grid2"><label class="field">Børnespørgsmål · niveau<select id="learningLevel"><option value="child3">Begynder · 3–4 år</option><option value="child5">Let · 5–6 år</option><option value="child7" selected>Mellem · 7–8 år</option><option value="child10">Svær · 9–12 år</option><option value="child15">Udfordring · 13–17 år</option></select></label><label class="field">Svarmulighed<select id="learningAnswerMode"><option value="choices">Vælg et svar</option><option value="write">Skriv svaret</option></select></label></div>
         <p class="tiny">De yngste får enklere opgaver under ikonerne, ligesom i Talstien. Skift af niveau rydder den aktuelle opgave.</p>
         <label class="field">Spillelederens stemme<select id="learningVoice"><option value="current">Spillelederens valgte stemme</option><option value="device">Enhedens danske stemme</option></select></label>
         <div class="row"><button id="learningLoadVoices" class="btn soft" type="button">Hent stemmer</button><button id="learningTryVoice" class="btn soft" type="button">🔊 Prøv stemme</button></div>
         <label class="option"><input id="learningAutoRead" type="checkbox" checked><span>Læs nye spørgsmål og svarbeskeder op</span></label>
-      </div></details>
-      <div class="learning-controls"><button id="learningRoll" class="btn main learning-die" type="button"><img src="./assets/icons/dice.svg" alt=""><span>Kast læringsterningen</span></button><p id="learningRollStatus" role="status">Vælg et ikon, eller kast terningen.</p></div>
-      <div id="learningIcons" class="learning-icons" aria-label="Vælg læringsområde"></div>
-    </section>
-    <section id="learningTask" class="paper learning-panel" hidden aria-labelledby="learningQuestion">
+      </div><p id="learningSettingsSpeechStatus" class="tiny" role="status"></p><button id="learningSoundToggle" class="btn soft" type="button">Lyd til/fra</button><div id="learningMusicSlot"></div></dialog>
+    <dialog id="learningQuestionDialog" class="learning-dialog" aria-labelledby="learningQuestion"><div class="learning-dialog-head"><span>Opgave</span><button id="learningCloseQuestion" class="btn soft" type="button">Tilbage til terningen</button></div>
+    <section id="learningTask" class="paper learning-panel" aria-labelledby="learningQuestion">
       <p id="learningTopic" class="tiny"></p><h2 id="learningQuestion" tabindex="-1"></h2>
       <div class="row"><button id="learningRead" type="button" class="btn soft">🔊 Læs spørgsmålet</button><button id="learningStop" type="button" class="btn soft">Stop oplæsning</button></div>
       <div id="learningChoices" class="learning-choices"></div>
@@ -252,7 +254,7 @@
       <p id="learningFeedback" role="status" aria-live="polite"></p>
       <div class="row"><button id="learningHelp" class="btn soft" type="button">💡 Hjælp mig</button><button id="learningReadHelp" class="btn soft" type="button" hidden>🔊 Læs hjælpen</button><button id="learningNext" class="btn soft" type="button">Nyt spørgsmål i samme område →</button></div>
       <p id="learningHint" hidden></p>
-    </section><p id="learningSpeechStatus" class="tiny" role="status"></p>
+    </section><p id="learningSpeechStatus" class="tiny" role="status"></p></dialog>
   </section>
   <section id="mathSetup" class="view math-page" aria-label="RegneKlog – vælg opgaver">
     <nav class="game-page-nav"><button id="mathSetupBack" class="btn soft" type="button">← Spilmenu</button></nav>

@@ -12,7 +12,8 @@
   const label=document.createElement('label');label.className='field';label.textContent='Melodi';const track=document.createElement('select');track.className='music-menu-track';for(const [id,item] of Object.entries(M.TRACKS)){const o=document.createElement('option');o.value=id;o.textContent=item.label;track.append(o)}label.append(track);body.append(label);track.onchange=()=>A.update(kind,{track:track.value});
   const volLabel=document.createElement('label');volLabel.className='field';const text=document.createElement('span'),out=document.createElement('output');text.append('Musikstyrke ',out);const volume=document.createElement('input');volume.type='range';volume.min='0';volume.max='100';volume.step='1';volume.className='music-menu-volume';volLabel.append(text,volume);body.append(volLabel);volume.oninput=()=>A.update(kind,{volume:Number(volume.value)});
   const note=document.createElement('p');note.className='tiny';note.textContent='Musikken dæmpes under tale. Dit valg huskes for dette spil på denne enhed.';body.append(note);const status=document.createElement('p');status.className='tiny music-menu-status';status.setAttribute('role','status');body.append(status);details.append(body);menus.push({kind,summary,toggle,track,volume,out,status});
-  if(view==='talkort')document.querySelector('.talkort-settings-group').prepend(details);
+  if(view==='learning')document.getElementById('learningMusicSlot').append(details);
+  else if(view==='talkort')document.querySelector('.talkort-settings-group').prepend(details);
   else if(view==='game')host.querySelector('.board-toolbar').append(details);
   else if(view==='cardsGame')host.querySelector('.card-game-top').after(details);
   else if(view==='mathGame')host.querySelector('.math-speech-options').before(details);

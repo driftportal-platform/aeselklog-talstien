@@ -5,6 +5,13 @@ findes i `docs/arkiv/`. Versioner uden post (fx 0.9.21, 0.9.26 og 0.9.37–0.9.4
 (v0.9.61) ligger i `docs/arkiv/CHANGELOG-v0.9.61-lang.md`.
 
 
+## v0.9.91 – enkel terningsside og plus/minus i alle spil (24. oktober 2026)
+- Læringsterningen er en side til bordbrug med børne-/voksenvalg og enten stor terning eller kun ikoner. Niveau, stemme, svarmåde, musik og betjeningsvalg ligger i indstillingsdialogen. Opgaven åbnes i en særskilt dialog.
+- Terningen bruger Talstiens eksisterende diceHop-animation og skiftende symboler; reduceret bevægelse respekteres, og kast annulleres ved navigation/skjult side.
+- Fælles engine.js omformulerer før/efter og mere/mindre-spørgsmål til plus/minus. Gælder nye spørgsmål i Talstien offline, online og læringsterningen; allerede gemte spørgsmål bevares. Navnet er Plus / minus.
+- 69/69 Node-tests samt browserkontrol af side, ikoner, svar, oplæsning med mock, animation, gemte valg, portræt/landskab og online Talstien. PWA-offline kontrolleret lokalt. Ikke publiceret eller prøvet med rigtig telefonlyd.
+- Cloudflare Worker skal genudgives, da den indlæser den fælles spørgemotor.
+
 ## v0.9.90 – Talstiens læringsterning uden bræt (24. oktober 2026)
 - Ny knap efter Talstien i spilmenuen åbner sin egen side via ?spil=laering, med Spilmenu-retur.
 - Genbruger engine.js og de seks læringsområder: direkte ikonvalg eller animeret terningkast. Fem børneniveauer og tre voksenniveauer; ingen tidsgrænse.

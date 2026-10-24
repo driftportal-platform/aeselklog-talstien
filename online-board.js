@@ -33,7 +33,7 @@ function setFit(){root.classList.toggle('board-fit',fit);$('boardFit').textConte
 function focusPlayer(index=current?.you){if(!current?.board)return;const n=current.board.players[index].pos,t=$('tile-'+n),target=n===current.board.config.start?$('boardPlayers'):t||$('boardPlayers');if(target){const view=$('onlineBoardViewport'),r=target.getBoundingClientRect(),v=view.getBoundingClientRect();view.scrollTo({left:view.scrollLeft+r.left-v.left-view.clientWidth/2+r.width/2,top:view.scrollTop+r.top-v.top-view.clientHeight/2,behavior:matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth'})}}
 $('boardFindMe').onclick=()=>focusPlayer();$('boardFit').onclick=()=>{fit=!fit;setFit()};$('boardDieClose').onclick=()=>$('boardDieDialog').close();
 let dieRun=0;
-function paintDie(kind,n){$('boardDiePips').hidden=kind!=='move';$('boardDieLearn').hidden=kind==='move';$('boardDiePips').className='dice-face face-'+n;$('boardDieLearn').textContent=['1 2 3','L / U','10 + 1','👑','> <','+ −'][n-1]}
+function paintDie(kind,n){$('boardDiePips').hidden=kind!=='move';$('boardDieLearn').hidden=kind==='move';$('boardDiePips').className='dice-face face-'+n;$('boardDieLearn').textContent=['+ −','L / U','10 + 1','👑','> <','+ −'][n-1]}
 function openDie(kind){
  const d=$('boardDieDialog'),face=$('boardDieFace'),run=++dieRun;
  $('boardDieMascot').src=new URL('assets/images/donkey-card.webp',document.querySelector('script[src$="online-board.js"]').src).href;
@@ -48,7 +48,7 @@ function openDie(kind){
   const seq=current.board.rollSeq;await send(kind==='move'?'board-roll':'board-learn');
   if(run!==dieRun)return;face.classList.remove('is-rolling');
   if(current?.board?.rollSeq===seq){$('boardDieResult').textContent='Kastet blev ikke sendt. Prøv igen.';face.disabled=false;$('boardDieClose').disabled=false;return}
-  const value=current.board.lastRoll.value;paintDie(kind,value);$('boardDieResult').textContent=kind==='move'?`${value} øjne!`:`${value} · ${['Før / efter','Lige / ulige','Tiere / enere','Primtal','Størst / mindst','Regn'][value-1]}`;
+  const value=current.board.lastRoll.value;paintDie(kind,value);$('boardDieResult').textContent=kind==='move'?`${value} øjne!`:`${value} · ${['Plus / minus','Lige / ulige','Tiere / enere','Primtal','Størst / mindst','Regn'][value-1]}`;
   setTimeout(()=>{if(run===dieRun&&d.open)d.close();$('boardDieClose').disabled=false},900);
  };d.showModal();
 }
