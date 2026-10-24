@@ -9,7 +9,7 @@
  };
  let prefs=JSON.parse(JSON.stringify(defaults)),currentMode='board';
  try{const saved=JSON.parse(localStorage.getItem(KEY)||'{}');for(const id of ids){if(saved?.[id]&&typeof saved[id]==='object')prefs[id]={...prefs[id],...saved[id]}}}catch(_){}
- const modeFor=view=>view==='fishGame'||view==='fishSetup'?'fish':view==='rummyGame'||view==='rummySetup'?'rummy':view==='mathGame'||view==='mathSetup'?'math':view==='talkort'?'talkort':view==='cardsGame'||view==='cardsSetup'?'cards':view==='game'||view==='setup'?'board':null;
+ const modeFor=view=>view==='fishGame'||view==='fishSetup'?'fish':view==='rummyGame'||view==='rummySetup'?'rummy':view==='mathGame'||view==='mathSetup'?'math':view==='talkort'?'talkort':view==='cardsGame'||view==='cardsSetup'?'cards':view==='game'||view==='setup'||view==='learning'?'board':null;
  const save=()=>{try{localStorage.setItem(KEY,JSON.stringify(prefs))}catch(_){}};
  function applyMusic(){const p=prefs[currentMode],m=window.AeselMusic;if(!m)return;const now=m.get();if(now.track!==p.track)m.setTrack(p.track);if(now.volume!==p.volume)m.setVolume(p.volume);if(now.enabled!==(p.music===true))m.setEnabled(p.music===true)}
  function apply(){if(['board','cards','talkort'].includes(currentMode))window.AeselApplyAudioProfile?.(prefs[currentMode]);else applyMusic()

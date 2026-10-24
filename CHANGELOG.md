@@ -5,6 +5,13 @@ findes i `docs/arkiv/`. Versioner uden post (fx 0.9.21, 0.9.26 og 0.9.37–0.9.4
 (v0.9.61) ligger i `docs/arkiv/CHANGELOG-v0.9.61-lang.md`.
 
 
+## v0.9.90 – Talstiens læringsterning uden bræt (24. oktober 2026)
+- Ny knap efter Talstien i spilmenuen åbner sin egen side via ?spil=laering, med Spilmenu-retur.
+- Genbruger engine.js og de seks læringsområder: direkte ikonvalg eller animeret terningkast. Fem børneniveauer og tre voksenniveauer; ingen tidsgrænse.
+- Vælg svarforslag eller skriv svaret, prøv igen efter fejl, åbn hjælp og læs spørgsmål/hjælp/feedback med fælles spillelederstemmer. Respekterer Lyd fra og afbryder ved navigation/skjult side.
+- Egne valg gemmes separat. Talstiens gemte spil/profiler ændres ikke; musik deler Talstiens profil. Nye filer er med offline.
+- 69/69 Node-tests, 48 niveau/område-browserforløb, svar/lyd med mock, mobilbredder, eksisterende Talstiens navigation og lokal PWA-offlinekontrol. Ikke prøvet med rigtig telefonlyd eller live AI-stemme. Worker uændret.
+
 ## v0.9.89 – svære opgaver med små tal (23. oktober 2026)
 - Kombinationsopgaver har valg mellem små og store tal; valget gemmes. Små tal er højst 100 i selve opgaven, med hele, eventuelt negative svar.
 - Sværhedsgraden ligger i regnerækkefølge, procent og parenteser; ekstra svær har flere trin og indlejrede parenteser. Eksisterende store opgaver bevares.

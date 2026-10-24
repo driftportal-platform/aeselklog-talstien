@@ -674,13 +674,14 @@ $('setupEditSettings').addEventListener('click',()=>show('settings'));
 
 $('addPlayer').addEventListener('click',()=>{if(setupPlayers.length<6){setupPlayers.push({name:`Spiller ${setupPlayers.length+1}`,age:7,kind:'child',difficulty:'mellem'});renderSetupPlayers()}});
 function show(view){
+ if(view!=='learning')window.AeselLearningPause?.();
  if(view!=='mathGame')window.AeselMathPause?.();
  if(view!=='cardsGame')window.AeselCardGamePause?.();if(view!=='fishGame')window.AeselFishPause?.();if(view!=='rummyGame')window.AeselRummyPause?.();
  let openOptions=false;if(view==='settings'&&pageView==='setup'&&!applyingAddress){view='setup';openOptions=true}
  if(view==='setup'){if($('boardSettingsSlot')?.append){$('boardSettingsSlot').append($('settings'));$('settings').classList.add('embedded-settings');$('settingsBack').hidden=true}if(openOptions)$('boardSetupOptions').open=true;$('boardResume').hidden=!G.read(safeStorage())}
  else if(view==='settings'){$('settings').classList.remove('embedded-settings');$('settingsBack').hidden=false;document.querySelector('main')?.append($('settings'))}
  pageView=view;updatePageAddress(view);
- const pageBrand={mathSetup:['RegneKlog','math-game'],mathGame:['RegneKlog','math-game'],rummySetup:['500','500-game'],rummyGame:['500','500-game'],fishSetup:['TorskeKlog','fish-game'],fishGame:['TorskeKlog','fish-game'],setup:['Talstien','board-game'],game:['Talstien','board-game'],cardsSetup:['Kortspil','card-game'],cardsGame:['Kortspil','card-game'],talkort:['Talkort','numbers']}[view];
+ const pageBrand={learning:['Læringsterningen','brain'],mathSetup:['RegneKlog','math-game'],mathGame:['RegneKlog','math-game'],rummySetup:['500','500-game'],rummyGame:['500','500-game'],fishSetup:['TorskeKlog','fish-game'],fishGame:['TorskeKlog','fish-game'],setup:['Talstien','board-game'],game:['Talstien','board-game'],cardsSetup:['Kortspil','card-game'],cardsGame:['Kortspil','card-game'],talkort:['Talkort','numbers']}[view];
  if($('pageTitle')){
   if(pageBrand)$('pageTitle').textContent=pageBrand[0]==='TorskeKlog'?'TorskeKlog':'ÆselKlog - '+pageBrand[0];else $('pageTitle').innerHTML='Æsel<span class="red">Klog</span> · Talstien';
   const icon=$('pageBrandIcon');icon.replaceChildren();
@@ -690,18 +691,19 @@ function show(view){
  }
 
  $('gameChooser').hidden=view!=='menu';for(const [id,selected] of [['chooseBoardMode','setup'],['openCardSetup','cardsSetup'],['openTalkort','talkort']])$(id).setAttribute('aria-pressed',String(view===selected));
- ['home','setup','settings','game','cardsSetup','cardsGame','talkort','fishSetup','fishGame','rummySetup','rummyGame','mathSetup','mathGame'].forEach(id=>$(id).classList.toggle('active',view===id));
- document.body.classList.toggle('home-active',view==='home');
+ ['home','setup','settings','game','cardsSetup','cardsGame','talkort','fishSetup','fishGame','rummySetup','rummyGame','mathSetup','mathGame','learning'].forEach(id=>$(id).classList.toggle('active',view===id));
+ document.body.classList.toggle('home-active',view==='home');document.body.classList.toggle('learning-active',view==='learning');
  window.AeselVoice?.stop?.();
  window.AeselAudioSettings?.activate?.(view);
  window.AeselMusic?.syncView?.(view);
  window.AeselMusicControls?.activate(view);
  if(view==='setup')updateSettingsSummary();
- document.title=({mathSetup:'RegneKlog',mathGame:'RegneKlog',rummySetup:'500',rummyGame:'500',fishSetup:'TorskeKlog',fishGame:'TorskeKlog',menu:'Spilmenu',setup:'Talstien',game:'Talstien',cardsSetup:'Kortspil',cardsGame:'Kortspil',talkort:'Talkort',settings:'Indstillinger'}[view]||'Talstien')+' · ÆselKlog';
+ document.title=({learning:'Læringsterningen',mathSetup:'RegneKlog',mathGame:'RegneKlog',rummySetup:'500',rummyGame:'500',fishSetup:'TorskeKlog',fishGame:'TorskeKlog',menu:'Spilmenu',setup:'Talstien',game:'Talstien',cardsSetup:'Kortspil',cardsGame:'Kortspil',talkort:'Talkort',settings:'Indstillinger'}[view]||'Talstien')+' · ÆselKlog';
  if(view==='home')renderResumeCard();
  window.scrollTo({top:0,behavior:'instant'});
  // Flyt også tastatur- og skærmlæserfokus, når den tidligere side skjules.
  const target={
+  learning:$('pageTitle'),
   home:$('homePlay'),
   menu:document.querySelector('#gameChooser h2'),
   setup:$('pageTitle'),
@@ -1344,11 +1346,11 @@ $('turnPanel').addEventListener('click',e=>{
 });
 function updatePageAddress(view){
  if(applyingAddress||typeof history==='undefined'||!location.href)return;
- try{const url=new URL(location.href),names={mathSetup:'regneklog',mathGame:'regneklog',menu:'menu',rummySetup:'500',rummyGame:'500',fishSetup:'torskeklog',fishGame:'torskeklog',setup:'talstien',game:'talstien',cardsSetup:'kortspil',cardsGame:'kortspil',talkort:'talkort',settings:'indstillinger'};if(names[view])url.searchParams.set('spil',names[view]);else url.searchParams.delete('spil');url.hash='';if(url.href!==location.href)history.pushState(null,'',url)}catch{}
+ try{const url=new URL(location.href),names={learning:'laering',mathSetup:'regneklog',mathGame:'regneklog',menu:'menu',rummySetup:'500',rummyGame:'500',fishSetup:'torskeklog',fishGame:'torskeklog',setup:'talstien',game:'talstien',cardsSetup:'kortspil',cardsGame:'kortspil',talkort:'talkort',settings:'indstillinger'};if(names[view])url.searchParams.set('spil',names[view]);else url.searchParams.delete('spil');url.hash='';if(url.href!==location.href)history.pushState(null,'',url)}catch{}
 }
 function openGameAddress(){
  let selected;try{selected=new URL(location.href).searchParams.get('spil')}catch{return}
- const view=location.hash==='#spilmenu'?'menu':({regneklog:'mathSetup','500':'rummySetup',menu:'menu',torskeklog:'fishSetup',talstien:'setup',kortspil:'cardsSetup',talkort:'talkort',indstillinger:'settings'}[selected]||'home');
+ const view=location.hash==='#spilmenu'?'menu':({laering:'learning',regneklog:'mathSetup','500':'rummySetup',menu:'menu',torskeklog:'fishSetup',talstien:'setup',kortspil:'cardsSetup',talkort:'talkort',indstillinger:'settings'}[selected]||'home');
  if($('game').classList.contains('active')){if(config&&!busy&&!showDiceState&&safePhase())saveCheckpoint();resetAsync()}
  applyingAddress=true;show(view);applyingAddress=false;
 }

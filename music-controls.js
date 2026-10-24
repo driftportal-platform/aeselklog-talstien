@@ -2,7 +2,7 @@
 (()=>{'use strict';const $=id=>document.getElementById(id),M=window.AeselMusic,A=window.AeselAudioSettings;
  let mode=null;
  const top=document.createElement('button');top.id='topMusicToggle';top.type='button';top.className='btn soft small';top.hidden=true;top.setAttribute('aria-pressed','false');document.querySelector('.top-actions').append(top);
- const modes={board:['setup','game'],cards:['cardsSetup','cardsGame'],talkort:['talkort'],fish:['fishSetup','fishGame'],rummy:['rummySetup','rummyGame'],math:['mathSetup','mathGame']};
+ const modes={board:['setup','game','learning'],cards:['cardsSetup','cardsGame'],talkort:['talkort'],fish:['fishSetup','fishGame'],rummy:['rummySetup','rummyGame'],math:['mathSetup','mathGame']};
  const menus=[];
  for(const [kind,views] of Object.entries(modes))for(const view of views){
   const host=$(view),details=document.createElement('details');details.className='paper game-options shared-music-options';details.dataset.musicMode=kind;

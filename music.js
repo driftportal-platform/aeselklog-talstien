@@ -22,7 +22,7 @@
  const speechIds=new Set(),listeners=new Set();
  function notify(){for(const l of listeners){try{l({...prefs,view,playing:playRequested,previewing:previewTimer!==null})}catch(_){}}}
  function save(){try{global.localStorage?.setItem(KEY,JSON.stringify(prefs))}catch(_){}notify()}
- function allowed(){return prefs.enabled&&['game','cardsGame','talkort','fishGame','rummyGame','mathGame'].includes(view)&&!global.document?.hidden}
+ function allowed(){return prefs.enabled&&['game','cardsGame','talkort','fishGame','rummyGame','mathGame','learning'].includes(view)&&!global.document?.hidden}
  function volumeGain(){return Math.pow(prefs.volume/100,1.35)*.45*(speechIds.size?.22:1)}
  function updateGain(){const value=volumeGain();
   if(gain&&ctx){try{gain.gain.setTargetAtTime(value,ctx.currentTime,.12)}catch(_){gain.gain.value=value}}

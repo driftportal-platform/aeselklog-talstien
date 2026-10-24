@@ -83,3 +83,7 @@ Gælder både mennesker og AI-assistenter. Hold denne fil kort og kun med regler
 - Cachenavnet udledes af `VERSION`. Ryd kun caches med præfikset `aeselklog-talstien-`; lydcachen `aeselklog-number-audio-v1` skal bevares ved opdateringer.
 - Klon svar (`response.clone()`) før asynkron `cache.put`. Cache aldrig Cloudflare-/ElevenLabs-svar.
 - Kode hentes netværk-først med timeout (`NETWORK_TIMEOUT_MS`); billeder og lyd er cache-first. Nye filer, som appen skal bruge offline, skal føjes til `CORE`.
+
+## Læringsterningen
+- ?spil=laering genbruger engine.js uden at skrive Talstiens gemte spil eller læringsprofiler. Egne valg i aeselklog-laeringsterning-v1; musik deler board-profilen.
+- Ingen tidsgrænse. Bevar begge svarmåder, ubegrænsede nye forsøg og fælles stemmeadapter med cancellation ved navigation/skjult side. Alderstilpasningen er den samme som brætspillets.

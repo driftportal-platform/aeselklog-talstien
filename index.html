@@ -12,13 +12,13 @@
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-title" content="ÆselKlog">
   <title>ÆselKlog · Talstien</title>
-  <link rel="stylesheet" href="./styles.css"><link rel="stylesheet" href="./fish.css"><link rel="stylesheet" href="./rummy.css"><link rel="stylesheet" href="./math-game.css">
+  <link rel="stylesheet" href="./styles.css"><link rel="stylesheet" href="./fish.css"><link rel="stylesheet" href="./rummy.css"><link rel="stylesheet" href="./math-game.css"><link rel="stylesheet" href="./learning.css">
 <link rel="stylesheet" href="./game-icons.css"></head>
 <body class="home-active">
 <div class="shell">
   <header class="top">
     <div class="brand"><div class="logo" id="pageBrandIcon" aria-hidden="true">🫏</div><div><h1 id="pageTitle">Æsel<span class="red">Klog</span> · Talstien</h1><small>Spil, lær og grin sammen</small></div></div>
-    <div class="top-actions"><span class="pill">PRØVEVERSION 0.9.89 (hver sit spil)</span><button id="voiceToggle" class="btn soft small" type="button" aria-pressed="true">🔊 Lyd til</button></div>
+    <div class="top-actions"><span class="pill">PRØVEVERSION 0.9.90 (hver sit spil)</span><button id="voiceToggle" class="btn soft small" type="button" aria-pressed="true">🔊 Lyd til</button></div>
   </header>
 
 
@@ -167,6 +167,7 @@
         <span class="game-mode-copy"><strong>Talstien</strong><small>Spil med brikker på digital eller fysisk plade</small></span>
         <span class="game-mode-check" aria-hidden="true">✓</span>
       </button>
+      <button type="button" id="openLearning" class="game-mode-card"><span class="game-mode-icon" aria-hidden="true"><img class="game-icon-image" src="./assets/icons/brain.svg" alt=""></span><span class="game-mode-copy"><strong>Læringsterningen</strong><small>Talstiens læringsikoner · øv spørgsmål uden bræt</small></span><span class="game-mode-check" aria-hidden="true">➜</span></button>
       <button type="button" id="openCardSetup" class="game-mode-card game-mode-cards" aria-pressed="false">
         <span class="game-mode-icon" aria-hidden="true">🃏</span>
         <span class="game-mode-copy"><strong>Kortspil</strong><small>Spil med talkort og æselkort</small></span>
@@ -229,6 +230,30 @@
     </div>
   </section>
 
+  <section id="learning" class="view math-page" aria-label="Talstien – læringsterningen">
+    <nav class="game-page-nav"><button id="learningBack" class="btn soft" type="button">← Spilmenu</button></nav>
+    <section class="paper learning-panel">
+      <p>Øv Talstiens seks læringsområder. Tryk på et ikon, eller lad læringsterningen vælge. Du har god tid og kan prøve igen.</p>
+      <details class="game-options" open><summary>⚙️ Niveau og oplæsning</summary><div class="options-content">
+        <div class="grid2"><label class="field">Sværhedsgrad<select id="learningLevel"><option value="child3">Begynder · 3–4 år</option><option value="child5">Let · 5–6 år</option><option value="child7" selected>Mellem · 7–8 år</option><option value="child10">Svær · 9–12 år</option><option value="child15">Udfordring · 13–17 år</option><option value="adult-let">Voksen · let</option><option value="adult-mellem">Voksen · mellem</option><option value="adult-svaer">Voksen · svær</option></select></label><label class="field">Svarmulighed<select id="learningAnswerMode"><option value="choices">Vælg et svar</option><option value="write">Skriv svaret</option></select></label></div>
+        <p class="tiny">De yngste får enklere opgaver under ikonerne, ligesom i Talstien. Skift af niveau rydder den aktuelle opgave.</p>
+        <label class="field">Spillelederens stemme<select id="learningVoice"><option value="current">Spillelederens valgte stemme</option><option value="device">Enhedens danske stemme</option></select></label>
+        <div class="row"><button id="learningLoadVoices" class="btn soft" type="button">Hent stemmer</button><button id="learningTryVoice" class="btn soft" type="button">🔊 Prøv stemme</button></div>
+        <label class="option"><input id="learningAutoRead" type="checkbox" checked><span>Læs nye spørgsmål og svarbeskeder op</span></label>
+      </div></details>
+      <div class="learning-controls"><button id="learningRoll" class="btn main learning-die" type="button"><img src="./assets/icons/dice.svg" alt=""><span>Kast læringsterningen</span></button><p id="learningRollStatus" role="status">Vælg et ikon, eller kast terningen.</p></div>
+      <div id="learningIcons" class="learning-icons" aria-label="Vælg læringsområde"></div>
+    </section>
+    <section id="learningTask" class="paper learning-panel" hidden aria-labelledby="learningQuestion">
+      <p id="learningTopic" class="tiny"></p><h2 id="learningQuestion" tabindex="-1"></h2>
+      <div class="row"><button id="learningRead" type="button" class="btn soft">🔊 Læs spørgsmålet</button><button id="learningStop" type="button" class="btn soft">Stop oplæsning</button></div>
+      <div id="learningChoices" class="learning-choices"></div>
+      <form id="learningForm"><label class="field">Dit svar<input id="learningAnswer" type="text" maxlength="150" autocomplete="off"></label><button id="learningCheck" class="btn main" type="submit">Tjek svar</button><p class="tiny">Ved tekstsvar: skriv hele svaret. Du kan også skifte til Vælg et svar ovenfor.</p></form>
+      <p id="learningFeedback" role="status" aria-live="polite"></p>
+      <div class="row"><button id="learningHelp" class="btn soft" type="button">💡 Hjælp mig</button><button id="learningReadHelp" class="btn soft" type="button" hidden>🔊 Læs hjælpen</button><button id="learningNext" class="btn soft" type="button">Nyt spørgsmål i samme område →</button></div>
+      <p id="learningHint" hidden></p>
+    </section><p id="learningSpeechStatus" class="tiny" role="status"></p>
+  </section>
   <section id="mathSetup" class="view math-page" aria-label="RegneKlog – vælg opgaver">
     <nav class="game-page-nav"><button id="mathSetupBack" class="btn soft" type="button">← Spilmenu</button></nav>
     <section class="paper math-intro"><img src="./assets/icons/donkey.svg" width="64" height="64" alt=""><div><h2>Små skridt. Store regneglæder.</h2><p>Regn med billeder eller tal. Æslet hjælper dig hele vejen – i dit eget tempo.</p></div></section>
@@ -435,7 +460,7 @@
 <script src="./numbers.js" defer></script>
 <script src="./fish-engine.js" defer></script><script src="./game-rules.js" defer></script><script src="./fish-view.js" defer></script><script src="./rummy-engine.js" defer></script><script src="./rummy-view.js" defer></script><script src="./app.js" defer></script>
 <script src="./cardgame-ui.js" defer></script>
-<script src="./card-cpu.js" defer></script><script src="./local-cpu.js" defer></script><script src="./fish-local.js" defer></script><script src="./rummy-local.js" defer></script><script src="./home-ui.js" defer></script><script src="./math-adult.js" defer></script><script src="./math-combined.js" defer></script><script src="./math-engine.js" defer></script><script src="./math-objects.js" defer></script><script src="./math-speech.js" defer></script><script src="./math-game.js" defer></script>
+<script src="./card-cpu.js" defer></script><script src="./local-cpu.js" defer></script><script src="./fish-local.js" defer></script><script src="./rummy-local.js" defer></script><script src="./home-ui.js" defer></script><script src="./math-adult.js" defer></script><script src="./math-combined.js" defer></script><script src="./math-engine.js" defer></script><script src="./math-objects.js" defer></script><script src="./math-speech.js" defer></script><script src="./math-game.js" defer></script><script src="./learning-engine.js" defer></script><script src="./learning.js" defer></script>
 <script src="./offline-talkort.js" defer></script>
 <script src="./talkort-counter.js" defer></script><script src="./talkort.js" defer></script>
 <script src="./audio-settings.js" defer></script><script src="./music-controls.js" defer></script>
