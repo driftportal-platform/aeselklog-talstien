@@ -37,7 +37,7 @@ with sync_playwright() as playwright:
     page=browser.new_page(viewport={'width':390,'height':844},locale='da-DK',reduced_motion='reduce')
     errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
     bootstrap(page)
-    page.locator('#homeSettings').click()
+    page.evaluate("AeselShowView('settings')")
     page.locator('#openParentReport').click()
     assert page.locator('#parentReportDialog').is_visible()
     assert page.locator('#parentReportContent').inner_text().find('Ingen lokal læringsprofil')>=0
@@ -87,7 +87,7 @@ with sync_playwright() as playwright:
     assert '"age"' not in str(profile) and '"question"' not in str(profile)
     page.locator('#boardExit').click();page.locator('#exitSave').click()
     assert page.locator('#resumeCard').is_visible()
-    page.locator('#homeSettings').click()
+    page.evaluate("AeselShowView('settings')")
     page.locator('#openParentReport').click()
     assert page.locator('#parentReportSelect').input_value()=='Karla'
     assert page.locator('.parent-skill').count()==4
@@ -119,7 +119,7 @@ with sync_playwright() as playwright:
         liv:{name:'Liv',updatedAt:Date.now(),progress:p,seen:[],history:hist}
       }});
     }''')
-    wide.locator('#homeSettings').click();wide.locator('#openParentReport').click()
+    wide.evaluate("AeselShowView('settings')");wide.locator('#openParentReport').click()
     assert wide.locator('.parent-trend').count()==1
     wide.locator('#parentReportDialog').screenshot(path=str(SHOTS/'preview_parent_overview_desktop.png'))
     wide.close();browser.close()

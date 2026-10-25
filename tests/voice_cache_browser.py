@@ -69,7 +69,7 @@ MOCK = r'''wavBase64=>{
 def inject(page):
     page.set_content(html,wait_until='load')
     for name in JS:page.add_script_tag(content=(ROOT/name).read_text('utf-8'))
-    page.locator('#homeSettings').click()
+    page.evaluate("AeselShowView('settings')")
     page.locator('#voiceSettings summary').click()
     page.wait_for_function("()=>document.querySelector('#aiVoiceChoice').options.length>=3",timeout=6000)
 

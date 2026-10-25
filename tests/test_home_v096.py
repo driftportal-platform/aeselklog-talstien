@@ -13,7 +13,7 @@ def inline_html():
     html = (ROOT / 'index.html').read_text(encoding='utf-8')
     html=html.replace('<link rel="stylesheet" href="./styles.css">','<style>'+ (ROOT/'styles.css').read_text(encoding='utf-8')+'</style>')
     html = re.sub(r'<script\s+src="[^"]+"\s+defer></script>', '', html)
-    for filename in ['home-fullscreen.webp', 'home-hero-wide.webp', 'home-hero-mobile.webp',
+    for filename in ['home-fullscreen-v095.webp', 'home-hero-wide.webp', 'home-hero-mobile.webp',
                      'home-mascot.webp', 'home-illustration.webp', 'aeselklog-card.webp']:
         path = ROOT / filename
         if path.exists():
@@ -39,7 +39,7 @@ def load(page, html, previous=None):
 
 def check_hit_centers(page):
     return page.evaluate('''() => Object.fromEntries([
-      'homePlay','homeSettings','homeTopscore','homeAbout','resumeGame','deleteSave'
+      'homePlay','homeTopscore','homeAbout','resumeGame','deleteSave'
     ].map(id=>{
       const r=document.getElementById(id).getBoundingClientRect();
       const hit=document.elementFromPoint(r.x+r.width/2,r.y+r.height/2);
@@ -48,11 +48,8 @@ def check_hit_centers(page):
 
 
 def check_visible_menus(page):
-    for ident in ['homePlay','homeSettings','homeTopscore','homeAbout']:
+    for ident in ['homePlay','homeTopscore','homeAbout']:
         assert page.locator('#'+ident).is_visible(), f'{ident} missing'
-    page.locator('#homeSettings').click()
-    assert page.locator('#settings').is_visible()
-    page.locator('#settingsBack').click()
     page.locator('#homeTopscore').click()
     assert page.locator('#topscoreDialog').is_visible()
     page.locator('#closeTopscore').click()
@@ -60,7 +57,7 @@ def check_visible_menus(page):
     assert page.locator('#aboutDialog').is_visible()
     page.locator('#closeAbout').click()
     page.locator('#homePlay').click()
-    assert page.locator('#setup').is_visible()
+    assert page.locator('#gameChooser').is_visible()
     page.locator('#setupBack').click()
     assert page.locator('#home').is_visible()
 
@@ -73,6 +70,7 @@ with sync_playwright() as playwright:
     load(setup, html)
     assert setup.locator('#resumeCard').is_hidden(), 'Resume is shown with no saved game'
     setup.locator('#homePlay').click()
+    setup.locator('#chooseBoardMode').click()
     setup.locator('#startButton').click()
     setup.locator('#boardExit').click();setup.locator('#exitSave').click()
     assert setup.locator('#resumeCard').is_visible(), 'Save does not reveal resume action'
@@ -89,7 +87,7 @@ with sync_playwright() as playwright:
             page.on('pageerror', lambda e:errors.append(str(e)))
             load(page, html, saved if with_save else None)
             assert page.locator('#resumeCard').is_visible() is with_save
-            assert page.locator('.home-art').evaluate('el=>el.naturalWidth') == 417
+            assert page.locator('.home-art').evaluate('el=>el.naturalWidth') > 0
             if with_save:
                 hits=check_hit_centers(page)
                 assert all(hits.values()), f'{width}x{height}: intercepted buttons: {hits}'
@@ -97,16 +95,16 @@ with sync_playwright() as playwright:
                 assert box is not None and box['width'] < width*.9 and box['height'] < height*.15
                 if width < height or height > 550:
                     play=page.locator('#homePlay').bounding_box()
-                    settings=page.locator('#homeSettings').bounding_box()
+                    settings=page.locator('#homeTopscore').bounding_box()
                     # Since v0.9.9 the continue action is below all four menu buttons;
                     # the backdrop artwork stays untouched and all hit regions are separate.
-                    for menu in ['homePlay','homeSettings','homeTopscore','homeAbout']:
+                    for menu in ['homePlay','homeTopscore','homeAbout']:
                         hit=page.locator('#'+menu).bounding_box()
                         separated=box['y']>=hit['y']+hit['height'] or box['y']+box['height']<=hit['y']
                         assert separated, (width,height,'Continue overlaps '+menu,box,hit)
                 else:
                     play=page.locator('#homePlay').bounding_box()
-                    settings=page.locator('#homeSettings').bounding_box()
+                    settings=page.locator('#homeTopscore').bounding_box()
                     assert box['y'] >= play['y']+play['height'], 'Landscape resume not below Spil'
                     assert box['y']+box['height'] <= settings['y'], 'Landscape resume overlaps Settings'
             check_visible_menus(page)
@@ -119,7 +117,7 @@ with sync_playwright() as playwright:
                 assert page.locator('#resumeCard').is_hidden(), 'Delete did not hide resume'
                 assert page.evaluate('window.__localItems["aeselklog-igangvaerende-v1"]') is None
                 assert all(page.locator('#'+id).is_visible() for id in
-                           ['homePlay','homeSettings','homeTopscore','homeAbout'])
+                           ['homePlay','homeTopscore','homeAbout'])
             assert not errors, f'{width}x{height} save={with_save}: {errors}'
             print(f'PASS {width}x{height} saved={with_save}')
             page.close()

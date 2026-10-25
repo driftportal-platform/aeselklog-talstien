@@ -24,7 +24,7 @@ def bootstrap(page,items=None):
     }''',items or {})
     for f in SCRIPTS:page.add_script_tag(content=(ROOT/f).read_text('utf-8'))
 def begin(page,physical=False,cpu=False):
-    page.locator('#homeSettings').click()
+    page.evaluate("AeselShowView('settings')")
     page.locator('#range').select_option('1-20')
     page.locator('input[name="learning"][value="leg"]').check()
     page.locator('input[name="boardMode"][value="physical"]' if physical else 'input[name="boardMode"][value="digital"]').check()
@@ -47,7 +47,7 @@ with sync_playwright() as playwright:
         page=browser.new_page(viewport={'width':size[0],'height':size[1]},reduced_motion='reduce')
         errors=[];page.on('pageerror',lambda e:errors.append(str(e)))
         bootstrap(page)
-        page.locator('#homeSettings').click()
+        page.evaluate("AeselShowView('settings')")
         assert page.locator('.voice-settings>summary').evaluate('(el)=>getComputedStyle(el).listStyleType')=='none'
         page.locator('#settingsBack').click()
         begin(page,physical=True)
@@ -123,7 +123,7 @@ with sync_playwright() as playwright:
     # Adult question countdown must not run behind Exit dialog.
     adult=browser.new_page(viewport={'width':844,'height':390},reduced_motion='reduce')
     bootstrap(adult)
-    adult.locator('#homeSettings').click()
+    adult.evaluate("AeselShowView('settings')")
     adult.locator('input[name="learning"][value="udfordring"]').check()
     adult.locator('input[name="moveDice"][value="physical"]').check()
     adult.locator('input[name="learnDice"][value="physical"]').check()

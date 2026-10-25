@@ -5,6 +5,13 @@ findes i `docs/arkiv/`. Versioner uden post (fx 0.9.21, 0.9.26 og 0.9.37–0.9.4
 (v0.9.61) ligger i `docs/arkiv/CHANGELOG-v0.9.61-lang.md`.
 
 
+## v0.9.95 – enkel forside og Om hele appen (25. oktober 2026)
+- Forsidens Indstillinger er fjernet som klikområde og fra illustrationen via imagegen. Nyt home-fullscreen-v095.webp undgår at en gammel billedcache viser knappen. Originalbilledet bevares; øvrige tre menuplaceringer er bevaret.
+- Om ÆselKlog beskriver alle syv offline-spil/aktiviteter, de fire onlinevalg, læring, stemmer, musik og indstillinger inde i spillene. Dialogen ruller på små skærme, åbner fra toppen og har fast synlig lukknap samt tastaturlukning.
+- Landskabsmenu og genoptagelse af gemt spil har stadig egne klikområder. Spilindstillinger er uændrede. Ældre komponenttests åbner indstillinger direkte frem for den fjernede forsideknap.
+- 69/69 Node-tests, browsertest af tre menuknapper/Om/indstillinger/genoptagelse, seks skærmformater med/uden gemt spil og lokal PWA-offlinekontrol. Ikke testet på rigtig iPhone.
+- Kun GitHub skal opdateres for denne ændring; ingen nye Worker-ændringer.
+
 ## v0.9.94 – voksentid og automatisk retur (24. oktober 2026)
 - Læringsterningens voksne får synlig nedtælling: 60/30/10 sekunder efter niveau eller valgt 15/30/60/90/120 sekunder i indstillinger. Børn er uden tidsfrist.
 - Tiden starter efter første oplæsning, holder pause ved skjult side og bevares ved genoptagelse. Deadline kontrolleres også ved indsendelse af svar.

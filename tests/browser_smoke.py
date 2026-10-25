@@ -25,7 +25,7 @@ def load(page):
 
 
 def config_game(page, learning='udfordring', cpu=False, range_name='21-40', adult=False):
-    page.locator('#homeSettings').click()
+    page.evaluate("AeselShowView('settings')")
     page.locator('#range').select_option(range_name)
     page.locator(f'input[name="learning"][value="{learning}"]').check()
     page.locator('input[name="moveDice"][value="physical"]').check()

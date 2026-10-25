@@ -32,10 +32,10 @@ with sync_playwright() as p:
         page.on('pageerror',lambda e:errors.append(str(e)))
         load(page)
         assert page.locator('#home').is_visible(),'home missing'
-        assert page.locator('#homePlay').is_visible() and page.locator('#homeSettings').is_visible()
+        assert page.locator('#homePlay').is_visible() and page.locator('#homeSettings').count()==0
         assert not page.locator('#setup').is_visible()
         page.screenshot(path=str(SHOTS/f'preview_home_{name}.png'),full_page=True)
-        page.locator('#homeSettings').click(); assert page.locator('#settings').is_visible()
+        page.evaluate("AeselShowView('settings')"); assert page.locator('#settings').is_visible()
         page.locator('#range').select_option('21-40')
         page.locator('input[name=learning][value=leg]').check(force=True)
         page.locator('#gamePace').select_option('ekstra')

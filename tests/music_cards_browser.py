@@ -31,7 +31,7 @@ def run(page,w,h):
  load(page)
  assert page.locator('#musicEnabled').count()==1
  assert not page.locator('#musicEnabled').is_checked()
- page.locator('#homeSettings').click()
+ page.evaluate("AeselShowView('settings')")
  assert page.locator('#musicTrack option').count()==3
  page.locator('#musicTrack').select_option('march')
  page.locator('#musicVolume').fill('47')

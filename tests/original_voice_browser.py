@@ -24,7 +24,7 @@ with sync_playwright() as p:
     window.speechSynthesis.speak=u=>setTimeout(()=>u.onend?.(),10);window.speechSynthesis.cancel=()=>{};
   }''',ORIGINAL)
   for f in ORDER:page.add_script_tag(content=(ROOT/f).read_text('utf-8'))
-  page.locator('#homeSettings').click();page.locator('#voiceSettings summary').click()
+  page.evaluate("AeselShowView('settings')");page.locator('#voiceSettings summary').click()
   page.wait_for_function(f"()=>Array.from(document.querySelector('#cpuVoiceChoice').options).some(o=>o.value==='{ORIGINAL}')",timeout=8000)
   assert page.locator('#cpuVoiceChoice').input_value()=='auto'
   assert 'original' in page.locator('#cpuVoiceChoice option[value="auto"]').text_content().lower()

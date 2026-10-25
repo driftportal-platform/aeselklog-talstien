@@ -1,7 +1,12 @@
 # Installation af ÆselKlog
 
-Aktuel opdatering: v0.9.94 – Talstiens læringsterning som selvstændig aktivitet. Musik-/stemme-/tekstændringerne fra v0.9.85–86 er også med.
+Aktuel opdatering: v0.9.95 – Talstiens læringsterning som selvstændig aktivitet. Musik-/stemme-/tekstændringerne fra v0.9.85–86 er også med.
 
+
+## Ny forside og Om appen
+Forsiden har Spil, Topscore og Om spillet. Indstillinger findes inde i hvert spil. Om spillet fortæller nu om hele appen og kan rulles på små skærme.
+
+Det nye billede home-fullscreen-v095.webp skal med. Bevar det gamle billede; intet skal slettes. Erstat opdateringens filer som normalt, og kontrollér PRØVEVERSION 0.9.95 i spilmenuen efter genindlæsning. Denne ændring kræver kun GitHub.
 
 ## Voksentid og automatisk retur
 Voksen let/mellem/svær bruger som standard 60/30/10 sekunder. Under tandhjulet kan du vælge en anden tidsfrist. Tiden starter efter første oplæsning, og børn har ingen tidsfrist. Ved udløb tæller opgaven som forkert, svarene låses, og resultatet vises.
@@ -39,7 +44,7 @@ Det er samme Worker-navn som i brugerens tidligere deployment. Bevar eksisterend
 1. Pak ZIP-filen ud i en separat mappe. Kopiér indholdet ind i projektmappen og vælg Erstat filerne. Bevar assets, audio, music, .git og .github. Vælg ikke Opret kopier. De nye music-controls.js, math-adult.js og math-combined.js skal med.
 2. Kør `npm.cmd test`: 69/69 skal bestå. Commit og Push origin i GitHub Desktop. Bevar `.github/workflows/test.yml`.
 3. Opdatér både GitHub og Cloudflare som beskrevet ovenfor.
-4. Genindlæs, luk appen helt, og åbn igen efter GitHub Pages er færdig. Kontrollér version 0.9.94.
+4. Genindlæs, luk appen helt, og åbn igen efter GitHub Pages er færdig. Kontrollér version 0.9.95.
 
 ## Svære opgaver med små tal
 Vælg et voksenniveau, slå Kombinationsopgaver til og vælg Små tal · svær regnerækkefølge. Tallene i opgaven er højst 100; svar og mellemregninger kan være større eller negative. Ekstra svær har flere trin og indlejrede parenteser. Store tal er stadig et valg, og valget gemmes.

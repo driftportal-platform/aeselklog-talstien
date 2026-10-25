@@ -42,7 +42,7 @@ with sync_playwright() as p:
     }''',encoded)
     for name in ['engine.js','board.js','actions.js','leaderboard.js','adaptive.js','profiles.js','parentreport.js','savegame.js','cpuvoice.js','voicecache.js','narration.js','actionfx.js','app.js']:
         page.add_script_tag(content=(ROOT/name).read_text())
-    page.locator('#homeSettings').click()
+    page.evaluate("AeselShowView('settings')")
     page.locator('#voiceSettings summary').click()
     page.wait_for_function("()=>document.querySelector('#cpuVoiceChoice').options.length>=3",timeout=8000)
     assert page.locator('#cpuVoiceChoice').input_value()=='auto'

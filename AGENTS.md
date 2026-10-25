@@ -11,7 +11,7 @@ Gælder både mennesker og AI-assistenter. Hold denne fil kort og kun med regler
 6. `.github/` er en skjult mappe og bliver ofte droppet ved upload via GitHubs webgrænseflade. Kontrollér efter upload at `.github/workflows/test.yml` findes.
 
 ## Produktregler
-- Matematik er altid frivillig. Den godkendte forside (`home-fullscreen.webp`, `home-ui.js`) ændres ikke uden eksplicit godkendelse.
+- Matematik er altid frivillig. Den godkendte forside (`home-fullscreen-v095.webp`, `home-ui.js`) ændres ikke uden eksplicit godkendelse.
 - Talstien, Kortspil og Talkort er selvstændige. Gem aldrig det ene spils data i det andets nøgle.
 - Fysisk A3: faste specialfelter (`A.FIELDS`) skal stemme med det trykte bræt. Digitalt bræt: ny tilfældig fordeling pr. spil; gamle gemte spil beholder deres.
 - Ingen action-kædereaktioner; højst ét ekstra Gulerod-kast pr. tur.
@@ -89,3 +89,5 @@ Gælder både mennesker og AI-assistenter. Hold denne fil kort og kun med regler
 - Børn har ingen tidsfrist. Voksne har valgt tidsfrist (standard 60/30/10 sekunder). Et afgivet svar/timeout afslutter opgaven og vender automatisk tilbage efter feedback og kort resultatvisning. Bevar begge svarmåder og fælles stemmeadapter med cancellation ved navigation/skjult side. Alderstilpasningen er den samme som brætspillets.
 
 - Før/efter-opgaver vises som plus/minus i fælles engine.js. Worker skal genudgives ved ændringer her. Læringsterningens bordside viser kun målgruppe og valgt betjening (terning eller ikoner), med indstillinger/opgaver i dialoger.
+
+- Forsiden har kun Spil, Topscore og Om spillet; indstillinger findes i de enkelte spil. Om-dialogen skal beskrive hele appen og forblive læsbar/lukbar på små skærme.

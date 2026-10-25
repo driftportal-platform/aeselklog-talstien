@@ -644,7 +644,6 @@ $('deleteParentProfile').addEventListener('click',()=>{
 let pageView='home',applyingAddress=false,exitToMenu=false;
 $('homePlay').addEventListener('click',()=>show('menu'));
  $('openOnlineGame')?.addEventListener('click',()=>{location.href='./site/online.html?menu=1'});
-$('homeSettings').addEventListener('click',()=>show('settings'));
 $('homeTopscore').addEventListener('click',openTopscore);
 
 

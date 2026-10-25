@@ -36,7 +36,7 @@ def test(page,w,h,reduced=True):
     page.on('pageerror',lambda e:errors.append(str(e)))
     load(page)
     assert page.locator('#home').is_visible()
-    page.locator('#homeSettings').click()
+    page.evaluate("AeselShowView('settings')")
     page.locator('#range').select_option('1-20')
     page.locator('input[name=learning][value=leg]').check()
     page.locator('input[name=moveDice][value=physical]').check()

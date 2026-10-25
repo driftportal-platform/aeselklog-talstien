@@ -18,7 +18,7 @@
 <div class="shell">
   <header class="top">
     <div class="brand"><div class="logo" id="pageBrandIcon" aria-hidden="true">🫏</div><div><h1 id="pageTitle">Æsel<span class="red">Klog</span> · Talstien</h1><small>Spil, lær og grin sammen</small></div></div>
-    <div class="top-actions"><span class="pill">PRØVEVERSION 0.9.94 (hver sit spil)</span><button id="voiceToggle" class="btn soft small" type="button" aria-pressed="true">🔊 Lyd til</button></div>
+    <div class="top-actions"><span class="pill">PRØVEVERSION 0.9.95 (hver sit spil)</span><button id="voiceToggle" class="btn soft small" type="button" aria-pressed="true">🔊 Lyd til</button></div>
   </header>
 
 
@@ -26,10 +26,9 @@
   <main>
   <section id="home" class="view active" aria-label="ÆselKlog – forside">
     <div class="home-layout home-art-screen" aria-label="ÆselKlog – Talstien, hovedmenu">
-      <img class="home-art" src="./home-fullscreen.webp" alt="" draggable="false" />
+      <img class="home-art" src="./home-fullscreen-v095.webp" alt="" draggable="false" />
       <nav class="home-image-actions" aria-label="Hovedmenu">
         <button type="button" id="homePlay" class="home-hit home-hit-play" aria-label="Spil – klar til et nyt eventyr"><span class="visually-hidden">Spil</span></button>
-        <button type="button" id="homeSettings" class="home-hit home-hit-settings" aria-label="Indstillinger – gør spillet til jeres eget"><span class="visually-hidden">Indstillinger</span></button>
         <button type="button" id="homeTopscore" class="home-hit home-hit-scores" aria-label="Topscore – se de dygtigste"><span class="visually-hidden">Topscore</span></button>
         <button type="button" id="homeAbout" class="home-hit home-hit-about" aria-label="Om spillet – sådan spiller I"><span class="visually-hidden">Om spillet</span></button>
         <!-- Kun synlig ved lokalt gemt spil. Ligger i samme koordinatsystem som forsideillustrationen. -->
@@ -412,9 +411,23 @@
 </dialog>
 
 <dialog id="aboutDialog" aria-labelledby="aboutTitle">
-  <h2 id="aboutTitle">🫏 Om ÆselKlog · Talstien</h2>
-  <p>Spil, lær og grin sammen! Vælg spillere under <strong>Spil</strong>, og indstil talområde, terninger og læringsopgaver under <strong>Indstillinger</strong>.</p>
-  <p>Slå terningen, flyt æslet på banen, og prøv de sjove specialfelter. Matematikken er altid frivillig – man kan også bare spille for sjov.</p>
+  <div class="about-head"><h2 id="aboutTitle">🫏 Om ÆselKlog</h2><button id="closeAboutTop" type="button" class="btn soft small" aria-label="Luk Om ÆselKlog">✕ Luk</button></div>
+  <p><strong>Spil, lær og grin sammen!</strong> ÆselKlog samler talspil og øvelser til børn og voksne. Spil sammen på én enhed, øv dig alene, eller invitér familien til et onlinespil på hver sin skærm.</p>
+  <h3>Find det, I har lyst til</h3>
+  <dl class="about-games">
+    <dt>Talstien</dt><dd>Slå terningen og flyt brikker på den digitale eller fysiske spilleplade. Prøv de sjove specialfelter og vælg læringsopgaver til eller fra.</dd>
+    <dt>Læringsterningen</dt><dd>Øv Talstiens læringsområder uden bræt. Vælg børne- eller voksenspørgsmål, kast terningen eller tryk på et ikon. Voksne kan spille med tidsfrist.</dd>
+    <dt>Kortspil</dt><dd>Vend talkort, byg talrækker i midten, og hold øje med fejl, der kan give æselkort.</dd>
+    <dt>Talkort</dt><dd>Se og hør tallene 1–100 på forskellige sprog. Bladr selv, brug Auto, eller tæl op og ned med en valgfri slutbesked.</dd>
+    <dt>TorskeKlog</dt><dd>Spil Fisk med talkort: spørg efter tal, fisk i dammen og saml fire ens.</dd>
+    <dt>ÆselKlog – 500</dt><dd>Saml ens tal og talrækker med æseljokere. Spil flere runder og saml point mod 500.</dd>
+    <dt>RegneKlog</dt><dd>Øv plus, minus, gange og division med point og hjælp. Børn kan regne med gulerødder; voksne kan vælge svære opgaver med små eller store tal.</dd>
+  </dl>
+  <h3>Spil på jeres måde</h3>
+  <p>Tryk <strong>Spil</strong> på forsiden og vælg et spil. I finder spillere, sværhedsgrad, lyd, stemmer og musik inde i det valgte spil. I TorskeKlog og 500 kan I også spille mod Æslet offline.</p>
+  <p>Under <strong>Online spil</strong> kan I vælge Talstien, Kortspil, TorskeKlog eller 500. Opret et rum og invitér de andre med rumkode eller invitationslink. Onlinespil kræver internet.</p>
+  <p>Appen kan installeres på enheden. Offlinespillene kan bruges uden internet, når appens filer er hentet. Nogle stemmer kræver forbindelse; offlinespillenes gemninger og valg ligger på den enkelte enhed.</p>
+  <p>Tag jer god tid og brug hjælpen. I Talstien er læringsopgaverne frivillige – I kan også bare spille for sjov.</p>
   <button type="button" id="closeAbout" class="btn main block">Tilbage til forsiden</button>
 </dialog>
 

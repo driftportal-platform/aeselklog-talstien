@@ -25,12 +25,12 @@ try:
         page.goto(url,wait_until='load')
         page.wait_for_function('()=>navigator.serviceWorker.controller !== null',timeout=25000)
         assert page.locator('#homePlay').is_visible()
-        assert page.locator('.home-art').evaluate('e=>e.naturalWidth')==417
+        assert page.locator('.home-art').evaluate('e=>e.naturalWidth')>0
         assert page.evaluate("()=>getComputedStyle(document.body).getPropertyValue('--navy').trim()")=='#113c70', 'CSS not loaded'
         context.set_offline(True)
         page.reload(wait_until='load',timeout=15000)
         assert page.locator('#homePlay').is_visible(), 'homepage failed offline'
-        assert page.locator('.home-art').evaluate('e=>e.naturalWidth')==417, 'home image failed offline'
+        assert page.locator('.home-art').evaluate('e=>e.naturalWidth')>0, 'home image failed offline'
         assert page.evaluate("()=>getComputedStyle(document.body).getPropertyValue('--navy').trim()")=='#113c70', 'CSS failed offline'
         page.wait_for_function('()=>Boolean(window.AeselIcons)')
         loaded=page.evaluate('''async()=>{const files=AeselIcons.names.map(n=>AeselIcons.url(n));files.push(new URL('./assets/images/donkey-card.webp',location.href).href);await Promise.all(files.map(src=>new Promise((resolve,reject)=>{const i=new Image();i.onload=resolve;i.onerror=()=>reject(Error(src));i.src=src})));return files.length}''')
@@ -54,7 +54,7 @@ try:
         page.locator('#mathHintNext').click()
         assert page.locator('#mathGuideText').inner_text()
         page.goto(url,wait_until='load')
-        page.locator('#homeSettings').click()
+        page.evaluate("AeselShowView('settings')")
         assert page.locator('#settings').is_visible()
         page.locator('#settingsBack').click()
         assert page.locator('#gameChooser').is_visible()

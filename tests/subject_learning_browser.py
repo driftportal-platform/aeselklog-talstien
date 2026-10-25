@@ -34,7 +34,7 @@ with sync_playwright() as playwright:
   page=browser.new_page(viewport={'width':390,'height':844},reduced_motion='reduce')
   errors=[];page.on('pageerror',lambda error:errors.append(str(error)))
   bootstrap(page)
-  page.locator('#homeSettings').click()
+  page.evaluate("AeselShowView('settings')")
   assert page.locator('#rememberLearning').is_checked()
   page.locator('#voiceToggle').click()
   page.locator('#range').select_option('21-40')
@@ -77,7 +77,7 @@ with sync_playwright() as playwright:
   assert second['players'][0]['learning']['areas']['minus']['step']==0
   # Offline / manual wipe from the settings menu.
   page.locator('#boardExit').click();page.locator('#exitSave').click()
-  page.locator('#homeSettings').click()
+  page.evaluate("AeselShowView('settings')")
   page.locator('#clearLearningProfiles').click()
   assert page.evaluate('window.__localItems["aeselklog-laereprofiler-v1"]') is None
   page.locator('#rememberLearning').uncheck()

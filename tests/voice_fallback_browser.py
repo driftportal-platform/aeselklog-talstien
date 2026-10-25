@@ -47,7 +47,7 @@ with sync_playwright() as p:
         errors=[]
         page.on('pageerror',lambda error:errors.append(str(error)))
         load(page,offline)
-        page.locator('#homeSettings').click()
+        page.evaluate("AeselShowView('settings')")
         assert page.locator('#voiceMode').input_value()=='ai'
         page.locator('#voiceSettings summary').click()
         page.locator('#cpuVoicePreview').click()

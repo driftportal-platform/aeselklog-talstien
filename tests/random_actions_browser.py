@@ -30,7 +30,7 @@ def snapshot(page):
     return page.evaluate('''()=>JSON.parse(window.__localItems['aeselklog-igangvaerende-v1'])''')
 
 def begin(page):
-    page.locator('#homeSettings').click()
+    page.evaluate("AeselShowView('settings')")
     page.locator('#range').select_option('1-100')
     page.locator('input[name="learning"][value="leg"]').check()
     page.locator('input[name="moveDice"][value="physical"]').check()
